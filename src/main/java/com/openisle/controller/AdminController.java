@@ -4,6 +4,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
+/*
+curl http://localhost:8080/api/admin/hello \
+    -H "Authorization: Bearer <token>"
+ */
+
 /**
  * Simple admin demo endpoint.
  */
