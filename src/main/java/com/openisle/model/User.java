@@ -5,6 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import com.openisle.model.Role;
+
+/**
+ * Simple user entity with basic fields and a role.
+ */
+
 @Entity
 @Getter
 @Setter
@@ -28,4 +34,8 @@ public class User {
     private boolean verified = false;
 
     private String verificationCode;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.USER;
 }
