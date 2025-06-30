@@ -1,6 +1,7 @@
 package com.openisle.service;
 
 import com.openisle.model.User;
+import com.openisle.model.Role;
 import com.openisle.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -50,6 +51,7 @@ public class UserService {
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
+        user.setRole(Role.USER);
         user.setVerified(false);
         user.setVerificationCode(genCode());
         return userRepository.save(user);

@@ -8,6 +8,7 @@ OpenIsle 是一个基于 Spring Boot 的社区后端平台示例，提供注册�
 - **JWT 认证**：登录成功后返回 JWT，后续请求需在 `Authorization` 头中携带 `Bearer` token。
 - **邮件通知**：示例通过 Resend API 发送欢迎邮件，可根据需要修改。
 - **灵活配置**：数据库地址、账户密码、Resend API Key 等均可通过环境变量或 `application.properties` 配置。
+- **角色权限**：内置 `ADMIN` 和 `USER` 两种角色，`/api/admin/**` 接口仅管理员可访问。
 
 ## 快速开始
 
@@ -45,6 +46,7 @@ mvn spring-boot:run
   ```
 - `POST /api/auth/login`：登录，返回 `{ "token": "..." }`。
 - 其他受保护接口示例：`GET /api/hello`，需在请求头加入 `Authorization: Bearer <token>`。
+- 管理员接口示例：`GET /api/admin/hello`，需要具备 `ADMIN` 角色。
 
 ## 目录结构
 
