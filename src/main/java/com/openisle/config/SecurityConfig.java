@@ -81,12 +81,18 @@ public class SecurityConfig {
             @Override
             protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
                 String authHeader = request.getHeader("Authorization");
+                String uri = request.getRequestURI();
+
+                boolean publicGet = "GET".equalsIgnoreCase(request.getMethod()) &&
+                        (uri.startsWith("/api/posts") || uri.startsWith("/api/comments"));
+
                 if (authHeader != null && authHeader.startsWith("Bearer ")) {
                     String token = authHeader.substring(7);
                     try {
                         String username = jwtService.validateAndGetSubject(token);
                         UserDetails userDetails = userDetailsService().loadUserByUsername(username);
-                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities());
                         org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(authToken);
                     } catch (Exception e) {
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -94,12 +100,13 @@ public class SecurityConfig {
                         response.getWriter().write("{\"error\": \"Invalid or expired token\"}");
                         return;
                     }
-                } else if (!request.getRequestURI().startsWith("/api/auth")) {
+                } else if (!uri.startsWith("/api/auth") && !publicGet) {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json");
                     response.getWriter().write("{\"error\": \"Missing token\"}");
                     return;
                 }
+
                 filterChain.doFilter(request, response);
             }
         };
