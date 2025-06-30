@@ -7,7 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.web.access.AccessDeniedHandler;
+import com.openisle.config.CustomAccessDeniedHandler;
 import com.openisle.config.SecurityConfig;
 import com.openisle.service.JwtService;
 import com.openisle.repository.UserRepository;
@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(AdminController.class)
 @AutoConfigureMockMvc
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, CustomAccessDeniedHandler.class})
 class AdminControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -31,8 +31,6 @@ class AdminControllerTest {
     private JwtService jwtService;
     @MockBean
     private UserRepository userRepository;
-    @MockBean
-    private AccessDeniedHandler customAccessDeniedHandler;
 
     @Test
     void adminHelloReturnsMessage() throws Exception {
