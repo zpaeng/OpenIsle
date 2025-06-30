@@ -5,8 +5,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 /*
+✅
 curl http://localhost:8080/api/admin/hello \
-    -H "Authorization: Bearer <token>"
+    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0X3VzZXIxIiwiaWF0IjoxNzUxMjg0OTU2LCJleHAiOjE3NTEzNzEzNTZ9.u84elcDTK2gIvuS4dKJCdE21pRSgY265fvdm9m9DnCQ"
  */
 
 /**

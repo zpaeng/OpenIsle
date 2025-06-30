@@ -15,11 +15,11 @@ import java.util.stream.Collectors;
 /*
 curl -X POST http://localhost:8080/api/posts \
     -H "Content-Type: application/json" \
-    -H "Authorization: Bearer <token>" \
+    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0X3VzZXIxIiwiaWF0IjoxNzUxMjg0OTU2LCJleHAiOjE3NTEzNzEzNTZ9.u84elcDTK2gIvuS4dKJCdE21pRSgY265fvdm9m9DnCQ" \
     -d '{ "title": "First", "content": "Post" }'
 
 curl http://localhost:8080/api/posts \
-    -H "Authorization: Bearer <token>"
+    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0X3VzZXIxIiwiaWF0IjoxNzUxMjg0OTU2LCJleHAiOjE3NTEzNzEzNTZ9.u84elcDTK2gIvuS4dKJCdE21pRSgY265fvdm9m9DnCQ"
 
 curl http://localhost:8080/api/posts/1 \
     -H "Authorization: Bearer <token>"
@@ -48,6 +48,7 @@ public class PostController {
         return postService.listPosts().stream().map(this::toDto).collect(Collectors.toList());
     }
 
+    // todo(tim): 希望返回文章所有评论，包含所有评论的子评论（包含reaction）、文章本身的reaction
     private PostDto toDto(Post post) {
         PostDto dto = new PostDto();
         dto.setId(post.getId());

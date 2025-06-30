@@ -12,25 +12,26 @@ import java.util.Map;
 import java.util.Optional;
 
 /*
+✅
 curl -X POST http://localhost:8080/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
-        "username": "test_user",
-        "email":    "cjt807916@gmail.com",
+        "username": "test_user1",
+        "email":    "1216414009@qq.com",
         "password": "password"
       }'
-
+✅
 curl -X POST http://localhost:8080/api/auth/verify \
   -H "Content-Type: application/json" \
   -d '{
-        "username": "test_user",
-        "code":    "361332"
+        "username": "test_user1",
+        "code":    "451247"
       }'
-
+✅
 curl -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-        "username": "test_user",
+        "username": "test_user1",
         "password":    "password"
       }'
  */
