@@ -17,6 +17,11 @@ public class AuthController {
     private final JwtService jwtService;
     private final EmailService emailService;
 
+    /**
+     * curl -X POST http://localhost:8080/api/auth/login \
+     *   -H "Content-Type: application/json" \
+     *   -d '{"username":"test","password":"password"}'
+     */
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
         User user = userService.register(req.getUsername(), req.getEmail(), req.getPassword());
@@ -25,6 +30,11 @@ public class AuthController {
         return ResponseEntity.ok(new JwtResponse(token));
     }
 
+    /**
+     * curl -X POST http://localhost:8080/api/auth/login \
+     *   -H "Content-Type: application/json" \
+     *   -d '{"username":"test","password":"password"}'
+     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest req) {
         return userService.authenticate(req.getUsername(), req.getPassword())
