@@ -12,6 +12,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/*
+curl -X POST http://localhost:8080/api/posts \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer <token>" \
+    -d '{ "title": "First", "content": "Post" }'
+
+curl http://localhost:8080/api/posts \
+    -H "Authorization: Bearer <token>"
+
+curl http://localhost:8080/api/posts/1 \
+    -H "Authorization: Bearer <token>"
+ */
+
 @RestController
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
