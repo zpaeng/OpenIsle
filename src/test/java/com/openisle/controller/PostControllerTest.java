@@ -3,6 +3,8 @@ package com.openisle.controller;
 import com.openisle.model.Post;
 import com.openisle.model.User;
 import com.openisle.service.PostService;
+import com.openisle.service.CommentService;
+import com.openisle.service.ReactionService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,10 @@ class PostControllerTest {
 
     @MockBean
     private PostService postService;
+    @MockBean
+    private CommentService commentService;
+    @MockBean
+    private ReactionService reactionService;
 
     @Test
     void createAndGetPost() throws Exception {
