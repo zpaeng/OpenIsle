@@ -30,7 +30,7 @@ public class EmailService {
         body.put("to", to);
         body.put("subject", subject);
         body.put("text", text);
-        body.put("from", "cjt807916@gmail.com"); // todo(tim): use config
+        body.put("from", "openisle <noreply@chenjiating.com>"); // todo(tim): use config
 
         HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
         restTemplate.exchange(url, HttpMethod.POST, entity, String.class);

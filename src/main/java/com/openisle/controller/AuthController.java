@@ -9,6 +9,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
+import java.util.Optional;
+
+/*
+curl -X POST http://localhost:8080/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+        "username": "test_user",
+        "email":    "cjt807916@gmail.com",
+        "password": "password"
+      }'
+
+
+
+ */
 
 @RestController
 @RequestMapping("/api/auth")
@@ -18,11 +32,6 @@ public class AuthController {
     private final JwtService jwtService;
     private final EmailService emailService;
 
-    /**
-     * curl -X POST http://localhost:8080/api/auth/login \
-     *   -H "Content-Type: application/json" \
-     *   -d '{"username":"test","password":"password"}'
-     */
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
         User user = userService.register(req.getUsername(), req.getEmail(), req.getPassword());
@@ -39,16 +48,14 @@ public class AuthController {
         return ResponseEntity.badRequest().body(Map.of("error", "Invalid verification code"));
     }
 
-    /**
-     * curl -X POST http://localhost:8080/api/auth/login \
-     *   -H "Content-Type: application/json" \
-     *   -d '{"username":"test","password":"password"}'
-     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest req) {
-        return userService.authenticate(req.getUsername(), req.getPassword())
-                .map(user -> ResponseEntity.ok(new JwtResponse(jwtService.generateToken(user.getUsername()))))
-                .orElse(ResponseEntity.status(401).body(Map.of("error", "Invalid credentials or user not verified")));
+        Optional<User> user = userService.authenticate(req.getUsername(), req.getPassword());
+        if (user.isPresent()) {
+            return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("error", "\"Invalid credentials or user not verified"));
+        }
     }
 
     @Data
@@ -68,10 +75,5 @@ public class AuthController {
     private static class VerifyRequest {
         private String username;
         private String code;
-    }
-
-    @Data
-    private static class JwtResponse {
-        private final String token;
     }
 }
