@@ -46,4 +46,16 @@ public class ReactionService {
         reaction.setType(type);
         return reactionRepository.save(reaction);
     }
+
+    public java.util.List<Reaction> getReactionsForPost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+        return reactionRepository.findByPost(post);
+    }
+
+    public java.util.List<Reaction> getReactionsForComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+        return reactionRepository.findByComment(comment);
+    }
 }
