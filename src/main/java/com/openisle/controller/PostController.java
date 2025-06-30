@@ -54,7 +54,6 @@ public class PostController {
         return postService.listPosts().stream().map(this::toDto).collect(Collectors.toList());
     }
 
-    // todo(tim): 希望返回文章所有评论，包含所有评论的子评论（包含reaction）、文章本身的reaction
     private PostDto toDto(Post post) {
         PostDto dto = new PostDto();
         dto.setId(post.getId());
