@@ -9,6 +9,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+/*
+curl -X POST http://localhost:8080/api/posts/1/reactions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer <token>" \
+    -d '{ "type": "LIKE" }'
+
+curl -X POST http://localhost:8080/api/comments/1/reactions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer <token>" \
+    -d '{ "type": "LIKE" }'
+ */
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
