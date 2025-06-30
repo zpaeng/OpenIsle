@@ -17,17 +17,46 @@ public class UserService {
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public User register(String username, String email, String password) {
-        if (userRepository.findByUsername(username).isPresent() || userRepository.findByEmail(email).isPresent()) {
-            throw new IllegalStateException("User already exists");
+        // ── 先按用户名查 ──────────────────────────────────────────
+        Optional<User> byUsername = userRepository.findByUsername(username);
+        if (byUsername.isPresent()) {
+            User u = byUsername.get();
+            if (u.isVerified()) {                           // 已验证 → 直接拒绝
+                throw new IllegalStateException("User name already exists");
+            }
+            // 未验证 → 允许“重注册”：覆盖必要字段并重新发验证码
+            u.setEmail(email);                              // 若不允许改邮箱可去掉
+            u.setPassword(passwordEncoder.encode(password));
+            u.setVerificationCode(genCode());
+            return userRepository.save(u);
         }
+
+        // ── 再按邮箱查 ───────────────────────────────────────────
+        Optional<User> byEmail = userRepository.findByEmail(email);
+        if (byEmail.isPresent()) {
+            User u = byEmail.get();
+            if (u.isVerified()) {                           // 已验证 → 直接拒绝
+                throw new IllegalStateException("User email already exists");
+            }
+            // 未验证 → 允许“重注册”
+            u.setUsername(username);                        // 若不允许改用户名可去掉
+            u.setPassword(passwordEncoder.encode(password));
+            u.setVerificationCode(genCode());
+            return userRepository.save(u);
+        }
+
+        // ── 完全新用户 ───────────────────────────────────────────
         User user = new User();
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
         user.setVerified(false);
-        String code = String.format("%06d", new Random().nextInt(1000000));
-        user.setVerificationCode(code);
+        user.setVerificationCode(genCode());
         return userRepository.save(user);
+    }
+
+    private String genCode() {
+        return String.format("%06d", new Random().nextInt(1000000));
     }
 
     public boolean verifyCode(String username, String code) {

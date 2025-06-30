@@ -20,8 +20,19 @@ curl -X POST http://localhost:8080/api/auth/register \
         "password": "password"
       }'
 
+curl -X POST http://localhost:8080/api/auth/verify \
+  -H "Content-Type: application/json" \
+  -d '{
+        "username": "test_user",
+        "code":    "361332"
+      }'
 
-
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+        "username": "test_user",
+        "password":    "password"
+      }'
  */
 
 @RestController
@@ -54,7 +65,7 @@ public class AuthController {
         if (user.isPresent()) {
             return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
         } else {
-            return ResponseEntity.badRequest().body(Map.of("error", "\"Invalid credentials or user not verified"));
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid credentials or user not verified"));
         }
     }
 

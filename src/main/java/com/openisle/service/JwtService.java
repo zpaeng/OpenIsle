@@ -3,6 +3,8 @@ package com.openisle.service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,7 +14,6 @@ import java.util.Date;
 
 @Service
 public class JwtService {
-
     @Value("${app.jwt.secret}")
     private String secret;
 
@@ -20,7 +21,8 @@ public class JwtService {
     private long expiration;
 
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes());
+        byte[] keyBytes = Encoders.BASE64.encode(secret.getBytes()).getBytes();
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String generateToken(String subject) {
@@ -30,7 +32,7 @@ public class JwtService {
                 .setSubject(subject)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .signWith(getSigningKey())
                 .compact();
     }
 
