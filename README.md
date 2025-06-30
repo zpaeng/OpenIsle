@@ -9,6 +9,7 @@ OpenIsle 是一个基于 Spring Boot 的社区后端平台示例，提供注册�
 - **邮件通知**：示例通过 Resend API 发送欢迎邮件，可根据需要修改。
 - **灵活配置**：数据库地址、账户密码、Resend API Key 等均可通过环境变量或 `application.properties` 配置。
 - **角色权限**：内置 `ADMIN` 和 `USER` 两种角色，`/api/admin/**` 接口仅管理员可访问。
+- **文章/评论**：支持发表文章并在文章下发布评论，评论可多级回复。
 
 ## 快速开始
 
