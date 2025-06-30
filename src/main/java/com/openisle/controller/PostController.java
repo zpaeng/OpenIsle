@@ -39,7 +39,7 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<PostDto> createPost(@RequestBody PostRequest req, Authentication auth) {
-        Post post = postService.createPost(auth.getName(), req.getTitle(), req.getContent());
+        Post post = postService.createPost(auth.getName(), req.getCategoryId(), req.getTitle(), req.getContent());
         return ResponseEntity.ok(toDto(post));
     }
 
@@ -61,6 +61,7 @@ public class PostController {
         dto.setContent(post.getContent());
         dto.setCreatedAt(post.getCreatedAt());
         dto.setAuthor(post.getAuthor().getUsername());
+        dto.setCategory(post.getCategory().getName());
         dto.setViews(post.getViews());
 
         List<ReactionDto> reactions = reactionService.getReactionsForPost(post.getId())
@@ -119,6 +120,7 @@ public class PostController {
 
     @Data
     private static class PostRequest {
+        private Long categoryId;
         private String title;
         private String content;
     }
@@ -130,6 +132,7 @@ public class PostController {
         private String content;
         private LocalDateTime createdAt;
         private String author;
+        private String category;
         private long views;
         private List<CommentDto> comments;
         private List<ReactionDto> reactions;

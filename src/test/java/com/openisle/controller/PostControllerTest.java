@@ -2,6 +2,7 @@ package com.openisle.controller;
 
 import com.openisle.model.Post;
 import com.openisle.model.User;
+import com.openisle.model.Category;
 import com.openisle.service.PostService;
 import com.openisle.service.CommentService;
 import com.openisle.service.ReactionService;
@@ -41,18 +42,22 @@ class PostControllerTest {
     void createAndGetPost() throws Exception {
         User user = new User();
         user.setUsername("alice");
+        Category cat = new Category();
+        cat.setId(1L);
+        cat.setName("tech");
         Post post = new Post();
         post.setId(1L);
         post.setTitle("t");
         post.setContent("c");
         post.setCreatedAt(LocalDateTime.now());
         post.setAuthor(user);
-        Mockito.when(postService.createPost(eq("alice"), eq("t"), eq("c"))).thenReturn(post);
+        post.setCategory(cat);
+        Mockito.when(postService.createPost(eq("alice"), eq(1L), eq("t"), eq("c"))).thenReturn(post);
         Mockito.when(postService.getPost(1L)).thenReturn(post);
 
         mockMvc.perform(post("/api/posts")
                         .contentType("application/json")
-                        .content("{\"title\":\"t\",\"content\":\"c\"}")
+                        .content("{\"title\":\"t\",\"content\":\"c\",\"categoryId\":1}")
                         .principal(new UsernamePasswordAuthenticationToken("alice", "p")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("t"));
@@ -66,12 +71,16 @@ class PostControllerTest {
     void listPosts() throws Exception {
         User user = new User();
         user.setUsername("bob");
+        Category cat = new Category();
+        cat.setId(1L);
+        cat.setName("tech");
         Post post = new Post();
         post.setId(2L);
         post.setTitle("hello");
         post.setContent("world");
         post.setCreatedAt(LocalDateTime.now());
         post.setAuthor(user);
+        post.setCategory(cat);
         Mockito.when(postService.listPosts()).thenReturn(List.of(post));
 
         mockMvc.perform(get("/api/posts"))
