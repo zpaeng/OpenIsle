@@ -30,6 +30,10 @@ public class Post {
     @JoinColumn(name = "author_id")
     private User author;
 
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     @Column(nullable = false)
     private long views = 0;
 

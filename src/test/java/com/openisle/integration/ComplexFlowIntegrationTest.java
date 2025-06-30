@@ -1,7 +1,9 @@
 package com.openisle.integration;
 
 import com.openisle.model.User;
+import com.openisle.model.Category;
 import com.openisle.repository.UserRepository;
+import com.openisle.repository.CategoryRepository;
 import com.openisle.service.EmailService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ class ComplexFlowIntegrationTest {
 
     @Autowired
     private UserRepository users;
+
+    @Autowired
+    private CategoryRepository categories;
 
     @MockBean
     private EmailService emailService;
@@ -52,8 +57,12 @@ class ComplexFlowIntegrationTest {
         String t1 = registerAndLogin("alice", "a@example.com");
         String t2 = registerAndLogin("bob", "b@example.com");
 
+        Category cat = new Category();
+        cat.setName("general");
+        cat = categories.save(cat);
+
         ResponseEntity<Map> postResp = postJson("/api/posts",
-                Map.of("title", "Hello", "content", "World"), t1);
+                Map.of("title", "Hello", "content", "World", "categoryId", cat.getId()), t1);
         Long postId = ((Number)postResp.getBody().get("id")).longValue();
 
         ResponseEntity<Map> c1Resp = postJson("/api/posts/" + postId + "/comments",
@@ -87,8 +96,12 @@ class ComplexFlowIntegrationTest {
         String t1 = registerAndLogin("carol", "c@example.com");
         String t2 = registerAndLogin("dave", "d@example.com");
 
+        Category cat = new Category();
+        cat.setName("general");
+        cat = categories.save(cat);
+
         ResponseEntity<Map> postResp = postJson("/api/posts",
-                Map.of("title", "React", "content", "Test"), t1);
+                Map.of("title", "React", "content", "Test", "categoryId", cat.getId()), t1);
         Long postId = ((Number)postResp.getBody().get("id")).longValue();
 
         postJson("/api/posts/" + postId + "/reactions",
