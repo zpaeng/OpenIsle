@@ -49,7 +49,7 @@ class UserControllerTest {
     @Test
     void uploadAvatar() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "a.png", MediaType.IMAGE_PNG_VALUE, "img".getBytes());
-        Mockito.when(imageUploader.upload(any(), eq("a.png"))).thenReturn("http://img/a.png");
+        Mockito.when(imageUploader.upload(any(), eq("a.png"))).thenReturn(java.util.concurrent.CompletableFuture.completedFuture("http://img/a.png"));
 
         mockMvc.perform(multipart("/api/users/me/avatar").file(file).principal(new UsernamePasswordAuthenticationToken("alice","p")))
                 .andExpect(status().isOk())
