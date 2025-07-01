@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class PostService {
@@ -57,6 +59,13 @@ public class PostService {
 
     public List<Post> listPosts() {
         return postRepository.findByStatus(PostStatus.PUBLISHED);
+    }
+
+    public List<Post> getRecentPostsByUser(String username, int limit) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Pageable pageable = PageRequest.of(0, limit);
+        return postRepository.findByAuthorAndStatusOrderByCreatedAtDesc(user, PostStatus.PUBLISHED, pageable);
     }
 
     public List<Post> listPendingPosts() {

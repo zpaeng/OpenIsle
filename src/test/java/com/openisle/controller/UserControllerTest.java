@@ -3,6 +3,8 @@ package com.openisle.controller;
 import com.openisle.model.User;
 import com.openisle.service.ImageUploader;
 import com.openisle.service.UserService;
+import com.openisle.service.PostService;
+import com.openisle.service.CommentService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,10 @@ class UserControllerTest {
     private UserService userService;
     @MockBean
     private ImageUploader imageUploader;
+    @MockBean
+    private PostService postService;
+    @MockBean
+    private CommentService commentService;
 
     @Test
     void getCurrentUser() throws Exception {
@@ -67,6 +73,56 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.error").value("File is not an image"));
 
         Mockito.verify(imageUploader, Mockito.never()).upload(any(), any());
+    }
+
+    @Test
+    void getUserByName() throws Exception {
+        User u = new User();
+        u.setId(2L);
+        u.setUsername("bob");
+        Mockito.when(userService.findByUsername("bob")).thenReturn(Optional.of(u));
+
+        mockMvc.perform(get("/api/users/bob"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(2));
+    }
+
+    @Test
+    void listUserPosts() throws Exception {
+        User user = new User();
+        user.setUsername("bob");
+        com.openisle.model.Category cat = new com.openisle.model.Category();
+        cat.setName("tech");
+        com.openisle.model.Post post = new com.openisle.model.Post();
+        post.setId(3L);
+        post.setTitle("hello");
+        post.setCreatedAt(java.time.LocalDateTime.now());
+        post.setCategory(cat);
+        post.setAuthor(user);
+        Mockito.when(postService.getRecentPostsByUser("bob", 10)).thenReturn(java.util.List.of(post));
+
+        mockMvc.perform(get("/api/users/bob/posts"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("hello"));
+    }
+
+    @Test
+    void listUserReplies() throws Exception {
+        User user = new User();
+        user.setUsername("bob");
+        com.openisle.model.Post post = new com.openisle.model.Post();
+        post.setId(5L);
+        com.openisle.model.Comment comment = new com.openisle.model.Comment();
+        comment.setId(4L);
+        comment.setContent("hi");
+        comment.setCreatedAt(java.time.LocalDateTime.now());
+        comment.setAuthor(user);
+        comment.setPost(post);
+        Mockito.when(commentService.getRecentCommentsByUser("bob", 50)).thenReturn(java.util.List.of(comment));
+
+        mockMvc.perform(get("/api/users/bob/replies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(4));
     }
 
 }
