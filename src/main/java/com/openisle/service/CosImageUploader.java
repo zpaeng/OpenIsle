@@ -12,6 +12,7 @@ import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -52,15 +53,22 @@ public class CosImageUploader extends ImageUploader {
     @Override
     public CompletableFuture<String> upload(byte[] data, String filename) {
         return CompletableFuture.supplyAsync(() -> {
+            String ext = "";
+            int dot = filename.lastIndexOf('.');
+            if (dot != -1) {
+                ext = filename.substring(dot);
+            }
+            String randomName = UUID.randomUUID().toString().replace("-", "") + ext;
+
             ObjectMetadata meta = new ObjectMetadata();
             meta.setContentLength(data.length);
             PutObjectRequest req = new PutObjectRequest(
                     bucketName,
-                    filename,
+                    randomName,
                     new ByteArrayInputStream(data),
                     meta);
             cosClient.putObject(req);
-            return baseUrl + "/" + filename;
+            return baseUrl + "/" + randomName;
         }, executor);
     }
 }

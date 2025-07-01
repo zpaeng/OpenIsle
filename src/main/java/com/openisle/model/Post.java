@@ -5,8 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
 import java.time.LocalDateTime;
 
+/**
+ * Post entity representing an article posted by a user.
+ */
 @Entity
 @Getter
 @Setter
@@ -36,6 +40,10 @@ public class Post {
 
     @Column(nullable = false)
     private long views = 0;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PostStatus status = PostStatus.PUBLISHED;
 
     @PrePersist
     protected void onCreate() {
