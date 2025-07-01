@@ -78,4 +78,15 @@ public class UserService {
                 .filter(User::isVerified)
                 .filter(user -> passwordEncoder.matches(password, user.getPassword()));
     }
+
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public User updateAvatar(String username, String avatarUrl) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setAvatar(avatarUrl);
+        return userRepository.save(user);
+    }
 }
