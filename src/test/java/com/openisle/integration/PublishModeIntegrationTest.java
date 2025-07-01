@@ -58,6 +58,12 @@ class PublishModeIntegrationTest {
         return rest.exchange(url, HttpMethod.POST, new HttpEntity<>(body, h), Map.class);
     }
 
+    private <T> ResponseEntity<T> get(String url, Class<T> type, String token) {
+        HttpHeaders h = new HttpHeaders();
+        if (token != null) h.setBearerAuth(token);
+        return rest.exchange(url, HttpMethod.GET, new HttpEntity<>(h), type);
+    }
+
     @Test
     void postRequiresApproval() {
         String userToken = registerAndLogin("eve", "e@example.com");
@@ -74,7 +80,7 @@ class PublishModeIntegrationTest {
         List<?> list = rest.getForObject("/api/posts", List.class);
         assertTrue(list.isEmpty(), "Post should not be listed before approval");
 
-        List<Map<String, Object>> pending = (List<Map<String, Object>>) rest.getForObject("/api/admin/posts/pending", List.class);
+        List<Map<String, Object>> pending = get("/api/admin/posts/pending", List.class, adminToken).getBody();
         assertEquals(1, pending.size());
         assertEquals(postId.intValue(), ((Number)pending.get(0).get("id")).intValue());
 

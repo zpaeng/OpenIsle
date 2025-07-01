@@ -1,70 +1,75 @@
-# OpenIsle
+<p align="center">
+  <img alt="OpenIsle" src="https://b3log.org/images/brand/sym-128.png" width="96">
+  <br><br>
+  一款简洁的社区后台示例
+  <br><br>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square"></a>
+</p>
 
-OpenIsle 是一个基于 Spring Boot 的社区后端平台示例，提供注册、登录和基于 JWT 的认证功能，支持使用 MySQL 作为数据库，并通过可插拔的邮件发送组件发送注册邮件。
+## 💡 简介
 
-## 功能特性
+OpenIsle 基于 Spring Boot 构建，提供社区后台常见的注册、登录、文章与评论等能力，适合用作二次开发的起点，完全开源。
 
-- **注册/登录**：用户可以注册并登录，密码使用 BCrypt 加密保存。
-- **JWT 认证**：登录成功后返回 JWT，后续请求需在 `Authorization` 头中携带 `Bearer` token。
-- **邮件通知**：邮件发送通过 `EmailSender` 抽象实现，默认提供 `ResendEmailSender` 实现，可根据需要扩展。
-- **灵活配置**：数据库地址、账户密码、Resend API Key 等均可通过环境变量或 `application.properties` 配置。
-- **角色权限**：内置 `ADMIN` 和 `USER` 两种角色，`/api/admin/**` 接口仅管理员可访问。
-- **文章/评论**：支持发表文章并在文章下发布评论，评论可多级回复。
-- **图片上传**：图片上传通过 `ImageUploader` 抽象实现，示例中提供基于腾讯云 COS 的 `CosImageUploader`。
-- **用户头像**：`User` 模型新增 `avatar` 字段，可通过 `UserController` 上传并更新。
-- **用户信息**：`UserController` 允许获取任意用户资料，并列出最近的发帖和回复记录，可通过参数或配置调整条数。
+## ⚡ 动机
 
-## 快速开始
+* 学习和实践现代 Java Web 开发
+* 快速搭建可扩展的社区或论坛应用
+* 提供清晰的代码示例和简单易懂的配置
 
-### 环境准备
+## ✨ 特性
+
+* **用户体系**：注册、登录，密码使用 BCrypt 加密
+* **JWT 认证**：登录后获得 Token，接口通过 `Authorization: Bearer` 认证
+* **邮件通知**：抽象 `EmailSender`，默认实现基于 Resend
+* **角色权限**：内置 `ADMIN` 与 `USER`，管理员接口以 `/api/admin/**` 提供
+* **文章与评论**：支持分类、评论及多级回复
+* **图片上传**：`ImageUploader` 可接入不同云存储，示例中实现了腾讯云 COS
+* **灵活配置**：数据库、邮件、存储等信息均可通过环境变量或 `application.properties` 设置
+* **简洁架构**：业务、持久化与安全配置清晰分层，便于扩展
+
+## 🚀 快速开始
+
+### 环境要求
 
 - Java 17+
 - Maven 3+
 - MySQL 数据库
 
-### 构建与运行
+### 运行
 
-1. 修改 `src/main/resources/application.properties`，或通过环境变量配置：
-   - `MYSQL_URL`：数据库连接 URL，例如 `jdbc:mysql://localhost:3306/openisle`。
-   - `MYSQL_USER`：数据库用户名。
-   - `MYSQL_PASSWORD`：数据库密码。
-   - `RESEND_API_KEY`：Resend 邮件服务 API Key。
-   - `COS_BASE_URL`：腾讯云 COS 访问域名，用于生成图片链接。
-   - `JWT_SECRET`：JWT 签名密钥。
-   - `JWT_EXPIRATION`：JWT 过期时间（毫秒）。
-
-2. 构建并运行：
+1. 按需修改 `src/main/resources/application.properties` 或设置以下环境变量：
+   - `MYSQL_URL`：数据库连接 URL，如 `jdbc:mysql://localhost:3306/openisle`
+   - `MYSQL_USER`：数据库用户名
+   - `MYSQL_PASSWORD`：数据库密码
+   - `RESEND_API_KEY`：Resend 邮件服务 API Key
+   - `COS_BASE_URL`：腾讯云 COS 访问域名
+   - `JWT_SECRET`：JWT 签名密钥
+   - `JWT_EXPIRATION`：JWT 过期时间（毫秒）
+2. 启动项目：
 
 ```bash
 mvn spring-boot:run
 ```
 
-启动后访问：
+启动后可访问主要接口：
 
-- `POST /api/auth/register`：注册新用户，参数示例：
-  ```json
-  {
-    "username": "test",
-    "email": "test@example.com",
-    "password": "password"
-  }
-  ```
-- `POST /api/auth/login`：登录，返回 `{ "token": "..." }`。
-- 其他受保护接口示例：`GET /api/hello`，需在请求头加入 `Authorization: Bearer <token>`。
-- 管理员接口示例：`GET /api/admin/hello`，需要具备 `ADMIN` 角色。
+- `POST /api/auth/register`：注册新用户
+- `POST /api/auth/login`：登录并获取 Token
+- 需要认证的接口示例：`GET /api/hello`（需 `Authorization` 头）
+- 管理员接口示例：`GET /api/admin/hello`
 
-## 目录结构
+## 🏘️ 社区
 
-```
-src/main/java/com/openisle
-├── OpenIsleApplication.java    // 应用入口
-├── config                      // Spring Security 配置
-├── controller                  // 控制器
-├── model                       // 数据模型
-├── repository                  // 数据访问层
-└── service                     // 业务逻辑
-```
+欢迎通过 [Issues](https://github.com/nagisa77/OpenIsle/issues) 交流反馈。
 
-## 许可
+## 📄 授权
 
-本项目使用 MIT License，可自由修改和分发。
+本项目以 MIT License 发布，欢迎自由使用与修改。
+
+## 🙏 鸣谢
+
+- [Spring Boot](https://spring.io/projects/spring-boot)
+- [JJWT](https://github.com/jwtk/jjwt)
+- [Lombok](https://github.com/projectlombok/lombok)
+- 以及所有开源贡献者
+
