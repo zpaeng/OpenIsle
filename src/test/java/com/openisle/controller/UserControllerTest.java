@@ -57,4 +57,16 @@ class UserControllerTest {
 
         Mockito.verify(userService).updateAvatar("alice", "http://img/a.png");
     }
+
+    @Test
+    void uploadAvatarRejectsNonImage() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", "a.txt", MediaType.TEXT_PLAIN_VALUE, "text".getBytes());
+
+        mockMvc.perform(multipart("/api/users/me/avatar").file(file).principal(new UsernamePasswordAuthenticationToken("alice","p")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("File is not an image"));
+
+        Mockito.verify(imageUploader, Mockito.never()).upload(any(), any());
+    }
+
 }

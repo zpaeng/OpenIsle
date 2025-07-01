@@ -3,6 +3,7 @@ package com.openisle.controller;
 import com.openisle.model.User;
 import com.openisle.service.ImageUploader;
 import com.openisle.service.UserService;
+import org.springframework.beans.factory.annotation.Value;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,12 @@ public class UserController {
     private final UserService userService;
     private final ImageUploader imageUploader;
 
+    @Value("${app.upload.check-type:true}")
+    private boolean checkImageType;
+
+    @Value("${app.upload.max-size:5242880}")
+    private long maxUploadSize;
+
     @GetMapping("/me")
     public ResponseEntity<UserDto> me(Authentication auth) {
         User user = userService.findByUsername(auth.getName()).orElseThrow();
@@ -29,6 +36,12 @@ public class UserController {
     @PostMapping("/me/avatar")
     public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file,
                                           Authentication auth) {
+        if (checkImageType && (file.getContentType() == null || !file.getContentType().startsWith("image/"))) {
+            return ResponseEntity.badRequest().body(Map.of("error", "File is not an image"));
+        }
+        if (file.getSize() > maxUploadSize) {
+            return ResponseEntity.badRequest().body(Map.of("error", "File too large"));
+        }
         String url = null;
         try {
             url = imageUploader.upload(file.getBytes(), file.getOriginalFilename()).join();
