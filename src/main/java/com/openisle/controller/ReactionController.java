@@ -15,6 +15,14 @@ import org.springframework.web.bind.annotation.*;
 public class ReactionController {
     private final ReactionService reactionService;
 
+    /**
+     * Get all available reaction types.
+     */
+    @GetMapping("/reaction-types")
+    public ReactionType[] listReactionTypes() {
+        return ReactionType.values();
+    }
+
     @PostMapping("/posts/{postId}/reactions")
     public ResponseEntity<ReactionDto> reactToPost(@PathVariable Long postId,
                                                   @RequestBody ReactionRequest req,
