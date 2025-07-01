@@ -69,6 +69,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/categories/**").hasAuthority("ADMIN")
                     .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasAuthority("ADMIN")
                     .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
@@ -87,7 +88,8 @@ public class SecurityConfig {
                 String uri = request.getRequestURI();
 
                 boolean publicGet = "GET".equalsIgnoreCase(request.getMethod()) &&
-                        (uri.startsWith("/api/posts") || uri.startsWith("/api/comments") || uri.startsWith("/api/categories"));
+                        (uri.startsWith("/api/posts") || uri.startsWith("/api/comments") ||
+                         uri.startsWith("/api/categories") || uri.startsWith("/api/search"));
 
                 if (authHeader != null && authHeader.startsWith("Bearer ")) {
                     String token = authHeader.substring(7);
