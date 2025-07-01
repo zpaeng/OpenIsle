@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="OpenIsle" src="https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/ChatGPT%20Image%20Jul%201%2C%202025%2C%2003_48_50%20PM.png" width="96">
+  <img alt="OpenIsle" src="https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/ChatGPT%20Image%20Jul%201%2C%202025%2C%2003_48_50%20PM.png" width="200">
   <br><br>
   一款简洁的社区后台示例
   <br><br>
