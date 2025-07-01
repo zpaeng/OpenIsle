@@ -4,6 +4,7 @@ import com.openisle.model.User;
 import com.openisle.service.EmailSender;
 import com.openisle.service.JwtService;
 import com.openisle.service.UserService;
+import com.openisle.service.CaptchaService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ class AuthControllerTest {
     private JwtService jwtService;
     @MockBean
     private EmailSender emailService;
+    @MockBean
+    private CaptchaService captchaService;
 
     @Test
     void registerSendsEmail() throws Exception {

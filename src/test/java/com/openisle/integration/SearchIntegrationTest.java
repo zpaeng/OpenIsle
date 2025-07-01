@@ -31,8 +31,10 @@ class SearchIntegrationTest {
         rest.postForEntity("/api/auth/register", new HttpEntity<>(
                 Map.of("username", username, "email", email, "password", "pass123"), h), Map.class);
         User u = users.findByUsername(username).orElseThrow();
-        rest.postForEntity("/api/auth/verify", new HttpEntity<>(
-                Map.of("username", username, "code", u.getVerificationCode()), h), Map.class);
+        if (u.getVerificationCode() != null) {
+            rest.postForEntity("/api/auth/verify", new HttpEntity<>(
+                    Map.of("username", username, "code", u.getVerificationCode()), h), Map.class);
+        }
         ResponseEntity<Map> resp = rest.postForEntity("/api/auth/login", new HttpEntity<>(
                 Map.of("username", username, "password", "pass123"), h), Map.class);
         return (String) resp.getBody().get("token");

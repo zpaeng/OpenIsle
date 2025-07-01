@@ -4,6 +4,7 @@ import com.openisle.model.Comment;
 import com.openisle.model.Post;
 import com.openisle.model.User;
 import com.openisle.service.CommentService;
+import com.openisle.service.CaptchaService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,8 @@ class CommentControllerTest {
 
     @MockBean
     private CommentService commentService;
+    @MockBean
+    private CaptchaService captchaService;
 
     private Comment createComment(Long id, String content, String authorName) {
         User user = new User();
