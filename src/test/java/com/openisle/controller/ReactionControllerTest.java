@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -69,5 +70,12 @@ class ReactionControllerTest {
                         .principal(new UsernamePasswordAuthenticationToken("u2", "p")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.commentId").value(2));
+    }
+
+    @Test
+    void listReactionTypes() throws Exception {
+        mockMvc.perform(get("/api/reaction-types"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0]").value("LIKE"));
     }
 }
