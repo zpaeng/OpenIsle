@@ -125,4 +125,36 @@ class UserControllerTest {
                 .andExpect(jsonPath("$[0].id").value(4));
     }
 
+    @Test
+    void aggregateUserData() throws Exception {
+        User user = new User();
+        user.setId(2L);
+        user.setUsername("bob");
+        user.setEmail("b@e.com");
+        com.openisle.model.Category cat = new com.openisle.model.Category();
+        cat.setName("tech");
+        com.openisle.model.Post post = new com.openisle.model.Post();
+        post.setId(3L);
+        post.setTitle("hello");
+        post.setCreatedAt(java.time.LocalDateTime.now());
+        post.setCategory(cat);
+        post.setAuthor(user);
+        com.openisle.model.Comment comment = new com.openisle.model.Comment();
+        comment.setId(4L);
+        comment.setContent("hi");
+        comment.setCreatedAt(java.time.LocalDateTime.now());
+        comment.setAuthor(user);
+        comment.setPost(post);
+
+        Mockito.when(userService.findByUsername("bob")).thenReturn(Optional.of(user));
+        Mockito.when(postService.getRecentPostsByUser("bob", 10)).thenReturn(java.util.List.of(post));
+        Mockito.when(commentService.getRecentCommentsByUser("bob", 50)).thenReturn(java.util.List.of(comment));
+
+        mockMvc.perform(get("/api/users/bob/all"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.user.id").value(2))
+                .andExpect(jsonPath("$.posts[0].id").value(3))
+                .andExpect(jsonPath("$.replies[0].id").value(4));
+    }
+
 }

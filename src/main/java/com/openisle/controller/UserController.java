@@ -86,6 +86,26 @@ public class UserController {
                 .collect(java.util.stream.Collectors.toList());
     }
 
+    @GetMapping("/{username}/all")
+    public ResponseEntity<UserAggregateDto> userAggregate(@PathVariable String username,
+                                                          @RequestParam(value = "postsLimit", required = false) Integer postsLimit,
+                                                          @RequestParam(value = "repliesLimit", required = false) Integer repliesLimit) {
+        User user = userService.findByUsername(username).orElseThrow();
+        int pLimit = postsLimit != null ? postsLimit : defaultPostsLimit;
+        int rLimit = repliesLimit != null ? repliesLimit : defaultRepliesLimit;
+        java.util.List<PostMetaDto> posts = postService.getRecentPostsByUser(username, pLimit).stream()
+                .map(this::toMetaDto)
+                .collect(java.util.stream.Collectors.toList());
+        java.util.List<CommentInfoDto> replies = commentService.getRecentCommentsByUser(username, rLimit).stream()
+                .map(this::toCommentInfoDto)
+                .collect(java.util.stream.Collectors.toList());
+        UserAggregateDto dto = new UserAggregateDto();
+        dto.setUser(toDto(user));
+        dto.setPosts(posts);
+        dto.setReplies(replies);
+        return ResponseEntity.ok(dto);
+    }
+
     private UserDto toDto(User user) {
         UserDto dto = new UserDto();
         dto.setId(user.getId());
@@ -137,5 +157,12 @@ public class UserController {
         private String content;
         private java.time.LocalDateTime createdAt;
         private Long postId;
+    }
+
+    @Data
+    private static class UserAggregateDto {
+        private UserDto user;
+        private java.util.List<PostMetaDto> posts;
+        private java.util.List<CommentInfoDto> replies;
     }
 }
