@@ -46,6 +46,12 @@ OpenIsle 基于 Spring Boot 构建，提供社区后台常见的注册、登录�
    - `JWT_SECRET`：JWT 签名密钥
    - `JWT_EXPIRATION`：JWT 过期时间（毫秒）
    - `PASSWORD_STRENGTH`：密码强度（LOW、MEDIUM、HIGH）
+   - `CAPTCHA_ENABLED`：是否启用验证码（true/false）
+   - `RECAPTCHA_SECRET_KEY`：Google reCAPTCHA 密钥
+   - `CAPTCHA_REGISTER_ENABLED`：注册是否需要验证码
+   - `CAPTCHA_LOGIN_ENABLED`：登录是否需要验证码
+   - `CAPTCHA_POST_ENABLED`：发帖是否需要验证码
+   - `CAPTCHA_COMMENT_ENABLED`：评论是否需要验证码
 2. 启动项目：
 
 ```bash
@@ -56,6 +62,7 @@ mvn spring-boot:run
 
 - `POST /api/auth/register`：注册新用户
 - `POST /api/auth/login`：登录并获取 Token
+- `GET /api/config`：查看验证码开关配置
 - 需要认证的接口示例：`GET /api/hello`（需 `Authorization` 头）
 - 管理员接口示例：`GET /api/admin/hello`
 
