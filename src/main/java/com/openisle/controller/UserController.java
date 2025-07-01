@@ -28,8 +28,13 @@ public class UserController {
 
     @PostMapping("/me/avatar")
     public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file,
-                                          Authentication auth) throws IOException {
-        String url = imageUploader.upload(file.getBytes(), file.getOriginalFilename()).join();
+                                          Authentication auth) {
+        String url = null;
+        try {
+            url = imageUploader.upload(file.getBytes(), file.getOriginalFilename()).join();
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().body(Map.of("url", url));
+        }
         userService.updateAvatar(auth.getName(), url);
         return ResponseEntity.ok(Map.of("url", url));
     }
