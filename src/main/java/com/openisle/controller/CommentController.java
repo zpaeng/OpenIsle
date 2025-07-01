@@ -2,9 +2,11 @@ package com.openisle.controller;
 
 import com.openisle.model.Comment;
 import com.openisle.service.CommentService;
+import com.openisle.service.CaptchaService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,11 +19,21 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
+    private final CaptchaService captchaService;
+
+    @Value("${app.captcha.enabled:false}")
+    private boolean captchaEnabled;
+
+    @Value("${app.captcha.comment-enabled:false}")
+    private boolean commentCaptchaEnabled;
 
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<CommentDto> createComment(@PathVariable Long postId,
                                                     @RequestBody CommentRequest req,
                                                     Authentication auth) {
+        if (captchaEnabled && commentCaptchaEnabled && !captchaService.verify(req.getCaptcha())) {
+            return ResponseEntity.badRequest().build();
+        }
         Comment comment = commentService.addComment(auth.getName(), postId, req.getContent());
         return ResponseEntity.ok(toDto(comment));
     }
@@ -30,6 +42,9 @@ public class CommentController {
     public ResponseEntity<CommentDto> replyComment(@PathVariable Long commentId,
                                                    @RequestBody CommentRequest req,
                                                    Authentication auth) {
+        if (captchaEnabled && commentCaptchaEnabled && !captchaService.verify(req.getCaptcha())) {
+            return ResponseEntity.badRequest().build();
+        }
         Comment comment = commentService.addReply(auth.getName(), commentId, req.getContent());
         return ResponseEntity.ok(toDto(comment));
     }
@@ -62,6 +77,7 @@ public class CommentController {
     @Data
     private static class CommentRequest {
         private String content;
+        private String captcha;
     }
 
     @Data
