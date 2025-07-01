@@ -49,8 +49,16 @@ public class PostController {
     }
 
     @GetMapping
-    public List<PostDto> listPosts() {
-        return postService.listPosts().stream().map(this::toDto).collect(Collectors.toList());
+    public List<PostDto> listPosts(@RequestParam(value = "categoryId", required = false) Long categoryId,
+                                   @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds,
+                                   @RequestParam(value = "page", required = false) Integer page,
+                                   @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+        List<Long> ids = categoryIds;
+        if (categoryId != null) {
+            ids = java.util.List.of(categoryId);
+        }
+        return postService.listPostsByCategories(ids, page, pageSize)
+                .stream().map(this::toDto).collect(Collectors.toList());
     }
 
     private PostDto toDto(Post post) {

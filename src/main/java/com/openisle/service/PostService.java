@@ -58,7 +58,29 @@ public class PostService {
     }
 
     public List<Post> listPosts() {
-        return postRepository.findByStatus(PostStatus.PUBLISHED);
+        return listPostsByCategories(null, null, null);
+    }
+
+    public List<Post> listPostsByCategories(java.util.List<Long> categoryIds,
+                                            Integer page,
+                                            Integer pageSize) {
+        Pageable pageable = null;
+        if (page != null && pageSize != null) {
+            pageable = PageRequest.of(page, pageSize);
+        }
+
+        if (categoryIds == null || categoryIds.isEmpty()) {
+            if (pageable != null) {
+                return postRepository.findByStatus(PostStatus.PUBLISHED, pageable);
+            }
+            return postRepository.findByStatus(PostStatus.PUBLISHED);
+        }
+
+        java.util.List<Category> categories = categoryRepository.findAllById(categoryIds);
+        if (pageable != null) {
+            return postRepository.findByCategoryInAndStatus(categories, PostStatus.PUBLISHED, pageable);
+        }
+        return postRepository.findByCategoryInAndStatus(categories, PostStatus.PUBLISHED);
     }
 
     public List<Post> getRecentPostsByUser(String username, int limit) {
