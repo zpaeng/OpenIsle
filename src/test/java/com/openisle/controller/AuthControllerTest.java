@@ -1,7 +1,7 @@
 package com.openisle.controller;
 
 import com.openisle.model.User;
-import com.openisle.service.EmailService;
+import com.openisle.service.EmailSender;
 import com.openisle.service.JwtService;
 import com.openisle.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ class AuthControllerTest {
     @MockBean
     private JwtService jwtService;
     @MockBean
-    private EmailService emailService;
+    private EmailSender emailService;
 
     @Test
     void registerSendsEmail() throws Exception {

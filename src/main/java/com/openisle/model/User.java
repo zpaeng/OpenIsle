@@ -35,6 +35,8 @@ public class User {
 
     private String verificationCode;
 
+    private String avatar;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role = Role.USER;

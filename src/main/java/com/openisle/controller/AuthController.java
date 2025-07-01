@@ -1,7 +1,7 @@
 package com.openisle.controller;
 
 import com.openisle.model.User;
-import com.openisle.service.EmailService;
+import com.openisle.service.EmailSender;
 import com.openisle.service.JwtService;
 import com.openisle.service.UserService;
 import lombok.Data;
@@ -42,7 +42,7 @@ curl -X POST http://localhost:8080/api/auth/login \
 public class AuthController {
     private final UserService userService;
     private final JwtService jwtService;
-    private final EmailService emailService;
+    private final EmailSender emailService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest req) {

@@ -1,15 +1,17 @@
 # OpenIsle
 
-OpenIsle 是一个基于 Spring Boot 的社区后端平台示例，提供注册、登录和基于 JWT 的认证功能，支持使用 MySQL 作为数据库，并通过 [Resend](https://resend.com) API 发送注册邮件。
+OpenIsle 是一个基于 Spring Boot 的社区后端平台示例，提供注册、登录和基于 JWT 的认证功能，支持使用 MySQL 作为数据库，并通过可插拔的邮件发送组件发送注册邮件。
 
 ## 功能特性
 
 - **注册/登录**：用户可以注册并登录，密码使用 BCrypt 加密保存。
 - **JWT 认证**：登录成功后返回 JWT，后续请求需在 `Authorization` 头中携带 `Bearer` token。
-- **邮件通知**：示例通过 Resend API 发送欢迎邮件，可根据需要修改。
+- **邮件通知**：邮件发送通过 `EmailSender` 抽象实现，默认提供 `ResendEmailSender` 实现，可根据需要扩展。
 - **灵活配置**：数据库地址、账户密码、Resend API Key 等均可通过环境变量或 `application.properties` 配置。
 - **角色权限**：内置 `ADMIN` 和 `USER` 两种角色，`/api/admin/**` 接口仅管理员可访问。
 - **文章/评论**：支持发表文章并在文章下发布评论，评论可多级回复。
+- **图片上传**：图片上传通过 `ImageUploader` 抽象实现，示例中提供基于腾讯云 COS 的 `CosImageUploader`。
+- **用户头像**：`User` 模型新增 `avatar` 字段，可通过 `UserController` 上传并更新。
 
 ## 快速开始
 
@@ -26,6 +28,7 @@ OpenIsle 是一个基于 Spring Boot 的社区后端平台示例，提供注册�
    - `MYSQL_USER`：数据库用户名。
    - `MYSQL_PASSWORD`：数据库密码。
    - `RESEND_API_KEY`：Resend 邮件服务 API Key。
+   - `COS_BASE_URL`：腾讯云 COS 访问域名，用于生成图片链接。
    - `JWT_SECRET`：JWT 签名密钥。
    - `JWT_EXPIRATION`：JWT 过期时间（毫秒）。
 
