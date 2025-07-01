@@ -16,19 +16,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/*
-curl -X POST http://localhost:8080/api/posts \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0X3VzZXIxIiwiaWF0IjoxNzUxMjg0OTU2LCJleHAiOjE3NTEzNzEzNTZ9.u84elcDTK2gIvuS4dKJCdE21pRSgY265fvdm9m9DnCQ" \
-    -d '{ "title": "First", "content": "Post" }'
-
-curl http://localhost:8080/api/posts \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0X3VzZXIxIiwiaWF0IjoxNzUxMjg0OTU2LCJleHAiOjE3NTEzNzEzNTZ9.u84elcDTK2gIvuS4dKJCdE21pRSgY265fvdm9m9DnCQ"
-
-curl http://localhost:8080/api/posts/1 \
-    -H "Authorization: Bearer <token>"
- */
-
 @RestController
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
