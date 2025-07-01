@@ -12,4 +12,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findByPostAndParentIsNullOrderByCreatedAtAsc(Post post);
     List<Comment> findByParentOrderByCreatedAtAsc(Comment parent);
     List<Comment> findByAuthorOrderByCreatedAtDesc(User author, Pageable pageable);
+    List<Comment> findByContentContainingIgnoreCase(String keyword);
 }
