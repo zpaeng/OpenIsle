@@ -81,7 +81,8 @@ class PostControllerTest {
         post.setCreatedAt(LocalDateTime.now());
         post.setAuthor(user);
         post.setCategory(cat);
-        Mockito.when(postService.listPosts()).thenReturn(List.of(post));
+        Mockito.when(postService.listPostsByCategories(Mockito.isNull(), Mockito.isNull(), Mockito.isNull()))
+                .thenReturn(List.of(post));
 
         mockMvc.perform(get("/api/posts"))
                 .andExpect(status().isOk())
