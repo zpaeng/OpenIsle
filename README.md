@@ -24,7 +24,7 @@ OpenIsle 基于 Spring Boot 构建，提供社区后台常见的注册、登录�
 * **角色权限**：内置 `ADMIN` 与 `USER`，管理员接口以 `/api/admin/**` 提供
 * **文章与评论**：支持分类、评论及多级回复
 * **图片上传**：`ImageUploader` 可接入不同云存储，示例中实现了腾讯云 COS
-* **灵活配置**：数据库、邮件、存储等信息均可通过环境变量或 `application.properties` 设置
+* **灵活配置**：数据库、邮件、存储及密码强度均可通过环境变量或 `application.properties` 设置
 * **简洁架构**：业务、持久化与安全配置清晰分层，便于扩展
 
 ## 🚀 快速开始
@@ -45,6 +45,7 @@ OpenIsle 基于 Spring Boot 构建，提供社区后台常见的注册、登录�
    - `COS_BASE_URL`：腾讯云 COS 访问域名
    - `JWT_SECRET`：JWT 签名密钥
    - `JWT_EXPIRATION`：JWT 过期时间（毫秒）
+   - `PASSWORD_STRENGTH`：密码强度（LOW、MEDIUM、HIGH）
 2. 启动项目：
 
 ```bash

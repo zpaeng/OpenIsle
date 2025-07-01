@@ -2,6 +2,7 @@ package com.openisle.service;
 
 import com.openisle.model.User;
 import com.openisle.model.Role;
+import com.openisle.service.PasswordValidator;
 import com.openisle.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,9 +16,11 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordValidator passwordValidator;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public User register(String username, String email, String password) {
+        passwordValidator.validate(password);
         // ── 先按用户名查 ──────────────────────────────────────────
         Optional<User> byUsername = userRepository.findByUsername(username);
         if (byUsername.isPresent()) {
