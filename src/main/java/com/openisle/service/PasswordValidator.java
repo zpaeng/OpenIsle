@@ -24,7 +24,14 @@ public class PasswordValidator {
                 checkHigh(password);
                 break;
             default:
-                // LOW, nothing beyond non-empty
+                checkLow(password);
+                break;
+        }
+    }
+
+    private void checkLow(String password) {
+        if (password.length() < 6) {
+            throw new IllegalArgumentException("Password must be at least 6 characters long");
         }
     }
 
