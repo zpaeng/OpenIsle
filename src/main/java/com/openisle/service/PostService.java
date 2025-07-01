@@ -1,22 +1,35 @@
 package com.openisle.service;
 
 import com.openisle.model.Post;
+import com.openisle.model.PostStatus;
+import com.openisle.model.PublishMode;
 import com.openisle.model.User;
 import com.openisle.model.Category;
 import com.openisle.repository.PostRepository;
 import com.openisle.repository.UserRepository;
 import com.openisle.repository.CategoryRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final PublishMode publishMode;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public PostService(PostRepository postRepository,
+                       UserRepository userRepository,
+                       CategoryRepository categoryRepository,
+                       @Value("${app.post.publish-mode:DIRECT}") PublishMode publishMode) {
+        this.postRepository = postRepository;
+        this.userRepository = userRepository;
+        this.categoryRepository = categoryRepository;
+        this.publishMode = publishMode;
+    }
 
     public Post createPost(String username, Long categoryId, String title, String content) {
         User author = userRepository.findByUsername(username)
@@ -28,17 +41,32 @@ public class PostService {
         post.setContent(content);
         post.setAuthor(author);
         post.setCategory(category);
+        post.setStatus(publishMode == PublishMode.REVIEW ? PostStatus.PENDING : PostStatus.PUBLISHED);
         return postRepository.save(post);
     }
 
     public Post getPost(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+        if (post.getStatus() != PostStatus.PUBLISHED) {
+            throw new IllegalArgumentException("Post not found");
+        }
         post.setViews(post.getViews() + 1);
         return postRepository.save(post);
     }
 
     public List<Post> listPosts() {
-        return postRepository.findAll();
+        return postRepository.findByStatus(PostStatus.PUBLISHED);
+    }
+
+    public List<Post> listPendingPosts() {
+        return postRepository.findByStatus(PostStatus.PENDING);
+    }
+
+    public Post approvePost(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+        post.setStatus(PostStatus.PUBLISHED);
+        return postRepository.save(post);
     }
 }
