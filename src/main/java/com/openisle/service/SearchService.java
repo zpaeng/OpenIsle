@@ -11,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,13 +48,29 @@ public class SearchService {
     public List<SearchResult> globalSearch(String keyword) {
         Stream<SearchResult> users = searchUsers(keyword).stream()
                 .map(u -> new SearchResult("user", u.getId(), u.getUsername()));
-        Stream<SearchResult> posts = searchPosts(keyword).stream()
-                .map(p -> new SearchResult("post", p.getId(), p.getTitle()));
-        Stream<SearchResult> titles = searchPostsByTitle(keyword).stream()
-                .map(p -> new SearchResult("post_title", p.getId(), p.getTitle()));
+
+        // Merge post results while removing duplicates between search by content
+        // and search by title
+        List<SearchResult> mergedPosts = Stream.concat(
+                    searchPosts(keyword).stream()
+                            .map(p -> new SearchResult("post", p.getId(), p.getTitle())),
+                    searchPostsByTitle(keyword).stream()
+                            .map(p -> new SearchResult("post_title", p.getId(), p.getTitle()))
+                )
+                .collect(java.util.stream.Collectors.toMap(
+                        SearchResult::id,
+                        sr -> sr,
+                        (a, b) -> a,
+                        java.util.LinkedHashMap::new
+                ))
+                .values()
+                .stream()
+                .toList();
+
         Stream<SearchResult> comments = searchComments(keyword).stream()
                 .map(c -> new SearchResult("comment", c.getId(), c.getContent()));
-        return Stream.concat(Stream.concat(Stream.concat(users, posts), titles), comments)
+
+        return Stream.concat(Stream.concat(users, mergedPosts.stream()), comments)
                 .toList();
     }
 
