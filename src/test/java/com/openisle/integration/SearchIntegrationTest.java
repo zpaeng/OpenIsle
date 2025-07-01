@@ -58,13 +58,13 @@ class SearchIntegrationTest {
     @Test
     void globalSearchReturnsMixedResults() {
         String admin = registerAndLoginAsAdmin("admin", "a@a.com");
-        String user = registerAndLogin("bob", "b@b.com");
+        String user = registerAndLogin("bob_nice", "b@b.com");
 
         ResponseEntity<Map> catResp = postJson("/api/categories", Map.of("name", "misc"), admin);
         Long catId = ((Number)catResp.getBody().get("id")).longValue();
 
         ResponseEntity<Map> postResp = postJson("/api/posts",
-                Map.of("title", "Hello World", "content", "Some content", "categoryId", catId), user);
+                Map.of("title", "Hello World Nice", "content", "Some content", "categoryId", catId), user);
         Long postId = ((Number)postResp.getBody().get("id")).longValue();
 
         postJson("/api/posts/" + postId + "/comments",
