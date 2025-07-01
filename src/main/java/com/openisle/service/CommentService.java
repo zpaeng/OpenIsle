@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -53,5 +55,12 @@ public class CommentService {
         Comment parent = commentRepository.findById(parentId)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
         return commentRepository.findByParentOrderByCreatedAtAsc(parent);
+    }
+
+    public List<Comment> getRecentCommentsByUser(String username, int limit) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Pageable pageable = PageRequest.of(0, limit);
+        return commentRepository.findByAuthorOrderByCreatedAtDesc(user, pageable);
     }
 }

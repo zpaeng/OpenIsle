@@ -12,6 +12,7 @@ OpenIsle 是一个基于 Spring Boot 的社区后端平台示例，提供注册�
 - **文章/评论**：支持发表文章并在文章下发布评论，评论可多级回复。
 - **图片上传**：图片上传通过 `ImageUploader` 抽象实现，示例中提供基于腾讯云 COS 的 `CosImageUploader`。
 - **用户头像**：`User` 模型新增 `avatar` 字段，可通过 `UserController` 上传并更新。
+- **用户信息**：`UserController` 允许获取任意用户资料，并列出最近的发帖和回复记录，可通过参数或配置调整条数。
 
 ## 快速开始
 
