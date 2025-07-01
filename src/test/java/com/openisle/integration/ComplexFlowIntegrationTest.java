@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 
+import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
 
@@ -102,9 +103,22 @@ class ComplexFlowIntegrationTest {
         String t2 = registerAndLogin("dave", "d@example.com");
 
         String adminToken = registerAndLoginAsAdmin("admin2", "admin2@example.com");
-        ResponseEntity<Map> catResp = postJson("/api/categories",
-                Map.of("name", "general"), adminToken);
-        Long catId = ((Number)catResp.getBody().get("id")).longValue();
+        List<Map<String, Object>> categories = (List<Map<String, Object>>) rest.getForObject("/api/categories", List.class);
+        Long catId = null;
+        if (categories != null) {
+            for (Map<String, Object> cat : categories) {
+                if ("general".equals(cat.get("name"))) {
+                    catId = ((Number)cat.get("id")).longValue();
+                    break;
+                }
+            }
+        }
+
+        if (catId == null) {
+            ResponseEntity<Map> catResp = postJson("/api/categories",
+                    Map.of("name", "general"), adminToken);
+            catId = ((Number)catResp.getBody().get("id")).longValue();
+        }
 
         ResponseEntity<Map> postResp = postJson("/api/posts",
                 Map.of("title", "React", "content", "Test", "categoryId", catId), t1);
