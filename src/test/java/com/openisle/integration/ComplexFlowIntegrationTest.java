@@ -3,7 +3,7 @@ package com.openisle.integration;
 import com.openisle.model.User;
 import com.openisle.model.Role;
 import com.openisle.repository.UserRepository;
-import com.openisle.service.EmailService;
+import com.openisle.service.EmailSender;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,7 +26,7 @@ class ComplexFlowIntegrationTest {
     private UserRepository users;
 
     @MockBean
-    private EmailService emailService;
+    private EmailSender emailService;
 
     private String registerAndLogin(String username, String email) {
         HttpHeaders h = new HttpHeaders();

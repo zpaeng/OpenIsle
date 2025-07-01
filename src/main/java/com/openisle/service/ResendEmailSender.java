@@ -12,13 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class EmailService {
+public class ResendEmailSender extends EmailSender {
 
     @Value("${resend.api.key}")
     private String apiKey;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
+    @Override
     public void sendEmail(String to, String subject, String text) {
         String url = "https://api.resend.com/emails"; // hypothetical endpoint
 
