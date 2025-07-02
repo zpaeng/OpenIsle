@@ -3,6 +3,7 @@ package com.openisle.controller;
 import com.openisle.model.Post;
 import com.openisle.model.User;
 import com.openisle.model.Category;
+import com.openisle.model.Tag;
 import com.openisle.service.PostService;
 import com.openisle.service.CommentService;
 import com.openisle.service.ReactionService;
@@ -48,6 +49,9 @@ class PostControllerTest {
         Category cat = new Category();
         cat.setId(1L);
         cat.setName("tech");
+        Tag tag = new Tag();
+        tag.setId(1L);
+        tag.setName("java");
         Post post = new Post();
         post.setId(1L);
         post.setTitle("t");
@@ -55,12 +59,13 @@ class PostControllerTest {
         post.setCreatedAt(LocalDateTime.now());
         post.setAuthor(user);
         post.setCategory(cat);
-        Mockito.when(postService.createPost(eq("alice"), eq(1L), eq("t"), eq("c"))).thenReturn(post);
+        post.setTags(java.util.Set.of(tag));
+        Mockito.when(postService.createPost(eq("alice"), eq(1L), eq("t"), eq("c"), eq(java.util.List.of(1L)))).thenReturn(post);
         Mockito.when(postService.getPost(1L)).thenReturn(post);
 
         mockMvc.perform(post("/api/posts")
                         .contentType("application/json")
-                        .content("{\"title\":\"t\",\"content\":\"c\",\"categoryId\":1}")
+                        .content("{\"title\":\"t\",\"content\":\"c\",\"categoryId\":1,\"tagIds\":[1]}")
                         .principal(new UsernamePasswordAuthenticationToken("alice", "p")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("t"));
@@ -77,6 +82,9 @@ class PostControllerTest {
         Category cat = new Category();
         cat.setId(1L);
         cat.setName("tech");
+        Tag tag = new Tag();
+        tag.setId(1L);
+        tag.setName("java");
         Post post = new Post();
         post.setId(2L);
         post.setTitle("hello");
@@ -84,6 +92,7 @@ class PostControllerTest {
         post.setCreatedAt(LocalDateTime.now());
         post.setAuthor(user);
         post.setCategory(cat);
+        post.setTags(java.util.Set.of(tag));
         Mockito.when(postService.listPostsByCategories(Mockito.isNull(), Mockito.isNull(), Mockito.isNull()))
                 .thenReturn(List.of(post));
 

@@ -73,8 +73,13 @@ class PublishModeIntegrationTest {
                 Map.of("name", "review"), adminToken);
         Long catId = ((Number)catResp.getBody().get("id")).longValue();
 
+        ResponseEntity<Map> tagResp = postJson("/api/tags",
+                Map.of("name", "t1"), adminToken);
+        Long tagId = ((Number)tagResp.getBody().get("id")).longValue();
+
         ResponseEntity<Map> postResp = postJson("/api/posts",
-                Map.of("title", "Need", "content", "Review", "categoryId", catId), userToken);
+                Map.of("title", "Need", "content", "Review", "categoryId", catId,
+                        "tagIds", List.of(tagId)), userToken);
         Long postId = ((Number)postResp.getBody().get("id")).longValue();
 
         List<?> list = rest.getForObject("/api/posts", List.class);

@@ -69,8 +69,13 @@ class ComplexFlowIntegrationTest {
                 Map.of("name", "general"), adminToken);
         Long catId = ((Number)catResp.getBody().get("id")).longValue();
 
+        ResponseEntity<Map> tagResp = postJson("/api/tags",
+                Map.of("name", "java"), adminToken);
+        Long tagId = ((Number)tagResp.getBody().get("id")).longValue();
+
         ResponseEntity<Map> postResp = postJson("/api/posts",
-                Map.of("title", "Hello", "content", "World", "categoryId", catId), t1);
+                Map.of("title", "Hello", "content", "World", "categoryId", catId,
+                        "tagIds", List.of(tagId)), t1);
         Long postId = ((Number)postResp.getBody().get("id")).longValue();
 
         ResponseEntity<Map> c1Resp = postJson("/api/posts/" + postId + "/comments",
@@ -122,8 +127,13 @@ class ComplexFlowIntegrationTest {
             catId = ((Number)catResp.getBody().get("id")).longValue();
         }
 
+        ResponseEntity<Map> tagResp = postJson("/api/tags",
+                Map.of("name", "spring"), adminToken);
+        Long tagId = ((Number)tagResp.getBody().get("id")).longValue();
+
         ResponseEntity<Map> postResp = postJson("/api/posts",
-                Map.of("title", "React", "content", "Test", "categoryId", catId), t1);
+                Map.of("title", "React", "content", "Test", "categoryId", catId,
+                        "tagIds", List.of(tagId)), t1);
         Long postId = ((Number)postResp.getBody().get("id")).longValue();
 
         postJson("/api/posts/" + postId + "/reactions",

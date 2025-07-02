@@ -63,8 +63,12 @@ class SearchIntegrationTest {
         ResponseEntity<Map> catResp = postJson("/api/categories", Map.of("name", "misc"), admin);
         Long catId = ((Number)catResp.getBody().get("id")).longValue();
 
+        ResponseEntity<Map> tagResp = postJson("/api/tags", Map.of("name", "misc"), admin);
+        Long tagId = ((Number)tagResp.getBody().get("id")).longValue();
+
         ResponseEntity<Map> postResp = postJson("/api/posts",
-                Map.of("title", "Hello World Nice", "content", "Some content", "categoryId", catId), user);
+                Map.of("title", "Hello World Nice", "content", "Some content", "categoryId", catId,
+                        "tagIds", List.of(tagId)), user);
         Long postId = ((Number)postResp.getBody().get("id")).longValue();
 
         postJson("/api/posts/" + postId + "/comments",
