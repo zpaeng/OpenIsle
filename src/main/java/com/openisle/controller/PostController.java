@@ -38,7 +38,8 @@ public class PostController {
         if (captchaEnabled && postCaptchaEnabled && !captchaService.verify(req.getCaptcha())) {
             return ResponseEntity.badRequest().build();
         }
-        Post post = postService.createPost(auth.getName(), req.getCategoryId(), req.getTitle(), req.getContent());
+        Post post = postService.createPost(auth.getName(), req.getCategoryId(),
+                req.getTitle(), req.getContent(), req.getTagIds());
         return ResponseEntity.ok(toDto(post));
     }
 
@@ -69,6 +70,7 @@ public class PostController {
         dto.setCreatedAt(post.getCreatedAt());
         dto.setAuthor(post.getAuthor().getUsername());
         dto.setCategory(post.getCategory().getName());
+        dto.setTags(post.getTags().stream().map(com.openisle.model.Tag::getName).collect(Collectors.toList()));
         dto.setViews(post.getViews());
 
         List<ReactionDto> reactions = reactionService.getReactionsForPost(post.getId())
@@ -130,6 +132,7 @@ public class PostController {
         private Long categoryId;
         private String title;
         private String content;
+        private java.util.List<Long> tagIds;
         private String captcha;
     }
 
@@ -141,6 +144,7 @@ public class PostController {
         private LocalDateTime createdAt;
         private String author;
         private String category;
+        private java.util.List<String> tags;
         private long views;
         private List<CommentDto> comments;
         private List<ReactionDto> reactions;

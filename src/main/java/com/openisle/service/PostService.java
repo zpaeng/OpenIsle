@@ -8,6 +8,7 @@ import com.openisle.model.Category;
 import com.openisle.repository.PostRepository;
 import com.openisle.repository.UserRepository;
 import com.openisle.repository.CategoryRepository;
+import com.openisle.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,29 +21,44 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final TagRepository tagRepository;
     private final PublishMode publishMode;
 
     @org.springframework.beans.factory.annotation.Autowired
     public PostService(PostRepository postRepository,
                        UserRepository userRepository,
                        CategoryRepository categoryRepository,
+                       TagRepository tagRepository,
                        @Value("${app.post.publish-mode:DIRECT}") PublishMode publishMode) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
+        this.tagRepository = tagRepository;
         this.publishMode = publishMode;
     }
 
-    public Post createPost(String username, Long categoryId, String title, String content) {
+    public Post createPost(String username,
+                           Long categoryId,
+                           String title,
+                           String content,
+                           java.util.List<Long> tagIds) {
+        if (tagIds == null || tagIds.isEmpty()) {
+            throw new IllegalArgumentException("At least one tag required");
+        }
         User author = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+        java.util.List<com.openisle.model.Tag> tags = tagRepository.findAllById(tagIds);
+        if (tags.isEmpty()) {
+            throw new IllegalArgumentException("Tag not found");
+        }
         Post post = new Post();
         post.setTitle(title);
         post.setContent(content);
         post.setAuthor(author);
         post.setCategory(category);
+        post.setTags(new java.util.HashSet<>(tags));
         post.setStatus(publishMode == PublishMode.REVIEW ? PostStatus.PENDING : PostStatus.PUBLISHED);
         return postRepository.save(post);
     }
