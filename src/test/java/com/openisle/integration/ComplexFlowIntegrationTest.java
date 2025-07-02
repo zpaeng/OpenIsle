@@ -66,11 +66,11 @@ class ComplexFlowIntegrationTest {
 
         String adminToken = registerAndLoginAsAdmin("admin", "admin@example.com");
         ResponseEntity<Map> catResp = postJson("/api/categories",
-                Map.of("name", "general"), adminToken);
+                Map.of("name", "general", "describe", "d", "icon", "i"), adminToken);
         Long catId = ((Number)catResp.getBody().get("id")).longValue();
 
         ResponseEntity<Map> tagResp = postJson("/api/tags",
-                Map.of("name", "java"), adminToken);
+                Map.of("name", "java", "describe", "d", "icon", "i"), adminToken);
         Long tagId = ((Number)tagResp.getBody().get("id")).longValue();
 
         ResponseEntity<Map> postResp = postJson("/api/posts",
@@ -123,12 +123,12 @@ class ComplexFlowIntegrationTest {
 
         if (catId == null) {
             ResponseEntity<Map> catResp = postJson("/api/categories",
-                    Map.of("name", "general"), adminToken);
+                    Map.of("name", "general", "describe", "d", "icon", "i"), adminToken);
             catId = ((Number)catResp.getBody().get("id")).longValue();
         }
 
         ResponseEntity<Map> tagResp = postJson("/api/tags",
-                Map.of("name", "spring"), adminToken);
+                Map.of("name", "spring", "describe", "d", "icon", "i"), adminToken);
         Long tagId = ((Number)tagResp.getBody().get("id")).longValue();
 
         ResponseEntity<Map> postResp = postJson("/api/posts",
