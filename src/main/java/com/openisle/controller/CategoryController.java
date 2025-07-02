@@ -2,6 +2,7 @@ package com.openisle.controller;
 
 import com.openisle.model.Category;
 import com.openisle.service.CategoryService;
+import com.openisle.service.PostService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;
+    private final PostService postService;
 
     @PostMapping
     public CategoryDto create(@RequestBody CategoryRequest req) {
@@ -44,6 +46,21 @@ public class CategoryController {
         return toDto(categoryService.getCategory(id));
     }
 
+    @GetMapping("/{id}/posts")
+    public List<PostSummaryDto> listPostsByCategory(@PathVariable Long id,
+                                                    @RequestParam(value = "page", required = false) Integer page,
+                                                    @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+        return postService.listPostsByCategories(java.util.List.of(id), page, pageSize)
+                .stream()
+                .map(p -> {
+                    PostSummaryDto dto = new PostSummaryDto();
+                    dto.setId(p.getId());
+                    dto.setTitle(p.getTitle());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
     private CategoryDto toDto(Category c) {
         CategoryDto dto = new CategoryDto();
         dto.setId(c.getId());
@@ -66,5 +83,11 @@ public class CategoryController {
         private String name;
         private String describe;
         private String icon;
+    }
+
+    @Data
+    private static class PostSummaryDto {
+        private Long id;
+        private String title;
     }
 }

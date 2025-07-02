@@ -106,6 +106,29 @@ public class PostService {
         return postRepository.findByAuthorAndStatusOrderByCreatedAtDesc(user, PostStatus.PUBLISHED, pageable);
     }
 
+    public List<Post> listPostsByTags(java.util.List<Long> tagIds,
+                                      Integer page,
+                                      Integer pageSize) {
+        if (tagIds == null || tagIds.isEmpty()) {
+            return java.util.List.of();
+        }
+
+        Pageable pageable = null;
+        if (page != null && pageSize != null) {
+            pageable = PageRequest.of(page, pageSize);
+        }
+
+        java.util.List<com.openisle.model.Tag> tags = tagRepository.findAllById(tagIds);
+        if (tags.isEmpty()) {
+            return java.util.List.of();
+        }
+
+        if (pageable != null) {
+            return postRepository.findDistinctByTagsInAndStatus(tags, PostStatus.PUBLISHED, pageable);
+        }
+        return postRepository.findDistinctByTagsInAndStatus(tags, PostStatus.PUBLISHED);
+    }
+
     public List<Post> listPendingPosts() {
         return postRepository.findByStatus(PostStatus.PENDING);
     }
