@@ -1,7 +1,7 @@
 <p align="center">
   <img alt="OpenIsle" src="https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/image.png" width="200">
   <br><br>
-  一款简洁的社区后台示例
+  高效的开源社区后端平台
   <br><br>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square"></a>
 </p>
