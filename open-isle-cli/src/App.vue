@@ -1,15 +1,22 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app">
+    <HeaderComponent @toggle-menu="menuVisible = !menuVisible" />
+    <MenuComponent :visible="menuVisible" />
+    <div class="content" :class="{ 'with-menu': menuVisible }">
+      <router-view />
+    </div>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import HeaderComponent from './components/HeaderComponent.vue'
+import MenuComponent from './components/MenuComponent.vue'
 
 export default {
   name: 'App',
-  components: {
-    HelloWorld
+  components: { HeaderComponent, MenuComponent },
+  data() {
+    return { menuVisible: true }
   }
 }
 </script>
@@ -19,8 +26,14 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+}
+.content {
+  margin-left: 0;
+  transition: margin-left 0.3s ease;
+  padding-top: 60px;
+}
+.content.with-menu {
+  margin-left: 200px;
 }
 </style>
