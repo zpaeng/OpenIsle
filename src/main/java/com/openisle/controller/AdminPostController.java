@@ -31,6 +31,11 @@ public class AdminPostController {
         return toDto(postService.approvePost(id));
     }
 
+    @PostMapping("/{id}/reject")
+    public PostDto reject(@PathVariable Long id) {
+        return toDto(postService.rejectPost(id));
+    }
+
     private PostDto toDto(Post post) {
         PostDto dto = new PostDto();
         dto.setId(post.getId());

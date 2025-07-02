@@ -5,10 +5,12 @@ import com.openisle.model.Post;
 import com.openisle.model.Reaction;
 import com.openisle.model.ReactionType;
 import com.openisle.model.User;
+import com.openisle.model.NotificationType;
 import com.openisle.repository.CommentRepository;
 import com.openisle.repository.PostRepository;
 import com.openisle.repository.ReactionRepository;
 import com.openisle.repository.UserRepository;
+import com.openisle.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ public class ReactionService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final NotificationService notificationService;
 
     public Reaction reactToPost(String username, Long postId, ReactionType type) {
         User user = userRepository.findByUsername(username)
@@ -30,7 +33,11 @@ public class ReactionService {
         reaction.setUser(user);
         reaction.setPost(post);
         reaction.setType(type);
-        return reactionRepository.save(reaction);
+        reaction = reactionRepository.save(reaction);
+        if (!user.getId().equals(post.getAuthor().getId())) {
+            notificationService.createNotification(post.getAuthor(), NotificationType.REACTION, post, null, null);
+        }
+        return reaction;
     }
 
     public Reaction reactToComment(String username, Long commentId, ReactionType type) {
@@ -44,7 +51,11 @@ public class ReactionService {
         reaction.setComment(comment);
         reaction.setPost(null);
         reaction.setType(type);
-        return reactionRepository.save(reaction);
+        reaction = reactionRepository.save(reaction);
+        if (!user.getId().equals(comment.getAuthor().getId())) {
+            notificationService.createNotification(comment.getAuthor(), NotificationType.REACTION, null, comment, null);
+        }
+        return reaction;
     }
 
     public java.util.List<Reaction> getReactionsForPost(Long postId) {
