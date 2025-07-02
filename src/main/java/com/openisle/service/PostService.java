@@ -10,6 +10,7 @@ import com.openisle.repository.PostRepository;
 import com.openisle.repository.UserRepository;
 import com.openisle.repository.CategoryRepository;
 import com.openisle.repository.TagRepository;
+import com.openisle.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ public class PostService {
     private final TagRepository tagRepository;
     private final PublishMode publishMode;
     private final NotificationService notificationService;
+    private final SubscriptionService subscriptionService;
 
     @org.springframework.beans.factory.annotation.Autowired
     public PostService(PostRepository postRepository,
@@ -32,12 +34,14 @@ public class PostService {
                        CategoryRepository categoryRepository,
                        TagRepository tagRepository,
                        NotificationService notificationService,
+                       SubscriptionService subscriptionService,
                        @Value("${app.post.publish-mode:DIRECT}") PublishMode publishMode) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.tagRepository = tagRepository;
         this.notificationService = notificationService;
+        this.subscriptionService = subscriptionService;
         this.publishMode = publishMode;
     }
 
@@ -64,7 +68,14 @@ public class PostService {
         post.setCategory(category);
         post.setTags(new java.util.HashSet<>(tags));
         post.setStatus(publishMode == PublishMode.REVIEW ? PostStatus.PENDING : PostStatus.PUBLISHED);
-        return postRepository.save(post);
+        post = postRepository.save(post);
+        // notify followers of author
+        for (User u : subscriptionService.getSubscribers(author.getUsername())) {
+            if (!u.getId().equals(author.getId())) {
+                notificationService.createNotification(u, NotificationType.USER_ACTIVITY, post, null, null);
+            }
+        }
+        return post;
     }
 
     public Post viewPost(Long id, String viewer) {

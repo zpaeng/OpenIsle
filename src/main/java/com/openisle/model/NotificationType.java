@@ -11,5 +11,9 @@ public enum NotificationType {
     /** Someone reacted to your post or comment */
     REACTION,
     /** Your post under review was approved or rejected */
-    POST_REVIEWED
+    POST_REVIEWED,
+    /** A subscribed post received a new comment */
+    POST_UPDATED,
+    /** A user you subscribe to created a post or comment */
+    USER_ACTIVITY
 }
