@@ -16,9 +16,9 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
-  background-color: #42b983;
-  color: white;
+  height: var(--header-height);
+  background-color: var(--header-background-color);
+  color: var(--header-text-color);
 }
 .menu-btn {
   font-size: 24px;

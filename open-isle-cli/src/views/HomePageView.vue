@@ -13,6 +13,7 @@ export default {
 
 <style scoped>
 .home-page {
-  padding: 20px;
+  background-color: white;
+  color: black;
 }
 </style>

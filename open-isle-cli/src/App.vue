@@ -1,9 +1,12 @@
 <template>
   <div id="app">
     <HeaderComponent @toggle-menu="menuVisible = !menuVisible" />
-    <MenuComponent :visible="menuVisible" />
-    <div class="content" :class="{ 'with-menu': menuVisible }">
-      <router-view />
+
+    <div class="main-container">
+      <MenuComponent :visible="menuVisible" />
+      <div class="content" :class="{ 'with-menu': menuVisible }">
+        <router-view />
+      </div>
     </div>
   </div>
 </template>
@@ -22,22 +25,18 @@ export default {
 </script>
 
 <style>
-<<<<<<< HEAD
-
-=======
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-}
 .content {
-  margin-left: 0;
   transition: margin-left 0.3s ease;
-  padding-top: 60px;
 }
-.content.with-menu {
-  margin-left: 200px;
+
+.main-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  max-width: var(--page-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  background-color: var(--normal-background-color);
 }
->>>>>>> 09bbafa1912b3a87115018c72230fd57e8d08aff
+
 </style>

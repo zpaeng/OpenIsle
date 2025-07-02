@@ -23,13 +23,9 @@ export default {
 <style scoped>
 .menu {
   width: 200px;
-  background-color: #f5f5f5;
-  padding: 10px;
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
+  background-color: var(--menu-background-color);
   overflow-y: auto;
+  height: calc(100vh - var(--header-height));
 }
 .slide-enter-active, .slide-leave-active {
   transition: transform 0.3s ease;

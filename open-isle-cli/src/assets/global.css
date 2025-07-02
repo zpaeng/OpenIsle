@@ -1,0 +1,13 @@
+:root {
+  --header-height: 60px;
+  --header-background-color: gray;
+  --menu-background-color: darkgray;
+  --normal-background-color: lightgray;
+  --menu-width: 200px;
+  --page-max-width: 1200px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
