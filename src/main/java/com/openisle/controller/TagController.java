@@ -17,7 +17,7 @@ public class TagController {
 
     @PostMapping
     public TagDto create(@RequestBody TagRequest req) {
-        Tag tag = tagService.createTag(req.getName());
+        Tag tag = tagService.createTag(req.getName(), req.getDescribe(), req.getIcon());
         return toDto(tag);
     }
 
@@ -42,17 +42,23 @@ public class TagController {
         TagDto dto = new TagDto();
         dto.setId(tag.getId());
         dto.setName(tag.getName());
+        dto.setIcon(tag.getIcon());
+        dto.setDescribe(tag.getDescribe());
         return dto;
     }
 
     @Data
     private static class TagRequest {
         private String name;
+        private String describe;
+        private String icon;
     }
 
     @Data
     private static class TagDto {
         private Long id;
         private String name;
+        private String describe;
+        private String icon;
     }
 }

@@ -12,9 +12,11 @@ import java.util.List;
 public class CategoryService {
     private final CategoryRepository categoryRepository;
 
-    public Category createCategory(String name) {
+    public Category createCategory(String name, String describe, String icon) {
         Category category = new Category();
         category.setName(name);
+        category.setDescribe(describe);
+        category.setIcon(icon);
         return categoryRepository.save(category);
     }
 

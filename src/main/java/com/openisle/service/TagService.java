@@ -12,9 +12,11 @@ import java.util.List;
 public class TagService {
     private final TagRepository tagRepository;
 
-    public Tag createTag(String name) {
+    public Tag createTag(String name, String describe, String icon) {
         Tag tag = new Tag();
         tag.setName(name);
+        tag.setDescribe(describe);
+        tag.setIcon(icon);
         return tagRepository.save(tag);
     }
 

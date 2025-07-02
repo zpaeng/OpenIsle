@@ -31,14 +31,18 @@ class CategoryControllerTest {
         Category c = new Category();
         c.setId(1L);
         c.setName("tech");
-        Mockito.when(categoryService.createCategory(eq("tech"))).thenReturn(c);
+        c.setDescribe("d");
+        c.setIcon("i");
+        Mockito.when(categoryService.createCategory(eq("tech"), eq("d"), eq("i"))).thenReturn(c);
         Mockito.when(categoryService.getCategory(1L)).thenReturn(c);
 
         mockMvc.perform(post("/api/categories")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"tech\"}"))
+                        .content("{\"name\":\"tech\",\"describe\":\"d\",\"icon\":\"i\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("tech"));
+                .andExpect(jsonPath("$.name").value("tech"))
+                .andExpect(jsonPath("$.describe").value("d"))
+                .andExpect(jsonPath("$.icon").value("i"));
 
         mockMvc.perform(get("/api/categories/1"))
                 .andExpect(status().isOk())
@@ -50,10 +54,14 @@ class CategoryControllerTest {
         Category c = new Category();
         c.setId(2L);
         c.setName("life");
+        c.setDescribe("d2");
+        c.setIcon("i2");
         Mockito.when(categoryService.listCategories()).thenReturn(List.of(c));
 
         mockMvc.perform(get("/api/categories"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("life"));
+                .andExpect(jsonPath("$[0].name").value("life"))
+                .andExpect(jsonPath("$[0].describe").value("d2"))
+                .andExpect(jsonPath("$[0].icon").value("i2"));
     }
 }

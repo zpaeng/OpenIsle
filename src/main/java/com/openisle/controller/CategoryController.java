@@ -17,7 +17,7 @@ public class CategoryController {
 
     @PostMapping
     public CategoryDto create(@RequestBody CategoryRequest req) {
-        Category c = categoryService.createCategory(req.getName());
+        Category c = categoryService.createCategory(req.getName(), req.getDescribe(), req.getIcon());
         return toDto(c);
     }
 
@@ -42,17 +42,23 @@ public class CategoryController {
         CategoryDto dto = new CategoryDto();
         dto.setId(c.getId());
         dto.setName(c.getName());
+        dto.setIcon(c.getIcon());
+        dto.setDescribe(c.getDescribe());
         return dto;
     }
 
     @Data
     private static class CategoryRequest {
         private String name;
+        private String describe;
+        private String icon;
     }
 
     @Data
     private static class CategoryDto {
         private Long id;
         private String name;
+        private String describe;
+        private String icon;
     }
 }
