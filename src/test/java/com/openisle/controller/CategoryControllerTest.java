@@ -2,6 +2,7 @@ package com.openisle.controller;
 
 import com.openisle.model.Category;
 import com.openisle.service.CategoryService;
+import com.openisle.service.PostService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ class CategoryControllerTest {
 
     @MockBean
     private CategoryService categoryService;
+
+    @MockBean
+    private PostService postService;
 
     @Test
     void createAndGetCategory() throws Exception {

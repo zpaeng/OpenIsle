@@ -2,6 +2,7 @@ package com.openisle.controller;
 
 import com.openisle.model.Tag;
 import com.openisle.service.TagService;
+import com.openisle.service.PostService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ class TagControllerTest {
 
     @MockBean
     private TagService tagService;
+
+    @MockBean
+    private PostService postService;
 
     @Test
     void createAndGetTag() throws Exception {
