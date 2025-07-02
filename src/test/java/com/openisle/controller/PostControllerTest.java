@@ -70,7 +70,7 @@ class PostControllerTest {
         post.setCategory(cat);
         post.setTags(java.util.Set.of(tag));
         Mockito.when(postService.createPost(eq("alice"), eq(1L), eq("t"), eq("c"), eq(java.util.List.of(1L)))).thenReturn(post);
-        Mockito.when(postService.viewPost(1L, "alice")).thenReturn(post);
+        Mockito.when(postService.viewPost(eq(1L), Mockito.isNull())).thenReturn(post);
 
         mockMvc.perform(post("/api/posts")
                         .contentType("application/json")
@@ -174,7 +174,7 @@ class PostControllerTest {
         cr.setComment(comment);
         cr.setType(com.openisle.model.ReactionType.LIKE);
 
-        Mockito.when(postService.viewPost(1L, user.getUsername())).thenReturn(post);
+        Mockito.when(postService.viewPost(eq(1L), Mockito.isNull())).thenReturn(post);
         Mockito.when(commentService.getCommentsForPost(1L)).thenReturn(List.of(comment));
         Mockito.when(commentService.getReplies(2L)).thenReturn(List.of(reply));
         Mockito.when(commentService.getReplies(3L)).thenReturn(List.of());
