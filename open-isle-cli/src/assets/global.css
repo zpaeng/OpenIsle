@@ -1,8 +1,11 @@
 :root {
   --header-height: 60px;
-  --header-background-color: gray;
-  --menu-background-color: darkgray;
-  --normal-background-color: lightgray;
+  --header-background-color: white;
+  --header-border-color: lightgray;
+  --menu-background-color: white;
+  --menu-border-color: lightgray;
+  --menu-selected-background-color: rgba(208, 250, 255, 0.659);
+  --normal-background-color: lightgrrgb(208, 246, 255)
   --menu-width: 200px;
   --page-max-width: 1200px;
 }
@@ -10,4 +13,5 @@
 body {
   margin: 0;
   padding: 0;
+  font-family: 'Roboto', sans-serif;
 }
