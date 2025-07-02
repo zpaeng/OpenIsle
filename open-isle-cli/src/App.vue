@@ -4,7 +4,7 @@
 
     <div class="main-container">
       <MenuComponent :visible="menuVisible" />
-      <div class="content" :class="{ 'with-menu': menuVisible }">
+      <div class="content">
         <router-view />
       </div>
     </div>
@@ -26,16 +26,13 @@ export default {
 
 <style>
 .content {
-  transition: margin-left 0.3s ease;
+  flex: 1;
 }
-
 .main-container {
   display: flex;
-  justify-content: center;
   flex-direction: row;
   max-width: var(--page-max-width);
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
   background-color: var(--normal-background-color);
 }
 

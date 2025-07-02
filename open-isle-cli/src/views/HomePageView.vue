@@ -1,7 +1,6 @@
 <template>
   <div class="home-page">
-    <h1>Home Page</h1>
-    <p>Welcome to OpenIsle</p>
+    hello?
   </div>
 </template>
 
@@ -15,5 +14,6 @@ export default {
 .home-page {
   background-color: white;
   color: black;
+  height: 100%;
 }
 </style>
