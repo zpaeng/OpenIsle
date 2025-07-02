@@ -3,9 +3,11 @@ package com.openisle.service;
 import com.openisle.model.Comment;
 import com.openisle.model.Post;
 import com.openisle.model.User;
+import com.openisle.model.NotificationType;
 import com.openisle.repository.CommentRepository;
 import com.openisle.repository.PostRepository;
 import com.openisle.repository.UserRepository;
+import com.openisle.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public Comment addComment(String username, Long postId, String content) {
         User author = userRepository.findByUsername(username)
@@ -29,7 +32,11 @@ public class CommentService {
         comment.setAuthor(author);
         comment.setPost(post);
         comment.setContent(content);
-        return commentRepository.save(comment);
+        comment = commentRepository.save(comment);
+        if (!author.getId().equals(post.getAuthor().getId())) {
+            notificationService.createNotification(post.getAuthor(), NotificationType.COMMENT_REPLY, post, comment, null);
+        }
+        return comment;
     }
 
     public Comment addReply(String username, Long parentId, String content) {
@@ -42,7 +49,11 @@ public class CommentService {
         comment.setPost(parent.getPost());
         comment.setParent(parent);
         comment.setContent(content);
-        return commentRepository.save(comment);
+        comment = commentRepository.save(comment);
+        if (!author.getId().equals(parent.getAuthor().getId())) {
+            notificationService.createNotification(parent.getAuthor(), NotificationType.COMMENT_REPLY, parent.getPost(), comment, null);
+        }
+        return comment;
     }
 
     public List<Comment> getCommentsForPost(Long postId) {

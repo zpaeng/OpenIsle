@@ -44,8 +44,9 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PostDto> getPost(@PathVariable Long id) {
-        Post post = postService.getPost(id);
+    public ResponseEntity<PostDto> getPost(@PathVariable Long id, Authentication auth) {
+        String viewer = auth != null ? auth.getName() : null;
+        Post post = postService.viewPost(id, viewer);
         return ResponseEntity.ok(toDto(post));
     }
 

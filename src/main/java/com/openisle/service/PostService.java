@@ -5,6 +5,7 @@ import com.openisle.model.PostStatus;
 import com.openisle.model.PublishMode;
 import com.openisle.model.User;
 import com.openisle.model.Category;
+import com.openisle.model.NotificationType;
 import com.openisle.repository.PostRepository;
 import com.openisle.repository.UserRepository;
 import com.openisle.repository.CategoryRepository;
@@ -23,17 +24,20 @@ public class PostService {
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
     private final PublishMode publishMode;
+    private final NotificationService notificationService;
 
     @org.springframework.beans.factory.annotation.Autowired
     public PostService(PostRepository postRepository,
                        UserRepository userRepository,
                        CategoryRepository categoryRepository,
                        TagRepository tagRepository,
+                       NotificationService notificationService,
                        @Value("${app.post.publish-mode:DIRECT}") PublishMode publishMode) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.tagRepository = tagRepository;
+        this.notificationService = notificationService;
         this.publishMode = publishMode;
     }
 
@@ -63,14 +67,18 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    public Post getPost(Long id) {
+    public Post viewPost(Long id, String viewer) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
         if (post.getStatus() != PostStatus.PUBLISHED) {
             throw new IllegalArgumentException("Post not found");
         }
         post.setViews(post.getViews() + 1);
-        return postRepository.save(post);
+        post = postRepository.save(post);
+        if (viewer != null && !viewer.equals(post.getAuthor().getUsername())) {
+            notificationService.createNotification(post.getAuthor(), NotificationType.POST_VIEWED, post, null, null);
+        }
+        return post;
     }
 
     public List<Post> listPosts() {
@@ -137,6 +145,17 @@ public class PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
         post.setStatus(PostStatus.PUBLISHED);
-        return postRepository.save(post);
+        post = postRepository.save(post);
+        notificationService.createNotification(post.getAuthor(), NotificationType.POST_REVIEWED, post, null, true);
+        return post;
+    }
+
+    public Post rejectPost(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+        post.setStatus(PostStatus.REJECTED);
+        post = postRepository.save(post);
+        notificationService.createNotification(post.getAuthor(), NotificationType.POST_REVIEWED, post, null, false);
+        return post;
     }
 }
