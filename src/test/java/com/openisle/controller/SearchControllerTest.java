@@ -63,4 +63,28 @@ class SearchControllerTest {
                 .andExpect(jsonPath("$[1].type").value("post"))
                 .andExpect(jsonPath("$[2].type").value("comment"));
     }
+
+    @Test
+    void searchPostsByTitle() throws Exception {
+        Post p = new Post();
+        p.setId(2L);
+        p.setTitle("spring");
+        Mockito.when(searchService.searchPostsByTitle("spr")).thenReturn(List.of(p));
+
+        mockMvc.perform(get("/api/search/posts/title").param("keyword", "spr"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("spring"));
+    }
+
+    @Test
+    void searchPosts() throws Exception {
+        Post p = new Post();
+        p.setId(5L);
+        p.setTitle("hello");
+        Mockito.when(searchService.searchPosts("he")).thenReturn(List.of(p));
+
+        mockMvc.perform(get("/api/search/posts").param("keyword", "he"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(5));
+    }
 }
