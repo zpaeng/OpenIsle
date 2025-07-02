@@ -20,6 +20,21 @@ public class TagService {
         return tagRepository.save(tag);
     }
 
+    public Tag updateTag(Long id, String name, String describe, String icon) {
+        Tag tag = tagRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Tag not found"));
+        if (name != null) {
+            tag.setName(name);
+        }
+        if (describe != null) {
+            tag.setDescribe(describe);
+        }
+        if (icon != null) {
+            tag.setIcon(icon);
+        }
+        return tagRepository.save(tag);
+    }
+
     public void deleteTag(Long id) {
         tagRepository.deleteById(id);
     }

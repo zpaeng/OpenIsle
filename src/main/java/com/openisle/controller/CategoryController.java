@@ -21,6 +21,12 @@ public class CategoryController {
         return toDto(c);
     }
 
+    @PutMapping("/{id}")
+    public CategoryDto update(@PathVariable Long id, @RequestBody CategoryRequest req) {
+        Category c = categoryService.updateCategory(id, req.getName(), req.getDescribe(), req.getIcon());
+        return toDto(c);
+    }
+
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         categoryService.deleteCategory(id);
