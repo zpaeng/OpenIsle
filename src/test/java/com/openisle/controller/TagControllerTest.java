@@ -31,14 +31,18 @@ class TagControllerTest {
         Tag t = new Tag();
         t.setId(1L);
         t.setName("java");
-        Mockito.when(tagService.createTag(eq("java"))).thenReturn(t);
+        t.setDescribe("d");
+        t.setIcon("i");
+        Mockito.when(tagService.createTag(eq("java"), eq("d"), eq("i"))).thenReturn(t);
         Mockito.when(tagService.getTag(1L)).thenReturn(t);
 
         mockMvc.perform(post("/api/tags")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"java\"}"))
+                        .content("{\"name\":\"java\",\"describe\":\"d\",\"icon\":\"i\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("java"));
+                .andExpect(jsonPath("$.name").value("java"))
+                .andExpect(jsonPath("$.describe").value("d"))
+                .andExpect(jsonPath("$.icon").value("i"));
 
         mockMvc.perform(get("/api/tags/1"))
                 .andExpect(status().isOk())
@@ -50,10 +54,15 @@ class TagControllerTest {
         Tag t = new Tag();
         t.setId(2L);
         t.setName("spring");
+        t.setDescribe("d2");
+        t.setIcon("i2");
         Mockito.when(tagService.listTags()).thenReturn(List.of(t));
 
         mockMvc.perform(get("/api/tags"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("spring"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("spring"))
+                .andExpect(jsonPath("$[0].describe").value("d2"))
+                .andExpect(jsonPath("$[0].icon").value("i2"));
     }
 }

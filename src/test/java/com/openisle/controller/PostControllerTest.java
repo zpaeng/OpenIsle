@@ -49,9 +49,13 @@ class PostControllerTest {
         Category cat = new Category();
         cat.setId(1L);
         cat.setName("tech");
+        cat.setDescribe("d");
+        cat.setIcon("i");
         Tag tag = new Tag();
         tag.setId(1L);
         tag.setName("java");
+        tag.setDescribe("td");
+        tag.setIcon("ti");
         Post post = new Post();
         post.setId(1L);
         post.setTitle("t");
@@ -82,9 +86,13 @@ class PostControllerTest {
         Category cat = new Category();
         cat.setId(1L);
         cat.setName("tech");
+        cat.setDescribe("d");
+        cat.setIcon("i");
         Tag tag = new Tag();
         tag.setId(1L);
         tag.setName("java");
+        tag.setDescribe("td");
+        tag.setIcon("ti");
         Post post = new Post();
         post.setId(2L);
         post.setTitle("hello");

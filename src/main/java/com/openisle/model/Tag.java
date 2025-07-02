@@ -17,4 +17,10 @@ public class Tag {
 
     @Column(nullable = false, unique = true)
     private String name;
+
+    @Column
+    private String icon;
+
+    @Column(nullable = false)
+    private String describe;
 }
