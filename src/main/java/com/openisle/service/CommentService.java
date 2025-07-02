@@ -8,6 +8,7 @@ import com.openisle.repository.CommentRepository;
 import com.openisle.repository.PostRepository;
 import com.openisle.repository.UserRepository;
 import com.openisle.service.NotificationService;
+import com.openisle.service.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ public class CommentService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final SubscriptionService subscriptionService;
 
     public Comment addComment(String username, Long postId, String content) {
         User author = userRepository.findByUsername(username)
@@ -35,6 +37,16 @@ public class CommentService {
         comment = commentRepository.save(comment);
         if (!author.getId().equals(post.getAuthor().getId())) {
             notificationService.createNotification(post.getAuthor(), NotificationType.COMMENT_REPLY, post, comment, null);
+        }
+        for (User u : subscriptionService.getPostSubscribers(postId)) {
+            if (!u.getId().equals(author.getId())) {
+                notificationService.createNotification(u, NotificationType.POST_UPDATED, post, comment, null);
+            }
+        }
+        for (User u : subscriptionService.getSubscribers(author.getUsername())) {
+            if (!u.getId().equals(author.getId())) {
+                notificationService.createNotification(u, NotificationType.USER_ACTIVITY, post, comment, null);
+            }
         }
         return comment;
     }
@@ -52,6 +64,21 @@ public class CommentService {
         comment = commentRepository.save(comment);
         if (!author.getId().equals(parent.getAuthor().getId())) {
             notificationService.createNotification(parent.getAuthor(), NotificationType.COMMENT_REPLY, parent.getPost(), comment, null);
+        }
+        for (User u : subscriptionService.getCommentSubscribers(parentId)) {
+            if (!u.getId().equals(author.getId())) {
+                notificationService.createNotification(u, NotificationType.COMMENT_REPLY, parent.getPost(), comment, null);
+            }
+        }
+        for (User u : subscriptionService.getPostSubscribers(parent.getPost().getId())) {
+            if (!u.getId().equals(author.getId())) {
+                notificationService.createNotification(u, NotificationType.POST_UPDATED, parent.getPost(), comment, null);
+            }
+        }
+        for (User u : subscriptionService.getSubscribers(author.getUsername())) {
+            if (!u.getId().equals(author.getId())) {
+                notificationService.createNotification(u, NotificationType.USER_ACTIVITY, parent.getPost(), comment, null);
+            }
         }
         return comment;
     }
