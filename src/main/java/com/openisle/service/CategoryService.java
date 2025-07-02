@@ -20,6 +20,21 @@ public class CategoryService {
         return categoryRepository.save(category);
     }
 
+    public Category updateCategory(Long id, String name, String describe, String icon) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+        if (name != null) {
+            category.setName(name);
+        }
+        if (describe != null) {
+            category.setDescribe(describe);
+        }
+        if (icon != null) {
+            category.setIcon(icon);
+        }
+        return categoryRepository.save(category);
+    }
+
     public void deleteCategory(Long id) {
         categoryRepository.deleteById(id);
     }

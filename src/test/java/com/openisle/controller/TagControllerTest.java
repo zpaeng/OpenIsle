@@ -65,4 +65,23 @@ class TagControllerTest {
                 .andExpect(jsonPath("$[0].describe").value("d2"))
                 .andExpect(jsonPath("$[0].icon").value("i2"));
     }
+
+    @Test
+    void updateTag() throws Exception {
+        Tag t = new Tag();
+        t.setId(3L);
+        t.setName("java");
+        t.setDescribe("d3");
+        t.setIcon("i3");
+        Mockito.when(tagService.updateTag(eq(3L), eq("java"), eq("d3"), eq("i3"))).thenReturn(t);
+
+        mockMvc.perform(put("/api/tags/3")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"java\",\"describe\":\"d3\",\"icon\":\"i3\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(3))
+                .andExpect(jsonPath("$.name").value("java"))
+                .andExpect(jsonPath("$.describe").value("d3"))
+                .andExpect(jsonPath("$.icon").value("i3"));
+    }
 }

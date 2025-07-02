@@ -64,4 +64,23 @@ class CategoryControllerTest {
                 .andExpect(jsonPath("$[0].describe").value("d2"))
                 .andExpect(jsonPath("$[0].icon").value("i2"));
     }
+
+    @Test
+    void updateCategory() throws Exception {
+        Category c = new Category();
+        c.setId(3L);
+        c.setName("tech");
+        c.setDescribe("d3");
+        c.setIcon("i3");
+        Mockito.when(categoryService.updateCategory(eq(3L), eq("tech"), eq("d3"), eq("i3"))).thenReturn(c);
+
+        mockMvc.perform(put("/api/categories/3")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"tech\",\"describe\":\"d3\",\"icon\":\"i3\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(3))
+                .andExpect(jsonPath("$.name").value("tech"))
+                .andExpect(jsonPath("$.describe").value("d3"))
+                .andExpect(jsonPath("$.icon").value("i3"));
+    }
 }

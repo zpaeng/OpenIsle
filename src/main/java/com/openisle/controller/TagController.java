@@ -21,6 +21,12 @@ public class TagController {
         return toDto(tag);
     }
 
+    @PutMapping("/{id}")
+    public TagDto update(@PathVariable Long id, @RequestBody TagRequest req) {
+        Tag tag = tagService.updateTag(id, req.getName(), req.getDescribe(), req.getIcon());
+        return toDto(tag);
+    }
+
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         tagService.deleteTag(id);
