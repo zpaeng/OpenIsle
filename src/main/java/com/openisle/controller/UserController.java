@@ -5,6 +5,7 @@ import com.openisle.service.ImageUploader;
 import com.openisle.service.UserService;
 import com.openisle.service.PostService;
 import com.openisle.service.CommentService;
+import com.openisle.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class UserController {
     private final ImageUploader imageUploader;
     private final PostService postService;
     private final CommentService commentService;
+    private final SubscriptionService subscriptionService;
 
     @Value("${app.upload.check-type:true}")
     private boolean checkImageType;
@@ -86,6 +88,20 @@ public class UserController {
                 .collect(java.util.stream.Collectors.toList());
     }
 
+    @GetMapping("/{username}/following")
+    public java.util.List<UserDto> following(@PathVariable String username) {
+        return subscriptionService.getSubscribedUsers(username).stream()
+                .map(this::toDto)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @GetMapping("/{username}/followers")
+    public java.util.List<UserDto> followers(@PathVariable String username) {
+        return subscriptionService.getSubscribers(username).stream()
+                .map(this::toDto)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
     @GetMapping("/{username}/all")
     public ResponseEntity<UserAggregateDto> userAggregate(@PathVariable String username,
                                                           @RequestParam(value = "postsLimit", required = false) Integer postsLimit,
@@ -112,6 +128,8 @@ public class UserController {
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
         dto.setAvatar(user.getAvatar());
+        dto.setFollowers(subscriptionService.countSubscribers(user.getUsername()));
+        dto.setFollowing(subscriptionService.countSubscribed(user.getUsername()));
         return dto;
     }
 
@@ -140,6 +158,8 @@ public class UserController {
         private String username;
         private String email;
         private String avatar;
+        private long followers;
+        private long following;
     }
 
     @Data
