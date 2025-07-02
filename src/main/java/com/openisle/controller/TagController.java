@@ -2,6 +2,7 @@ package com.openisle.controller;
 
 import com.openisle.model.Tag;
 import com.openisle.service.TagService;
+import com.openisle.service.PostService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TagController {
     private final TagService tagService;
+    private final PostService postService;
 
     @PostMapping
     public TagDto create(@RequestBody TagRequest req) {
@@ -38,6 +40,21 @@ public class TagController {
         return toDto(tagService.getTag(id));
     }
 
+    @GetMapping("/{id}/posts")
+    public List<PostSummaryDto> listPostsByTag(@PathVariable Long id,
+                                               @RequestParam(value = "page", required = false) Integer page,
+                                               @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+        return postService.listPostsByTags(java.util.List.of(id), page, pageSize)
+                .stream()
+                .map(p -> {
+                    PostSummaryDto dto = new PostSummaryDto();
+                    dto.setId(p.getId());
+                    dto.setTitle(p.getTitle());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
     private TagDto toDto(Tag tag) {
         TagDto dto = new TagDto();
         dto.setId(tag.getId());
@@ -60,5 +77,11 @@ public class TagController {
         private String name;
         private String describe;
         private String icon;
+    }
+
+    @Data
+    private static class PostSummaryDto {
+        private Long id;
+        private String title;
     }
 }
