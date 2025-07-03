@@ -258,22 +258,24 @@ export default {
 .post-page-scroller-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   width: 15%;
-  background-color: #f0f0f0;
+}
+
+.scroller {
+  margin-top: 20px;
+  margin-left: 20px;
 }
 
 .scroller-time {
   font-size: 14px;
-  opacity: 0.7;
+  opacity: 0.5;
 }
 
 .scroller-middle {
   margin: 10px 0;
+  margin-left: 10px;
   display: flex;
   flex-direction: row;
-  align-items: center;
   gap: 8px;
 }
 
@@ -287,20 +289,19 @@ export default {
 }
 
 .scroller-range::-webkit-slider-runnable-track {
-  width: 2px;
+  width: 1px;
   height: 100%;
-  background-color: #ccc;
-  border-radius: 1px;
+  background-color: var(--scroller-background-color);
 }
 
 .scroller-range::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 10px;
-  height: 10px;
-  background-color: #333;
-  border-radius: 50%;
+  width: 6px;
+  height: 60px;
+  right: 2px;
+  border-radius: 3px;
+  background-color: var(--scroller-background-color);
   cursor: pointer;
-  margin-top: -4px;
 }
 
 .scroller-range::-moz-range-track {
@@ -319,8 +320,9 @@ export default {
 }
 
 .scroller-index {
-  font-size: 14px;
-  opacity: 0.7;
+  font-size: 17px;
+  font-weight: bold;
+  margin-top: 10px;
 }
 
 .article-title-container {
