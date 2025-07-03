@@ -23,7 +23,7 @@
     <div class="article-container">
       <div class="article-item">
         <div class="article-main-container">
-          <div class="article-item-title">各位佬，科研项目python语言适合什么ai编程？</div>
+          <router-link class="article-item-title" to="/posts/1">各位佬，科研项目python语言适合什么ai编程？</router-link>
           <div class="article-item-description">是的，L站目前每天都有不少各色各样的佬友加入。对于一个在线社区来说，不断壮大和涌入新的血液是一件好事。但我每天都要问问自己，这里面有没有问题？真的完全是好事吗？在这个过程中我嗅到了一丝危险的气息：有人试图同质化这里，把这里当作互联网上另⋯阅读更多 </div>
           <div class="article-info-container">
             <div class="article-info-item">
