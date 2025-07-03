@@ -1,6 +1,6 @@
 <template>
   <div class="post-page-container">
-    <div class="post-page-main-container">
+    <div class="post-page-main-container" ref="mainContainer" @scroll="onScroll">
       <div class="article-title-container">
         <div class="article-title">请不要把互联网上的戾气带来这里！</div>
         <div class="article-info-container">
@@ -18,7 +18,7 @@
         </div>
       </div>
 
-      <div class="info-content-container">
+      <div class="info-content-container" ref="postItems">
         <div class="user-avatar-container">
           <div class="user-avatar-item">
             <img class="user-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
@@ -28,7 +28,7 @@
         <div class="info-content">
           <div class="info-content-header">
             <div class="user-name">Nagisa77</div>
-            <div class="post-time">3月10日</div>
+            <div class="post-time">{{ postTime }}</div>
           </div>
           <div class="info-content-text">
             是的，L站目前每天都有不少各色各样的佬友加入。对于一个在线社区来说，不断壮大和涌入新的血液是一件好事。
@@ -82,7 +82,7 @@
       </div>
 
       <div class="comments-container">
-        <div class="info-content-container" v-for="comment in comments" :key="comment.id">
+        <div class="info-content-container" v-for="comment in comments" :key="comment.id" ref="postItems">
           <div class="user-avatar-container">
             <div class="user-avatar-item">
               <img class="user-avatar-item-img" :src="comment.avatar" alt="avatar">
@@ -131,13 +131,25 @@
     </div>
 
     <div class="post-page-scroller-container">
-      scroller
+      <div class="scroller-time">{{ postTime }}</div>
+      <div class="scroller-middle">
+        <input
+          type="range"
+          class="scroller-range"
+          :min="1"
+          :max="totalPosts"
+          v-model.number="currentIndex"
+          @input="onSliderInput"
+        />
+        <div class="scroller-index">{{ currentIndex }}/{{ totalPosts }}</div>
+      </div>
+      <div class="scroller-time">{{ lastReplyTime }}</div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 export default {
   name: 'PostPageView',
@@ -187,8 +199,49 @@ export default {
         text: '这里面有没有问题？真的完全是好事吗？在这个过程中我嗅到了一丝危险的气息'
       }
     ])
+    const postTime = ref('3月10日')
+    const postItems = ref([])
+    const mainContainer = ref(null)
+    const currentIndex = ref(1)
+    const totalPosts = computed(() => comments.value.length + 1)
+    const lastReplyTime = computed(() =>
+      comments.value.length ? comments.value[comments.value.length - 1].time : postTime.value
+    )
 
-    return { tags, comments }
+    const updateCurrentIndex = () => {
+      const scrollTop = mainContainer.value ? mainContainer.value.scrollTop : 0
+      for (let i = 0; i < postItems.value.length; i++) {
+        const el = postItems.value[i]
+        if (el.offsetTop + el.offsetHeight > scrollTop) {
+          currentIndex.value = i + 1
+          break
+        }
+      }
+    }
+
+    const onSliderInput = () => {
+      const target = postItems.value[currentIndex.value - 1]
+      if (target && mainContainer.value) {
+        mainContainer.value.scrollTo({ top: target.offsetTop, behavior: 'smooth' })
+      }
+    }
+
+    onMounted(() => {
+      updateCurrentIndex()
+    })
+
+    return {
+      tags,
+      comments,
+      postTime,
+      lastReplyTime,
+      postItems,
+      mainContainer,
+      currentIndex,
+      totalPosts,
+      onSliderInput,
+      onScroll: updateCurrentIndex
+    }
   }
 }
 </script>
@@ -208,10 +261,40 @@ export default {
 }
 
 .post-page-scroller-container {
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
   height: 100%;
   width: 15%;
   background-color: #f0f0f0;
+}
+
+.scroller-time {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.scroller-middle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-grow: 1;
+}
+
+.scroller-range {
+  writing-mode: bt-lr;
+  -webkit-appearance: slider-vertical;
+  width: 8px;
+  height: 200px;
+}
+
+.scroller-index {
+  font-size: 14px;
+  opacity: 0.7;
 }
 
 .article-title-container {
