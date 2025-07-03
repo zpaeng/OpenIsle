@@ -2,18 +2,18 @@
   <transition name="slide">
     <nav v-if="visible" class="menu">
       <div class="menu-item-container">
-        <div class="menu-item selected">
+        <router-link class="menu-item" exact-active-class="selected" to="/">
           <i class="menu-item-icon fas fa-hashtag"></i>
-          <router-link class="menu-item-text" to="/">话题</router-link>
-        </div>
-        <div class="menu-item">
+          <span class="menu-item-text">话题</span>
+        </router-link>
+        <router-link class="menu-item" exact-active-class="selected" to="/message">
           <i class="menu-item-icon fas fa-envelope"></i>
-          <router-link class="menu-item-text" to="/">我的消息</router-link>
-        </div>
-        <div class="menu-item">
+          <span class="menu-item-text">我的消息</span>
+        </router-link>
+        <router-link class="menu-item" exact-active-class="selected" to="/about">
           <i class="menu-item-icon fas fa-info-circle"></i>
-          <router-link class="menu-item-text" to="/">关于</router-link>
-        </div>
+          <span class="menu-item-text">关于</span>
+        </router-link>
       </div>
     </nav>
   </transition>
