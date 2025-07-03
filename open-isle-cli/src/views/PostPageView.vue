@@ -9,11 +9,7 @@
         </div>
 
         <div class="article-tags-container">
-          <div
-            class="article-tag-item"
-            v-for="tag in tags"
-            :key="tag"
-          >
+          <div class="article-tag-item" v-for="tag in tags" :key="tag">
             <i class="fas fa-tag"></i>
             <div class="article-tag-item-text">{{ tag }}</div>
           </div>
@@ -85,11 +81,7 @@
     </div>
 
     <div class="comments-container">
-      <div
-        class="info-content-container"
-        v-for="comment in comments"
-        :key="comment.id"
-      >
+      <div class="info-content-container" v-for="comment in comments" :key="comment.id">
         <div class="user-avatar-container">
           <div class="user-avatar-item">
             <img class="user-avatar-item-img" :src="comment.avatar" alt="avatar">

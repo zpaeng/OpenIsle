@@ -10,30 +10,18 @@
     </div>
 
 
-  <div class="topic-container">
+    <div class="topic-container">
       <div class="topic-item-container">
-        <div
-          v-for="topic in topics"
-          :key="topic"
-          class="topic-item"
-          :class="{ selected: topic === selectedTopic }"
-        >
+        <div v-for="topic in topics" :key="topic" class="topic-item" :class="{ selected: topic === selectedTopic }">
           {{ topic }}
         </div>
       </div>
     </div>
 
     <div class="article-container">
-      <div
-        class="article-item"
-        v-for="article in articles"
-        :key="article.id"
-      >
+      <div class="article-item" v-for="article in articles" :key="article.id">
         <div class="article-main-container">
-          <router-link
-            class="article-item-title"
-            :to="`/posts/${article.id}`"
-          >
+          <router-link class="article-item-title" :to="`/posts/${article.id}`">
             {{ article.title }}
           </router-link>
           <div class="article-item-description">{{ article.description }}</div>
@@ -44,11 +32,7 @@
             </div>
 
             <div class="article-tags-container">
-              <div
-                class="article-tag-item"
-                v-for="tag in article.tags"
-                :key="tag"
-              >
+              <div class="article-tag-item" v-for="tag in article.tags" :key="tag">
                 <i class="fas fa-tag"></i>
                 <div class="article-tag-item-text">{{ tag }}</div>
               </div>
@@ -57,16 +41,8 @@
         </div>
 
         <div class="article-member-avatars-container">
-          <div
-            class="article-member-avatar-item"
-            v-for="(avatar, idx) in article.members"
-            :key="idx"
-          >
-            <img
-              class="article-member-avatar-item-img"
-              :src="avatar"
-              alt="avatar"
-            >
+          <div class="article-member-avatar-item" v-for="(avatar, idx) in article.members" :key="idx">
+            <img class="article-member-avatar-item-img" :src="avatar" alt="avatar">
           </div>
         </div>
         <div class="article-comments">
@@ -263,7 +239,7 @@ export default {
 
 .article-item-title {
   font-size: 20px;
-  text-decoration: none;  
+  text-decoration: none;
   color: black;
 }
 
@@ -339,6 +315,4 @@ export default {
   margin-left: 20px;
   margin-right: 20px;
 }
-
-
 </style>
