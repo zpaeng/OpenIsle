@@ -25,16 +25,19 @@
       </div>
     </div>
 
-    <div class="article-content-container">
+    <div class="info-content-container">
       <div class="user-avatar-container">
         <div class="user-avatar-item">
           <img class="user-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
         </div>
       </div>
 
-      <div class="article-content">
-        <div class="user-name">Nagisa77</div>
-        <div class="article-content-text">
+      <div class="info-content">
+        <div class="info-content-header">
+          <div class="user-name">Nagisa77</div>
+          <div class="post-time">3月10日</div>
+        </div>
+        <div class="info-content-text">
           是的，L站目前每天都有不少各色各样的佬友加入。对于一个在线社区来说，不断壮大和涌入新的血液是一件好事。
 
           但我每天都要问问自己，这里面有没有问题？真的完全是好事吗？在这个过程中我嗅到了一丝危险的气息：有人试图同质化这里，把这里当作互联网上另一个可以随意发泄情绪的地方！甚至试图占领舆论高地，把这里堂而皇之地变成另一个垃圾场。
@@ -84,6 +87,279 @@
         </div>
       </div>
     </div>
+
+    <div class="comments-container">
+      <div class="info-content-container">
+        <div class="user-avatar-container">
+          <div class="user-avatar-item">
+            <img class="user-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
+          </div>
+        </div>
+
+        <div class="info-content">
+          <div class="info-content-header">
+            <div class="user-name">Nagisa77</div>
+            <div class="post-time">3月10日</div>
+          </div>
+          <div class="info-content-text">
+            沙发🛋️🛋️🛋️🛋️
+          </div>
+
+          <div class="article-footer-container">
+            <div class="reactions-container">
+              <div class="reactions-viewer">
+                <div class="reactions-viewer-item-container">
+                  <div class="reactions-viewer-item">
+                    🤣
+                  </div>
+                  <div class="reactions-viewer-item">
+                    ❤️
+                  </div>
+                  <div class="reactions-viewer-item">
+                    👏
+                  </div>
+                </div>
+                <div class="reactions-count">1882</div>
+              </div>
+
+              <div class="make-reaction-container">
+                <div class="make-reaction-item like-reaction">
+                  <i class="far fa-heart"></i>
+                </div>
+                <div class="make-reaction-item copy-link">
+                  <i class="fas fa-link"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-content-container">
+        <div class="user-avatar-container">
+          <div class="user-avatar-item">
+            <img class="user-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
+          </div>
+        </div>
+
+        <div class="info-content">
+          <div class="info-content-header">
+            <div class="user-name">Nagisa77</div>
+            <div class="post-time">3月10日</div>
+          </div>
+          <div class="info-content-text">
+            💩💩💩💩💩
+          </div>
+
+          <div class="article-footer-container">
+            <div class="reactions-container">
+              <div class="reactions-viewer">
+                <div class="reactions-viewer-item-container">
+                  <div class="reactions-viewer-item">
+                    🤣
+                  </div>
+                  <div class="reactions-viewer-item">
+                    ❤️
+                  </div>
+                  <div class="reactions-viewer-item">
+                    👏
+                  </div>
+                </div>
+                <div class="reactions-count">1882</div>
+              </div>
+
+              <div class="make-reaction-container">
+                <div class="make-reaction-item like-reaction">
+                  <i class="far fa-heart"></i>
+                </div>
+                <div class="make-reaction-item copy-link">
+                  <i class="fas fa-link"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-content-container">
+        <div class="user-avatar-container">
+          <div class="user-avatar-item">
+            <img class="user-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
+          </div>
+        </div>
+
+        <div class="info-content">
+          <div class="info-content-header">
+            <div class="user-name">Nagisa77</div>
+            <div class="post-time">3月10日</div>
+          </div>
+          <div class="info-content-text">
+            是的
+          </div>
+
+          <div class="article-footer-container">
+            <div class="reactions-container">
+              <div class="reactions-viewer">
+                <div class="reactions-viewer-item-container">
+                  <div class="reactions-viewer-item">
+                    🤣
+                  </div>
+                  <div class="reactions-viewer-item">
+                    ❤️
+                  </div>
+                  <div class="reactions-viewer-item">
+                    👏
+                  </div>
+                </div>
+                <div class="reactions-count">1882</div>
+              </div>
+
+              <div class="make-reaction-container">
+                <div class="make-reaction-item like-reaction">
+                  <i class="far fa-heart"></i>
+                </div>
+                <div class="make-reaction-item copy-link">
+                  <i class="fas fa-link"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-content-container">
+        <div class="user-avatar-container">
+          <div class="user-avatar-item">
+            <img class="user-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
+          </div>
+        </div>
+
+        <div class="info-content">
+          <div class="info-content-header">
+            <div class="user-name">Nagisa77</div>
+            <div class="post-time">3月10日</div>
+          </div>
+          <div class="info-content-text">
+            持续时间至最后一个不会好好说话的账号持有者被请出社区为止。
+          </div>
+
+          <div class="article-footer-container">
+            <div class="reactions-container">
+              <div class="reactions-viewer">
+                <div class="reactions-viewer-item-container">
+                  <div class="reactions-viewer-item">
+                    🤣
+                  </div>
+                  <div class="reactions-viewer-item">
+                    ❤️
+                  </div>
+                  <div class="reactions-viewer-item">
+                    👏
+                  </div>
+                </div>
+                <div class="reactions-count">1882</div>
+              </div>
+
+              <div class="make-reaction-container">
+                <div class="make-reaction-item like-reaction">
+                  <i class="far fa-heart"></i>
+                </div>
+                <div class="make-reaction-item copy-link">
+                  <i class="fas fa-link"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-content-container">
+        <div class="user-avatar-container">
+          <div class="user-avatar-item">
+            <img class="user-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
+          </div>
+        </div>
+
+        <div class="info-content">
+          <div class="info-content-header">
+            <div class="user-name">Nagisa77</div>
+            <div class="post-time">3月10日</div>
+          </div>
+          <div class="info-content-text">
+            赞同楼主
+          </div>
+
+          <div class="article-footer-container">
+            <div class="reactions-container">
+              <div class="reactions-viewer">
+                <div class="reactions-viewer-item-container">
+                  <div class="reactions-viewer-item">
+                    🤣
+                  </div>
+                  <div class="reactions-viewer-item">
+                    ❤️
+                  </div>
+                  <div class="reactions-viewer-item">
+                    👏
+                  </div>
+                </div>
+                <div class="reactions-count">1882</div>
+              </div>
+
+              <div class="make-reaction-container">
+                <div class="make-reaction-item like-reaction">
+                  <i class="far fa-heart"></i>
+                </div>
+                <div class="make-reaction-item copy-link">
+                  <i class="fas fa-link"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-content-container">
+        <div class="user-avatar-container">
+          <div class="user-avatar-item">
+            <img class="user-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
+          </div>
+        </div>
+
+        <div class="info-content">
+          <div class="info-content-header">
+            <div class="user-name">Nagisa77</div>
+            <div class="post-time">3月10日</div>
+          </div>
+          <div class="info-content-text">
+            这里面有没有问题？真的完全是好事吗？在这个过程中我嗅到了一丝危险的气息
+          </div>
+
+          <div class="article-footer-container">
+            <div class="reactions-container">
+              <div class="reactions-viewer">
+                <div class="reactions-viewer-item-container">
+                  <div class="reactions-viewer-item">
+                    🤣
+                  </div>
+                  <div class="reactions-viewer-item">
+                    ❤️
+                  </div>
+                  <div class="reactions-viewer-item">
+                    👏
+                  </div>
+                </div>
+                <div class="reactions-count">1882</div>
+              </div>
+
+              <div class="make-reaction-container">
+                <div class="make-reaction-item like-reaction">
+                  <i class="far fa-heart"></i>
+                </div>
+                <div class="make-reaction-item copy-link">
+                  <i class="fas fa-link"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -117,6 +393,8 @@ export default {
 <style scoped>
 .post-page {
   padding: 20px;
+  overflow-y: auto;
+  height: calc(100vh - var(--header-height) - 40px);
 }
 
 .article-title-container {
@@ -157,18 +435,16 @@ export default {
   align-items: center;
 }
 
-.article-content-container {
+.info-content-container {
   margin-top: 20px;
   display: flex;
+  width: 100%;
   flex-direction: row;
   gap: 10px;
+  border-bottom: 1px solid #e2e2e2;
 }
 
-.user-avatar-container {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-}
+.user-avatar-container {}
 
 .user-avatar-item {
   width: 50px;
@@ -181,21 +457,37 @@ export default {
   border-radius: 50%;
 }
 
-.article-content {
+.info-content {
   display: flex;
+  width: 100%;
   flex-direction: column;
   gap: 10px;
+}
+
+.info-content-header {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .user-name {
   font-size: 16px;
   font-weight: bold;
+  opacity: 0.7;
 }
 
-.article-content-text {
+.post-time {
+  font-size: 14px;
+  opacity: 0.5;
+}
+
+.info-content-text {
   font-size: 16px;
   line-height: 1.8;
   opacity: 0.7;
+  width: 100%;
 }
 
 .article-footer-container {
@@ -266,5 +558,4 @@ export default {
 .copy-link:hover {
   background-color: #e2e2e2;
 }
-
 </style>
