@@ -1,9 +1,12 @@
 <template>
   <div id="app">
-    <HeaderComponent @toggle-menu="menuVisible = !menuVisible" />
+    <HeaderComponent
+      @toggle-menu="menuVisible = !menuVisible"
+      :show-menu-btn="!hideMenu"
+    />
 
     <div class="main-container">
-      <MenuComponent :visible="menuVisible" />
+      <MenuComponent :visible="!hideMenu && menuVisible" />
       <div class="content">
         <router-view />
       </div>
@@ -20,6 +23,11 @@ export default {
   components: { HeaderComponent, MenuComponent },
   data() {
     return { menuVisible: true }
+  },
+  computed: {
+    hideMenu() {
+      return ['/login', '/signup'].includes(this.$route.path)
+    }
   }
 }
 </script>
