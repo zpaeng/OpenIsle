@@ -403,6 +403,13 @@ export default {
 
 .article-item-title {
   font-size: 20px;
+  text-decoration: none;  
+  color: black;
+}
+
+.article-item-title:hover {
+  color: var(--primary-color);
+  text-decoration: underline;
 }
 
 .article-item-description {

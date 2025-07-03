@@ -4,7 +4,7 @@
       <button class="menu-btn" @click="$emit('toggle-menu')">
         <i class="fas fa-bars"></i> 
       </button>
-      <div class="logo-container">
+      <div class="logo-container" @click="goToHome">
         <img alt="OpenIsle" src="https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/image.png" width="60" height="60">
         <div class="logo-text">OpenIsle</div>
       </div>
@@ -14,7 +14,12 @@
 
 <script>
 export default {
-  name: 'HeaderComponent'
+  name: 'HeaderComponent',
+  methods: {
+    goToHome() {
+      this.$router.push('/')
+    }
+  }
 }
 </script>
 
@@ -34,6 +39,7 @@ export default {
   align-items: center;
   font-size: 20px;
   font-weight: bold;
+  cursor: pointer;
 }
 
 .header-content {
