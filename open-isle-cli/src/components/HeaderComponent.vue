@@ -1,8 +1,8 @@
 <template>
   <header class="header">
     <div class="header-content">
-      <button class="menu-btn" @click="$emit('toggle-menu')">
-        <i class="fas fa-bars"></i> 
+      <button v-if="showMenuBtn" class="menu-btn" @click="$emit('toggle-menu')">
+        <i class="fas fa-bars"></i>
       </button>
       <div class="logo-container" @click="goToHome">
         <img alt="OpenIsle" src="https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/image.png" width="60" height="60">
@@ -15,6 +15,12 @@
 <script>
 export default {
   name: 'HeaderComponent',
+  props: {
+    showMenuBtn: {
+      type: Boolean,
+      default: true
+    }
+  },
   methods: {
     goToHome() {
       this.$router.push('/')
