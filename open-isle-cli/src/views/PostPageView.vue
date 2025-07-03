@@ -280,9 +280,42 @@ export default {
 .scroller-range {
   writing-mode: vertical-rl;
   direction: ltr;
-  width: 2px;
-  -webkit-appearance: slider-vertical;
   height: 300px;
+  width: 2px;
+  -webkit-appearance: none;
+  background: transparent;
+}
+
+.scroller-range::-webkit-slider-runnable-track {
+  width: 2px;
+  height: 100%;
+  background-color: #ccc;
+  border-radius: 1px;
+}
+
+.scroller-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+  background-color: #333;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -4px;
+}
+
+.scroller-range::-moz-range-track {
+  width: 2px;
+  height: 100%;
+  background-color: #ccc;
+  border-radius: 1px;
+}
+
+.scroller-range::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  background-color: #333;
+  border-radius: 50%;
+  cursor: pointer;
 }
 
 .scroller-index {
