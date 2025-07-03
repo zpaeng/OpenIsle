@@ -131,19 +131,15 @@
     </div>
 
     <div class="post-page-scroller-container">
-      <div class="scroller-time">{{ postTime }}</div>
-      <div class="scroller-middle">
-        <input
-          type="range"
-          class="scroller-range"
-          :min="1"
-          :max="totalPosts"
-          v-model.number="currentIndex"
-          @input="onSliderInput"
-        />
-        <div class="scroller-index">{{ currentIndex }}/{{ totalPosts }}</div>
+      <div class="scroller">
+        <div class="scroller-time">{{ postTime }}</div>
+        <div class="scroller-middle">
+          <input type="range" class="scroller-range" :max="totalPosts" :min="1" v-model.number="currentIndex"
+            @input="onSliderInput" />
+          <div class="scroller-index" :style="indexStyle">{{ currentIndex }}/{{ totalPosts }}</div>
+        </div>
+        <div class="scroller-time">{{ lastReplyTime }}</div>
       </div>
-      <div class="scroller-time">{{ lastReplyTime }}</div>
     </div>
   </div>
 </template>
@@ -166,35 +162,35 @@ export default {
       {
         id: 2,
         userName: 'Nagisa77',
-        time: '3月10日',
+        time: '3月11日',
         avatar: 'https://picsum.photos/200/200',
         text: '💩💩💩💩💩'
       },
       {
         id: 3,
         userName: 'Nagisa77',
-        time: '3月10日',
+        time: '3月12日',
         avatar: 'https://picsum.photos/200/200',
         text: '是的'
       },
       {
         id: 4,
         userName: 'Nagisa77',
-        time: '3月10日',
+        time: '3月13日',
         avatar: 'https://picsum.photos/200/200',
         text: '持续时间至最后一个不会好好说话的账号持有者被请出社区为止。'
       },
       {
         id: 5,
         userName: 'Nagisa77',
-        time: '3月10日',
+        time: '3月14日',
         avatar: 'https://picsum.photos/200/200',
         text: '赞同楼主'
       },
       {
         id: 6,
         userName: 'Nagisa77',
-        time: '3月10日',
+        time: '3月15日',
         avatar: 'https://picsum.photos/200/200',
         text: '这里面有没有问题？真的完全是好事吗？在这个过程中我嗅到了一丝危险的气息'
       }
@@ -207,7 +203,6 @@ export default {
     const lastReplyTime = computed(() =>
       comments.value.length ? comments.value[comments.value.length - 1].time : postTime.value
     )
-
     const updateCurrentIndex = () => {
       const scrollTop = mainContainer.value ? mainContainer.value.scrollTop : 0
       for (let i = 0; i < postItems.value.length; i++) {
@@ -222,7 +217,7 @@ export default {
     const onSliderInput = () => {
       const target = postItems.value[currentIndex.value - 1]
       if (target && mainContainer.value) {
-        mainContainer.value.scrollTo({ top: target.offsetTop, behavior: 'smooth' })
+        mainContainer.value.scrollTo({ top: target.offsetTop, behavior: 'instant' })
       }
     }
 
@@ -264,9 +259,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: 10px 0;
-  height: 100%;
+  justify-content: center;
   width: 15%;
   background-color: #f0f0f0;
 }
@@ -277,19 +270,19 @@ export default {
 }
 
 .scroller-middle {
+  margin: 10px 0;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  flex-grow: 1;
+  gap: 8px;
 }
 
 .scroller-range {
-  writing-mode: bt-lr;
+  writing-mode: vertical-rl;
+  direction: ltr;
+  width: 2px;
   -webkit-appearance: slider-vertical;
-  width: 8px;
-  height: 200px;
+  height: 300px;
 }
 
 .scroller-index {
