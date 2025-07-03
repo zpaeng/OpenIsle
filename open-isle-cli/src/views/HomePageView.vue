@@ -10,295 +10,155 @@
     </div>
 
 
-    <div class="topic-container">
+  <div class="topic-container">
       <div class="topic-item-container">
-        <div class="topic-item selected">最新</div>
-        <div class="topic-item">排行榜</div>
-        <div class="topic-item">热门</div>
-        <div class="topic-item">类别</div> 
+        <div
+          v-for="topic in topics"
+          :key="topic"
+          class="topic-item"
+          :class="{ selected: topic === selectedTopic }"
+        >
+          {{ topic }}
+        </div>
       </div>
     </div>
 
-
     <div class="article-container">
-      <div class="article-item">
+      <div
+        class="article-item"
+        v-for="article in articles"
+        :key="article.id"
+      >
         <div class="article-main-container">
-          <router-link class="article-item-title" to="/posts/1">各位佬，科研项目python语言适合什么ai编程？</router-link>
-          <div class="article-item-description">是的，L站目前每天都有不少各色各样的佬友加入。对于一个在线社区来说，不断壮大和涌入新的血液是一件好事。但我每天都要问问自己，这里面有没有问题？真的完全是好事吗？在这个过程中我嗅到了一丝危险的气息：有人试图同质化这里，把这里当作互联网上另⋯阅读更多 </div>
+          <router-link
+            class="article-item-title"
+            :to="`/posts/${article.id}`"
+          >
+            {{ article.title }}
+          </router-link>
+          <div class="article-item-description">{{ article.description }}</div>
           <div class="article-info-container">
             <div class="article-info-item">
               <i class="fas fa-user"></i>
-              <div class="article-info-item-text">开发调优</div>
+              <div class="article-info-item-text">{{ article.category }}</div>
             </div>
 
             <div class="article-tags-container">
-              <div class="article-tag-item">
+              <div
+                class="article-tag-item"
+                v-for="tag in article.tags"
+                :key="tag"
+              >
                 <i class="fas fa-tag"></i>
-                <div class="article-tag-item-text">AI</div>
-              </div>
-              <div class="article-tag-item">
-                <i class="fas fa-tag"></i>
-                <div class="article-tag-item-text">Python</div>
-              </div>
-              <div class="article-tag-item">
-                <i class="fas fa-tag"></i>
-                <div class="article-tag-item-text">Java</div>
+                <div class="article-tag-item-text">{{ tag }}</div>
               </div>
             </div>
           </div>
         </div>
 
         <div class="article-member-avatars-container">
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div>
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div>
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div> 
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div>
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
+          <div
+            class="article-member-avatar-item"
+            v-for="(avatar, idx) in article.members"
+            :key="idx"
+          >
+            <img
+              class="article-member-avatar-item-img"
+              :src="avatar"
+              alt="avatar"
+            >
           </div>
         </div>
         <div class="article-comments">
-          139
+          {{ article.comments }}
         </div>
         <div class="article-views">
-          2.4k
+          {{ article.views }}
         </div>
         <div class="article-time">
-          23小时前
+          {{ article.time }}
         </div>
       </div>
+    </div>
 
-      <div class="article-item">
-        <div class="article-main-container">
-          <div class="article-item-title">各位佬，科研项目python语言适合什么ai编程？</div>
-          <div class="article-item-description">是的，L站目前每天都有不少各色各样的佬友加入。对于一个在线社区来说，不断壮大和涌入新的血液是一件好事。但我每天都要问问自己，这里面有没有问题？真的完全是好事吗？在这个过程中我嗅到了一丝危险的气息：有人试图同质化这里，把这里当作互联网上另⋯阅读更多 </div>
-          <div class="article-info-container">
-            <div class="article-info-item">
-              <i class="fas fa-user"></i>
-              <div class="article-info-item-text">开发调优</div>
-            </div>
-
-            <div class="article-tags-container">
-              <div class="article-tag-item">
-                <i class="fas fa-tag"></i>
-                <div class="article-tag-item-text">AI</div>
-              </div>
-              <div class="article-tag-item">
-                <i class="fas fa-tag"></i>
-                <div class="article-tag-item-text">Python</div>
-              </div>
-              <div class="article-tag-item">
-                <i class="fas fa-tag"></i>
-                <div class="article-tag-item-text">Java</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="article-member-avatars-container">
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div>
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div>
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div> 
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div>
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div>
-        </div>
-        <div class="article-comments">
-          139
-        </div>
-        <div class="article-views">
-          2.4k
-        </div>
-        <div class="article-time">
-          23小时前
-        </div>
-      </div>
-      <div class="article-item">
-        <div class="article-main-container">
-          <div class="article-item-title">各位佬，科研项目python语言适合什么ai编程？</div>
-          <div class="article-item-description">是的，L站目前每天都有不少各色各样的佬友加入。对于一个在线社区来说，不断壮大和涌入新的血液是一件好事。但我每天都要问问自己，这里面有没有问题？真的完全是好事吗？在这个过程中我嗅到了一丝危险的气息：有人试图同质化这里，把这里当作互联网上另⋯阅读更多 </div>
-          <div class="article-info-container">
-            <div class="article-info-item">
-              <i class="fas fa-user"></i>
-              <div class="article-info-item-text">开发调优</div>
-            </div>
-
-            <div class="article-tags-container">
-              <div class="article-tag-item">
-                <i class="fas fa-tag"></i>
-                <div class="article-tag-item-text">AI</div>
-              </div>
-              <div class="article-tag-item">
-                <i class="fas fa-tag"></i>
-                <div class="article-tag-item-text">Python</div>
-              </div>
-              <div class="article-tag-item">
-                <i class="fas fa-tag"></i>
-                <div class="article-tag-item-text">Java</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="article-member-avatars-container">
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div>
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div>
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div> 
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div>
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div>
-        </div>
-        <div class="article-comments">
-          139
-        </div>
-        <div class="article-views">
-          2.4k
-        </div>
-        <div class="article-time">
-          23小时前
-        </div>
-      </div>
-      <div class="article-item">
-        <div class="article-main-container">
-          <div class="article-item-title">各位佬，科研项目python语言适合什么ai编程？</div>
-          <div class="article-item-description">是的，L站目前每天都有不少各色各样的佬友加入。对于一个在线社区来说，不断壮大和涌入新的血液是一件好事。但我每天都要问问自己，这里面有没有问题？真的完全是好事吗？在这个过程中我嗅到了一丝危险的气息：有人试图同质化这里，把这里当作互联网上另⋯阅读更多 </div>
-          <div class="article-info-container">
-            <div class="article-info-item">
-              <i class="fas fa-user"></i>
-              <div class="article-info-item-text">开发调优</div>
-            </div>
-
-            <div class="article-tags-container">
-              <div class="article-tag-item">
-                <i class="fas fa-tag"></i>
-                <div class="article-tag-item-text">AI</div>
-              </div>
-              <div class="article-tag-item">
-                <i class="fas fa-tag"></i>
-                <div class="article-tag-item-text">Python</div>
-              </div>
-              <div class="article-tag-item">
-                <i class="fas fa-tag"></i>
-                <div class="article-tag-item-text">Java</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="article-member-avatars-container">
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div>
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div>
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div> 
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div>
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div>
-        </div>
-        <div class="article-comments">
-          139
-        </div>
-        <div class="article-views">
-          2.4k
-        </div>
-        <div class="article-time">
-          23小时前
-        </div>
-      </div>
-      <div class="article-item">
-        <div class="article-main-container">
-          <div class="article-item-title">各位佬，科研项目python语言适合什么ai编程？</div>
-          <div class="article-item-description">是的，L站目前每天都有不少各色各样的佬友加入。对于一个在线社区来说，不断壮大和涌入新的血液是一件好事。但我每天都要问问自己，这里面有没有问题？真的完全是好事吗？在这个过程中我嗅到了一丝危险的气息：有人试图同质化这里，把这里当作互联网上另⋯阅读更多 </div>
-          <div class="article-info-container">
-            <div class="article-info-item">
-              <i class="fas fa-user"></i>
-              <div class="article-info-item-text">开发调优</div>
-            </div>
-
-            <div class="article-tags-container">
-              <div class="article-tag-item">
-                <i class="fas fa-tag"></i>
-                <div class="article-tag-item-text">AI</div>
-              </div>
-              <div class="article-tag-item">
-                <i class="fas fa-tag"></i>
-                <div class="article-tag-item-text">Python</div>
-              </div>
-              <div class="article-tag-item">
-                <i class="fas fa-tag"></i>
-                <div class="article-tag-item-text">Java</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="article-member-avatars-container">
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div>
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div>
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div> 
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div>
-          <div class="article-member-avatar-item">
-            <img class="article-member-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
-          </div>
-        </div>
-        <div class="article-comments">
-          139
-        </div>
-        <div class="article-views">
-          2.4k
-        </div>
-        <div class="article-time">
-          23小时前
-        </div>
-      </div>
-    </div> 
   </div>
 </template>
 
 <script>
+import { ref } from 'vue'
+
 export default {
-  name: 'HomePageView'
+  name: 'HomePageView',
+  setup() {
+    const topics = ref(['最新', '排行榜', '热门', '类别'])
+    const selectedTopic = ref('最新')
+
+    const baseAvatar = 'https://picsum.photos/200/200'
+    const articles = ref([
+      {
+        id: 1,
+        title: '各位佬，科研项目python语言适合什么ai编程？',
+        description:
+          '是的，L站目前每天都有不少各色各样的佬友加入。对于一个在线社区来说，不断壮大和涌入新的血液是一件好事。但我每天都要问问自己，这里面有没有问题？真的完全是好事吗？在这个过程中我嗅到了一丝危险的气息：有人试图同质化这里，把这里当作互联网上另⋯阅读更多',
+        category: '开发调优',
+        tags: ['AI', 'Python', 'Java'],
+        members: Array(5).fill(baseAvatar),
+        comments: 139,
+        views: '2.4k',
+        time: '23小时前'
+      },
+      {
+        id: 2,
+        title: '各位佬，科研项目python语言适合什么ai编程？',
+        description:
+          '是的，L站目前每天都有不少各色各样的佬友加入。对于一个在线社区来说，不断壮大和涌入新的血液是一件好事。但我每天都要问问自己，这里面有没有问题？真的完全是好事吗？在这个过程中我嗅到了一丝危险的气息：有人试图同质化这里，把这里当作互联网上另⋯阅读更多',
+        category: '开发调优',
+        tags: ['AI', 'Python', 'Java'],
+        members: Array(5).fill(baseAvatar),
+        comments: 139,
+        views: '2.4k',
+        time: '23小时前'
+      },
+      {
+        id: 3,
+        title: '各位佬，科研项目python语言适合什么ai编程？',
+        description:
+          '是的，L站目前每天都有不少各色各样的佬友加入。对于一个在线社区来说，不断壮大和涌入新的血液是一件好事。但我每天都要问问自己，这里面有没有问题？真的完全是好事吗？在这个过程中我嗅到了一丝危险的气息：有人试图同质化这里，把这里当作互联网上另⋯阅读更多',
+        category: '开发调优',
+        tags: ['AI', 'Python', 'Java'],
+        members: Array(5).fill(baseAvatar),
+        comments: 139,
+        views: '2.4k',
+        time: '23小时前'
+      },
+      {
+        id: 4,
+        title: '各位佬，科研项目python语言适合什么ai编程？',
+        description:
+          '是的，L站目前每天都有不少各色各样的佬友加入。对于一个在线社区来说，不断壮大和涌入新的血液是一件好事。但我每天都要问问自己，这里面有没有问题？真的完全是好事吗？在这个过程中我嗅到了一丝危险的气息：有人试图同质化这里，把这里当作互联网上另⋯阅读更多',
+        category: '开发调优',
+        tags: ['AI', 'Python', 'Java'],
+        members: Array(5).fill(baseAvatar),
+        comments: 139,
+        views: '2.4k',
+        time: '23小时前'
+      },
+      {
+        id: 5,
+        title: '各位佬，科研项目python语言适合什么ai编程？',
+        description:
+          '是的，L站目前每天都有不少各色各样的佬友加入。对于一个在线社区来说，不断壮大和涌入新的血液是一件好事。但我每天都要问问自己，这里面有没有问题？真的完全是好事吗？在这个过程中我嗅到了一丝危险的气息：有人试图同质化这里，把这里当作互联网上另⋯阅读更多',
+        category: '开发调优',
+        tags: ['AI', 'Python', 'Java'],
+        members: Array(5).fill(baseAvatar),
+        comments: 139,
+        views: '2.4k',
+        time: '23小时前'
+      }
+    ])
+
+    return { topics, selectedTopic, articles }
+  }
 }
 </script>
 
