@@ -24,7 +24,7 @@
           <router-link class="article-item-title" :to="`/posts/${article.id}`">
             {{ article.title }}
           </router-link>
-          <div class="article-item-description">{{ article.description }}</div>
+          <div class="article-item-description">{{ sanitizeDescription(article.description) }}</div>
           <div class="article-info-container">
             <div class="article-info-item">
               <i class="fas fa-user"></i>
@@ -62,6 +62,7 @@
 
 <script>
 import { ref } from 'vue'
+import { stripMarkdown } from '../utils/markdown'
 
 export default {
   name: 'HomePageView',
@@ -162,7 +163,9 @@ L 站的愿景是成为新的**理想型社区**，让每一个一身疲惫的�
       }
     ])
 
-    return { topics, selectedTopic, articles }
+    const sanitizeDescription = (text) => stripMarkdown(text)
+
+    return { topics, selectedTopic, articles, sanitizeDescription }
   }
 }
 </script>
@@ -281,6 +284,10 @@ L 站的愿景是成为新的**理想型社区**，让每一个一身疲惫的�
   margin-top: 10px;
   font-size: 14px;
   color: gray;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .article-info-container {
