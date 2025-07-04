@@ -48,6 +48,7 @@
 </template>
 
 <script>
+import { API_BASE_URL } from '../main'
 export default {
   name: 'LoginPageView',
   data() {
@@ -59,7 +60,7 @@ export default {
   methods: {
     async submitLogin() {
       try {
-        const res = await fetch('/api/auth/login', {
+        const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username: this.username, password: this.password })
