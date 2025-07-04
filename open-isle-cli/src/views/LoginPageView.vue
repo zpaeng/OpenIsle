@@ -10,16 +10,26 @@
       <div class="email-login-page-content">
         <div class="login-page-input">
           <i class="login-page-input-icon fas fa-envelope"></i>
-          <input class="login-page-input-text" type="text" placeholder="邮箱/用户名">
+          <input
+            class="login-page-input-text"
+            v-model="username"
+            type="text"
+            placeholder="邮箱/用户名"
+          >
         </div>
 
         <div class="login-page-input">
           <i class="login-page-input-icon fas fa-lock"></i>
-          <input class="login-page-input-text" type="password" placeholder="密码">
+          <input
+            class="login-page-input-text"
+            v-model="password"
+            type="password"
+            placeholder="密码"
+          >
         </div>
 
 
-        <div class="login-page-button-primary">
+        <div class="login-page-button-primary" @click="submitLogin">
           <div class="login-page-button-text">登录</div>
         </div>
 
@@ -40,6 +50,33 @@
 <script>
 export default {
   name: 'LoginPageView',
+  data() {
+    return {
+      username: '',
+      password: ''
+    }
+  },
+  methods: {
+    async submitLogin() {
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: this.username, password: this.password })
+        })
+        const data = await res.json()
+        if (res.ok && data.token) {
+          localStorage.setItem('token', data.token)
+          alert('登录成功')
+          this.$router.push('/')
+        } else {
+          alert(data.error || '登录失败')
+        }
+      } catch (e) {
+        alert('登录失败')
+      }
+    }
+  }
 }
 </script>
 

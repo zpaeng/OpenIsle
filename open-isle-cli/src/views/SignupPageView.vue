@@ -10,25 +10,45 @@
       <div v-if="emailStep === 0" class="email-signup-page-content">
         <div class="signup-page-input">
           <i class="signup-page-input-icon fas fa-envelope"></i>
-          <input class="signup-page-input-text" type="text" placeholder="邮箱">
+          <input
+            class="signup-page-input-text"
+            v-model="email"
+            type="text"
+            placeholder="邮箱"
+          >
         </div>
 
         <div class="signup-page-input">
           <i class="signup-page-input-icon fas fa-user"></i>
-          <input class="signup-page-input-text" type="text" placeholder="用户名">
+          <input
+            class="signup-page-input-text"
+            v-model="username"
+            type="text"
+            placeholder="用户名"
+          >
         </div>
 
         <div class="signup-page-input">
           <i class="signup-page-input-icon fas fa-lock"></i>
-          <input class="signup-page-input-text" type="password" placeholder="密码">
+          <input
+            class="signup-page-input-text"
+            v-model="password"
+            type="password"
+            placeholder="密码"
+          >
         </div>
 
         <div class="signup-page-input">
           <i class="signup-page-input-icon fas fa-user"></i>
-          <input class="signup-page-input-text" type="text" placeholder="昵称 (可选)">
+          <input
+            class="signup-page-input-text"
+            v-model="nickname"
+            type="text"
+            placeholder="昵称 (可选)"
+          >
         </div>
 
-        <div class="signup-page-button-primary">
+        <div class="signup-page-button-primary" @click="sendVerification">
           <div class="signup-page-button-text">验证邮箱</div>
         </div>
 
@@ -39,9 +59,14 @@
       <div v-if="emailStep === 1" class="email-signup-page-content">
         <div class="signup-page-input">
           <i class="signup-page-input-icon fas fa-envelope"></i>
-          <input class="signup-page-input-text" type="text" placeholder="邮箱验证码">
+          <input
+            class="signup-page-input-text"
+            v-model="code"
+            type="text"
+            placeholder="邮箱验证码"
+          >
         </div>
-        <div class="signup-page-button-primary">
+        <div class="signup-page-button-primary" @click="verifyCode">
           <div class="signup-page-button-text">注册</div>
         </div>
       </div>
@@ -62,11 +87,56 @@ export default {
 
   data() {
     return {
-      emailStep: 1,
+      emailStep: 0,
+      email: '',
+      username: '',
+      password: '',
+      nickname: '',
+      code: ''
     }
   },
-
-
+  methods: {
+    async sendVerification() {
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: this.username,
+            email: this.email,
+            password: this.password
+          })
+        })
+        const data = await res.json()
+        if (res.ok) {
+          this.emailStep = 1
+          alert('验证码已发送，请查看邮箱')
+        } else {
+          alert(data.error || '发送失败')
+        }
+      } catch (e) {
+        alert('发送失败')
+      }
+    },
+    async verifyCode() {
+      try {
+        const res = await fetch('/api/auth/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: this.username, code: this.code })
+        })
+        const data = await res.json()
+        if (res.ok) {
+          alert('注册成功，请登录')
+          this.$router.push('/login')
+        } else {
+          alert(data.error || '注册失败')
+        }
+      } catch (e) {
+        alert('注册失败')
+      }
+    }
+  }
 }
 </script>
 
