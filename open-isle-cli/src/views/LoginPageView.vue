@@ -68,13 +68,13 @@ export default {
         const data = await res.json()
         if (res.ok && data.token) {
           localStorage.setItem('token', data.token)
-          alert('登录成功')
+          this.$toast.success('登录成功')
           this.$router.push('/')
         } else {
-          alert(data.error || '登录失败')
+          this.$toast.error(data.error || '登录失败')
         }
       } catch (e) {
-        alert('登录失败')
+        this.$toast.error('登录失败')
       }
     }
   }
