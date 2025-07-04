@@ -29,6 +29,9 @@
             <div class="reactions-count">1882</div>
           </div>
           <div class="make-reaction-container">
+            <div class="make-reaction-item comment-reaction">
+              <i class="far fa-comment"></i>
+            </div>
             <div class="make-reaction-item like-reaction">
               <i class="far fa-heart"></i>
             </div>
@@ -85,6 +88,16 @@ export default CommentItem
   color: var(--primary-color);
   user-select: none;
 }
+
 .reply-list {
 }
+
+.comment-reaction {
+  color: var(--primary-color);
+}
+
+.comment-reaction:hover {
+  background-color: lightgray;
+}
+
 </style>

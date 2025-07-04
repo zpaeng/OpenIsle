@@ -517,27 +517,23 @@ export default {
 .make-reaction-container {
   display: flex;
   flex-direction: row;
-  gap: 20px;
+  gap: 10px;
 }
 
 .make-reaction-item {
   cursor: pointer;
   padding: 10px;
   border-radius: 50%;
-  opacity: 0.7;
+  opacity: 0.5;
+  font-size: 20px;
 }
 
 .like-reaction {
-  font-size: 20px;
   color: #ff0000;
 }
 
 .like-reaction:hover {
   background-color: #ffe2e2;
-}
-
-.copy-link {
-  font-size: 20px;
 }
 
 .copy-link:hover {
