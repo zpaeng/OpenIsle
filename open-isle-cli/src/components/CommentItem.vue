@@ -15,9 +15,7 @@
         <div class="user-name">{{ comment.userName }}</div>
         <div class="post-time">{{ comment.time }}</div>
       </div>
-      <div class="info-content-text">
-        {{ comment.text }}
-      </div>
+      <div class="info-content-text" v-html="renderMarkdown(comment.text)"></div>
       <div class="article-footer-container">
         <div class="reactions-container">
           <div class="reactions-viewer">
@@ -60,6 +58,7 @@
 <script>
 import { ref } from 'vue'
 import CommentEditor from './CommentEditor.vue'
+import { renderMarkdown } from '../utils/markdown'
 const CommentItem = {
   name: 'CommentItem',
   props: {
@@ -94,7 +93,7 @@ const CommentItem = {
       })
       showEditor.value = false
     }
-    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply }
+    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, renderMarkdown }
   }
 }
 CommentItem.components = { CommentItem, CommentEditor }
