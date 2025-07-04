@@ -3,6 +3,7 @@ package com.openisle.service;
 import com.openisle.model.User;
 import com.openisle.model.Role;
 import com.openisle.service.PasswordValidator;
+import com.openisle.exception.FieldException;
 import com.openisle.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,7 +27,7 @@ public class UserService {
         if (byUsername.isPresent()) {
             User u = byUsername.get();
             if (u.isVerified()) {                           // 已验证 → 直接拒绝
-                throw new IllegalStateException("User name already exists");
+                throw new FieldException("username", "User name already exists");
             }
             // 未验证 → 允许“重注册”：覆盖必要字段并重新发验证码
             u.setEmail(email);                              // 若不允许改邮箱可去掉
@@ -40,7 +41,7 @@ public class UserService {
         if (byEmail.isPresent()) {
             User u = byEmail.get();
             if (u.isVerified()) {                           // 已验证 → 直接拒绝
-                throw new IllegalStateException("User email already exists");
+                throw new FieldException("email", "User email already exists");
             }
             // 未验证 → 允许“重注册”
             u.setUsername(username);                        // 若不允许改用户名可去掉
