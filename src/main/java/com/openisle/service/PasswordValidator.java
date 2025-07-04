@@ -1,6 +1,7 @@
 package com.openisle.service;
 
 import com.openisle.model.PasswordStrength;
+import com.openisle.exception.FieldException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,7 @@ public class PasswordValidator {
 
     public void validate(String password) {
         if (password == null || password.isEmpty()) {
-            throw new IllegalArgumentException("Password cannot be empty");
+            throw new FieldException("password", "Password cannot be empty");
         }
         switch (strength) {
             case MEDIUM:
@@ -31,34 +32,34 @@ public class PasswordValidator {
 
     private void checkLow(String password) {
         if (password.length() < 6) {
-            throw new IllegalArgumentException("Password must be at least 6 characters long");
+            throw new FieldException("password", "Password must be at least 6 characters long");
         }
     }
 
     private void checkMedium(String password) {
         if (password.length() < 8) {
-            throw new IllegalArgumentException("Password must be at least 8 characters long");
+            throw new FieldException("password", "Password must be at least 8 characters long");
         }
         if (!password.matches(".*[A-Za-z].*") || !password.matches(".*\\d.*")) {
-            throw new IllegalArgumentException("Password must contain letters and numbers");
+            throw new FieldException("password", "Password must contain letters and numbers");
         }
     }
 
     private void checkHigh(String password) {
         if (password.length() < 12) {
-            throw new IllegalArgumentException("Password must be at least 12 characters long");
+            throw new FieldException("password", "Password must be at least 12 characters long");
         }
         if (!password.matches(".*[A-Z].*")) {
-            throw new IllegalArgumentException("Password must contain uppercase letters");
+            throw new FieldException("password", "Password must contain uppercase letters");
         }
         if (!password.matches(".*[a-z].*")) {
-            throw new IllegalArgumentException("Password must contain lowercase letters");
+            throw new FieldException("password", "Password must contain lowercase letters");
         }
         if (!password.matches(".*\\d.*")) {
-            throw new IllegalArgumentException("Password must contain numbers");
+            throw new FieldException("password", "Password must contain numbers");
         }
         if (!password.matches(".*[^A-Za-z0-9].*")) {
-            throw new IllegalArgumentException("Password must contain special characters");
+            throw new FieldException("password", "Password must contain special characters");
         }
     }
 }
