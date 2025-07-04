@@ -57,9 +57,11 @@ export default {
         cache: { enable: false },
         input(value) {
           emit('update:modelValue', value)
+        },
+        after() {
+          vditorInstance.value.setValue(props.modelValue)
         }
       })
-      vditorInstance.value.setValue(props.modelValue)
     })
 
     return {}

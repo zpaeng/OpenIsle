@@ -60,7 +60,10 @@ export default {
           'link',
           'image'
         ],
-        toolbarConfig: { pin: true }
+        toolbarConfig: { pin: true },
+        after() {
+          vditorInstance.value = this
+        }
       })
     })
 
