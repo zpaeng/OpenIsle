@@ -29,9 +29,9 @@
             <div class="reactions-count">1882</div>
           </div>
           <div class="make-reaction-container">
-            <div class="make-reaction-item comment-reaction">
-              <i class="far fa-comment"></i>
-            </div>
+          <div class="make-reaction-item comment-reaction" @click="toggleEditor">
+            <i class="far fa-comment"></i>
+          </div>
             <div class="make-reaction-item like-reaction">
               <i class="far fa-heart"></i>
             </div>
@@ -41,6 +41,7 @@
           </div>
         </div>
       </div>
+      <CommentEditor v-if="showEditor" @submit="submitReply" />
       <div v-if="comment.reply && comment.reply.length" class="reply-toggle" @click="toggleReplies">
         {{ comment.reply.length }}条回复
       </div>
@@ -58,6 +59,7 @@
 
 <script>
 import { ref } from 'vue'
+import CommentEditor from './CommentEditor.vue'
 const CommentItem = {
   name: 'CommentItem',
   props: {
@@ -70,15 +72,32 @@ const CommentItem = {
       default: 0
     }
   },
-  setup() {
+  setup(props) {
     const showReplies = ref(false)
+    const showEditor = ref(false)
     const toggleReplies = () => {
       showReplies.value = !showReplies.value
     }
-    return { showReplies, toggleReplies }
+    const toggleEditor = () => {
+      showEditor.value = !showEditor.value
+    }
+    const submitReply = (text) => {
+      if (!text.trim()) return
+      const replyList = props.comment.reply || (props.comment.reply = [])
+      replyList.push({
+        id: Date.now(),
+        userName: '你',
+        time: new Date().toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
+        avatar: 'https://picsum.photos/200/200',
+        text,
+        reply: []
+      })
+      showEditor.value = false
+    }
+    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply }
   }
 }
-CommentItem.components = { CommentItem }
+CommentItem.components = { CommentItem, CommentEditor }
 export default CommentItem
 </script>
 

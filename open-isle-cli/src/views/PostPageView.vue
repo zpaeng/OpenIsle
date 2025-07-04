@@ -81,12 +81,7 @@
         </div>
       </div>
 
-      <div class="comment-editor-container">
-        <div id="vditor" ref="vditorElement"></div>
-        <div class="comment-bottom-container">
-          <div class="comment-submit" @click="postComment">发布评论</div>
-        </div>
-      </div>
+      <CommentEditor @submit="postComment" />
 
       <div class="comments-container">
         <CommentItem v-for="comment in comments" :key="comment.id" :comment="comment" :level="0" ref="postItems" />
@@ -99,7 +94,7 @@
         <div class="scroller-middle">
           <input type="range" class="scroller-range" :max="totalPosts" :min="1" v-model.number="currentIndex"
             @input="onSliderInput" />
-          <div class="scroller-index" :style="indexStyle">{{ currentIndex }}/{{ totalPosts }}</div>
+          <div class="scroller-index">{{ currentIndex }}/{{ totalPosts }}</div>
         </div>
         <div class="scroller-time">{{ lastReplyTime }}</div>
       </div>
@@ -110,15 +105,12 @@
 <script>
 import { ref, computed, onMounted } from 'vue'
 import CommentItem from '../components/CommentItem.vue'
-import Vditor from 'vditor'
-import 'vditor/dist/index.css'
+import CommentEditor from '../components/CommentEditor.vue'
 
 export default {
   name: 'PostPageView',
-  components: { CommentItem },
+  components: { CommentItem, CommentEditor },
   setup() {
-    const vditorInstance = ref(null)
-    const vditorElement = ref(null)
     const tags = ref(['AI', 'Python', 'Java'])
     const comments = ref([
       {
@@ -221,9 +213,7 @@ export default {
       }
     }
 
-    const postComment = () => {
-      if (!vditorInstance.value) return
-      const text = vditorInstance.value.getValue()
+    const postComment = (text) => {
       if (!text.trim()) return
       comments.value.push({
         id: comments.value.length + 1,
@@ -233,49 +223,8 @@ export default {
         text,
         reply: []
       })
-      vditorInstance.value.setValue('')
     }
-
     onMounted(() => {
-      vditorInstance.value = new Vditor('vditor', {
-        placeholder: '说点什么...',
-        height: 120,
-
-        /* ===================== 主题相关 ===================== */
-        // 编辑区主题（classic|dark|light）。classic = 很淡、和浅色页面更搭
-        theme: 'classic',
-        // 预览区主题：light / dark / wechat / ant-design
-        preview: {
-          theme: {
-            current: 'light', 
-          },
-          actions: [], 
-          markdown: { toc: false }, 
-        },
-
-        /* ===================== 功能裁剪 ===================== */
-        toolbar: [
-          'emoji',
-          'bold',
-          'italic',
-          'strike',
-          '|',
-          'list',
-          'line',
-          'quote',
-          'code',
-          'inline-code',
-          '|',
-          'undo',
-          'redo',
-          '|',
-          'link',
-          'image',
-        ],
-        toolbarConfig: {
-          pin: true,
-        },
-      })
       updateCurrentIndex()
     })
 
@@ -288,7 +237,6 @@ export default {
       mainContainer,
       currentIndex,
       totalPosts,
-      vditorElement,
       postComment,
       onSliderInput,
       onScroll: updateCurrentIndex
@@ -540,30 +488,5 @@ export default {
   background-color: #e2e2e2;
 }
 
-.comment-editor-container {
-  margin-top: 20px;
-  margin-bottom: 50px;
-  border: 1px solid #e2e2e2;
-}
-
-.comment-bottom-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  padding: 10px;
-}
-
-.comment-submit {
-  background-color: var(--primary-color);
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 10px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.comment-submit:hover {
-  background-color: var(--primary-color-hover);
-}
 
 </style>
