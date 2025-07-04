@@ -157,42 +157,73 @@ export default {
         userName: 'Nagisa77',
         time: '3月10日',
         avatar: 'https://picsum.photos/200/200',
-        text: '沙发🛋️🛋️🛋️🛋️'
+        text: '沙发🛋️🛋️🛋️🛋️',
+        reply: [
+          {
+            id: 7,
+            userName: 'Nagisa77',
+            time: '3月11日',
+            avatar: 'https://picsum.photos/200/200',
+            text: '💩💩💩💩💩',
+            reply: [
+              {
+                id: 9,
+                userName: 'Nagisa77',
+                time: '3月11日',
+                avatar: 'https://picsum.photos/200/200',
+                text: '发💩干嘛? 我💩你'
+              },
+            ],
+          },
+          {
+            id: 8,
+            userName: 'Nagisa77',
+            time: '3月11日',
+            avatar: 'https://picsum.photos/200/200',
+            text: '支持',
+            reply: [],
+          },
+        ]
       },
       {
         id: 2,
         userName: 'Nagisa77',
         time: '3月11日',
         avatar: 'https://picsum.photos/200/200',
-        text: '💩💩💩💩💩'
+        text: '💩💩💩💩💩',
+        reply: [],
       },
       {
         id: 3,
         userName: 'Nagisa77',
         time: '3月12日',
         avatar: 'https://picsum.photos/200/200',
-        text: '是的'
+        text: '是的',
+        reply: [],
       },
       {
         id: 4,
         userName: 'Nagisa77',
         time: '3月13日',
         avatar: 'https://picsum.photos/200/200',
-        text: '持续时间至最后一个不会好好说话的账号持有者被请出社区为止。'
+        text: '持续时间至最后一个不会好好说话的账号持有者被请出社区为止。',
+        reply: [],
       },
       {
         id: 5,
         userName: 'Nagisa77',
         time: '3月14日',
         avatar: 'https://picsum.photos/200/200',
-        text: '赞同楼主'
+        text: '赞同楼主',
+        reply: [],
       },
       {
         id: 6,
         userName: 'Nagisa77',
         time: '3月15日',
         avatar: 'https://picsum.photos/200/200',
-        text: '这里面有没有问题？真的完全是好事吗？在这个过程中我嗅到了一丝危险的气息'
+        text: '这里面有没有问题？真的完全是好事吗？在这个过程中我嗅到了一丝危险的气息',
+        reply: [],
       }
     ])
     const postTime = ref('3月10日')
