@@ -13,30 +13,36 @@
           <input
             class="signup-page-input-text"
             v-model="email"
+            @input="emailError = ''"
             type="text"
             placeholder="邮箱"
           >
         </div>
+        <div v-if="emailError" class="error-message">{{ emailError }}</div>
 
         <div class="signup-page-input">
           <i class="signup-page-input-icon fas fa-user"></i>
           <input
             class="signup-page-input-text"
             v-model="username"
+            @input="usernameError = ''"
             type="text"
             placeholder="用户名"
           >
         </div>
+        <div v-if="usernameError" class="error-message">{{ usernameError }}</div>
 
         <div class="signup-page-input">
           <i class="signup-page-input-icon fas fa-lock"></i>
           <input
             class="signup-page-input-text"
             v-model="password"
+            @input="passwordError = ''"
             type="password"
             placeholder="密码"
           >
         </div>
+        <div v-if="passwordError" class="error-message">{{ passwordError }}</div>
 
         <div class="signup-page-input">
           <i class="signup-page-input-icon fas fa-user"></i>
@@ -92,12 +98,34 @@ export default {
       email: '',
       username: '',
       password: '',
+      emailError: '',
+      usernameError: '',
+      passwordError: '',
       nickname: '',
       code: ''
     }
   },
   methods: {
+    clearErrors() {
+      this.emailError = ''
+      this.usernameError = ''
+      this.passwordError = ''
+    },
     async sendVerification() {
+      this.clearErrors()
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(this.email)) {
+        this.emailError = '邮箱格式不正确'
+      }
+      if (!this.password || this.password.length < 6) {
+        this.passwordError = '密码至少6位'
+      }
+      if (!this.username) {
+        this.usernameError = '用户名不能为空'
+      }
+      if (this.emailError || this.passwordError || this.usernameError) {
+        return
+      }
       try {
         const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
           method: 'POST',
@@ -112,6 +140,10 @@ export default {
         if (res.ok) {
           this.emailStep = 1
           alert('验证码已发送，请查看邮箱')
+        } else if (data.field) {
+          if (data.field === 'username') this.usernameError = data.error
+          if (data.field === 'email') this.emailError = data.error
+          if (data.field === 'password') this.passwordError = data.error
         } else {
           alert(data.error || '发送失败')
         }
@@ -272,5 +304,13 @@ export default {
 
 .signup-page-button-secondary-link {
   color: var(--primary-color);
+}
+
+.error-message {
+  color: red;
+  font-size: 14px;
+  width: calc(100% - 40px);
+  margin-top: -10px;
+  margin-bottom: 10px;
 }
 </style>
