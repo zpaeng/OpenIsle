@@ -53,3 +53,23 @@ body {
 .comment-editor-container .vditor-textarea {
   background: transparent !important;
 }
+.post-editor-container .vditor {
+  --panel-background-color: transparent;
+  --border-color: transparent;
+  --textarea-background-color: transparent;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.post-editor-container .vditor-toolbar {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.post-editor-container .vditor-content,
+.post-editor-container .vditor-wysiwyg,
+.post-editor-container .vditor-ir,
+.post-editor-container .vditor-textarea {
+  background: transparent !important;
+}
