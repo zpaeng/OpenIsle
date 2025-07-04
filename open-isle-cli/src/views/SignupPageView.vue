@@ -82,6 +82,7 @@
 </template>
 
 <script>
+import { API_BASE_URL } from '../main'
 export default {
   name: 'SignupPageView',
 
@@ -98,7 +99,7 @@ export default {
   methods: {
     async sendVerification() {
       try {
-        const res = await fetch('/api/auth/register', {
+        const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -120,7 +121,7 @@ export default {
     },
     async verifyCode() {
       try {
-        const res = await fetch('/api/auth/verify', {
+        const res = await fetch(`${API_BASE_URL}/api/auth/verify`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username: this.username, code: this.code })
