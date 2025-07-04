@@ -81,18 +81,15 @@
         </div>
       </div>
 
-      <div class="comments-container">
-        <CommentItem
-          v-for="comment in comments"
-          :key="comment.id"
-          :comment="comment"
-          :level="0"
-          ref="postItems"
-        />
-      </div>
       <div class="comment-editor-container">
         <div id="vditor" ref="vditorElement"></div>
-        <button class="comment-submit" @click="postComment">发布评论</button>
+        <div class="comment-bottom-container">
+          <div class="comment-submit" @click="postComment">发布评论</div>
+        </div>
+      </div>
+
+      <div class="comments-container">
+        <CommentItem v-for="comment in comments" :key="comment.id" :comment="comment" :level="0" ref="postItems" />
       </div>
     </div>
 
@@ -241,8 +238,43 @@ export default {
 
     onMounted(() => {
       vditorInstance.value = new Vditor('vditor', {
-        placeholder: '写点什么...',
-        height: 200
+        placeholder: '说点什么...',
+        height: 120,
+
+        /* ===================== 主题相关 ===================== */
+        // 编辑区主题（classic|dark|light）。classic = 很淡、和浅色页面更搭
+        theme: 'classic',
+        // 预览区主题：light / dark / wechat / ant-design
+        preview: {
+          theme: {
+            current: 'light', 
+          },
+          actions: [], 
+          markdown: { toc: false }, 
+        },
+
+        /* ===================== 功能裁剪 ===================== */
+        toolbar: [
+          'emoji',
+          'bold',
+          'italic',
+          'strike',
+          '|',
+          'list',
+          'line',
+          'quote',
+          'code',
+          'inline-code',
+          '|',
+          'undo',
+          'redo',
+          '|',
+          'link',
+          'image',
+        ],
+        toolbarConfig: {
+          pin: true,
+        },
       })
       updateCurrentIndex()
     })
@@ -511,4 +543,31 @@ export default {
 .copy-link:hover {
   background-color: #e2e2e2;
 }
+
+.comment-editor-container {
+  margin-top: 20px;
+  margin-bottom: 50px;
+  border: 1px solid #e2e2e2;
+}
+
+.comment-bottom-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  padding: 10px;
+}
+
+.comment-submit {
+  background-color: var(--primary-color);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.comment-submit:hover {
+  background-color: var(--primary-color-hover);
+}
+
 </style>
