@@ -5,6 +5,7 @@ import AboutPageView from '../views/AboutPageView.vue'
 import PostPageView from '../views/PostPageView.vue'
 import LoginPageView from '../views/LoginPageView.vue'
 import SignupPageView from '../views/SignupPageView.vue'
+import NewPostPageView from '../views/NewPostPageView.vue'
 
 const routes = [
   {
@@ -21,6 +22,11 @@ const routes = [
     path: '/about',
     name: 'about',
     component: AboutPageView
+  },
+  {
+    path: '/new-post',
+    name: 'new-post',
+    component: NewPostPageView
   },
   {
     path: '/posts/:id',
