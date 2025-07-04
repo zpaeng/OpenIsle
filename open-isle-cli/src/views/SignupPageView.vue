@@ -7,7 +7,7 @@
         </div>
       </div>
 
-      <div class="email-signup-page-content">
+      <div v-if="emailStep === 0" class="email-signup-page-content">
         <div class="signup-page-input">
           <i class="signup-page-input-icon fas fa-envelope"></i>
           <input class="signup-page-input-text" type="text" placeholder="邮箱">
@@ -29,17 +29,28 @@
         </div>
 
         <div class="signup-page-button-primary">
-          <div class="signup-page-button-text">注册</div>
+          <div class="signup-page-button-text">验证邮箱</div>
         </div>
 
-        <div class="signup-page-button-secondary">已经有账号？ <a class="signup-page-button-secondary-link" href="/login">登录</a></div>
+        <div class="signup-page-button-secondary">已经有账号？ <a class="signup-page-button-secondary-link"
+            href="/login">登录</a></div>
+      </div>
+
+      <div v-if="emailStep === 1" class="email-signup-page-content">
+        <div class="signup-page-input">
+          <i class="signup-page-input-icon fas fa-envelope"></i>
+          <input class="signup-page-input-text" type="text" placeholder="邮箱验证码">
+        </div>
+        <div class="signup-page-button-primary">
+          <div class="signup-page-button-text">注册</div>
+        </div>
       </div>
     </div>
 
     <div class="other-signup-page-content">
       <div class="signup-page-button">
-          <img class="signup-page-button-icon" src="../assets/icons/google.svg" alt="Google Logo" />
-          <div class="signup-page-button-text">Google 注册</div>
+        <img class="signup-page-button-icon" src="../assets/icons/google.svg" alt="Google Logo" />
+        <div class="signup-page-button-text">Google 注册</div>
       </div>
     </div>
   </div>
@@ -47,7 +58,15 @@
 
 <script>
 export default {
-  name: 'SignupPageView'
+  name: 'SignupPageView',
+
+  data() {
+    return {
+      emailStep: 1,
+    }
+  },
+
+
 }
 </script>
 
