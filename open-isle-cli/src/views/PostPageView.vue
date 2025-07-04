@@ -90,6 +90,10 @@
           ref="postItems"
         />
       </div>
+      <div class="comment-editor-container">
+        <div id="vditor" ref="vditorElement"></div>
+        <button class="comment-submit" @click="postComment">发布评论</button>
+      </div>
     </div>
 
     <div class="post-page-scroller-container">
@@ -109,11 +113,15 @@
 <script>
 import { ref, computed, onMounted } from 'vue'
 import CommentItem from '../components/CommentItem.vue'
+import Vditor from 'vditor'
+import 'vditor/dist/index.css'
 
 export default {
   name: 'PostPageView',
   components: { CommentItem },
   setup() {
+    const vditorInstance = ref(null)
+    const vditorElement = ref(null)
     const tags = ref(['AI', 'Python', 'Java'])
     const comments = ref([
       {
@@ -216,7 +224,26 @@ export default {
       }
     }
 
+    const postComment = () => {
+      if (!vditorInstance.value) return
+      const text = vditorInstance.value.getValue()
+      if (!text.trim()) return
+      comments.value.push({
+        id: comments.value.length + 1,
+        userName: '你',
+        time: new Date().toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
+        avatar: 'https://picsum.photos/200/200',
+        text,
+        reply: []
+      })
+      vditorInstance.value.setValue('')
+    }
+
     onMounted(() => {
+      vditorInstance.value = new Vditor('vditor', {
+        placeholder: '写点什么...',
+        height: 200
+      })
       updateCurrentIndex()
     })
 
@@ -229,6 +256,8 @@ export default {
       mainContainer,
       currentIndex,
       totalPosts,
+      vditorElement,
+      postComment,
       onSliderInput,
       onScroll: updateCurrentIndex
     }
