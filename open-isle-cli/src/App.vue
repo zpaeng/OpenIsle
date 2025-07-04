@@ -41,7 +41,6 @@ export default {
   flex-direction: row;
   max-width: var(--page-max-width);
   margin: 0 auto;
-  background-color: var(--normal-background-color);
 }
 
 </style>

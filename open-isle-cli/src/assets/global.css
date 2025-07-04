@@ -1,5 +1,6 @@
 :root {
-  --primary-color: rgb(9, 95, 105);;
+  --primary-color-hover: rgb(9, 95, 105);
+  --primary-color: rgb(10, 110, 120);
   --header-height: 60px;
   --header-background-color: white;
   --header-border-color: lightgray;
@@ -7,7 +8,7 @@
   --menu-border-color: lightgray;
   --menu-selected-background-color: rgba(208, 250, 255, 0.659);
   --scroller-background-color: rgba(130, 175, 180, 0.5);
-  --normal-background-color: lightgrrgb(208, 246, 255)
+  --normal-background-color: rgb(241, 241, 241);
   --menu-width: 200px;
   --page-max-width: 1200px;
 }

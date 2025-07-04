@@ -67,6 +67,7 @@ export default {
   opacity: 0.5;
 }
 
+/*
 .slide-enter-active, .slide-leave-active {
   transition: 
     transform 0.3s ease,
@@ -81,4 +82,5 @@ export default {
   transform: translateX(0);
   opacity: 1;
 }
+  */
 </style>

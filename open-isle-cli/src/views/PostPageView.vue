@@ -250,6 +250,7 @@ export default {
 
 .post-page-main-container {
   overflow-y: auto;
+  scrollbar-width: none;
   padding: 20px;
   height: calc(100% - 40px);
   width: calc(85% - 40px);
