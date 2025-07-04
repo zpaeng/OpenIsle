@@ -111,12 +111,12 @@ export default {
         const data = await res.json()
         if (res.ok) {
           this.emailStep = 1
-          alert('验证码已发送，请查看邮箱')
+          this.$toast.success('验证码已发送，请查看邮箱')
         } else {
-          alert(data.error || '发送失败')
+          this.$toast.error(data.error || '发送失败')
         }
       } catch (e) {
-        alert('发送失败')
+        this.$toast.error('发送失败')
       }
     },
     async verifyCode() {
@@ -128,13 +128,13 @@ export default {
         })
         const data = await res.json()
         if (res.ok) {
-          alert('注册成功，请登录')
+          this.$toast.success('注册成功，请登录')
           this.$router.push('/login')
         } else {
-          alert(data.error || '注册失败')
+          this.$toast.error(data.error || '注册失败')
         }
       } catch (e) {
-        alert('注册失败')
+        this.$toast.error('注册失败')
       }
     }
   }
