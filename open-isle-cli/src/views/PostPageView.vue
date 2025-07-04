@@ -82,51 +82,13 @@
       </div>
 
       <div class="comments-container">
-        <div class="info-content-container" v-for="comment in comments" :key="comment.id" ref="postItems">
-          <div class="user-avatar-container">
-            <div class="user-avatar-item">
-              <img class="user-avatar-item-img" :src="comment.avatar" alt="avatar">
-            </div>
-          </div>
-
-          <div class="info-content">
-            <div class="info-content-header">
-              <div class="user-name">{{ comment.userName }}</div>
-              <div class="post-time">{{ comment.time }}</div>
-            </div>
-            <div class="info-content-text">
-              {{ comment.text }}
-            </div>
-
-            <div class="article-footer-container">
-              <div class="reactions-container">
-                <div class="reactions-viewer">
-                  <div class="reactions-viewer-item-container">
-                    <div class="reactions-viewer-item">
-                      🤣
-                    </div>
-                    <div class="reactions-viewer-item">
-                      ❤️
-                    </div>
-                    <div class="reactions-viewer-item">
-                      👏
-                    </div>
-                  </div>
-                  <div class="reactions-count">1882</div>
-                </div>
-
-                <div class="make-reaction-container">
-                  <div class="make-reaction-item like-reaction">
-                    <i class="far fa-heart"></i>
-                  </div>
-                  <div class="make-reaction-item copy-link">
-                    <i class="fas fa-link"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CommentItem
+          v-for="comment in comments"
+          :key="comment.id"
+          :comment="comment"
+          :level="0"
+          ref="postItems"
+        />
       </div>
     </div>
 
@@ -146,9 +108,11 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue'
+import CommentItem from '../components/CommentItem.vue'
 
 export default {
   name: 'PostPageView',
+  components: { CommentItem },
   setup() {
     const tags = ref(['AI', 'Python', 'Java'])
     const comments = ref([
@@ -237,7 +201,7 @@ export default {
     const updateCurrentIndex = () => {
       const scrollTop = mainContainer.value ? mainContainer.value.scrollTop : 0
       for (let i = 0; i < postItems.value.length; i++) {
-        const el = postItems.value[i]
+        const el = postItems.value[i].$el
         if (el.offsetTop + el.offsetHeight > scrollTop) {
           currentIndex.value = i + 1
           break
@@ -246,7 +210,7 @@ export default {
     }
 
     const onSliderInput = () => {
-      const target = postItems.value[currentIndex.value - 1]
+      const target = postItems.value[currentIndex.value - 1]?.$el
       if (target && mainContainer.value) {
         mainContainer.value.scrollTo({ top: target.offsetTop, behavior: 'instant' })
       }
