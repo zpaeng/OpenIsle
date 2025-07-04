@@ -54,8 +54,14 @@
           >
         </div>
 
-        <div class="signup-page-button-primary" @click="sendVerification">
+        <div v-if="!isWaitingForEmailSent" class="signup-page-button-primary" @click="sendVerification">
           <div class="signup-page-button-text">验证邮箱</div>
+        </div>
+        <div v-else class="signup-page-button-primary disabled">
+          <div class="signup-page-button-text">
+            <i class="fas fa-spinner fa-spin"></i>
+            发送中...
+          </div>
         </div>
 
         <div class="signup-page-button-secondary">已经有账号？ <a class="signup-page-button-secondary-link"
@@ -72,8 +78,14 @@
             placeholder="邮箱验证码"
           >
         </div>
-        <div class="signup-page-button-primary" @click="verifyCode">
+        <div v-if="!isWaitingForEmailVerified" class="signup-page-button-primary" @click="verifyCode">
           <div class="signup-page-button-text">注册</div>
+        </div>
+        <div v-else class="signup-page-button-primary disabled">
+          <div class="signup-page-button-text">
+            <i class="fas fa-spinner fa-spin"></i>
+            验证中...
+          </div>
         </div>
       </div>
     </div>
@@ -88,7 +100,7 @@
 </template>
 
 <script>
-import { API_BASE_URL } from '../main'
+import { API_BASE_URL, toast } from '../main'
 export default {
   name: 'SignupPageView',
 
@@ -102,7 +114,9 @@ export default {
       usernameError: '',
       passwordError: '',
       nickname: '',
-      code: ''
+      code: '',
+      isWaitingForEmailSent: false,
+      isWaitingForEmailVerified: false
     }
   },
   methods: {
@@ -127,46 +141,51 @@ export default {
         return
       }
       try {
+        console.log('base url: ', API_BASE_URL)
+        this.isWaitingForEmailSent = true
         const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             username: this.username,
             email: this.email,
-            password: this.password
+            password: this.password,
           })
         })
+        this.isWaitingForEmailSent = false
         const data = await res.json()
         if (res.ok) {
           this.emailStep = 1
-          this.$toast.success('验证码已发送，请查看邮箱')
+          toast.success('验证码已发送，请查看邮箱')
         } else if (data.field) {
           if (data.field === 'username') this.usernameError = data.error
           if (data.field === 'email') this.emailError = data.error
           if (data.field === 'password') this.passwordError = data.error
         } else {
-          this.$toast.error(data.error || '发送失败')
+          toast.error(data.error || '发送失败')
         }
       } catch (e) {
-        this.$toast.error('发送失败')
+        toast.error('发送失败')
       }
     },
     async verifyCode() {
       try {
+        this.isWaitingForEmailVerified = true
         const res = await fetch(`${API_BASE_URL}/api/auth/verify`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username: this.username, code: this.code })
         })
+        this.isWaitingForEmailVerified = false
         const data = await res.json()
         if (res.ok) {
-          this.$toast.success('注册成功，请登录')
+          toast.success('注册成功，请登录')
           this.$router.push('/login')
         } else {
-          this.$toast.error(data.error || '注册失败')
+          toast.error(data.error || '注册失败')
         }
       } catch (e) {
-        this.$toast.error('注册失败')
+        toast.error('注册失败')
       }
     }
   }
@@ -264,6 +283,16 @@ export default {
   border-radius: 10px;
   cursor: pointer;
   gap: 10px;
+}
+
+.signup-page-button-primary.disabled {
+  background-color: var(--primary-color-disabled);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.signup-page-button-primary.disabled:hover {
+  background-color: var(--primary-color-disabled);
 }
 
 .signup-page-button-primary:hover {

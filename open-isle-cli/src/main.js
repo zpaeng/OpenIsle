@@ -4,13 +4,13 @@ import router from './router'
 import './assets/global.css'
 import Toast, { POSITION } from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
+import { useToast } from 'vue-toastification'
 
 // Configurable API domain and port
-export const API_DOMAIN =
-  process.env.VUE_APP_API_DOMAIN ||
-  `${window.location.protocol}//${window.location.hostname}`
-export const API_PORT = process.env.VUE_APP_API_PORT || window.location.port
+export const API_DOMAIN = 'http://127.0.0.1'
+export const API_PORT = 8081
 export const API_BASE_URL = API_PORT ? `${API_DOMAIN}:${API_PORT}` : API_DOMAIN
+export const toast = useToast()
 
 const app = createApp(App)
 app.use(router)

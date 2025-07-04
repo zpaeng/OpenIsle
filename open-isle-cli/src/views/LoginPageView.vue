@@ -29,8 +29,15 @@
         </div>
 
 
-        <div class="login-page-button-primary" @click="submitLogin">
+        <div v-if="!isWaitingForLogin" class="login-page-button-primary" @click="submitLogin">
           <div class="login-page-button-text">登录</div>
+        </div>
+
+        <div v-else class="login-page-button-primary disabled">
+          <div class="login-page-button-text">
+            <i class="fas fa-spinner fa-spin"></i>
+            登录中...
+          </div>
         </div>
 
         <div class="login-page-button-secondary">没有账号？ <a class="login-page-button-secondary-link" href="/signup">注册</a>
@@ -48,33 +55,36 @@
 </template>
 
 <script>
-import { API_BASE_URL } from '../main'
+import { API_BASE_URL, toast } from '../main'
 export default {
   name: 'LoginPageView',
   data() {
     return {
       username: '',
-      password: ''
+      password: '',
+      isWaitingForLogin: false
     }
   },
   methods: {
     async submitLogin() {
       try {
+        this.isWaitingForLogin = true
         const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username: this.username, password: this.password })
         })
+        this.isWaitingForLogin = false
         const data = await res.json()
         if (res.ok && data.token) {
           localStorage.setItem('token', data.token)
-          this.$toast.success('登录成功')
+          toast.success('登录成功')
           this.$router.push('/')
         } else {
-          this.$toast.error(data.error || '登录失败')
+          toast.error(data.error || '登录失败')
         }
       } catch (e) {
-        this.$toast.error('登录失败')
+        toast.error('登录失败')
       }
     }
   }
@@ -176,6 +186,16 @@ export default {
 
 .login-page-button-primary:hover {
   background-color: var(--primary-color-hover);
+}
+
+.login-page-button-primary.disabled {
+  background-color: var(--primary-color-disabled);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.login-page-button-primary.disabled:hover {
+  background-color: var(--primary-color-disabled);
 }
 
 .login-page-button {
