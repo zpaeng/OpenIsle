@@ -53,7 +53,7 @@
                 <div class="make-reaction-item like-reaction">
                   <i class="far fa-heart"></i>
                 </div>
-                <div class="make-reaction-item copy-link">
+                <div class="make-reaction-item copy-link" @click="copyPostLink">
                   <i class="fas fa-link"></i>
                 </div>
               </div>
@@ -236,8 +236,21 @@ L 站的愿景是成为新的**理想型社区**，让每一个一身疲惫的�
         reply: []
       })
     }
+    const copyPostLink = () => {
+      navigator.clipboard.writeText(location.href.split('#')[0])
+    }
     onMounted(() => {
       updateCurrentIndex()
+      const hash = location.hash
+      if (hash.startsWith('#comment-')) {
+        const id = hash.substring('#comment-'.length)
+        const el = document.getElementById('comment-' + id)
+        if (el && mainContainer.value) {
+          mainContainer.value.scrollTo({ top: el.offsetTop, behavior: 'instant' })
+          el.classList.add('comment-highlight')
+          setTimeout(() => el.classList.remove('comment-highlight'), 2000)
+        }
+      }
     })
 
     return {
@@ -253,6 +266,7 @@ L 站的愿景是成为新的**理想型社区**，让每一个一身疲惫的�
       postComment,
       onSliderInput,
       onScroll: updateCurrentIndex,
+      copyPostLink,
       renderMarkdown
     }
   }

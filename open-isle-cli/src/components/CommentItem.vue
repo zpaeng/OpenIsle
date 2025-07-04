@@ -1,6 +1,7 @@
 <template>
   <div
     class="info-content-container"
+    :id="'comment-' + comment.id"
     :style="{
       ...(level > 0 ? { /*borderLeft: '1px solid #e0e0e0', */borderBottom: 'none' } : {})
     }"
@@ -33,7 +34,7 @@
             <div class="make-reaction-item like-reaction">
               <i class="far fa-heart"></i>
             </div>
-            <div class="make-reaction-item copy-link">
+            <div class="make-reaction-item copy-link" @click="copyCommentLink">
               <i class="fas fa-link"></i>
             </div>
           </div>
@@ -93,7 +94,11 @@ const CommentItem = {
       })
       showEditor.value = false
     }
-    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, renderMarkdown }
+    const copyCommentLink = () => {
+      const link = `${location.origin}${location.pathname}#comment-${props.comment.id}`
+      navigator.clipboard.writeText(link)
+    }
+    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown }
   }
 }
 CommentItem.components = { CommentItem, CommentEditor }
@@ -116,6 +121,15 @@ export default CommentItem
 
 .comment-reaction:hover {
   background-color: lightgray;
+}
+
+.comment-highlight {
+  animation: highlight 2s;
+}
+
+@keyframes highlight {
+  from { background-color: yellow; }
+  to { background-color: transparent; }
 }
 
 </style>
