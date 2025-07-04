@@ -1,10 +1,15 @@
 <template>
-  <div class="info-content-container" :style="{ marginLeft: level * 20 + 'px' }">
+  <div
+    class="info-content-container"
+    :style="{
+      ...(level > 0 ? { /*borderLeft: '1px solid #e0e0e0', */borderBottom: 'none' } : {})
+    }"
+  >
     <div class="user-avatar-container">
       <div class="user-avatar-item">
         <img class="user-avatar-item-img" :src="comment.avatar" alt="avatar" />
       </div>
-    </div>
+    </div>  
     <div class="info-content">
       <div class="info-content-header">
         <div class="user-name">{{ comment.userName }}</div>
@@ -78,10 +83,8 @@ export default CommentItem
 .reply-toggle {
   cursor: pointer;
   color: var(--primary-color);
-  margin-top: 10px;
   user-select: none;
 }
 .reply-list {
-  margin-top: 10px;
 }
 </style>

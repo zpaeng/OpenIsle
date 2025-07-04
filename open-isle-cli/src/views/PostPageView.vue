@@ -236,7 +236,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .post-page-container {
   display: flex;
   flex-direction: row;
@@ -362,9 +362,9 @@ export default {
 .info-content-container {
   margin-top: 20px;
   display: flex;
-  width: 100%;
   flex-direction: row;
   gap: 10px;
+  padding: 0px;
   border-bottom: 1px solid #e2e2e2;
 }
 
