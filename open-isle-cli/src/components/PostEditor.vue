@@ -28,7 +28,7 @@ export default {
     onMounted(() => {
       vditorInstance.value = new Vditor(props.editorId, {
         placeholder: '请输入正文...',
-        height: 400,
+        height: 500,
         theme: 'classic',
         preview: {
           theme: { current: 'light' },
@@ -71,7 +71,9 @@ export default {
 
 <style scoped>
 .post-editor-container {
-  border: 1px solid #e2e2e2;
+  border-right: 1px solid #e2e2e2;
+  border-top: 1px solid #e2e2e2;
+  border-bottom: 1px solid #e2e2e2;
 }
 </style>
 

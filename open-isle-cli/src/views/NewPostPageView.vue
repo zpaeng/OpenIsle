@@ -2,7 +2,9 @@
   <div class="new-post-page">
     <div class="new-post-form">
       <input class="post-title-input" v-model="title" placeholder="标题" />
-      <PostEditor v-model="content" />
+      <div class="post-editor-container">
+        <PostEditor v-model="content" />
+      </div>
       <div class="post-submit" @click="submitPost">发布</div>
     </div>
   </div>
@@ -32,24 +34,25 @@ export default {
 .new-post-page {
   display: flex;
   justify-content: center;
-  padding: 20px;
 }
 
 .new-post-form {
   width: 100%;
-  max-width: 800px;
 }
 
 .post-title-input {
-  width: calc(100% - 20px);
-  padding: 10px;
-  margin-bottom: 20px;
   font-size: 18px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
+  border: none;
+  outline: none;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  background-color: transparent;
+  font-size: 42px;
+  font-weight: bold;
 }
 
 .post-submit {
+  margin-left: 20px;
   margin-top: 20px;
   background-color: var(--primary-color);
   color: #fff;
