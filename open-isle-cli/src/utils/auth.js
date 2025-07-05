@@ -14,6 +14,12 @@ export function clearToken() {
   localStorage.removeItem(TOKEN_KEY)
 }
 
+export function isLogin() {
+  const token = getToken()
+  console.log('token', token)
+  return token !== null && token !== ''
+}
+
 export async function checkToken() {
   const token = getToken()
   if (!token) return false

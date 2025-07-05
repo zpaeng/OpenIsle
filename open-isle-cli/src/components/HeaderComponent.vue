@@ -12,7 +12,12 @@
         </div>
       </div>
 
-      <div class="header-content-right">
+      <div v-if="isLogin" class="header-content-right">
+        <div class="header-content-item-main" @click="goToProfile">个人中心</div>
+        <div class="header-content-item-secondary" @click="goToLogout">退出</div>
+      </div>
+
+      <div v-else class="header-content-right">
         <div class="header-content-item-main" @click="goToLogin">登录</div>
         <div class="header-content-item-secondary" @click="goToSignup">注册</div>
       </div>
@@ -21,6 +26,8 @@
 </template>
 
 <script>
+import { isLogin } from '../utils/auth'
+
 export default {
   name: 'HeaderComponent',
   props: {
@@ -29,6 +36,12 @@ export default {
       default: true
     }
   },
+  computed: {
+    isLogin() {
+      return isLogin()
+    }
+  },
+
   methods: {
     goToHome() {
       this.$router.push('/')
