@@ -39,7 +39,7 @@ public class Notification {
     @Column
     private Boolean approved;
 
-    @Column(nullable = false)
+    @Column(name = "is_read", nullable = false)
     private boolean read = false;
 
     @Column(nullable = false)

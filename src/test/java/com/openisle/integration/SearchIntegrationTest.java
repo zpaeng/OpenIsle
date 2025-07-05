@@ -60,10 +60,10 @@ class SearchIntegrationTest {
         String admin = registerAndLoginAsAdmin("admin", "a@a.com");
         String user = registerAndLogin("bob_nice", "b@b.com");
 
-        ResponseEntity<Map> catResp = postJson("/api/categories", Map.of("name", "misc", "describe", "d", "icon", "i"), admin);
+        ResponseEntity<Map> catResp = postJson("/api/categories", Map.of("name", "misc", "description", "d", "icon", "i"), admin);
         Long catId = ((Number)catResp.getBody().get("id")).longValue();
 
-        ResponseEntity<Map> tagResp = postJson("/api/tags", Map.of("name", "misc", "describe", "d", "icon", "i"), admin);
+        ResponseEntity<Map> tagResp = postJson("/api/tags", Map.of("name", "misc", "description", "d", "icon", "i"), admin);
         Long tagId = ((Number)tagResp.getBody().get("id")).longValue();
 
         ResponseEntity<Map> postResp = postJson("/api/posts",

@@ -24,6 +24,6 @@ public class Tag {
     @Column
     private String smallIcon;
 
-    @Column(nullable = false)
-    private String describe;
+    @Column(name = "description", nullable = false)
+    private String description;
 }
