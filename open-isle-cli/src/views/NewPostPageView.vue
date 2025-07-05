@@ -12,7 +12,8 @@
         </div>
         <div class="post-options-right">
           <div class="post-draft" @click="saveDraft">存草稿</div>
-          <div class="post-submit" @click="submitPost">发布</div>
+          <div v-if="!isWaitingPosting" class="post-submit" @click="submitPost">发布</div>
+          <div v-else class="post-submit-loading"> <i class="fa-solid fa-spinner fa-spin"></i> 发布中...</div>
         </div>
       </div>
     </div>
@@ -29,6 +30,11 @@ import { getToken } from '../utils/auth'
 
 export default {
   name: 'NewPostPageView',
+  data() {
+    return {
+      isWaitingPosting: false
+    }
+  },
   components: { PostEditor, CategorySelect, TagSelect },
   setup() {
     const title = ref('')
@@ -126,6 +132,15 @@ export default {
 
 .post-submit:hover {
   background-color: var(--primary-color-hover);
+}
+
+.post-submit-loading {
+  color: white;
+  background-color: var(--primary-color-disabled);
+  padding: 10px 20px;
+  border-radius: 10px;
+  width: fit-content;
+  cursor: not-allowed;
 }
 
 .post-options-left {
