@@ -24,6 +24,8 @@ import { ref } from 'vue'
 import PostEditor from '../components/PostEditor.vue'
 import CategorySelect from '../components/CategorySelect.vue'
 import TagSelect from '../components/TagSelect.vue'
+import { API_BASE_URL, toast } from '../main'
+import { getToken } from '../utils/auth'
 
 export default {
   name: 'NewPostPageView',
@@ -33,12 +35,50 @@ export default {
     const content = ref('')
     const selectedCategory = ref('')
     const selectedTags = ref([])
-    const submitPost = () => {
-      console.log('title:', title.value)
-      console.log('content:', content.value)
-      console.log('category:', selectedCategory.value)
-      console.log('tags:', selectedTags.value)
-      // 在此处可以调用接口提交帖子
+    const submitPost = async () => {
+      if (!title.value.trim()) {
+        toast.error('标题不能为空')
+        return
+      }
+      if (!content.value.trim()) {
+        toast.error('内容不能为空')
+        return
+      }
+      if (!selectedCategory.value) {
+        toast.error('请选择分类')
+        return
+      }
+      if (selectedTags.value.length === 0) {
+        toast.error('请选择标签')
+        return
+      }
+      try {
+        const token = getToken()
+        const res = await fetch(`${API_BASE_URL}/api/posts`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            title: title.value,
+            content: content.value,
+            categoryId: selectedCategory.value,
+            tagIds: selectedTags.value
+          })
+        })
+        const data = await res.json()
+        if (res.ok) {
+          toast.success('发布成功')
+          if (data.id) {
+            window.location.href = `/posts/${data.id}`
+          }
+        } else {
+          toast.error(data.error || '发布失败')
+        }
+      } catch (e) {
+        toast.error('发布失败')
+      }
     }
     return { title, content, selectedCategory, selectedTags, submitPost }
   }
