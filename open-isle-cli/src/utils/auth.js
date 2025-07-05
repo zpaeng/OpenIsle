@@ -1,6 +1,13 @@
 import { API_BASE_URL } from '../main'
+import { reactive } from 'vue'
 
 const TOKEN_KEY = 'token'
+
+export const authState = reactive({
+  loggedIn: false
+})
+
+authState.loggedIn = localStorage.getItem(TOKEN_KEY) !== null && localStorage.getItem(TOKEN_KEY) !== ''
 
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY)
@@ -8,10 +15,12 @@ export function getToken() {
 
 export function setToken(token) {
   localStorage.setItem(TOKEN_KEY, token)
+  authState.loggedIn = true
 }
 
 export function clearToken() {
   localStorage.removeItem(TOKEN_KEY)
+  authState.loggedIn = false
 }
 
 export async function fetchCurrentUser() {
@@ -29,9 +38,7 @@ export async function fetchCurrentUser() {
 }
 
 export function isLogin() {
-  const token = getToken()
-  console.log('token', token)
-  return token !== null && token !== ''
+  return authState.loggedIn
 }
 
 export async function checkToken() {
@@ -41,8 +48,10 @@ export async function checkToken() {
     const res = await fetch(`${API_BASE_URL}/api/auth/check`, {
       headers: { Authorization: `Bearer ${token}` }
     })
+    authState.loggedIn = res.ok
     return res.ok
   } catch (e) {
+    authState.loggedIn = false
     return false
   }
 }

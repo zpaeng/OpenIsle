@@ -32,7 +32,8 @@
 </template>
 
 <script>
-import { isLogin, clearToken, fetchCurrentUser } from '../utils/auth'
+import { authState, clearToken, fetchCurrentUser } from '../utils/auth'
+import { watch } from 'vue'
 
 export default {
   name: 'HeaderComponent',
@@ -50,16 +51,41 @@ export default {
   },
   computed: {
     isLogin() {
-      return isLogin()
+      return authState.loggedIn
     }
   },
   async mounted() {
-    if (this.isLogin) {
-      const user = await fetchCurrentUser()
-      if (user && user.avatar) {
-        this.avatar = user.avatar
+    const updateAvatar = async () => {
+      if (authState.loggedIn) {
+        const user = await fetchCurrentUser()
+        if (user && user.avatar) {
+          this.avatar = user.avatar
+        }
+      } else {
+        this.avatar = 'https://picsum.photos/40'
       }
     }
+
+    await updateAvatar()
+
+    watch(() => authState.loggedIn, async () => {
+      await updateAvatar()
+    })
+
+    watch(() => this.$route.fullPath, () => {
+      this.dropdownVisible = false
+    })
+
+    this.onClickOutside = (e) => {
+      if (!this.$el.contains(e.target)) {
+        this.dropdownVisible = false
+      }
+    }
+    document.addEventListener('click', this.onClickOutside)
+  },
+
+  beforeUnmount() {
+    document.removeEventListener('click', this.onClickOutside)
   },
 
   methods: {
