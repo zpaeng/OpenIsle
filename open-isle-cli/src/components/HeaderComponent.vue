@@ -13,8 +13,9 @@
       </div>
 
       <div v-if="isLogin" class="header-content-right">
-        <div class="header-content-item-main" @click="goToProfile">个人中心</div>
-        <div class="header-content-item-secondary" @click="goToLogout">退出</div>
+        <div class="header-user-avatar-item">
+          <img class="header-user-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar" />
+        </div>
       </div>
 
       <div v-else class="header-content-right">
@@ -129,6 +130,19 @@ export default {
   color: var(--primary-color);
   text-decoration: underline;
   cursor: pointer;
+}
+
+.header-user-avatar-item {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.header-user-avatar-item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 </style>
