@@ -37,16 +37,18 @@ class TagControllerTest {
         t.setName("java");
         t.setDescribe("d");
         t.setIcon("i");
-        Mockito.when(tagService.createTag(eq("java"), eq("d"), eq("i"))).thenReturn(t);
+        t.setSmallIcon("s1");
+        Mockito.when(tagService.createTag(eq("java"), eq("d"), eq("i"), eq("s1"))).thenReturn(t);
         Mockito.when(tagService.getTag(1L)).thenReturn(t);
 
         mockMvc.perform(post("/api/tags")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"java\",\"describe\":\"d\",\"icon\":\"i\"}"))
+                        .content("{\"name\":\"java\",\"describe\":\"d\",\"icon\":\"i\",\"smallIcon\":\"s1\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("java"))
                 .andExpect(jsonPath("$.describe").value("d"))
-                .andExpect(jsonPath("$.icon").value("i"));
+                .andExpect(jsonPath("$.icon").value("i"))
+                .andExpect(jsonPath("$.smallIcon").value("s1"));
 
         mockMvc.perform(get("/api/tags/1"))
                 .andExpect(status().isOk())
@@ -60,6 +62,7 @@ class TagControllerTest {
         t.setName("spring");
         t.setDescribe("d2");
         t.setIcon("i2");
+        t.setSmallIcon("s2");
         Mockito.when(tagService.listTags()).thenReturn(List.of(t));
 
         mockMvc.perform(get("/api/tags"))
@@ -67,7 +70,8 @@ class TagControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("spring"))
                 .andExpect(jsonPath("$[0].describe").value("d2"))
-                .andExpect(jsonPath("$[0].icon").value("i2"));
+                .andExpect(jsonPath("$[0].icon").value("i2"))
+                .andExpect(jsonPath("$[0].smallIcon").value("s2"));
     }
 
     @Test
@@ -77,15 +81,17 @@ class TagControllerTest {
         t.setName("java");
         t.setDescribe("d3");
         t.setIcon("i3");
-        Mockito.when(tagService.updateTag(eq(3L), eq("java"), eq("d3"), eq("i3"))).thenReturn(t);
+        t.setSmallIcon("s3");
+        Mockito.when(tagService.updateTag(eq(3L), eq("java"), eq("d3"), eq("i3"), eq("s3"))).thenReturn(t);
 
         mockMvc.perform(put("/api/tags/3")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"java\",\"describe\":\"d3\",\"icon\":\"i3\"}"))
+                        .content("{\"name\":\"java\",\"describe\":\"d3\",\"icon\":\"i3\",\"smallIcon\":\"s3\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(3))
                 .andExpect(jsonPath("$.name").value("java"))
                 .andExpect(jsonPath("$.describe").value("d3"))
-                .andExpect(jsonPath("$.icon").value("i3"));
+                .andExpect(jsonPath("$.icon").value("i3"))
+                .andExpect(jsonPath("$.smallIcon").value("s3"));
     }
 }

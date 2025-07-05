@@ -12,15 +12,16 @@ import java.util.List;
 public class CategoryService {
     private final CategoryRepository categoryRepository;
 
-    public Category createCategory(String name, String describe, String icon) {
+    public Category createCategory(String name, String describe, String icon, String smallIcon) {
         Category category = new Category();
         category.setName(name);
         category.setDescribe(describe);
         category.setIcon(icon);
+        category.setSmallIcon(smallIcon);
         return categoryRepository.save(category);
     }
 
-    public Category updateCategory(Long id, String name, String describe, String icon) {
+    public Category updateCategory(Long id, String name, String describe, String icon, String smallIcon) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Category not found"));
         if (name != null) {
@@ -31,6 +32,9 @@ public class CategoryService {
         }
         if (icon != null) {
             category.setIcon(icon);
+        }
+        if (smallIcon != null) {
+            category.setSmallIcon(smallIcon);
         }
         return categoryRepository.save(category);
     }

@@ -21,6 +21,9 @@ public class Category {
     @Column(nullable = false)
     private String icon;
 
+    @Column
+    private String smallIcon;
+
     @Column(nullable = false)
     private String describe;
 }

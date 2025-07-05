@@ -19,13 +19,13 @@ public class CategoryController {
 
     @PostMapping
     public CategoryDto create(@RequestBody CategoryRequest req) {
-        Category c = categoryService.createCategory(req.getName(), req.getDescribe(), req.getIcon());
+        Category c = categoryService.createCategory(req.getName(), req.getDescribe(), req.getIcon(), req.getSmallIcon());
         return toDto(c);
     }
 
     @PutMapping("/{id}")
     public CategoryDto update(@PathVariable Long id, @RequestBody CategoryRequest req) {
-        Category c = categoryService.updateCategory(id, req.getName(), req.getDescribe(), req.getIcon());
+        Category c = categoryService.updateCategory(id, req.getName(), req.getDescribe(), req.getIcon(), req.getSmallIcon());
         return toDto(c);
     }
 
@@ -66,6 +66,7 @@ public class CategoryController {
         dto.setId(c.getId());
         dto.setName(c.getName());
         dto.setIcon(c.getIcon());
+        dto.setSmallIcon(c.getSmallIcon());
         dto.setDescribe(c.getDescribe());
         return dto;
     }
@@ -75,6 +76,7 @@ public class CategoryController {
         private String name;
         private String describe;
         private String icon;
+        private String smallIcon;
     }
 
     @Data
@@ -83,6 +85,7 @@ public class CategoryController {
         private String name;
         private String describe;
         private String icon;
+        private String smallIcon;
     }
 
     @Data
