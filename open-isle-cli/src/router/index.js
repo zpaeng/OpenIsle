@@ -6,6 +6,7 @@ import PostPageView from '../views/PostPageView.vue'
 import LoginPageView from '../views/LoginPageView.vue'
 import SignupPageView from '../views/SignupPageView.vue'
 import NewPostPageView from '../views/NewPostPageView.vue'
+import SettingsPageView from '../views/SettingsPageView.vue'
 
 const routes = [
   {
@@ -42,6 +43,11 @@ const routes = [
     path: '/signup',
     name: 'signup',
     component: SignupPageView
+  },
+  {
+    path: '/settings',
+    name: 'settings',
+    component: SettingsPageView
   }
 ]
 

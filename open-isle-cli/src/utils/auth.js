@@ -14,6 +14,20 @@ export function clearToken() {
   localStorage.removeItem(TOKEN_KEY)
 }
 
+export async function fetchCurrentUser() {
+  const token = getToken()
+  if (!token) return null
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/users/me`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (!res.ok) return null
+    return await res.json()
+  } catch (e) {
+    return null
+  }
+}
+
 export function isLogin() {
   const token = getToken()
   console.log('token', token)
