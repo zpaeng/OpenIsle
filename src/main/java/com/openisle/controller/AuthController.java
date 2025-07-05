@@ -5,6 +5,7 @@ import com.openisle.service.EmailSender;
 import com.openisle.service.JwtService;
 import com.openisle.service.UserService;
 import com.openisle.service.CaptchaService;
+import com.openisle.service.GoogleAuthService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final EmailSender emailService;
     private final CaptchaService captchaService;
+    private final GoogleAuthService googleAuthService;
 
     @Value("${app.captcha.enabled:false}")
     private boolean captchaEnabled;
@@ -63,6 +65,15 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/google")
+    public ResponseEntity<?> loginWithGoogle(@RequestBody GoogleLoginRequest req) {
+        Optional<User> user = googleAuthService.authenticate(req.getIdToken());
+        if (user.isPresent()) {
+            return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
+        }
+        return ResponseEntity.badRequest().body(Map.of("error", "Invalid google token"));
+    }
+
     @GetMapping("/check")
     public ResponseEntity<?> checkToken() {
         return ResponseEntity.ok(Map.of("valid", true));
@@ -81,6 +92,11 @@ public class AuthController {
         private String username;
         private String password;
         private String captcha;
+    }
+
+    @Data
+    private static class GoogleLoginRequest {
+        private String idToken;
     }
 
     @Data

@@ -19,6 +19,7 @@ OpenIsle 基于 Spring Boot 构建，提供社区后台常见的注册、登录�
 
 * **用户体系**：注册、登录，密码使用 BCrypt 加密
 * **JWT 认证**：登录后获得 Token，接口通过 `Authorization: Bearer` 认证
+* **Google 登录**：支持使用 Google OAuth 登录
 * **邮件通知**：抽象 `EmailSender`，默认实现基于 Resend
 * **角色权限**：内置 `ADMIN` 与 `USER`，管理员接口以 `/api/admin/**` 提供
 * **文章与评论**：支持分类、评论及多级回复
@@ -43,6 +44,7 @@ OpenIsle 基于 Spring Boot 构建，提供社区后台常见的注册、登录�
    - `MYSQL_PASSWORD`：数据库密码
    - `RESEND_API_KEY`：Resend 邮件服务 API Key
    - `COS_BASE_URL`：腾讯云 COS 访问域名
+   - `GOOGLE_CLIENT_ID`：Google OAuth 客户端 ID
    - `JWT_SECRET`：JWT 签名密钥
    - `JWT_EXPIRATION`：JWT 过期时间（毫秒）
    - `PASSWORD_STRENGTH`：密码强度（LOW、MEDIUM、HIGH）
@@ -62,6 +64,7 @@ mvn spring-boot:run
 
 - `POST /api/auth/register`：注册新用户
 - `POST /api/auth/login`：登录并获取 Token
+- `POST /api/auth/google`：Google 登录并获取 Token
 - `GET /api/config`：查看验证码开关配置
 - 需要认证的接口示例：`GET /api/hello`（需 `Authorization` 头）
 - 管理员接口示例：`GET /api/admin/hello`
