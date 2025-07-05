@@ -5,6 +5,7 @@ import './assets/global.css'
 import Toast, { POSITION } from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 import { useToast } from 'vue-toastification'
+import { checkToken, clearToken } from './utils/auth'
 
 // Configurable API domain and port
 export const API_DOMAIN = 'http://127.0.0.1'
@@ -16,3 +17,9 @@ const app = createApp(App)
 app.use(router)
 app.use(Toast, { position: POSITION.TOP_RIGHT })
 app.mount('#app')
+
+checkToken().then(valid => {
+  if (!valid) {
+    clearToken()
+  }
+})

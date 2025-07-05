@@ -63,6 +63,11 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/check")
+    public ResponseEntity<?> checkToken() {
+        return ResponseEntity.ok(Map.of("valid", true));
+    }
+
     @Data
     private static class RegisterRequest {
         private String username;
