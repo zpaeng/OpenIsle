@@ -4,7 +4,7 @@
 
 <script>
 import { computed } from 'vue'
-import { API_BASE_URL } from '../main'
+import { API_BASE_URL, toast } from '../main'
 import Dropdown from './Dropdown.vue'
 
 export default {
@@ -23,7 +23,13 @@ export default {
 
     const selected = computed({
       get: () => props.modelValue,
-      set: v => emit('update:modelValue', v)
+      set: v => {
+        if (Array.isArray(v) && v.length > 2) {
+          toast.error('最多选择两个标签')
+          return
+        }
+        emit('update:modelValue', v)
+      }
     })
 
     return { fetchTags, selected }

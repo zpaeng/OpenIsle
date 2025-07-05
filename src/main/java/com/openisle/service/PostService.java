@@ -53,6 +53,9 @@ public class PostService {
         if (tagIds == null || tagIds.isEmpty()) {
             throw new IllegalArgumentException("At least one tag required");
         }
+        if (tagIds.size() > 2) {
+            throw new IllegalArgumentException("At most two tags allowed");
+        }
         User author = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         Category category = categoryRepository.findById(categoryId)
