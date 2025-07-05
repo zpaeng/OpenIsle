@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import PostEditor from '../components/PostEditor.vue'
 import CategorySelect from '../components/CategorySelect.vue'
 import TagSelect from '../components/TagSelect.vue'
@@ -35,6 +35,55 @@ export default {
     const content = ref('')
     const selectedCategory = ref('')
     const selectedTags = ref([])
+
+    const loadDraft = async () => {
+      const token = getToken()
+      if (!token) return
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/drafts/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        if (res.ok && res.status !== 204) {
+          const data = await res.json()
+          title.value = data.title || ''
+          content.value = data.content || ''
+          selectedCategory.value = data.categoryId || ''
+          selectedTags.value = data.tagIds || []
+        }
+      } catch (e) {}
+    }
+
+    onMounted(loadDraft)
+
+    const saveDraft = async () => {
+      const token = getToken()
+      if (!token) {
+        toast.error('请先登录')
+        return
+      }
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/drafts`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            title: title.value,
+            content: content.value,
+            categoryId: selectedCategory.value || null,
+            tagIds: selectedTags.value
+          })
+        })
+        if (res.ok) {
+          toast.success('草稿已保存')
+        } else {
+          toast.error('保存失败')
+        }
+      } catch (e) {
+        toast.error('保存失败')
+      }
+    }
     const submitPost = async () => {
       if (!title.value.trim()) {
         toast.error('标题不能为空')
@@ -80,7 +129,7 @@ export default {
         toast.error('发布失败')
       }
     }
-    return { title, content, selectedCategory, selectedTags, submitPost }
+    return { title, content, selectedCategory, selectedTags, submitPost, saveDraft }
   }
 }
 </script>
