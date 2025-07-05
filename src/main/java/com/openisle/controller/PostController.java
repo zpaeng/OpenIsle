@@ -7,6 +7,7 @@ import com.openisle.service.CommentService;
 import com.openisle.service.PostService;
 import com.openisle.service.ReactionService;
 import com.openisle.service.CaptchaService;
+import com.openisle.service.DraftService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ public class PostController {
     private final CommentService commentService;
     private final ReactionService reactionService;
     private final CaptchaService captchaService;
+    private final DraftService draftService;
 
     @Value("${app.captcha.enabled:false}")
     private boolean captchaEnabled;
@@ -40,6 +42,7 @@ public class PostController {
         }
         Post post = postService.createPost(auth.getName(), req.getCategoryId(),
                 req.getTitle(), req.getContent(), req.getTagIds());
+        draftService.deleteDraft(auth.getName());
         return ResponseEntity.ok(toDto(post));
     }
 
