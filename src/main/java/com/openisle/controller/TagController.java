@@ -19,13 +19,13 @@ public class TagController {
 
     @PostMapping
     public TagDto create(@RequestBody TagRequest req) {
-        Tag tag = tagService.createTag(req.getName(), req.getDescribe(), req.getIcon());
+        Tag tag = tagService.createTag(req.getName(), req.getDescribe(), req.getIcon(), req.getSmallIcon());
         return toDto(tag);
     }
 
     @PutMapping("/{id}")
     public TagDto update(@PathVariable Long id, @RequestBody TagRequest req) {
-        Tag tag = tagService.updateTag(id, req.getName(), req.getDescribe(), req.getIcon());
+        Tag tag = tagService.updateTag(id, req.getName(), req.getDescribe(), req.getIcon(), req.getSmallIcon());
         return toDto(tag);
     }
 
@@ -66,6 +66,7 @@ public class TagController {
         dto.setId(tag.getId());
         dto.setName(tag.getName());
         dto.setIcon(tag.getIcon());
+        dto.setSmallIcon(tag.getSmallIcon());
         dto.setDescribe(tag.getDescribe());
         return dto;
     }
@@ -75,6 +76,7 @@ public class TagController {
         private String name;
         private String describe;
         private String icon;
+        private String smallIcon;
     }
 
     @Data
@@ -83,6 +85,7 @@ public class TagController {
         private String name;
         private String describe;
         private String icon;
+        private String smallIcon;
     }
 
     @Data
