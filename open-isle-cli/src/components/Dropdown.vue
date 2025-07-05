@@ -2,11 +2,20 @@
   <div class="dropdown" ref="wrapper">
     <div class="dropdown-display" @click="toggle">
       <template v-if="multiple">
-        <span v-if="selectedLabels.length" class="selected-text">{{ selectedLabels.join(', ') }}</span>
+        <span v-if="selectedLabels.length">
+          <template v-for="(label, idx) in selectedLabels" :key="label.id">
+            <img v-if="label.icon" :src="label.icon" class="option-icon" />
+            <span>{{ label.name }}</span>
+            <span v-if="idx !== selectedLabels.length - 1">, </span>
+          </template>
+        </span>
         <span v-else class="placeholder">{{ placeholder }}</span>
       </template>
       <template v-else>
-        <span v-if="selectedLabels.length" class="selected-text">{{ selectedLabels[0] }}</span>
+        <span v-if="selectedLabels.length">
+          <img v-if="selectedLabels[0].icon" :src="selectedLabels[0].icon" class="option-icon" />
+          <span>{{ selectedLabels[0].name }}</span>
+        </span>
         <span v-else class="placeholder">{{ placeholder }}</span>
       </template>
       <i class="fas fa-caret-down dropdown-caret"></i>
@@ -16,10 +25,9 @@
         <i class="fas fa-search search-icon"></i>
         <input type="text" v-model="search" placeholder="搜索" />
       </div>
-      <div class="dropdown-option" v-for="o in filteredOptions" :key="o.id" @click="select(o.id)">
+      <div class="dropdown-option" v-for="o in filteredOptions" :key="o.id" @click="select(o.id)" :class="{ 'selected': isSelected(o.id) }">
         <img v-if="o.icon" :src="o.icon" class="option-icon" />
         <span>{{ o.name }}</span>
-        <input v-if="multiple" type="checkbox" :checked="modelValue.includes(o.id)" @change.prevent />
       </div>
     </div>
   </div>
@@ -101,13 +109,17 @@ export default {
 
     const selectedLabels = computed(() => {
       if (props.multiple) {
-        return options.value.filter(o => (props.modelValue || []).includes(o.id)).map(o => o.name)
+        return options.value.filter(o => (props.modelValue || []).includes(o.id))
       }
       const match = options.value.find(o => o.id === props.modelValue)
-      return match ? [match.name] : []
+      return match ? [match] : []
     })
 
-    return { open, toggle, select, search, filteredOptions, wrapper, selectedLabels }
+    const isSelected = (id) => {
+      return selectedLabels.value.some(label => label.id === id)
+    }
+
+    return { open, toggle, select, search, filteredOptions, wrapper, selectedLabels, isSelected }
   }
 }
 </script>
@@ -117,6 +129,7 @@ export default {
   position: relative;
   width: 200px;
 }
+
 .dropdown-display {
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -126,9 +139,11 @@ export default {
   justify-content: space-between;
   align-items: center;
 }
+
 .placeholder {
   color: gray;
 }
+
 .dropdown-menu {
   position: absolute;
   top: 100%;
@@ -140,31 +155,39 @@ export default {
   max-height: 200px;
   overflow-y: auto;
 }
+
 .dropdown-search {
   display: flex;
   align-items: center;
   padding: 5px;
   border-bottom: 1px solid #eee;
 }
+
 .dropdown-search input {
   flex: 1;
   border: none;
   outline: none;
   margin-left: 5px;
 }
+
 .dropdown-option {
   display: flex;
   align-items: center;
-  padding: 5px 10px;
+  padding: 10px 20px;
   gap: 5px;
   cursor: pointer;
 }
+
+.dropdown-option.selected {
+  background-color: #f5f5f5;
+}
+
 .dropdown-option:hover {
   background-color: #f5f5f5;
 }
+
 .option-icon {
   width: 16px;
   height: 16px;
 }
 </style>
-

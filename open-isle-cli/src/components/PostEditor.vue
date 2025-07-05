@@ -28,7 +28,7 @@ export default {
     onMounted(() => {
       vditorInstance.value = new Vditor(props.editorId, {
         placeholder: '请输入正文...',
-        height: 500,
+        height: 450,
         theme: 'classic',
         preview: {
           theme: { current: 'light' },
