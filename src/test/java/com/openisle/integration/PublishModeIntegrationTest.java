@@ -70,11 +70,11 @@ class PublishModeIntegrationTest {
         String adminToken = registerAndLoginAsAdmin("admin", "admin@example.com");
 
         ResponseEntity<Map> catResp = postJson("/api/categories",
-                Map.of("name", "review", "describe", "d", "icon", "i"), adminToken);
+                Map.of("name", "review", "description", "d", "icon", "i"), adminToken);
         Long catId = ((Number)catResp.getBody().get("id")).longValue();
 
         ResponseEntity<Map> tagResp = postJson("/api/tags",
-                Map.of("name", "t1", "describe", "d", "icon", "i"), adminToken);
+                Map.of("name", "t1", "description", "d", "icon", "i"), adminToken);
         Long tagId = ((Number)tagResp.getBody().get("id")).longValue();
 
         ResponseEntity<Map> postResp = postJson("/api/posts",

@@ -12,23 +12,23 @@ import java.util.List;
 public class TagService {
     private final TagRepository tagRepository;
 
-    public Tag createTag(String name, String describe, String icon, String smallIcon) {
+    public Tag createTag(String name, String description, String icon, String smallIcon) {
         Tag tag = new Tag();
         tag.setName(name);
-        tag.setDescribe(describe);
+        tag.setDescription(description);
         tag.setIcon(icon);
         tag.setSmallIcon(smallIcon);
         return tagRepository.save(tag);
     }
 
-    public Tag updateTag(Long id, String name, String describe, String icon, String smallIcon) {
+    public Tag updateTag(Long id, String name, String description, String icon, String smallIcon) {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Tag not found"));
         if (name != null) {
             tag.setName(name);
         }
-        if (describe != null) {
-            tag.setDescribe(describe);
+        if (description != null) {
+            tag.setDescription(description);
         }
         if (icon != null) {
             tag.setIcon(icon);

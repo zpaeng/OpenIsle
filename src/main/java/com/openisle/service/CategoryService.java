@@ -12,23 +12,23 @@ import java.util.List;
 public class CategoryService {
     private final CategoryRepository categoryRepository;
 
-    public Category createCategory(String name, String describe, String icon, String smallIcon) {
+    public Category createCategory(String name, String description, String icon, String smallIcon) {
         Category category = new Category();
         category.setName(name);
-        category.setDescribe(describe);
+        category.setDescription(description);
         category.setIcon(icon);
         category.setSmallIcon(smallIcon);
         return categoryRepository.save(category);
     }
 
-    public Category updateCategory(Long id, String name, String describe, String icon, String smallIcon) {
+    public Category updateCategory(Long id, String name, String description, String icon, String smallIcon) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Category not found"));
         if (name != null) {
             category.setName(name);
         }
-        if (describe != null) {
-            category.setDescribe(describe);
+        if (description != null) {
+            category.setDescription(description);
         }
         if (icon != null) {
             category.setIcon(icon);

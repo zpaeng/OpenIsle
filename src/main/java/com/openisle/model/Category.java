@@ -24,6 +24,6 @@ public class Category {
     @Column
     private String smallIcon;
 
-    @Column(nullable = false)
-    private String describe;
+    @Column(name = "description", nullable = false)
+    private String description;
 }
