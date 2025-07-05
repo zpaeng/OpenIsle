@@ -91,7 +91,7 @@
     </div>
 
     <div class="other-signup-page-content">
-      <div class="signup-page-button">
+      <div class="signup-page-button" @click="signupWithGoogle">
         <img class="signup-page-button-icon" src="../assets/icons/google.svg" alt="Google Logo" />
         <div class="signup-page-button-text">Google 注册</div>
       </div>
@@ -101,6 +101,7 @@
 
 <script>
 import { API_BASE_URL, toast } from '../main'
+import { googleSignIn } from '../utils/google'
 export default {
   name: 'SignupPageView',
 
@@ -187,6 +188,11 @@ export default {
       } catch (e) {
         toast.error('注册失败')
       }
+    },
+    signupWithGoogle() {
+      googleSignIn(() => {
+        this.$router.push('/')
+      })
     }
   }
 }

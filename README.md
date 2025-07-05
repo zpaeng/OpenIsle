@@ -45,6 +45,7 @@ OpenIsle 基于 Spring Boot 构建，提供社区后台常见的注册、登录�
    - `RESEND_API_KEY`：Resend 邮件服务 API Key
    - `COS_BASE_URL`：腾讯云 COS 访问域名
    - `GOOGLE_CLIENT_ID`：Google OAuth 客户端 ID
+   - `VUE_APP_GOOGLE_CLIENT_ID`：前端 Google OAuth 客户端 ID
    - `JWT_SECRET`：JWT 签名密钥
    - `JWT_EXPIRATION`：JWT 过期时间（毫秒）
    - `PASSWORD_STRENGTH`：密码强度（LOW、MEDIUM、HIGH）

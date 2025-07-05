@@ -46,7 +46,7 @@
     </div>
 
     <div class="other-login-page-content">
-      <div class="login-page-button">
+      <div class="login-page-button" @click="loginWithGoogle">
         <img class="login-page-button-icon" src="../assets/icons/google.svg" alt="Google Logo" />
         <div class="login-page-button-text">Google 登录</div>
       </div>
@@ -57,6 +57,7 @@
 <script>
 import { API_BASE_URL, toast } from '../main'
 import { setToken } from '../utils/auth'
+import { googleSignIn } from '../utils/google'
 export default {
   name: 'LoginPageView',
   data() {
@@ -87,6 +88,11 @@ export default {
       } catch (e) {
         toast.error('登录失败')
       }
+    },
+    loginWithGoogle() {
+      googleSignIn(() => {
+        this.$router.push('/')
+      })
     }
   }
 }
