@@ -56,6 +56,7 @@
 
 <script>
 import { API_BASE_URL, toast } from '../main'
+import { setToken } from '../utils/auth'
 export default {
   name: 'LoginPageView',
   data() {
@@ -77,7 +78,7 @@ export default {
         this.isWaitingForLogin = false
         const data = await res.json()
         if (res.ok && data.token) {
-          localStorage.setItem('token', data.token)
+          setToken(data.token)
           toast.success('登录成功')
           this.$router.push('/')
         } else {
