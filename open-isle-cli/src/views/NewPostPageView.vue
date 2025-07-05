@@ -6,15 +6,8 @@
         <PostEditor v-model="content" />
       </div>
       <div class="post-options">
-        <select class="category-select" v-model="selectedCategory">
-          <option disabled value="">请选择分类</option>
-          <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
-        </select>
-        <div class="tag-select">
-          <label class="tag-item" v-for="t in tags" :key="t.id">
-            <input type="checkbox" :value="t.id" v-model="selectedTags" /> {{ t.name }}
-          </label>
-        </div>
+        <CategorySelect v-model="selectedCategory" />
+        <TagSelect v-model="selectedTags" />
       </div>
       <div class="post-submit" @click="submitPost">发布</div>
     </div>
@@ -24,22 +17,15 @@
 <script>
 import { ref } from 'vue'
 import PostEditor from '../components/PostEditor.vue'
+import CategorySelect from '../components/CategorySelect.vue'
+import TagSelect from '../components/TagSelect.vue'
 
 export default {
   name: 'NewPostPageView',
-  components: { PostEditor },
+  components: { PostEditor, CategorySelect, TagSelect },
   setup() {
     const title = ref('')
     const content = ref('')
-    const categories = ref([
-      { id: 1, name: '闲聊' },
-      { id: 2, name: '技术' }
-    ])
-    const tags = ref([
-      { id: 1, name: 'Java' },
-      { id: 2, name: 'Python' },
-      { id: 3, name: 'AI' }
-    ])
     const selectedCategory = ref('')
     const selectedTags = ref([])
     const submitPost = () => {
@@ -49,7 +35,7 @@ export default {
       console.log('tags:', selectedTags.value)
       // 在此处可以调用接口提交帖子
     }
-    return { title, content, categories, tags, selectedCategory, selectedTags, submitPost }
+    return { title, content, selectedCategory, selectedTags, submitPost }
   }
 }
 </script>
@@ -97,21 +83,5 @@ export default {
   gap: 10px;
 }
 
-.category-select {
-  padding: 5px 10px;
-  border-radius: 5px;
-}
-
-.tag-select {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.tag-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
 </style>
 
