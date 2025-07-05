@@ -13,8 +13,14 @@
       </div>
 
       <div v-if="isLogin" class="header-content-right">
-        <div class="header-content-item-main" @click="goToProfile">个人中心</div>
-        <div class="header-content-item-secondary" @click="goToLogout">退出</div>
+        <div class="avatar-container" @click="toggleDropdown">
+          <img class="avatar-img" :src="avatar" alt="avatar">
+          <i class="fas fa-caret-down dropdown-icon"></i>
+          <div v-if="dropdownVisible" class="dropdown-menu">
+            <div class="dropdown-item" @click="goToSettings">设置</div>
+            <div class="dropdown-item" @click="goToLogout">退出</div>
+          </div>
+        </div>
       </div>
 
       <div v-else class="header-content-right">
@@ -26,7 +32,7 @@
 </template>
 
 <script>
-import { isLogin } from '../utils/auth'
+import { isLogin, clearToken, fetchCurrentUser } from '../utils/auth'
 
 export default {
   name: 'HeaderComponent',
@@ -36,21 +42,47 @@ export default {
       default: true
     }
   },
+  data() {
+    return {
+      dropdownVisible: false,
+      avatar: 'https://picsum.photos/40'
+    }
+  },
   computed: {
     isLogin() {
       return isLogin()
     }
   },
+  async mounted() {
+    if (this.isLogin) {
+      const user = await fetchCurrentUser()
+      if (user && user.avatar) {
+        this.avatar = user.avatar
+      }
+    }
+  },
 
   methods: {
+    toggleDropdown() {
+      this.dropdownVisible = !this.dropdownVisible
+    },
     goToHome() {
       this.$router.push('/')
     },
     goToLogin() {
       this.$router.push('/login')
     },
+    goToSettings() {
+      this.$router.push('/settings')
+      this.dropdownVisible = false
+    },
     goToSignup() {
       this.$router.push('/signup')
+    },
+    goToLogout() {
+      clearToken()
+      this.dropdownVisible = false
+      this.$router.push('/login')
     }
   }
 }
@@ -129,6 +161,43 @@ export default {
   color: var(--primary-color);
   text-decoration: underline;
   cursor: pointer;
+}
+
+.avatar-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.dropdown-icon {
+  margin-left: 5px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.dropdown-item {
+  padding: 8px 16px;
+  white-space: nowrap;
+}
+
+.dropdown-item:hover {
+  background-color: #f2f2f2;
 }
 
 </style>
