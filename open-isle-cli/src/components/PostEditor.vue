@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import Vditor from 'vditor'
 import 'vditor/dist/index.css'
 
@@ -24,6 +24,15 @@ export default {
   },
   setup(props, { emit }) {
     const vditorInstance = ref(null)
+
+    watch(
+      () => props.modelValue,
+      val => {
+        if (vditorInstance.value && vditorInstance.value.getValue() !== val) {
+          vditorInstance.value.setValue(val)
+        }
+      }
+    )
 
     onMounted(() => {
       vditorInstance.value = new Vditor(props.editorId, {

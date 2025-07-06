@@ -61,7 +61,9 @@ export default {
 
           toast.success('草稿已加载')
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error(e)
+      }
     }
 
     onMounted(loadDraft)
