@@ -40,7 +40,7 @@
           </div>
         </div>
       </div>
-      <CommentEditor v-if="showEditor" @submit="submitReply" />
+      <CommentEditor v-if="showEditor" @submit="submitReply" :loading="isWaitingForReply" />
       <div v-if="comment.reply && comment.reply.length" class="reply-toggle" @click="toggleReplies">
         {{ comment.reply.length }}条回复
       </div>
@@ -77,6 +77,7 @@ const CommentItem = {
   setup(props) {
     const showReplies = ref(false)
     const showEditor = ref(false)
+    const isWaitingForReply = ref(false)
     const toggleReplies = () => {
       showReplies.value = !showReplies.value
     }
@@ -85,9 +86,11 @@ const CommentItem = {
     }
     const submitReply = async (text) => {
       if (!text.trim()) return
+      isWaitingForReply.value = true
       const token = getToken()
       if (!token) {
         toast.error('请先登录')
+        isWaitingForReply.value = false
         return
       }
       try {
@@ -120,13 +123,15 @@ const CommentItem = {
         }
       } catch (e) {
         toast.error('回复失败')
+      } finally {
+        isWaitingForReply.value = false
       }
     }
     const copyCommentLink = () => {
       const link = `${location.origin}${location.pathname}#comment-${props.comment.id}`
       navigator.clipboard.writeText(link)
     }
-    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown }
+    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply }
   }
 }
 CommentItem.components = { CommentItem, CommentEditor }

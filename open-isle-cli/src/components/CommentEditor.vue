@@ -2,13 +2,24 @@
   <div class="comment-editor-container">
     <div :id="editorId" ref="vditorElement"></div>
     <div class="comment-bottom-container">
-      <div class="comment-submit" @click="submit">发布评论</div>
+      <div
+        class="comment-submit"
+        :class="{ disabled: isDisabled }"
+        @click="submit"
+      >
+        <template v-if="!loading">
+          发布评论
+        </template>
+        <template v-else>
+          <i class="fa-solid fa-spinner fa-spin"></i> 发布中...
+        </template>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import Vditor from 'vditor'
 import 'vditor/dist/index.css'
 
@@ -19,17 +30,24 @@ export default {
     editorId: {
       type: String,
       default: () => 'editor-' + Math.random().toString(36).slice(2)
+    },
+    loading: {
+      type: Boolean,
+      default: false
     }
   },
   setup(props, { emit }) {
     const vditorInstance = ref(null)
+    const text = ref('')
+
+    const isDisabled = computed(() => props.loading || !text.value.trim())
 
     const submit = () => {
-      if (!vditorInstance.value) return
-      const text = vditorInstance.value.getValue()
-      if (!text.trim()) return
-      emit('submit', text)
+      if (!vditorInstance.value || isDisabled.value) return
+      const value = vditorInstance.value.getValue()
+      emit('submit', value)
       vditorInstance.value.setValue('')
+      text.value = ''
     }
 
     onMounted(() => {
@@ -60,11 +78,14 @@ export default {
           'link',
           'image'
         ],
-        toolbarConfig: { pin: true }
+        toolbarConfig: { pin: true },
+        input(value) {
+          text.value = value
+        }
       })
     })
 
-    return { submit }
+    return { submit, isDisabled }
   }
 }
 </script>
@@ -88,6 +109,14 @@ export default {
   border-radius: 10px;
   font-size: 14px;
   cursor: pointer;
+}
+.comment-submit.disabled {
+  background-color: var(--primary-color-disabled);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.comment-submit.disabled:hover {
+  background-color: var(--primary-color-disabled);
 }
 .comment-submit:hover {
   background-color: var(--primary-color-hover);
