@@ -118,6 +118,7 @@ const CommentItem = {
             }))
           })
           showEditor.value = false
+          toast.success('回复成功')
         } else {
           toast.error('回复失败')
         }

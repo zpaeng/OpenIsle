@@ -186,6 +186,7 @@ export default {
         if (res.ok) {
           const data = await res.json()
           comments.value.push(mapComment(data))
+          toast.success('评论成功')
         } else {
           toast.error('评论失败')
         }
