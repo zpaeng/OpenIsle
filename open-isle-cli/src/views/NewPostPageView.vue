@@ -11,6 +11,9 @@
           <TagSelect v-model="selectedTags" />
         </div>
         <div class="post-options-right">
+          <div class="post-clear" @click="clearPost">
+            <i class="fa-solid fa-eraser"></i> 清空
+          </div>
           <div class="post-draft" @click="saveDraft">存草稿</div>
           <div v-if="!isWaitingPosting" class="post-submit" @click="submitPost">发布</div>
           <div v-else class="post-submit-loading"> <i class="fa-solid fa-spinner fa-spin"></i> 发布中...</div>
@@ -55,11 +58,37 @@ export default {
           content.value = data.content || ''
           selectedCategory.value = data.categoryId || ''
           selectedTags.value = data.tagIds || []
+
+          toast.success('草稿已加载')
         }
       } catch (e) {}
     }
 
     onMounted(loadDraft)
+
+    const clearPost = async () => {
+      title.value = ''
+      content.value = ''
+      selectedCategory.value = ''
+      selectedTags.value = []
+
+      // 删除草稿
+      const token = getToken()
+      if (token) {
+        const res = await fetch(`${API_BASE_URL}/api/drafts/me`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          }
+        })
+        if (res.ok) {
+          toast.success('草稿已清空')
+        } else {
+          toast.error('云端草稿清空失败, 请稍后重试')
+        }
+      }
+    }
 
     const saveDraft = async () => {
       const token = getToken()
@@ -135,7 +164,7 @@ export default {
         toast.error('发布失败')
       }
     }
-    return { title, content, selectedCategory, selectedTags, submitPost, saveDraft }
+    return { title, content, selectedCategory, selectedTags, submitPost, saveDraft, clearPost }
   }
 }
 </script>
@@ -162,12 +191,17 @@ export default {
 }
 
 .post-draft {
-  margin-left: 20px;
   color: var(--primary-color);
   padding: 10px 20px;
   border-radius: 10px;
   cursor: pointer;
   text-decoration: underline;
+}
+
+.post-clear {
+  color: var(--primary-color);
+  cursor: pointer;
+  opacity: 0.7;
 }
 
 .post-submit {
@@ -199,6 +233,7 @@ export default {
 
 .post-options-right {
   display: flex;
+  align-items: center;
   gap: 10px;
 }
 
