@@ -65,7 +65,7 @@
         </div>
       </div>
 
-      <CommentEditor @submit="postComment" />
+      <CommentEditor @submit="postComment" :loading="isWaitingPostingComment" />
 
       <div class="comments-container">
         <CommentItem v-for="comment in comments" :key="comment.id" :comment="comment" :level="0" ref="postItems" />
@@ -112,6 +112,7 @@ export default {
     const tags = ref([])
     const comments = ref([])
     const isWaitingFetchingPost = ref(false);
+    const isWaitingPostingComment = ref(false);
     const postTime = ref('')
     const postItems = ref([])
     const mainContainer = ref(null)
@@ -169,9 +170,11 @@ export default {
 
     const postComment = async (text) => {
       if (!text.trim()) return
+      isWaitingPostingComment.value = true
       const token = getToken()
       if (!token) {
         toast.error('请先登录')
+        isWaitingPostingComment.value = false
         return
       }
       try {
@@ -188,6 +191,8 @@ export default {
         }
       } catch (e) {
         toast.error('评论失败')
+      } finally {
+        isWaitingPostingComment.value = false
       }
     }
 
@@ -227,7 +232,8 @@ export default {
       onScroll: updateCurrentIndex,
       copyPostLink,
       renderMarkdown,
-      isWaitingFetchingPost
+      isWaitingFetchingPost,
+      isWaitingPostingComment
     }
   }
 }
