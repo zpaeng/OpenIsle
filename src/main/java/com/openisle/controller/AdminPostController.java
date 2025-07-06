@@ -43,8 +43,18 @@ public class AdminPostController {
         dto.setContent(post.getContent());
         dto.setCreatedAt(post.getCreatedAt());
         dto.setAuthor(post.getAuthor().getUsername());
-        dto.setCategory(post.getCategory().getName());
+        dto.setCategory(toCategoryDto(post.getCategory()));
         dto.setViews(post.getViews());
+        return dto;
+    }
+
+    private CategoryDto toCategoryDto(com.openisle.model.Category c) {
+        CategoryDto dto = new CategoryDto();
+        dto.setId(c.getId());
+        dto.setName(c.getName());
+        dto.setDescription(c.getDescription());
+        dto.setIcon(c.getIcon());
+        dto.setSmallIcon(c.getSmallIcon());
         return dto;
     }
 
@@ -55,7 +65,16 @@ public class AdminPostController {
         private String content;
         private LocalDateTime createdAt;
         private String author;
-        private String category;
+        private CategoryDto category;
         private long views;
+    }
+
+    @Data
+    private static class CategoryDto {
+        private Long id;
+        private String name;
+        private String description;
+        private String icon;
+        private String smallIcon;
     }
 }

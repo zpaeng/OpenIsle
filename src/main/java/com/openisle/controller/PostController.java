@@ -84,8 +84,8 @@ public class PostController {
         dto.setContent(post.getContent());
         dto.setCreatedAt(post.getCreatedAt());
         dto.setAuthor(post.getAuthor().getUsername());
-        dto.setCategory(post.getCategory().getName());
-        dto.setTags(post.getTags().stream().map(com.openisle.model.Tag::getName).collect(Collectors.toList()));
+        dto.setCategory(toCategoryDto(post.getCategory()));
+        dto.setTags(post.getTags().stream().map(this::toTagDto).collect(Collectors.toList()));
         dto.setViews(post.getViews());
 
         List<ReactionDto> reactions = reactionService.getReactionsForPost(post.getId())
@@ -142,6 +142,26 @@ public class PostController {
         return dto;
     }
 
+    private CategoryDto toCategoryDto(com.openisle.model.Category category) {
+        CategoryDto dto = new CategoryDto();
+        dto.setId(category.getId());
+        dto.setName(category.getName());
+        dto.setDescription(category.getDescription());
+        dto.setIcon(category.getIcon());
+        dto.setSmallIcon(category.getSmallIcon());
+        return dto;
+    }
+
+    private TagDto toTagDto(com.openisle.model.Tag tag) {
+        TagDto dto = new TagDto();
+        dto.setId(tag.getId());
+        dto.setName(tag.getName());
+        dto.setDescription(tag.getDescription());
+        dto.setIcon(tag.getIcon());
+        dto.setSmallIcon(tag.getSmallIcon());
+        return dto;
+    }
+
     @Data
     private static class PostRequest {
         private Long categoryId;
@@ -158,11 +178,29 @@ public class PostController {
         private String content;
         private LocalDateTime createdAt;
         private String author;
-        private String category;
-        private java.util.List<String> tags;
+        private CategoryDto category;
+        private java.util.List<TagDto> tags;
         private long views;
         private List<CommentDto> comments;
         private List<ReactionDto> reactions;
+    }
+
+    @Data
+    private static class CategoryDto {
+        private Long id;
+        private String name;
+        private String description;
+        private String icon;
+        private String smallIcon;
+    }
+
+    @Data
+    private static class TagDto {
+        private Long id;
+        private String name;
+        private String description;
+        private String icon;
+        private String smallIcon;
     }
 
     @Data
