@@ -104,15 +104,15 @@ const CommentItem = {
           const replyList = props.comment.reply || (props.comment.reply = [])
           replyList.push({
             id: data.id,
-            userName: data.author,
+            userName: data.author.username,
             time: new Date(data.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
-            avatar: 'https://picsum.photos/200/200',
+            avatar: data.avatar.username,
             text: data.content,
             reply: (data.replies || []).map(r => ({
               id: r.id,
-              userName: r.author,
+              userName: r.author.username,
               time: new Date(r.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
-              avatar: 'https://picsum.photos/200/200',
+              avatar: r.avatar,
               text: r.content,
               reply: []
             }))

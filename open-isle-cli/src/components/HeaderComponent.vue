@@ -46,7 +46,7 @@ export default {
   data() {
     return {
       dropdownVisible: false,
-      avatar: 'https://picsum.photos/40'
+      avatar: ''
     }
   },
   computed: {
@@ -61,9 +61,7 @@ export default {
         if (user && user.avatar) {
           this.avatar = user.avatar
         }
-      } else {
-        this.avatar = 'https://picsum.photos/40'
-      }
+      } 
     }
 
     await updateAvatar()

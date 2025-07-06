@@ -24,7 +24,7 @@
       <div class="info-content-container" ref="postItems">
         <div class="user-avatar-container">
           <div class="user-avatar-item">
-            <img class="user-avatar-item-img" src="https://picsum.photos/200/200" alt="avatar">
+            <img class="user-avatar-item-img" :src="author.avatar" alt="avatar">
           </div>
         </div>
 
@@ -107,6 +107,7 @@ export default {
     const postId = route.params.id
 
     const title = ref('')
+    const author = ref('')
     const postContent = ref('')
     const category = ref('')
     const tags = ref([])
@@ -120,9 +121,9 @@ export default {
 
     const mapComment = c => ({
       id: c.id,
-      userName: c.author,
+      userName: c.author.username,
       time: new Date(c.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
-      avatar: 'https://picsum.photos/200/200',
+      avatar: c.author.avatar,
       text: c.content,
       reply: (c.replies || []).map(mapComment)
     })
@@ -135,6 +136,7 @@ export default {
         if (!res.ok) return
         const data = await res.json()
         postContent.value = data.content
+        author.value = data.author
         title.value = data.title
         category.value = data.category
         tags.value = data.tags || []
@@ -218,6 +220,7 @@ export default {
 
     return {
       postContent,
+      author,
       title,
       category,
       tags,
