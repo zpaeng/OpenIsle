@@ -78,7 +78,6 @@ export default {
         const res = await fetch(`${API_BASE_URL}/api/drafts/me`, {
           method: 'DELETE',
           headers: {
-            'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
           }
         })
