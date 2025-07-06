@@ -197,6 +197,12 @@ L 站的愿景是成为新的**理想型社区**，让每一个一身疲惫的�
   flex-direction: column;
   align-items: center;
   overflow-y: auto;
+  /* width variables shared between header and article rows */
+  --main-width: 60%;
+  --avatars-width: 150px;
+  --comments-width: 80px;
+  --views-width: 80px;
+  --activity-width: 120px;
 }
 
 .search-container {
@@ -273,19 +279,17 @@ L 站的愿景是成为新的**理想型社区**，让每一个一身疲惫的�
 }
 
 .header-container {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: var(--main-width) var(--avatars-width) var(--comments-width) var(--views-width) var(--activity-width);
   align-items: center;
   width: 100%;
-  justify-content: space-between;
 }
 
 .article-item {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: var(--main-width) var(--avatars-width) var(--comments-width) var(--views-width) var(--activity-width);
   align-items: center;
   width: 100%;
-  justify-content: space-between;
   border-bottom: 1px solid lightgray;
 }
 
@@ -294,14 +298,25 @@ L 站的愿景是成为新的**理想型社区**，让每一个一身疲惫的�
 }
 
 .header-item.main {
-  width: 60%;
   margin-left: 20px;
+}
+
+.header-item.main,
+.article-main-container,
+.header-item.avatars,
+.article-member-avatars-container,
+.header-item.comments,
+.article-comments,
+.header-item.views,
+.article-views,
+.header-item.activity,
+.article-time {
+  width: 100%;
 }
 
 .article-main-container {
   margin-left: 20px;
   padding: 10px 0;
-  width: 60%;
 }
 
 .article-item-title {
