@@ -60,6 +60,8 @@
 import { ref } from 'vue'
 import CommentEditor from './CommentEditor.vue'
 import { renderMarkdown } from '../utils/markdown'
+import { API_BASE_URL, toast } from '../main'
+import { getToken } from '../utils/auth'
 const CommentItem = {
   name: 'CommentItem',
   props: {
@@ -81,18 +83,44 @@ const CommentItem = {
     const toggleEditor = () => {
       showEditor.value = !showEditor.value
     }
-    const submitReply = (text) => {
+    const submitReply = async (text) => {
       if (!text.trim()) return
-      const replyList = props.comment.reply || (props.comment.reply = [])
-      replyList.push({
-        id: Date.now(),
-        userName: '你',
-        time: new Date().toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
-        avatar: 'https://picsum.photos/200/200',
-        text,
-        reply: []
-      })
-      showEditor.value = false
+      const token = getToken()
+      if (!token) {
+        toast.error('请先登录')
+        return
+      }
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/comments/${props.comment.id}/replies`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ content: text })
+        })
+        if (res.ok) {
+          const data = await res.json()
+          const replyList = props.comment.reply || (props.comment.reply = [])
+          replyList.push({
+            id: data.id,
+            userName: data.author,
+            time: new Date(data.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
+            avatar: 'https://picsum.photos/200/200',
+            text: data.content,
+            reply: (data.replies || []).map(r => ({
+              id: r.id,
+              userName: r.author,
+              time: new Date(r.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
+              avatar: 'https://picsum.photos/200/200',
+              text: r.content,
+              reply: []
+            }))
+          })
+          showEditor.value = false
+        } else {
+          toast.error('回复失败')
+        }
+      } catch (e) {
+        toast.error('回复失败')
+      }
     }
     const copyCommentLink = () => {
       const link = `${location.origin}${location.pathname}#comment-${props.comment.id}`

@@ -85,128 +85,56 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import CommentItem from '../components/CommentItem.vue'
 import CommentEditor from '../components/CommentEditor.vue'
 import { renderMarkdown } from '../utils/markdown'
+import { API_BASE_URL, toast } from '../main'
+import { getToken } from '../utils/auth'
 
 export default {
   name: 'PostPageView',
   components: { CommentItem, CommentEditor },
   setup() {
-    const postContent = ref(`# 📢 社区公告
+    const route = useRoute()
+    const postId = route.params.id
 
-是的，L 站目前每天都有不少各色各样的佬友加入。对于一个在线社区来说，不断壮大和涌入新的血液是一件好事。
-
-但我每天都要问问自己：**这里面有没有问题？真的完全是好事吗？**
-在这个过程中我嗅到了一丝危险的气息——有人试图**同质化**这里，把这里当作互联网上**另一个可以随意发泄情绪**的地方！甚至试图占领舆论高地，把这里堂而皇之地变成**另一个垃圾场**。
-
-> 这是要万分警惕并坚决予以打击的！
-
-L 站的愿景是成为新的**理想型社区**，让每一个一身疲惫的佬友在这里得到放松。哪怕只有一刻能放松手中攥紧的武器，徜徉在和谐的氛围中得到喘息与治愈。
-
-我和管理团队始终**坚定这一点，丝毫不会放松**！
-千里之堤，溃于蚁穴——如果任由戾气蔓延、争端四起，最终这里的愿景将会完全破产。**有病要医，不是同路人不必强行融合。**任何把戾气带来这里、试图在此建立另一个互联网垃圾场的人，**都是不受欢迎的，都要被驱逐出社区。**
-
-请好好说话，友善交流！我们完全支持并鼓励友好交流与分享，每个人都可以。**键盘**是你与人沟通、互通有无的桥梁，不只是你谋取私利的工具，更不是肆意挥舞用来攻击的武器。
-
----
-
-## 🚫 自本公告发布之日起，我们将严肃处理以下 3 类发言：
-
-1. **傲慢轻蔑回复**
-2. **阴阳怪气回复**
-3. **攻击谩骂回复**
-
-如有以上发言，我们将视言论破坏程度采取（但不限于）**删帖、临时封禁、永久封禁**等举措。
-
-> 请各位佬友积极监督，感谢你们为共建美好社区做出的贡献！
-> **请一定一定不要把互联网上的戾气带来这里，这里就要做不一样。**
-
-**持续时间：** *直至最后一个不会好好说话的账号持有者被请出社区为止。*`)
-    const tags = ref(['AI', 'Python', 'Java'])
-    const comments = ref([
-      {
-        id: 1,
-        userName: 'Nagisa77',
-        time: '3月10日',
-        avatar: 'https://picsum.photos/200/200',
-        text: '沙发🛋️🛋️🛋️🛋️',
-        reply: [
-          {
-            id: 7,
-            userName: 'Nagisa77',
-            time: '3月11日',
-            avatar: 'https://picsum.photos/200/200',
-            text: '💩💩💩💩💩',
-            reply: [
-              {
-                id: 9,
-                userName: 'Nagisa77',
-                time: '3月11日',
-                avatar: 'https://picsum.photos/200/200',
-                text: '发💩干嘛? 我💩你'
-              },
-            ],
-          },
-          {
-            id: 8,
-            userName: 'Nagisa77',
-            time: '3月11日',
-            avatar: 'https://picsum.photos/200/200',
-            text: '支持',
-            reply: [],
-          },
-        ]
-      },
-      {
-        id: 2,
-        userName: 'Nagisa77',
-        time: '3月11日',
-        avatar: 'https://picsum.photos/200/200',
-        text: '💩💩💩💩💩',
-        reply: [],
-      },
-      {
-        id: 3,
-        userName: 'Nagisa77',
-        time: '3月12日',
-        avatar: 'https://picsum.photos/200/200',
-        text: '是的',
-        reply: [],
-      },
-      {
-        id: 4,
-        userName: 'Nagisa77',
-        time: '3月13日',
-        avatar: 'https://picsum.photos/200/200',
-        text: '持续时间至最后一个不会好好说话的账号持有者被请出社区为止。',
-        reply: [],
-      },
-      {
-        id: 5,
-        userName: 'Nagisa77',
-        time: '3月14日',
-        avatar: 'https://picsum.photos/200/200',
-        text: '赞同楼主',
-        reply: [],
-      },
-      {
-        id: 6,
-        userName: 'Nagisa77',
-        time: '3月15日',
-        avatar: 'https://picsum.photos/200/200',
-        text: '这里面有没有问题？真的完全是好事吗？在这个过程中我嗅到了一丝危险的气息',
-        reply: [],
-      }
-    ])
-    const postTime = ref('3月10日')
+    const postContent = ref('')
+    const tags = ref([])
+    const comments = ref([])
+    const postTime = ref('')
     const postItems = ref([])
     const mainContainer = ref(null)
     const currentIndex = ref(1)
+
+    const mapComment = c => ({
+      id: c.id,
+      userName: c.author,
+      time: new Date(c.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
+      avatar: 'https://picsum.photos/200/200',
+      text: c.content,
+      reply: (c.replies || []).map(mapComment)
+    })
+
+    const fetchPost = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`)
+        if (!res.ok) return
+        const data = await res.json()
+        postContent.value = data.content
+        tags.value = data.tags || []
+        comments.value = (data.comments || []).map(mapComment)
+        postTime.value = new Date(data.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
     const totalPosts = computed(() => comments.value.length + 1)
     const lastReplyTime = computed(() =>
       comments.value.length ? comments.value[comments.value.length - 1].time : postTime.value
     )
+
     const updateCurrentIndex = () => {
       const scrollTop = mainContainer.value ? mainContainer.value.scrollTop : 0
       for (let i = 0; i < postItems.value.length; i++) {
@@ -225,21 +153,36 @@ L 站的愿景是成为新的**理想型社区**，让每一个一身疲惫的�
       }
     }
 
-    const postComment = (text) => {
+    const postComment = async (text) => {
       if (!text.trim()) return
-      comments.value.push({
-        id: comments.value.length + 1,
-        userName: '你',
-        time: new Date().toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
-        avatar: 'https://picsum.photos/200/200',
-        text,
-        reply: []
-      })
+      const token = getToken()
+      if (!token) {
+        toast.error('请先登录')
+        return
+      }
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/comments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ content: text })
+        })
+        if (res.ok) {
+          const data = await res.json()
+          comments.value.push(mapComment(data))
+        } else {
+          toast.error('评论失败')
+        }
+      } catch (e) {
+        toast.error('评论失败')
+      }
     }
+
     const copyPostLink = () => {
       navigator.clipboard.writeText(location.href.split('#')[0])
     }
+
     onMounted(() => {
+      fetchPost()
       updateCurrentIndex()
       const hash = location.hash
       if (hash.startsWith('#comment-')) {
@@ -268,11 +211,9 @@ L 站的愿景是成为新的**理想型社区**，让每一个一身疲惫的�
       onScroll: updateCurrentIndex,
       copyPostLink,
       renderMarkdown
-    }
   }
 }
 </script>
-
 <style>
 .post-page-container {
   display: flex;
