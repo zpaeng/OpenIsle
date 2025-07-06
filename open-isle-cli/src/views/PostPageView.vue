@@ -2,7 +2,7 @@
   <div class="post-page-container">
     <div class="post-page-main-container" ref="mainContainer" @scroll="onScroll">
       <div class="article-title-container">
-        <div class="article-title">请不要把互联网上的戾气带来这里！</div>
+        <div class="article-title">{{ title }}</div>
         <div class="article-info-container">
           <div class="article-info-item">
             <i class="fas fa-user"></i>
@@ -99,6 +99,7 @@ export default {
     const route = useRoute()
     const postId = route.params.id
 
+    const title = ref('')
     const postContent = ref('')
     const tags = ref([])
     const comments = ref([])
@@ -122,6 +123,7 @@ export default {
         if (!res.ok) return
         const data = await res.json()
         postContent.value = data.content
+        title.value = data.title
         tags.value = data.tags || []
         comments.value = (data.comments || []).map(mapComment)
         postTime.value = new Date(data.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })
@@ -198,6 +200,7 @@ export default {
 
     return {
       postContent,
+      title,
       tags,
       comments,
       postTime,
@@ -211,6 +214,7 @@ export default {
       onScroll: updateCurrentIndex,
       copyPostLink,
       renderMarkdown
+    }
   }
 }
 </script>
@@ -456,6 +460,4 @@ export default {
 .copy-link:hover {
   background-color: #e2e2e2;
 }
-
-
 </style>

@@ -39,6 +39,16 @@
         </div>
       </div>
 
+      <div v-if="isLoadingPosts" class="loading-container">
+        <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+      </div>
+
+      <div v-else-if="articles.length === 0">
+        <div class="no-posts-container">
+          <div class="no-posts-text">暂时没有帖子 :( 点击发帖发送第一篇相关帖子吧!</div>
+        </div>
+      </div>
+
       <div class="article-item" v-for="article in articles" :key="article.id">
         <div class="article-main-container">
           <router-link class="article-item-title main-item" :to="`/posts/${article.id}`">
@@ -86,6 +96,9 @@ import { stripMarkdown } from '../utils/markdown'
 import { API_BASE_URL } from '../main'
 import CategorySelect from '../components/CategorySelect.vue'
 import TagSelect from '../components/TagSelect.vue'
+import { hatch } from 'ldrs'
+hatch.register()
+
 
 export default {
   name: 'HomePageView',
@@ -96,10 +109,11 @@ export default {
   data() {
     return {
       selectedCategory: '',
-      selectedTags: []
+      selectedTags: [],
     }
   },
   setup() {
+    const isLoadingPosts = ref(false)
     const topics = ref(['最新', '排行榜', '热门', '类别'])
     const selectedTopic = ref('最新')
 
@@ -107,7 +121,9 @@ export default {
 
     const fetchPosts = async () => {
       try {
+        isLoadingPosts.value = true
         const res = await fetch(`${API_BASE_URL}/api/posts`)
+        isLoadingPosts.value = false
         if (!res.ok) return
         const data = await res.json()
         articles.value = data.map(p => ({
@@ -130,7 +146,7 @@ export default {
 
     const sanitizeDescription = (text) => stripMarkdown(text)
 
-    return { topics, selectedTopic, articles, sanitizeDescription }
+    return { topics, selectedTopic, articles, sanitizeDescription, isLoadingPosts }
   }
 }
 </script>
@@ -189,6 +205,25 @@ export default {
   font-size: 16px;
   width: 100%;
   margin-left: 10px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.no-posts-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.no-posts-text {
+  font-size: 14px;
+  opacity: 0.7;
 }
 
 .topic-container {
