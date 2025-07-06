@@ -19,6 +19,24 @@
     </div>
 
     <div class="article-container">
+      <div class="header-container">
+        <div class="header-item main">
+          话题
+        </div>
+        <div class="header-item avatars">
+          参与人员
+        </div>
+        <div class="header-item comments">
+          回复
+        </div>
+        <div class="header-item views">
+          浏览 
+        </div>
+        <div class="header-item activity">
+          活动
+        </div>
+      </div>
+
       <div class="article-item" v-for="article in articles" :key="article.id">
         <div class="article-main-container">
           <router-link class="article-item-title" :to="`/posts/${article.id}`">
@@ -254,6 +272,14 @@ L 站的愿景是成为新的**理想型社区**，让每一个一身疲惫的�
   width: 100%;
 }
 
+.header-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+}
+
 .article-item {
   display: flex;
   flex-direction: row;
@@ -261,6 +287,15 @@ L 站的愿景是成为新的**理想型社区**，让每一个一身疲惫的�
   width: 100%;
   justify-content: space-between;
   border-bottom: 1px solid lightgray;
+}
+
+.header-item {
+
+}
+
+.header-item.main {
+  width: 60%;
+  margin-left: 20px;
 }
 
 .article-main-container {
@@ -348,6 +383,22 @@ L 站的愿景是成为新的**理想型社区**，让每一个一身疲惫的�
 }
 
 .article-time {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.header-item.avatars {
+}
+
+.header-item.comments {
+  margin-left: 20px;
+}
+
+.header-item.views {
+  margin-left: 20px;
+}
+
+.header-item.activity {
   margin-left: 20px;
   margin-right: 20px;
 }
