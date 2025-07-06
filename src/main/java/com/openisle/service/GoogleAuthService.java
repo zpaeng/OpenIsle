@@ -64,6 +64,7 @@ public class GoogleAuthService {
         user.setPassword("");
         user.setRole(Role.USER);
         user.setVerified(true);
+        user.setAvatar("https://github.com/identicons/" + username + ".png");
         return userRepository.save(user);
     }
 }

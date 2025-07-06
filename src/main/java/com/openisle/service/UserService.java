@@ -58,6 +58,7 @@ public class UserService {
         user.setRole(Role.USER);
         user.setVerified(false);
         user.setVerificationCode(genCode());
+        user.setAvatar("https://github.com/identicons/" + username + ".png");
         return userRepository.save(user);
     }
 
