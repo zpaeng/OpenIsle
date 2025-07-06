@@ -15,6 +15,8 @@
         <div v-for="topic in topics" :key="topic" class="topic-item" :class="{ selected: topic === selectedTopic }">
           {{ topic }}
         </div>
+        <CategorySelect v-model="selectedCategory" />
+        <TagSelect v-model="selectedTags" />
       </div>
     </div>
 
@@ -81,9 +83,21 @@
 <script>
 import { ref } from 'vue'
 import { stripMarkdown } from '../utils/markdown'
+import CategorySelect from '../components/CategorySelect.vue'
+import TagSelect from '../components/TagSelect.vue'
 
 export default {
   name: 'HomePageView',
+  components: {
+    CategorySelect,
+    TagSelect
+  },
+  data() {
+    return {
+      selectedCategory: '',
+      selectedTags: []
+    }
+  },
   setup() {
     const topics = ref(['最新', '排行榜', '热门', '类别'])
     const selectedTopic = ref('最新')
