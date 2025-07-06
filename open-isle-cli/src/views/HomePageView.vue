@@ -20,30 +20,30 @@
 
     <div class="article-container">
       <div class="header-container">
-        <div class="header-item main">
-          话题
+        <div class="header-item main-item">
+          <div class="header-item-text">话题</div>
         </div>
         <div class="header-item avatars">
-          参与人员
+          <div class="header-item-text">参与人员</div>
         </div>
-        <div class="header-item comments">
-          回复
+        <div class="header-item">
+          <div class="header-item-text">回复</div>
         </div>
-        <div class="header-item views">
-          浏览 
+        <div class="header-item">
+          <div class="header-item-text">浏览</div>
         </div>
-        <div class="header-item activity">
-          活动
+        <div class="header-item">
+          <div class="header-item-text">活动</div>
         </div>
       </div>
 
       <div class="article-item" v-for="article in articles" :key="article.id">
         <div class="article-main-container">
-          <router-link class="article-item-title" :to="`/posts/${article.id}`">
+          <router-link class="article-item-title main-item" :to="`/posts/${article.id}`">
             {{ article.title }}
           </router-link>
-          <div class="article-item-description">{{ sanitizeDescription(article.description) }}</div>
-          <div class="article-info-container">
+          <div class="article-item-description main-item">{{ sanitizeDescription(article.description) }}</div>
+          <div class="article-info-container main-item">
             <div class="article-info-item">
               <i class="fas fa-user"></i>
               <div class="article-info-item-text">{{ article.category }}</div>
@@ -199,10 +199,10 @@ L 站的愿景是成为新的**理想型社区**，让每一个一身疲惫的�
   overflow-y: auto;
   /* width variables shared between header and article rows */
   --main-width: 60%;
-  --avatars-width: 150px;
-  --comments-width: 80px;
-  --views-width: 80px;
-  --activity-width: 120px;
+  --avatars-width: 20%;
+  --comments-width: 5%;
+  --views-width: 5%;
+  --activity-width: 10%;
 }
 
 .search-container {
@@ -283,6 +283,9 @@ L 站的愿景是成为新的**理想型社区**，让每一个一身疲惫的�
   grid-template-columns: var(--main-width) var(--avatars-width) var(--comments-width) var(--views-width) var(--activity-width);
   align-items: center;
   width: 100%;
+  color: gray;
+  border-bottom: 1px solid lightgray;
+  padding-bottom: 10px;
 }
 
 .article-item {
@@ -293,30 +296,12 @@ L 站的愿景是成为新的**理想型社区**，让每一个一身疲惫的�
   border-bottom: 1px solid lightgray;
 }
 
-.header-item {
-
-}
-
-.header-item.main {
+.header-item.avatars {
   margin-left: 20px;
 }
 
-.header-item.main,
-.article-main-container,
-.header-item.avatars,
-.article-member-avatars-container,
-.header-item.comments,
-.article-comments,
-.header-item.views,
-.article-views,
-.header-item.activity,
-.article-time {
-  width: 100%;
-}
-
-.article-main-container {
-  margin-left: 20px;
-  padding: 10px 0;
+.main-item {
+  padding-left: 20px;
 }
 
 .article-item-title {
@@ -374,6 +359,7 @@ L 站的愿景是成为新的**理想型社区**，让每一个一身疲惫的�
   flex-direction: row;
   align-items: center;
   gap: 3px;
+  margin-left: 20px;
 }
 
 .article-member-avatar-item {
@@ -387,34 +373,5 @@ L 站的愿景是成为新的**理想型社区**，让每一个一身疲惫的�
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.article-comments {
-  margin-left: 20px;
-}
-
-.article-views {
-  margin-left: 20px;
-}
-
-.article-time {
-  margin-left: 20px;
-  margin-right: 20px;
-}
-
-.header-item.avatars {
-}
-
-.header-item.comments {
-  margin-left: 20px;
-}
-
-.header-item.views {
-  margin-left: 20px;
-}
-
-.header-item.activity {
-  margin-left: 20px;
-  margin-right: 20px;
 }
 </style>
