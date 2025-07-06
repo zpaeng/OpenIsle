@@ -83,7 +83,7 @@ public class PostController {
         dto.setTitle(post.getTitle());
         dto.setContent(post.getContent());
         dto.setCreatedAt(post.getCreatedAt());
-        dto.setAuthor(post.getAuthor().getUsername());
+        dto.setAuthor(toAuthorDto(post.getAuthor()));
         dto.setCategory(toCategoryDto(post.getCategory()));
         dto.setTags(post.getTags().stream().map(this::toTagDto).collect(Collectors.toList()));
         dto.setViews(post.getViews());
@@ -124,7 +124,7 @@ public class PostController {
         dto.setId(comment.getId());
         dto.setContent(comment.getContent());
         dto.setCreatedAt(comment.getCreatedAt());
-        dto.setAuthor(comment.getAuthor().getUsername());
+        dto.setAuthor(toAuthorDto(comment.getAuthor()));
         return dto;
     }
 
@@ -162,6 +162,14 @@ public class PostController {
         return dto;
     }
 
+    private AuthorDto toAuthorDto(com.openisle.model.User user) {
+        AuthorDto dto = new AuthorDto();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setAvatar(user.getAvatar());
+        return dto;
+    }
+
     @Data
     private static class PostRequest {
         private Long categoryId;
@@ -177,7 +185,7 @@ public class PostController {
         private String title;
         private String content;
         private LocalDateTime createdAt;
-        private String author;
+        private AuthorDto author;
         private CategoryDto category;
         private java.util.List<TagDto> tags;
         private long views;
@@ -204,11 +212,18 @@ public class PostController {
     }
 
     @Data
+    private static class AuthorDto {
+        private Long id;
+        private String username;
+        private String avatar;
+    }
+
+    @Data
     private static class CommentDto {
         private Long id;
         private String content;
         private LocalDateTime createdAt;
-        private String author;
+        private AuthorDto author;
         private List<CommentDto> replies;
         private List<ReactionDto> reactions;
     }

@@ -70,7 +70,15 @@ public class CommentController {
         dto.setId(comment.getId());
         dto.setContent(comment.getContent());
         dto.setCreatedAt(comment.getCreatedAt());
-        dto.setAuthor(comment.getAuthor().getUsername());
+        dto.setAuthor(toAuthorDto(comment.getAuthor()));
+        return dto;
+    }
+
+    private AuthorDto toAuthorDto(com.openisle.model.User user) {
+        AuthorDto dto = new AuthorDto();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setAvatar(user.getAvatar());
         return dto;
     }
 
@@ -85,7 +93,14 @@ public class CommentController {
         private Long id;
         private String content;
         private LocalDateTime createdAt;
-        private String author;
+        private AuthorDto author;
         private List<CommentDto> replies;
+    }
+
+    @Data
+    private static class AuthorDto {
+        private Long id;
+        private String username;
+        private String avatar;
     }
 }
