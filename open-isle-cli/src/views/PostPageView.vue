@@ -1,18 +1,21 @@
 <template>
   <div class="post-page-container">
-    <div class="post-page-main-container" ref="mainContainer" @scroll="onScroll">
+    <div v-if="isWaitingFetchingPost" class="loading-container">
+      <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+    </div>
+    <div v-else class="post-page-main-container" ref="mainContainer" @scroll="onScroll">
       <div class="article-title-container">
         <div class="article-title">{{ title }}</div>
         <div class="article-info-container">
           <div class="article-info-item">
-            <i class="fas fa-user"></i>
-            <div class="article-info-item-text">开发调优</div>
+            <img class="article-info-item-img" :src="category.smallIcon" alt="category">
+            <div class="article-info-item-text">{{ category.name }}</div>
           </div>
 
           <div class="article-tags-container">
-            <div class="article-tag-item" v-for="tag in tags" :key="tag">
-              <i class="fas fa-tag"></i>
-              <div class="article-tag-item-text">{{ tag }}</div>
+            <div class="article-info-item" v-for="tag in tags" :key="tag">
+              <img class="article-info-item-img" :src="tag.smallIcon" alt="tag">
+              <div class="article-info-item-text">{{ tag.name }}</div>
             </div>
           </div>
         </div>
@@ -71,13 +74,15 @@
 
     <div class="post-page-scroller-container">
       <div class="scroller">
-        <div class="scroller-time">{{ postTime }}</div>
+        <div v-if="isWaitingFetchingPost" class="scroller-time">loading...</div>
+        <div v-else class="scroller-time">{{ postTime }}</div>
         <div class="scroller-middle">
           <input type="range" class="scroller-range" :max="totalPosts" :min="1" v-model.number="currentIndex"
             @input="onSliderInput" />
           <div class="scroller-index">{{ currentIndex }}/{{ totalPosts }}</div>
         </div>
-        <div class="scroller-time">{{ lastReplyTime }}</div>
+        <div v-if="isWaitingFetchingPost" class="scroller-time">loading...</div>
+        <div v-else class="scroller-time">{{ lastReplyTime }}</div>
       </div>
     </div>
   </div>
@@ -91,6 +96,8 @@ import CommentEditor from '../components/CommentEditor.vue'
 import { renderMarkdown } from '../utils/markdown'
 import { API_BASE_URL, toast } from '../main'
 import { getToken } from '../utils/auth'
+import { hatch } from 'ldrs'
+hatch.register()
 
 export default {
   name: 'PostPageView',
@@ -101,8 +108,10 @@ export default {
 
     const title = ref('')
     const postContent = ref('')
+    const category = ref('')
     const tags = ref([])
     const comments = ref([])
+    const isWaitingFetchingPost = ref(false);
     const postTime = ref('')
     const postItems = ref([])
     const mainContainer = ref(null)
@@ -119,11 +128,14 @@ export default {
 
     const fetchPost = async () => {
       try {
+        isWaitingFetchingPost.value = true;
         const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`)
+        isWaitingFetchingPost.value = false;
         if (!res.ok) return
         const data = await res.json()
         postContent.value = data.content
         title.value = data.title
+        category.value = data.category
         tags.value = data.tags || []
         comments.value = (data.comments || []).map(mapComment)
         postTime.value = new Date(data.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })
@@ -201,6 +213,7 @@ export default {
     return {
       postContent,
       title,
+      category,
       tags,
       comments,
       postTime,
@@ -213,7 +226,8 @@ export default {
       onSliderInput,
       onScroll: updateCurrentIndex,
       copyPostLink,
-      renderMarkdown
+      renderMarkdown,
+      isWaitingFetchingPost
     }
   }
 }
@@ -223,6 +237,14 @@ export default {
   display: flex;
   flex-direction: row;
   height: calc(100vh - var(--header-height));
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  width: 85%;
 }
 
 .post-page-main-container {
@@ -334,11 +356,19 @@ export default {
   gap: 10px;
 }
 
-.article-tag-item {
+.article-info-item {
   display: flex;
   flex-direction: row;
   gap: 5px;
   align-items: center;
+  font-size: 14px;
+  padding: 2px 4px;
+  background-color: #f0f0f0;
+}
+
+.article-info-item-img {
+  width: 16px;
+  height: 16px;
 }
 
 .info-content-container {

@@ -57,14 +57,14 @@
           <div class="article-item-description main-item">{{ sanitizeDescription(article.description) }}</div>
           <div class="article-info-container main-item">
             <div class="article-info-item">
-              <i class="fas fa-user"></i>
-              <div class="article-info-item-text">{{ article.category }}</div>
+              <img class="article-info-item-img" :src="article.category.smallIcon" alt="category">
+              <div class="article-info-item-text">{{ article.category.name }}</div>
             </div>
 
             <div class="article-tags-container">
-              <div class="article-tag-item" v-for="tag in article.tags" :key="tag">
-                <i class="fas fa-tag"></i>
-                <div class="article-tag-item-text">{{ tag }}</div>
+              <div class="article-info-item" v-for="tag in article.tags" :key="tag">
+                <img class="article-info-item-img" :src="tag.smallIcon" alt="tag">
+                <div class="article-info-item-text">{{ tag.name }}</div>
               </div>
             </div>
           </div>
