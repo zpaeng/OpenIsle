@@ -8,6 +8,7 @@ import com.openisle.repository.CategoryRepository;
 import com.openisle.repository.DraftRepository;
 import com.openisle.repository.TagRepository;
 import com.openisle.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ public class DraftService {
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
 
+    @Transactional
     public Draft saveDraft(String username, Long categoryId, String title, String content, List<Long> tagIds) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -46,11 +48,13 @@ public class DraftService {
         return draftRepository.save(draft);
     }
 
+    @Transactional(readOnly = true)
     public Optional<Draft> getDraft(String username) {
         return userRepository.findByUsername(username)
                 .flatMap(draftRepository::findByAuthor);
     }
 
+    @Transactional
     public void deleteDraft(String username) {
         userRepository.findByUsername(username)
                 .ifPresent(draftRepository::deleteByAuthor);
