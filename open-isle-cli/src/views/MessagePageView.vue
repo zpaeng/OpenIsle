@@ -15,6 +15,8 @@
 import { ref, onMounted } from 'vue'
 import { API_BASE_URL } from '../main'
 import BaseTimeline from '../components/BaseTimeline.vue'
+import { getToken } from '../utils/auth'
+import { toast } from '../main'
 
 export default {
   name: 'MessagePageView',
@@ -33,8 +35,20 @@ export default {
 
     const fetchNotifications = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/notifications`)
-        if (!res.ok) return
+        const token = getToken()
+        if (!token) {
+          toast.error('请先登录')
+          return
+        }
+        const res = await fetch(`${API_BASE_URL}/api/notifications`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        if (!res.ok) {
+          toast.error('获取通知失败')
+          return
+        }
         const data = await res.json()
         notifications.value = data.map(n => ({ ...n, icon: iconMap[n.type] }))
       } catch (e) {

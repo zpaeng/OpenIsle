@@ -30,7 +30,7 @@
 
         <div class="info-content">
           <div class="info-content-header">
-            <div class="user-name">Nagisa77</div>
+            <div class="user-name">{{ author.username }}</div>
             <div class="post-time">{{ postTime }}</div>
           </div>
           <div class="info-content-text" v-html="renderMarkdown(postContent)"></div>
