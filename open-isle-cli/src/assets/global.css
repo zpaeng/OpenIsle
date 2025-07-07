@@ -7,6 +7,7 @@
   --header-border-color: lightgray;
   --header-text-color: black;
   --menu-background-color: white;
+  --background-color: white;
   --menu-border-color: lightgray;
   --menu-selected-background-color: rgba(208, 250, 255, 0.659);
   --menu-text-color: black;
@@ -22,6 +23,7 @@
   --header-border-color: #555;
   --header-text-color: white;
   --menu-background-color: #333;
+  --background-color: #121212;
   --menu-border-color: #555;
   --menu-selected-background-color: rgba(255, 255, 255, 0.1);
   --menu-text-color: white;

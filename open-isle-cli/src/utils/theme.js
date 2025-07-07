@@ -1,4 +1,5 @@
 import { reactive } from 'vue'
+import { toast } from '../main'
 
 export const ThemeMode = {
   SYSTEM: 'system',
@@ -40,6 +41,13 @@ export function cycleTheme() {
   const modes = [ThemeMode.SYSTEM, ThemeMode.LIGHT, ThemeMode.DARK]
   const index = modes.indexOf(themeState.mode)
   const next = modes[(index + 1) % modes.length]
+  if (next === ThemeMode.SYSTEM) {
+    toast.success('💻 已经切换到系统主题')
+  } else if (next === ThemeMode.LIGHT) {
+    toast.success('🌞 已经切换到明亮主题')
+  } else {
+    toast.success('🌙 已经切换到暗色主题')
+  }
   setTheme(next)
 }
 

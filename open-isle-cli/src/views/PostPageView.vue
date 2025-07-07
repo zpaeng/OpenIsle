@@ -244,6 +244,7 @@ export default {
 </script>
 <style>
 .post-page-container {
+  background-color: var(--background-color);
   display: flex;
   flex-direction: row;
   height: calc(100vh - var(--header-height));
