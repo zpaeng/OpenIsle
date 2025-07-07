@@ -21,7 +21,7 @@
         </div>
       </div>
 
-      <div class="info-content-container" ref="postItems">
+      <div class="info-content-container">
         <div class="user-avatar-container">
           <div class="user-avatar-item">
             <img class="user-avatar-item-img" :src="author.avatar" alt="avatar">
@@ -106,7 +106,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import CommentItem from '../components/CommentItem.vue'
 import CommentEditor from '../components/CommentEditor.vue'
@@ -136,6 +136,19 @@ export default {
     const postItems = ref([])
     const mainContainer = ref(null)
     const currentIndex = ref(1)
+
+    const gatherPostItems = () => {
+      const items = []
+      if (mainContainer.value) {
+        const main = mainContainer.value.querySelector('.info-content-container')
+        if (main) items.push(main)
+        for (const c of comments.value) {
+          const el = document.getElementById('comment-' + c.id)
+          if (el) items.push(el)
+        }
+      }
+      postItems.value = items
+    }
 
     const mapComment = c => ({
       id: c.id,
@@ -183,6 +196,8 @@ export default {
         tags.value = data.tags || []
         comments.value = (data.comments || []).map(mapComment)
         postTime.value = new Date(data.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })
+        await nextTick()
+        gatherPostItems()
       } catch (e) {
         console.error(e)
       }
@@ -193,10 +208,18 @@ export default {
       comments.value.length ? comments.value[comments.value.length - 1].time : postTime.value
     )
 
+    watch(
+      () => comments.value.length,
+      async () => {
+        await nextTick()
+        gatherPostItems()
+      }
+    )
+
     const updateCurrentIndex = () => {
       const scrollTop = mainContainer.value ? mainContainer.value.scrollTop : 0
       for (let i = 0; i < postItems.value.length; i++) {
-        const el = postItems.value[i].$el
+        const el = postItems.value[i]
         if (el.offsetTop + el.offsetHeight > scrollTop) {
           currentIndex.value = i + 1
           break
@@ -205,7 +228,7 @@ export default {
     }
 
     const onSliderInput = () => {
-      const target = postItems.value[currentIndex.value - 1]?.$el
+      const target = postItems.value[currentIndex.value - 1]
       if (target && mainContainer.value) {
         mainContainer.value.scrollTo({ top: target.offsetTop, behavior: 'instant' })
       }
@@ -229,6 +252,8 @@ export default {
         if (res.ok) {
           const data = await res.json()
           comments.value.push(mapComment(data))
+          await nextTick()
+          gatherPostItems()
           toast.success('评论成功')
         } else {
           toast.error('评论失败')
@@ -264,6 +289,7 @@ export default {
       const hash = location.hash
       const id = hash.startsWith('#comment-') ? hash.substring('#comment-'.length) : null
       await fetchPost()
+      gatherPostItems()
       if (id) expandCommentPath(id)
       updateCurrentIndex()
       await jumpToHashComment()
