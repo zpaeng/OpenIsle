@@ -59,11 +59,12 @@ export default {
 .timeline-item::before {
   content: '';
   position: absolute;
-  top: 24px;
-  left: 12px;
+  top: 32px;
+  left: 15px;
   width: 2px;
   bottom: -20px;
-  background: #eee;
+  background: var(--text-color);
+  opacity: 0.2;
 }
 
 .timeline-item:last-child::before {
