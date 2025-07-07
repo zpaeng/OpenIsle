@@ -2,6 +2,8 @@ package com.openisle.controller;
 
 import com.openisle.model.Notification;
 import com.openisle.model.NotificationType;
+import com.openisle.model.Comment;
+import com.openisle.model.Post;
 import com.openisle.service.NotificationService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -36,11 +38,43 @@ public class NotificationController {
         NotificationDto dto = new NotificationDto();
         dto.setId(n.getId());
         dto.setType(n.getType());
-        dto.setPostId(n.getPost() != null ? n.getPost().getId() : null);
-        dto.setCommentId(n.getComment() != null ? n.getComment().getId() : null);
+        if (n.getPost() != null) {
+            dto.setPost(toPostDto(n.getPost()));
+        }
+        if (n.getComment() != null) {
+            dto.setComment(toCommentDto(n.getComment()));
+            Comment parent = n.getComment().getParent();
+            if (parent != null) {
+                dto.setParentComment(toCommentDto(parent));
+            }
+        }
         dto.setApproved(n.getApproved());
         dto.setRead(n.isRead());
         dto.setCreatedAt(n.getCreatedAt());
+        return dto;
+    }
+
+    private PostDto toPostDto(Post post) {
+        PostDto dto = new PostDto();
+        dto.setId(post.getId());
+        dto.setTitle(post.getTitle());
+        return dto;
+    }
+
+    private CommentDto toCommentDto(Comment comment) {
+        CommentDto dto = new CommentDto();
+        dto.setId(comment.getId());
+        dto.setContent(comment.getContent());
+        dto.setCreatedAt(comment.getCreatedAt());
+        dto.setAuthor(toAuthorDto(comment.getAuthor()));
+        return dto;
+    }
+
+    private AuthorDto toAuthorDto(com.openisle.model.User user) {
+        AuthorDto dto = new AuthorDto();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setAvatar(user.getAvatar());
         return dto;
     }
 
@@ -53,10 +87,32 @@ public class NotificationController {
     private static class NotificationDto {
         private Long id;
         private NotificationType type;
-        private Long postId;
-        private Long commentId;
+        private PostDto post;
+        private CommentDto comment;
+        private CommentDto parentComment;
         private Boolean approved;
         private boolean read;
         private LocalDateTime createdAt;
+    }
+
+    @Data
+    private static class PostDto {
+        private Long id;
+        private String title;
+    }
+
+    @Data
+    private static class CommentDto {
+        private Long id;
+        private String content;
+        private LocalDateTime createdAt;
+        private AuthorDto author;
+    }
+
+    @Data
+    private static class AuthorDto {
+        private Long id;
+        private String username;
+        private String avatar;
     }
 }
