@@ -3,7 +3,16 @@
     <BaseTimeline :items="notifications">
       <template #item="{ item }">
         <div class="notif-content">
-          <span class="notif-type">{{ formatType(item.type) }}</span>
+          <span class="notif-type">
+            <template v-if="item.type === 'COMMENT_REPLY'">
+              <router-link :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
+                {{ item.comment.author.username }} 对我的评论 “{{ item.parentComment ? item.parentComment.content : item.post.title }}” 回复了 “{{ item.comment.content }}”
+              </router-link>
+            </template>
+            <template v-else>
+              {{ formatType(item.type) }}
+            </template>
+          </span>
           <span class="notif-time">{{ new Date(item.createdAt).toLocaleString() }}</span>
         </div>
       </template>
