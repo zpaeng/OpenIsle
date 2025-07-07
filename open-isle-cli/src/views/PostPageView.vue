@@ -68,14 +68,9 @@
       <CommentEditor @submit="postComment" :loading="isWaitingPostingComment" />
 
       <div class="comments-container">
-        <BaseTimeline :items="comments" >
+        <BaseTimeline :items="comments">
           <template #item="{ item }">
-            <CommentItem
-              :key="item.id"
-              :comment="item"
-              :level="level + 1"
-              :default-show-replies="item.openReplies"
-            />
+            <CommentItem :key="item.id" :comment="item" :level="level + 1" :default-show-replies="item.openReplies" />
           </template>
         </BaseTimeline>
         <!-- <CommentItem
@@ -141,13 +136,18 @@ export default {
       const items = []
       if (mainContainer.value) {
         const main = mainContainer.value.querySelector('.info-content-container')
-        if (main) items.push(main)
+        if (main) items.push({ el: main, top: 0 })
+
         for (const c of comments.value) {
           const el = document.getElementById('comment-' + c.id)
-          if (el) items.push(el)
+          if (el) {
+            items.push({ el, top: getTopRelativeTo(el, mainContainer.value) })
+          }
         }
+        // 根据 top 排序，防止评论异步插入后顺序错乱
+        items.sort((a, b) => a.top - b.top)
+        postItems.value = items.map(i => i.el)
       }
-      postItems.value = items
     }
 
     const mapComment = c => ({
@@ -160,6 +160,13 @@ export default {
       openReplies: false,
       src: c.author.avatar,
     })
+
+    const getTopRelativeTo = (el, container) => {
+      const elRect = el.getBoundingClientRect()
+      const parentRect = container.getBoundingClientRect()
+      // 加上 scrollTop，得到相对于 container 内部顶部的距离
+      return elRect.top - parentRect.top + container.scrollTop
+    }
 
     const findCommentPath = (id, list) => {
       for (const item of list) {
@@ -217,10 +224,18 @@ export default {
     )
 
     const updateCurrentIndex = () => {
-      const scrollTop = mainContainer.value ? mainContainer.value.scrollTop : 0
+      const container = mainContainer.value
+      if (!container) return
+
+      const scrollTop = container.scrollTop
+
       for (let i = 0; i < postItems.value.length; i++) {
         const el = postItems.value[i]
-        if (el.offsetTop + el.offsetHeight > scrollTop) {
+        // 计算元素相对 container 顶部的 top
+        const top = getTopRelativeTo(el, container)
+        const bottom = top + el.offsetHeight
+
+        if (bottom > scrollTop) {
           currentIndex.value = i + 1
           break
         }
@@ -230,7 +245,8 @@ export default {
     const onSliderInput = () => {
       const target = postItems.value[currentIndex.value - 1]
       if (target && mainContainer.value) {
-        mainContainer.value.scrollTo({ top: target.offsetTop, behavior: 'instant' })
+        const top = getTopRelativeTo(target, mainContainer.value)
+        mainContainer.value.scrollTo({ top, behavior: 'instant' })
       }
     }
 
@@ -278,7 +294,7 @@ export default {
         await nextTick()
         const el = document.getElementById('comment-' + id)
         if (el && mainContainer.value) {
-          mainContainer.value.scrollTo({ top: el.offsetTop, behavior: 'instant' })
+          mainContainer.value.scrollTo({ top: getTopRelativeTo(el, mainContainer.value), behavior: 'instant' })
           el.classList.add('comment-highlight')
           setTimeout(() => el.classList.remove('comment-highlight'), 2000)
         }
