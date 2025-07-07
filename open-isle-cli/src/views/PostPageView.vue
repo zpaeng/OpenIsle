@@ -434,7 +434,6 @@ export default {
 }
 
 .info-content-container {
-  margin-top: 20px;
   display: flex;
   flex-direction: row;
   gap: 10px;
