@@ -37,8 +37,8 @@ export default {
 }
 
 .timeline-icon {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background-color: var(--primary-color, #3498db);
   color: white;
