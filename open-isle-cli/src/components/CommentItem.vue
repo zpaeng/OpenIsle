@@ -6,11 +6,11 @@
       ...(level > 0 ? { /*borderLeft: '1px solid #e0e0e0', */borderBottom: 'none' } : {})
     }"
   >
-    <div class="user-avatar-container">
+    <!-- <div class="user-avatar-container">
       <div class="user-avatar-item">
         <img class="user-avatar-item-img" :src="comment.avatar" alt="avatar" />
       </div>
-    </div>  
+    </div>   -->
     <div class="info-content">
       <div class="info-content-header">
         <div class="user-name">{{ comment.userName }}</div>
@@ -45,13 +45,23 @@
         {{ comment.reply.length }}条回复
       </div>
       <div v-if="showReplies" class="reply-list">
-        <CommentItem
+        <BaseTimeline :items="comment.reply" >
+          <template #item="{ item }">
+            <CommentItem
+              :key="item.id"
+              :comment="item"
+              :level="level + 1"
+              :default-show-replies="item.openReplies"
+            />
+          </template>
+        </BaseTimeline>
+        <!-- <CommentItem
           v-for="r in comment.reply"
           :key="r.id"
           :comment="r"
           :level="level + 1"
           :default-show-replies="r.openReplies"
-        />
+        /> -->
       </div>
     </div>
   </div>
@@ -61,6 +71,7 @@
 import { ref, watch } from 'vue'
 import CommentEditor from './CommentEditor.vue'
 import { renderMarkdown } from '../utils/markdown'
+import BaseTimeline from './BaseTimeline.vue'
 import { API_BASE_URL, toast } from '../main'
 import { getToken } from '../utils/auth'
 const CommentItem = {
@@ -150,7 +161,7 @@ const CommentItem = {
     return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply }
   }
 }
-CommentItem.components = { CommentItem, CommentEditor }
+CommentItem.components = { CommentItem, CommentEditor, BaseTimeline }
 export default CommentItem
 </script>
 

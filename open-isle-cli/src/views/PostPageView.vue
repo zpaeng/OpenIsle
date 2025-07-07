@@ -68,14 +68,24 @@
       <CommentEditor @submit="postComment" :loading="isWaitingPostingComment" />
 
       <div class="comments-container">
-        <CommentItem
+        <BaseTimeline :items="comments" >
+          <template #item="{ item }">
+            <CommentItem
+              :key="item.id"
+              :comment="item"
+              :level="level + 1"
+              :default-show-replies="item.openReplies"
+            />
+          </template>
+        </BaseTimeline>
+        <!-- <CommentItem
           v-for="comment in comments"
           :key="comment.id"
           :comment="comment"
           :level="0"
           :default-show-replies="comment.openReplies"
           ref="postItems"
-        />
+        /> -->
       </div>
     </div>
 
@@ -100,6 +110,7 @@ import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import CommentItem from '../components/CommentItem.vue'
 import CommentEditor from '../components/CommentEditor.vue'
+import BaseTimeline from '../components/BaseTimeline.vue'
 import { renderMarkdown } from '../utils/markdown'
 import { API_BASE_URL, toast } from '../main'
 import { getToken } from '../utils/auth'
@@ -108,7 +119,7 @@ hatch.register()
 
 export default {
   name: 'PostPageView',
-  components: { CommentItem, CommentEditor },
+  components: { CommentItem, CommentEditor, BaseTimeline },
   setup() {
     const route = useRoute()
     const postId = route.params.id
@@ -133,7 +144,8 @@ export default {
       avatar: c.author.avatar,
       text: c.content,
       reply: (c.replies || []).map(mapComment),
-      openReplies: false
+      openReplies: false,
+      src: c.author.avatar,
     })
 
     const findCommentPath = (id, list) => {
