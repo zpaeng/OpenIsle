@@ -94,4 +94,19 @@ public class UserService {
         user.setAvatar(avatarUrl);
         return userRepository.save(user);
     }
+
+    public User updateProfile(String currentUsername, String newUsername, String introduction) {
+        User user = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if (newUsername != null && !newUsername.equals(currentUsername)) {
+            userRepository.findByUsername(newUsername).ifPresent(u -> {
+                throw new FieldException("username", "User name already exists");
+            });
+            user.setUsername(newUsername);
+        }
+        if (introduction != null) {
+            user.setIntroduction(introduction);
+        }
+        return userRepository.save(user);
+    }
 }

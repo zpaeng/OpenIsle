@@ -37,6 +37,9 @@ public class User {
 
     private String avatar;
 
+    @Column(length = 1000)
+    private String introduction;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role = Role.USER;

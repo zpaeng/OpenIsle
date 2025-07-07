@@ -64,6 +64,13 @@ public class UserController {
         return ResponseEntity.ok(Map.of("url", url));
     }
 
+    @PutMapping("/me")
+    public ResponseEntity<UserDto> updateProfile(@RequestBody UpdateProfileDto dto,
+                                                 Authentication auth) {
+        User user = userService.updateProfile(auth.getName(), dto.getUsername(), dto.getIntroduction());
+        return ResponseEntity.ok(toDto(user));
+    }
+
     @GetMapping("/{username}")
     public ResponseEntity<UserDto> getUser(@PathVariable String username) {
         User user = userService.findByUsername(username).orElseThrow();
@@ -128,6 +135,8 @@ public class UserController {
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
         dto.setAvatar(user.getAvatar());
+        dto.setRole(user.getRole().name());
+        dto.setIntroduction(user.getIntroduction());
         dto.setFollowers(subscriptionService.countSubscribers(user.getUsername()));
         dto.setFollowing(subscriptionService.countSubscribed(user.getUsername()));
         return dto;
@@ -158,6 +167,8 @@ public class UserController {
         private String username;
         private String email;
         private String avatar;
+        private String role;
+        private String introduction;
         private long followers;
         private long following;
     }
@@ -177,6 +188,12 @@ public class UserController {
         private String content;
         private java.time.LocalDateTime createdAt;
         private Long postId;
+    }
+
+    @Data
+    private static class UpdateProfileDto {
+        private String username;
+        private String introduction;
     }
 
     @Data

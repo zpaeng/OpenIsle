@@ -24,7 +24,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
-    private final PublishMode publishMode;
+    private PublishMode publishMode;
     private final NotificationService notificationService;
     private final SubscriptionService subscriptionService;
 
@@ -42,6 +42,14 @@ public class PostService {
         this.tagRepository = tagRepository;
         this.notificationService = notificationService;
         this.subscriptionService = subscriptionService;
+        this.publishMode = publishMode;
+    }
+
+    public PublishMode getPublishMode() {
+        return publishMode;
+    }
+
+    public void setPublishMode(PublishMode publishMode) {
         this.publishMode = publishMode;
     }
 

@@ -7,9 +7,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PasswordValidator {
-    private final PasswordStrength strength;
+    private PasswordStrength strength;
 
     public PasswordValidator(@Value("${app.password.strength:LOW}") PasswordStrength strength) {
+        this.strength = strength;
+    }
+
+    public PasswordStrength getStrength() {
+        return strength;
+    }
+
+    public void setStrength(PasswordStrength strength) {
         this.strength = strength;
     }
 
