@@ -19,6 +19,12 @@
           <span class="menu-item-text">发帖</span>
         </router-link>
       </div>
+
+      <div class="menu-footer">
+        <div class="menu-footer-btn" @click="$emit('toggle-dark-mode')">
+          <i class="fas fa-moon"></i>
+        </div>
+      </div>
     </nav>
   </transition>
 </template>
@@ -41,6 +47,9 @@ export default {
   background-color: var(--menu-background-color);
   height: calc(100vh - var(--header-height));
   border-right: 1px solid var(--menu-border-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .menu-item-container {
@@ -69,6 +78,22 @@ export default {
 .menu-item-icon {
   margin-right: 10px;
   opacity: 0.5;
+}
+
+.menu-footer {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.menu-footer-btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /*
