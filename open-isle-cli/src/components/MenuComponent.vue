@@ -9,7 +9,9 @@
         <router-link class="menu-item" exact-active-class="selected" to="/message">
           <i class="menu-item-icon fas fa-envelope"></i>
           <span class="menu-item-text">我的消息</span>
-          <span v-if="unreadCount > 0" class="unread-dot"></span>
+          <span v-if="unreadCount > 0" class="unread-container">
+            <span class="unread"> {{ showUnreadCount }} </span>
+          </span>
         </router-link>
         <router-link class="menu-item" exact-active-class="selected" to="/about">
           <i class="menu-item-icon fas fa-info-circle"></i>
@@ -56,6 +58,9 @@ export default {
         default:
           return 'fas fa-desktop'
       }
+    },
+    showUnreadCount() {
+      return this.unreadCount > 99 ? '99+' : this.unreadCount
     }
   },
   async mounted() {
@@ -91,11 +96,12 @@ export default {
 }
 
 .menu-item {
-  display: block;
   padding: 4px 10px;
   text-decoration: none;
   color: var(--menu-text-color);
   border-radius: 10px;
+  display: flex;
+  align-items: center;
 }
 
 .menu-item.selected {
@@ -109,18 +115,27 @@ export default {
   color: var(--menu-text-color);
 }
 
+.unread-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: rgb(255, 102, 102);
+  margin-left: 15px;
+  width: 18px;
+  height: 18px;
+  text-align: center;
+}
+.unread {
+  color: white;
+  font-size: 9px;
+  font-weight: bold;
+}
+
 .menu-item-icon {
   margin-right: 10px;
   opacity: 0.5;
-}
-
-.unread-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  margin-left: 4px;
-  border-radius: 50%;
-  background-color: red;
+  font-weight: bold;
 }
 
 .menu-footer {
