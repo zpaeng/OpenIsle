@@ -60,4 +60,22 @@ class NotificationServiceTest {
         assertEquals(1, list.size());
         verify(nRepo).findByUserOrderByCreatedAtDesc(user);
     }
+
+    @Test
+    void countUnreadReturnsRepositoryValue() {
+        NotificationRepository nRepo = mock(NotificationRepository.class);
+        UserRepository uRepo = mock(UserRepository.class);
+        NotificationService service = new NotificationService(nRepo, uRepo);
+
+        User user = new User();
+        user.setId(3L);
+        user.setUsername("carl");
+        when(uRepo.findByUsername("carl")).thenReturn(Optional.of(user));
+        when(nRepo.countByUserAndRead(user, false)).thenReturn(5L);
+
+        long count = service.countUnread("carl");
+
+        assertEquals(5L, count);
+        verify(nRepo).countByUserAndRead(user, false);
+    }
 }

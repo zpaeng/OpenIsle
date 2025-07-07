@@ -29,6 +29,14 @@ public class NotificationController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("/unread-count")
+    public UnreadCount unreadCount(Authentication auth) {
+        long count = notificationService.countUnread(auth.getName());
+        UnreadCount uc = new UnreadCount();
+        uc.setCount(count);
+        return uc;
+    }
+
     @PostMapping("/read")
     public void markRead(@RequestBody MarkReadRequest req, Authentication auth) {
         notificationService.markRead(auth.getName(), req.getIds());
@@ -114,5 +122,10 @@ public class NotificationController {
         private Long id;
         private String username;
         private String avatar;
+    }
+
+    @Data
+    private static class UnreadCount {
+        private long count;
     }
 }
