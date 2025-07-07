@@ -130,7 +130,9 @@ const CommentItem = {
     }
     const copyCommentLink = () => {
       const link = `${location.origin}${location.pathname}#comment-${props.comment.id}`
-      navigator.clipboard.writeText(link)
+      navigator.clipboard.writeText(link).then(() => {
+        toast.success('已复制')
+      })
     }
     return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply }
   }
