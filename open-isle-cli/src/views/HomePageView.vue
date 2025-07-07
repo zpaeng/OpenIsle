@@ -153,8 +153,6 @@ export default {
 
 <style scoped>
 .home-page {
-  background-color: white;
-  color: black;
   height: calc(100vh - var(--header-height));
   display: flex;
   flex-direction: column;
@@ -289,7 +287,7 @@ export default {
 .article-item-title {
   font-size: 20px;
   text-decoration: none;
-  color: black;
+  color: var(--text-color);
 }
 
 .article-item-title:hover {
