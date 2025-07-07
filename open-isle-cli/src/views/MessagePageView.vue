@@ -4,13 +4,39 @@
       <template #item="{ item }">
         <div class="notif-content">
           <span class="notif-type">
-            <template v-if="item.type === 'COMMENT_REPLY'">
-              <router-link :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
-                {{ item.comment.author.username }} 对我的评论 “{{ item.parentComment ? item.parentComment.content : item.post.title }}” 回复了 “{{ item.comment.content }}”
-              </router-link>
+            <template v-if="item.type === 'COMMENT_REPLY' && item.parentComment">
+              <div class="notif-content-container">
+                <span class="notif-user">{{ item.comment.author.username }} </span> 对我的评论
+                <span>
+                  <router-link class="notif-content-text"
+                    :to="`/posts/${item.post.id}#comment-${item.parentComment.id}`">
+                    {{ sanitizeDescription(item.parentComment.content) }}
+                  </router-link>
+                </span> 回复了 <span>
+                  <router-link class="notif-content-text" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
+                    {{ sanitizeDescription(item.comment.content) }}
+                  </router-link>
+                </span>
+              </div>
+            </template>
+            <template v-else-if="item.type === 'COMMENT_REPLY' && !item.parentComment">
+              <div class="notif-content-container">
+                <span class="notif-user">{{ item.comment.author.username }} </span> 对我的文章
+                <span>
+                  <router-link class="notif-content-text" :to="`/posts/${item.post.id}`">
+                    {{ sanitizeDescription(item.post.title) }}
+                  </router-link>
+                </span> 回复了 <span>
+                  <router-link class="notif-content-text" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
+                    {{ sanitizeDescription(item.comment.content) }}
+                  </router-link>
+                </span>
+              </div>
             </template>
             <template v-else>
-              {{ formatType(item.type) }}
+              <div class="notif-content-container">
+                {{ formatType(item.type) }}
+              </div>
             </template>
           </span>
           <span class="notif-time">{{ new Date(item.createdAt).toLocaleString() }}</span>
@@ -26,6 +52,7 @@ import { API_BASE_URL } from '../main'
 import BaseTimeline from '../components/BaseTimeline.vue'
 import { getToken } from '../utils/auth'
 import { toast } from '../main'
+import { stripMarkdown } from '../utils/markdown'
 
 export default {
   name: 'MessagePageView',
@@ -40,6 +67,10 @@ export default {
       POST_REVIEWED: 'fas fa-check',
       POST_UPDATED: 'fas fa-comment-dots',
       USER_ACTIVITY: 'fas fa-user'
+    }
+
+    const sanitizeDescription = (text) => {
+      return stripMarkdown(text)
     }
 
     const fetchNotifications = async () => {
@@ -86,7 +117,7 @@ export default {
 
     onMounted(fetchNotifications)
 
-    return { notifications, formatType }
+    return { notifications, formatType, sanitizeDescription }
   }
 }
 </script>
@@ -108,5 +139,23 @@ export default {
 .notif-time {
   font-size: 12px;
   color: gray;
+}
+
+.notif-content-container {
+  color: rgb(140, 140, 140);
+  font-weight: normal;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.notif-content-text {
+  font-weight: bold;
+  color: var(--primary-color) !important;
+  text-decoration: none !important;
+}
+
+.notif-user {
+  font-weight: bold;
+  color: var(--text-color);
 }
 </style>
