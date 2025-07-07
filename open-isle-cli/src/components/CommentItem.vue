@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import CommentEditor from './CommentEditor.vue'
 import { renderMarkdown } from '../utils/markdown'
 import { API_BASE_URL, toast } from '../main'
@@ -81,6 +81,12 @@ const CommentItem = {
   },
   setup(props) {
     const showReplies = ref(props.defaultShowReplies)
+    watch(
+      () => props.defaultShowReplies,
+      (val) => {
+        showReplies.value = val
+      }
+    )
     const showEditor = ref(false)
     const isWaitingForReply = ref(false)
     const toggleReplies = () => {
