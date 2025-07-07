@@ -1,5 +1,16 @@
 <template>
   <div class="message-page">
+    <div v-if="isLoadingMessage" class="loading-message">
+      <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+    </div>
+
+    <div v-else-if="notifications.length === 0" class="no-message">
+      <i class="fas fa-inbox no-message-icon"></i>
+      <div class="no-message-text">
+        暂时没有消息 :)
+      </div>
+    </div>
+
     <BaseTimeline :items="notifications">
       <template #item="{ item }">
         <div class="notif-content">
@@ -53,12 +64,15 @@ import BaseTimeline from '../components/BaseTimeline.vue'
 import { getToken } from '../utils/auth'
 import { toast } from '../main'
 import { stripMarkdown } from '../utils/markdown'
+import { hatch } from 'ldrs'
+hatch.register()
 
 export default {
   name: 'MessagePageView',
   components: { BaseTimeline },
   setup() {
     const notifications = ref([])
+    const isLoadingMessage = ref(false)
 
     const iconMap = {
       POST_VIEWED: 'fas fa-eye',
@@ -80,11 +94,13 @@ export default {
           toast.error('请先登录')
           return
         }
+        isLoadingMessage.value = true
         const res = await fetch(`${API_BASE_URL}/api/notifications`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         })
+        isLoadingMessage.value = false
         if (!res.ok) {
           toast.error('获取通知失败')
           return
@@ -117,12 +133,34 @@ export default {
 
     onMounted(fetchNotifications)
 
-    return { notifications, formatType, sanitizeDescription }
+    return { notifications, formatType, sanitizeDescription, isLoadingMessage }
   }
 }
 </script>
 
 <style scoped>
+.loading-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
+.no-message {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  opacity: 0.5;
+}
+
+.no-message-text {
+  font-size: 16px;
+  color: var(--text-color);
+}
+
 .message-page {
   padding: 20px;
 }
@@ -152,6 +190,11 @@ export default {
   font-weight: bold;
   color: var(--primary-color) !important;
   text-decoration: none !important;
+}
+
+.notif-content-text:hover {
+  color: var(--primary-color) !important;
+  text-decoration: underline !important;
 }
 
 .notif-user {
