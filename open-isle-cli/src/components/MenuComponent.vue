@@ -21,8 +21,8 @@
       </div>
 
       <div class="menu-footer">
-        <div class="menu-footer-btn" @click="$emit('toggle-dark-mode')">
-          <i class="fas fa-moon"></i>
+        <div class="menu-footer-btn" @click="cycleTheme">
+          <i :class="iconClass"></i>
         </div>
       </div>
     </nav>
@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import { themeState, cycleTheme, ThemeMode } from '../utils/theme'
 export default {
   name: 'MenuComponent',
   props: {
@@ -37,7 +38,20 @@ export default {
       type: Boolean,
       default: true
     }
-  }
+  },
+  computed: {
+    iconClass() {
+      switch (themeState.mode) {
+        case ThemeMode.DARK:
+          return 'fas fa-moon'
+        case ThemeMode.LIGHT:
+          return 'fas fa-sun'
+        default:
+          return 'fas fa-desktop'
+      }
+    }
+  },
+  methods: { cycleTheme }
 }
 </script>
 
