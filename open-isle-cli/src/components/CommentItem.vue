@@ -50,6 +50,7 @@
           :key="r.id"
           :comment="r"
           :level="level + 1"
+          :default-show-replies="r.openReplies"
         />
       </div>
     </div>
@@ -72,10 +73,14 @@ const CommentItem = {
     level: {
       type: Number,
       default: 0
+    },
+    defaultShowReplies: {
+      type: Boolean,
+      default: false
     }
   },
   setup(props) {
-    const showReplies = ref(false)
+    const showReplies = ref(props.defaultShowReplies)
     const showEditor = ref(false)
     const isWaitingForReply = ref(false)
     const toggleReplies = () => {
@@ -114,8 +119,10 @@ const CommentItem = {
               time: new Date(r.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
               avatar: r.avatar,
               text: r.content,
-              reply: []
-            }))
+              reply: [],
+              openReplies: false
+            })),
+            openReplies: false
           })
           showEditor.value = false
           toast.success('回复成功')

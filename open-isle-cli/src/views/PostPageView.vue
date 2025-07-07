@@ -68,7 +68,14 @@
       <CommentEditor @submit="postComment" :loading="isWaitingPostingComment" />
 
       <div class="comments-container">
-        <CommentItem v-for="comment in comments" :key="comment.id" :comment="comment" :level="0" ref="postItems" />
+        <CommentItem
+          v-for="comment in comments"
+          :key="comment.id"
+          :comment="comment"
+          :level="0"
+          :default-show-replies="comment.openReplies"
+          ref="postItems"
+        />
       </div>
     </div>
 
@@ -125,8 +132,30 @@ export default {
       time: new Date(c.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
       avatar: c.author.avatar,
       text: c.content,
-      reply: (c.replies || []).map(mapComment)
+      reply: (c.replies || []).map(mapComment),
+      openReplies: false
     })
+
+    const findCommentPath = (id, list) => {
+      for (const item of list) {
+        if (item.id === Number(id) || item.id === id) {
+          return [item]
+        }
+        if (item.reply && item.reply.length) {
+          const sub = findCommentPath(id, item.reply)
+          if (sub) return [item, ...sub]
+        }
+      }
+      return null
+    }
+
+    const expandCommentPath = (id) => {
+      const path = findCommentPath(id, comments.value)
+      if (!path) return
+      for (let i = 0; i < path.length - 1; i++) {
+        path[i].openReplies = true
+      }
+    }
 
     const fetchPost = async () => {
       try {
@@ -220,7 +249,10 @@ export default {
     }
 
     onMounted(async () => {
+      const hash = location.hash
+      const id = hash.startsWith('#comment-') ? hash.substring('#comment-'.length) : null
       await fetchPost()
+      if (id) expandCommentPath(id)
       updateCurrentIndex()
       await jumpToHashComment()
     })
