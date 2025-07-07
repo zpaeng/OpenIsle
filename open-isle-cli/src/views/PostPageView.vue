@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import CommentItem from '../components/CommentItem.vue'
 import CommentEditor from '../components/CommentEditor.vue'
@@ -200,15 +200,16 @@ export default {
     }
 
     const copyPostLink = () => {
-      navigator.clipboard.writeText(location.href.split('#')[0])
+      navigator.clipboard.writeText(location.href.split('#')[0]).then(() => {
+        toast.success('已复制')
+      })
     }
 
-    onMounted(() => {
-      fetchPost()
-      updateCurrentIndex()
+    const jumpToHashComment = async () => {
       const hash = location.hash
       if (hash.startsWith('#comment-')) {
         const id = hash.substring('#comment-'.length)
+        await nextTick()
         const el = document.getElementById('comment-' + id)
         if (el && mainContainer.value) {
           mainContainer.value.scrollTo({ top: el.offsetTop, behavior: 'instant' })
@@ -216,6 +217,12 @@ export default {
           setTimeout(() => el.classList.remove('comment-highlight'), 2000)
         }
       }
+    }
+
+    onMounted(async () => {
+      await fetchPost()
+      updateCurrentIndex()
+      await jumpToHashComment()
     })
 
     return {
