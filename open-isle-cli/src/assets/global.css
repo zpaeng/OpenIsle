@@ -5,19 +5,36 @@
   --header-height: 60px;
   --header-background-color: white;
   --header-border-color: lightgray;
+  --header-text-color: black;
   --menu-background-color: white;
   --menu-border-color: lightgray;
   --menu-selected-background-color: rgba(208, 250, 255, 0.659);
+  --menu-text-color: black;
   --scroller-background-color: rgba(130, 175, 180, 0.5);
   --normal-background-color: rgb(241, 241, 241);
+  --text-color: black;
   --menu-width: 200px;
   --page-max-width: 1200px;
+}
+
+[data-theme='dark'] {
+  --header-background-color: #2b2b2b;
+  --header-border-color: #555;
+  --header-text-color: white;
+  --menu-background-color: #333;
+  --menu-border-color: #555;
+  --menu-selected-background-color: rgba(255, 255, 255, 0.1);
+  --menu-text-color: white;
+  --normal-background-color: #121212;
+  --text-color: #eee;
 }
 
 body {
   margin: 0;
   padding: 0;
   font-family: 'Roboto', sans-serif;
+  background-color: var(--normal-background-color);
+  color: var(--text-color);
 }
 
 
