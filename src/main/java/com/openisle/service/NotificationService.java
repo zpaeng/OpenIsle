@@ -45,4 +45,10 @@ public class NotificationService {
         }
         notificationRepository.saveAll(notifs);
     }
+
+    public long countUnread(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return notificationRepository.countByUserAndRead(user, false);
+    }
 }

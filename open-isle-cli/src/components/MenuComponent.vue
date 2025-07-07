@@ -9,6 +9,7 @@
         <router-link class="menu-item" exact-active-class="selected" to="/message">
           <i class="menu-item-icon fas fa-envelope"></i>
           <span class="menu-item-text">我的消息</span>
+          <span v-if="unreadCount > 0" class="unread-dot"></span>
         </router-link>
         <router-link class="menu-item" exact-active-class="selected" to="/about">
           <i class="menu-item-icon fas fa-info-circle"></i>
@@ -31,6 +32,9 @@
 
 <script>
 import { themeState, cycleTheme, ThemeMode } from '../utils/theme'
+import { authState } from '../utils/auth'
+import { fetchUnreadCount } from '../utils/notification'
+import { watch } from 'vue'
 export default {
   name: 'MenuComponent',
   props: {
@@ -38,6 +42,9 @@ export default {
       type: Boolean,
       default: true
     }
+  },
+  data() {
+    return { unreadCount: 0 }
   },
   computed: {
     iconClass() {
@@ -50,6 +57,19 @@ export default {
           return 'fas fa-desktop'
       }
     }
+  },
+  async mounted() {
+    const updateCount = async () => {
+      if (authState.loggedIn) {
+        this.unreadCount = await fetchUnreadCount()
+      } else {
+        this.unreadCount = 0
+      }
+    }
+    await updateCount()
+    watch(() => authState.loggedIn, async () => {
+      await updateCount()
+    })
   },
   methods: { cycleTheme }
 }
@@ -92,6 +112,15 @@ export default {
 .menu-item-icon {
   margin-right: 10px;
   opacity: 0.5;
+}
+
+.unread-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-left: 4px;
+  border-radius: 50%;
+  background-color: red;
 }
 
 .menu-footer {

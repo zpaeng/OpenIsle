@@ -60,4 +60,14 @@ class NotificationControllerTest {
 
         verify(notificationService).markRead("alice", List.of(1L,2L));
     }
+
+    @Test
+    void unreadCountEndpoint() throws Exception {
+        Mockito.when(notificationService.countUnread("alice")).thenReturn(3L);
+
+        mockMvc.perform(get("/api/notifications/unread-count")
+                        .principal(new UsernamePasswordAuthenticationToken("alice","p")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.count").value(3));
+    }
 }
