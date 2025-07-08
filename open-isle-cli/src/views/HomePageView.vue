@@ -61,12 +61,7 @@
               <div class="article-info-item-text">{{ article.category.name }}</div>
             </div>
 
-            <div class="article-tags-container">
-              <div class="article-info-item" v-for="tag in article.tags" :key="tag">
-                <img class="article-info-item-img" :src="tag.smallIcon" alt="tag">
-                <div class="article-info-item-text">{{ tag.name }}</div>
-              </div>
-            </div>
+            <ArticleTags :tags="article.tags" />
           </div>
         </div>
 
@@ -96,6 +91,7 @@ import { stripMarkdown } from '../utils/markdown'
 import { API_BASE_URL } from '../main'
 import CategorySelect from '../components/CategorySelect.vue'
 import TagSelect from '../components/TagSelect.vue'
+import ArticleTags from '../components/ArticleTags.vue'
 import { hatch } from 'ldrs'
 hatch.register()
 
@@ -104,7 +100,8 @@ export default {
   name: 'HomePageView',
   components: {
     CategorySelect,
-    TagSelect
+    TagSelect,
+    ArticleTags
   },
   data() {
     return {

@@ -12,12 +12,7 @@
             <div class="article-info-item-text">{{ category.name }}</div>
           </div>
 
-          <div class="article-tags-container">
-            <div class="article-info-item" v-for="tag in tags" :key="tag">
-              <img class="article-info-item-img" :src="tag.smallIcon" alt="tag">
-              <div class="article-info-item-text">{{ tag.name }}</div>
-            </div>
-          </div>
+          <ArticleTags :tags="tags" />
         </div>
       </div>
 
@@ -106,6 +101,7 @@ import { useRoute } from 'vue-router'
 import CommentItem from '../components/CommentItem.vue'
 import CommentEditor from '../components/CommentEditor.vue'
 import BaseTimeline from '../components/BaseTimeline.vue'
+import ArticleTags from '../components/ArticleTags.vue'
 import { renderMarkdown } from '../utils/markdown'
 import { API_BASE_URL, toast } from '../main'
 import { getToken } from '../utils/auth'
@@ -114,7 +110,7 @@ hatch.register()
 
 export default {
   name: 'PostPageView',
-  components: { CommentItem, CommentEditor, BaseTimeline },
+  components: { CommentItem, CommentEditor, BaseTimeline, ArticleTags },
   setup() {
     const route = useRoute()
     const postId = route.params.id
