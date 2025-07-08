@@ -3,16 +3,26 @@
     <div class="settings-title">设置</div>
     <div class="profile-section">
       <div class="avatar-row">
-        <img :src="avatar" class="avatar-preview" />
-        <input type="file" @change="onAvatarChange" />
+        <!-- label 充当点击区域，内部隐藏 input -->
+        <label class="avatar-container">
+          <img :src="avatar" class="avatar-preview" />
+          <!-- 半透明蒙层：hover 时出现 -->
+          <div class="avatar-overlay">更换头像</div>
+          <input
+            type="file"
+            class="avatar-input"
+            accept="image/*"
+            @change="onAvatarChange"
+          />
+        </label>
       </div>
       <div class="form-row">
         <label>用户名</label>
-        <input v-model="username" type="text" />
+        <BaseInput v-model="username" />
       </div>
       <div class="form-row">
         <label>自我介绍</label>
-        <textarea v-model="introduction" rows="3" />
+        <BaseInput v-model="introduction" textarea rows="3" />
       </div>
     </div>
     <div v-if="role === 'ADMIN'" class="admin-section">
@@ -42,8 +52,10 @@
 <script>
 import { API_BASE_URL, toast } from '../main'
 import { getToken, fetchCurrentUser } from '../utils/auth'
+import BaseInput from '../components/BaseInput.vue'
 export default {
   name: 'SettingsPageView',
+  components: { BaseInput },
   data() {
     return {
       username: '',
@@ -162,5 +174,37 @@ export default {
   margin-top: 20px;
   display: flex;
   gap: 10px;
+}
+
+/* 容器：定位 + 光标 */
+.avatar-container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+/* 隐藏默认文件选择按钮 */
+.avatar-input {
+  display: none;
+}
+
+/* 蒙层：初始透明，hover 时渐显 */
+.avatar-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 40px;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* hover 触发 */
+.avatar-container:hover .avatar-overlay {
+  opacity: 1;
 }
 </style>
