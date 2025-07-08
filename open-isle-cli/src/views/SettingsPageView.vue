@@ -81,7 +81,15 @@ export default {
   },
   methods: {
     onAvatarChange(e) {
-      this.avatarFile = e.target.files[0]
+      const file = e.target.files[0]
+      this.avatarFile = file
+      if (file) {
+        const reader = new FileReader()
+        reader.onload = () => {
+          this.avatar = reader.result
+        }
+        reader.readAsDataURL(file)
+      }
     },
     fetchPublishModes() {
       return Promise.resolve([
