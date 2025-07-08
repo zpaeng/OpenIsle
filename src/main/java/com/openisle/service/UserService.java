@@ -3,6 +3,7 @@ package com.openisle.service;
 import com.openisle.model.User;
 import com.openisle.model.Role;
 import com.openisle.service.PasswordValidator;
+import com.openisle.service.UsernameValidator;
 import com.openisle.exception.FieldException;
 import com.openisle.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +19,11 @@ import java.util.Random;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordValidator passwordValidator;
+    private final UsernameValidator usernameValidator;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public User register(String username, String email, String password) {
+        usernameValidator.validate(username);
         passwordValidator.validate(password);
         // ── 先按用户名查 ──────────────────────────────────────────
         Optional<User> byUsername = userRepository.findByUsername(username);
@@ -99,6 +102,7 @@ public class UserService {
         User user = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         if (newUsername != null && !newUsername.equals(currentUsername)) {
+            usernameValidator.validate(newUsername);
             userRepository.findByUsername(newUsername).ifPresent(u -> {
                 throw new FieldException("username", "User name already exists");
             });
