@@ -23,7 +23,8 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import Dropdown from './Dropdown.vue'
 import { API_BASE_URL } from '../main'
 import { stripMarkdown } from '../utils/markdown'
@@ -32,21 +33,24 @@ export default {
   name: 'SearchDropdown',
   components: { Dropdown },
   setup() {
+    const router = useRouter()
     const keyword = ref('')
     const selected = ref(null)
+    const results = ref([])
 
     const fetchResults = async (kw) => {
       if (!kw) return []
       const res = await fetch(`${API_BASE_URL}/api/search/global?keyword=${encodeURIComponent(kw)}`)
       if (!res.ok) return []
       const data = await res.json()
-      return data.map(r => ({
+      results.value = data.map(r => ({
         id: r.id,
         text: r.text,
         type: r.type,
         subText: r.subText,
         extra: r.extra
       }))
+      return results.value
     }
 
     const highlight = (text) => {
@@ -62,6 +66,19 @@ export default {
       post: 'fas fa-file-alt',
       comment: 'fas fa-comment'
     }
+
+    watch(selected, val => {
+      if (!val) return
+      const opt = results.value.find(r => r.id === val)
+      if (!opt) return
+      if (opt.type === 'post' || opt.type === 'post_title') {
+        router.push(`/posts/${opt.id}`)
+      } else if (opt.type === 'user') {
+        router.push(`/users/${opt.id}`)
+      }
+      selected.value = null
+      keyword.value = ''
+    })
 
     return { keyword, selected, fetchResults, highlight, iconMap }
   }
