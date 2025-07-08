@@ -43,17 +43,8 @@ body {
 /*************************
  * Vditor 自定义皮肤覆写
  *************************/
-/*
-  思路：
-  1. 用 CSS 变量快速改大色块；
-  2. 再用选择器去掉边框 / 阴影。
-  注意顺序：一定写在官方 index.css 之后才能生效。
-*/
-
 .comment-editor-container .vditor {
   /* 去掉整体背景与边框，让它融入父容器 */
-  --panel-background-color: transparent;
-  --border-color: transparent;
   --textarea-background-color: transparent;
   border: none !important;
   box-shadow: none !important;
@@ -64,32 +55,4 @@ body {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
-}
-
-/* 编辑区（wysiwyg / ir / sv）背景透明 */
-.comment-editor-container .vditor-content,
-.comment-editor-container .vditor-wysiwyg,
-.comment-editor-container .vditor-ir,
-.comment-editor-container .vditor-textarea {
-  background: transparent !important;
-}
-.post-editor-container .vditor {
-  --panel-background-color: transparent;
-  --border-color: transparent;
-  --textarea-background-color: transparent;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-.post-editor-container .vditor-toolbar {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-.post-editor-container .vditor-content,
-.post-editor-container .vditor-wysiwyg,
-.post-editor-container .vditor-ir,
-.post-editor-container .vditor-textarea {
-  background: transparent !important;
 }

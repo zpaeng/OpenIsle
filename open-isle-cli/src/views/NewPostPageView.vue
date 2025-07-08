@@ -192,6 +192,7 @@ export default {
   padding-bottom: 20px;
   background-color: transparent;
   font-size: 42px;
+  width: 100%;
   font-weight: bold;
 }
 

@@ -21,7 +21,7 @@
         </div>
       </div>
 
-      <div class="info-content-container">
+      <div class="info-content-container author-info-container">
         <div class="user-avatar-container">
           <div class="user-avatar-item">
             <img class="user-avatar-item-img" :src="author.avatar" alt="avatar">
@@ -406,6 +406,10 @@ export default {
   border-radius: 3px;
   background-color: var(--scroller-background-color);
   cursor: pointer;
+}
+
+.author-info-container {
+  margin-top: 20px;
 }
 
 .scroller-range::-moz-range-track {

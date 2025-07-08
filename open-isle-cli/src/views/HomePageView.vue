@@ -289,6 +289,10 @@ export default {
   font-size: 20px;
   text-decoration: none;
   color: var(--text-color);
+  line-clamp: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .article-item-title:hover {

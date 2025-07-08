@@ -4,11 +4,13 @@
       <template v-if="multiple">
         <span v-if="selectedLabels.length">
           <template v-for="(label, idx) in selectedLabels" :key="label.id">
-            <template v-if="label.icon">
-              <img v-if="isImageIcon(label.icon)" :src="label.icon" class="option-icon" />
-              <i v-else :class="['option-icon', label.icon]"></i>
-            </template>
-            <span>{{ label.name }}</span>
+            <div class="selected-label">
+              <template v-if="label.icon">
+                <img v-if="isImageIcon(label.icon)" :src="label.icon" class="option-icon" />
+                <i v-else :class="['option-icon', label.icon]"></i>
+              </template>
+              <span>{{ label.name }}</span>
+            </div>
             <span v-if="idx !== selectedLabels.length - 1">, </span>
           </template>
         </span>
@@ -16,11 +18,13 @@
       </template>
       <template v-else>
         <span v-if="selectedLabels.length">
-          <template v-if="selectedLabels[0].icon">
-            <img v-if="isImageIcon(selectedLabels[0].icon)" :src="selectedLabels[0].icon" class="option-icon" />
-            <i v-else :class="['option-icon', selectedLabels[0].icon]"></i>
-          </template>
-          <span>{{ selectedLabels[0].name }}</span>
+          <div class="selected-label">
+            <template v-if="selectedLabels[0].icon">
+              <img v-if="isImageIcon(selectedLabels[0].icon)" :src="selectedLabels[0].icon" class="option-icon" />
+              <i v-else :class="['option-icon', selectedLabels[0].icon]"></i>
+            </template>
+            <span>{{ selectedLabels[0].name }}</span>
+          </div>
         </span>
         <span v-else class="placeholder">{{ placeholder }}</span>
       </template>
@@ -35,7 +39,8 @@
         <l-hatch size="20" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
       </div>
       <template v-else>
-        <div class="dropdown-option" v-for="o in filteredOptions" :key="o.id" @click="select(o.id)" :class="{ 'selected': isSelected(o.id) }">
+        <div class="dropdown-option" v-for="o in filteredOptions" :key="o.id" @click="select(o.id)"
+          :class="{ 'selected': isSelected(o.id) }">
           <template v-if="o.icon">
             <img v-if="isImageIcon(o.icon)" :src="o.icon" class="option-icon" />
             <i v-else :class="['option-icon', o.icon]"></i>
@@ -196,6 +201,13 @@ export default {
   z-index: 10;
   max-height: 200px;
   overflow-y: auto;
+}
+
+.selected-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-right: 5px;
 }
 
 .dropdown-search {
