@@ -80,9 +80,7 @@ export default {
 
 <style scoped>
 .post-editor-container {
-  border-right: 1px solid #e2e2e2;
-  border-top: 1px solid #e2e2e2;
-  border-bottom: 1px solid #e2e2e2;
+  border: 1px solid #e2e2e2;
 }
 </style>
 

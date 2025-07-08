@@ -1,15 +1,28 @@
 <template>
   <div class="base-input">
-    <i v-if="icon" :class="['base-input-icon', icon]"></i>
-    <component
-      :is="textarea ? 'textarea' : 'input'"
+    <i v-if="icon" :class="['base-input-icon', icon]" />
+
+    <!-- 普通输入框 -->
+    <input
+      v-if="!textarea"
       class="base-input-text"
       :type="type"
-      v-model="innerValue"
       v-bind="$attrs"
+      :value="modelValue"
+      @input="$emit('update:modelValue', $event.target.value)"
+    />
+
+    <!-- 多行输入框 -->
+    <textarea
+      v-else
+      class="base-input-text"
+      v-bind="$attrs"
+      :value="modelValue"
+      @input="$emit('update:modelValue', $event.target.value)"
     />
   </div>
 </template>
+
 
 <script>
 export default {

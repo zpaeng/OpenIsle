@@ -174,6 +174,10 @@ export default {
 .new-post-page {
   display: flex;
   justify-content: center;
+  background-color: var(--background-color);
+  height: calc(100vh - var(--header-height));
+  padding-right: 20px;
+  padding-left: 20px;
 }
 
 .new-post-form {
@@ -242,7 +246,6 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-left: 20px;
   margin-top: 20px;
 }
 
