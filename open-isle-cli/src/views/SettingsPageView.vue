@@ -1,6 +1,6 @@
 <template>
   <div class="settings-page">
-    <div class="settings-title">设置</div>
+    <div class="settings-title">个人资料设置</div>
     <div class="profile-section">
       <div class="avatar-row">
         <!-- label 充当点击区域，内部隐藏 input -->
@@ -34,7 +34,8 @@
       </div>
     </div>
     <div class="buttons">
-      <button @click="save">保存</button>
+      <div v-if="isSaving" class="save-button disabled">保存中...</div>
+      <div v-else @click="save" class="save-button">保存</div>
     </div>
   </div>
 </template>
@@ -44,6 +45,8 @@ import { API_BASE_URL, toast } from '../main'
 import { getToken, fetchCurrentUser } from '../utils/auth'
 import BaseInput from '../components/BaseInput.vue'
 import Dropdown from '../components/Dropdown.vue'
+import { hatch } from 'ldrs'
+hatch.register()
 export default {
   name: 'SettingsPageView',
   components: { BaseInput, Dropdown },
@@ -56,11 +59,15 @@ export default {
       avatarFile: null,
       role: '',
       publishMode: 'DIRECT',
-      passwordStrength: 'LOW'
+      passwordStrength: 'LOW',
+      isLoadingPage: false,
+      isSaving: false
     }
   },
   async mounted() {
+    this.isLoadingPage = true
     const user = await fetchCurrentUser()
+
     if (user) {
       this.username = user.username
       this.introduction = user.introduction || ''
@@ -70,6 +77,7 @@ export default {
         this.loadAdminConfig()
       }
     }
+    this.isLoadingPage = false
   },
   methods: {
     onAvatarChange(e) {
@@ -131,11 +139,13 @@ export default {
           return
         }
       }
+      this.isSaving = true
       const res = await fetch(`${API_BASE_URL}/api/users/me`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ username: this.username, introduction: this.introduction })
       })
+      this.isSaving = false
       if (!res.ok) {
         const data = await res.json()
         toast.error(data.error || '保存失败')
@@ -261,4 +271,30 @@ export default {
   margin-top: -10px;
   margin-bottom: 10px;
 }
+
+.save-button {
+  margin-top: 40px;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.save-button:hover {
+  background-color: var(--primary-color-hover);
+}
+
+.save-button.disabled:hover {
+  background-color: var(--primary-color-disabled);
+  cursor: not-allowed;
+}
+
+.save-button.disabled {
+  background-color: var(--primary-color-disabled);
+  cursor: not-allowed;
+}
+
 </style>
