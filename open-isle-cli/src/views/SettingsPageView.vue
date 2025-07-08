@@ -28,11 +28,11 @@
       </div>
       <div v-if="role === 'ADMIN'" class="admin-section">
         <h3>管理员设置</h3>
-        <div class="form-row">
+        <div class="form-row dropdown-row">
           <div class="setting-title">发布规则</div>
           <Dropdown v-model="publishMode" :fetch-options="fetchPublishModes" />
         </div>
-        <div class="form-row">
+        <div class="form-row dropdown-row">
           <div class="setting-title">密码强度</div>
           <Dropdown v-model="passwordStrength" :fetch-options="fetchPasswordStrengths" />
         </div>
@@ -245,6 +245,10 @@ export default {
 
 .introduction-row {
   max-width: 500px;
+}
+
+.dropdown-row {
+  max-width: 200px;
 }
 
 .profile-section {

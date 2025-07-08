@@ -75,5 +75,6 @@ export default {
   outline: none;
   width: 100%;
   font-size: 16px;
+  resize: none; 
 }
 </style>

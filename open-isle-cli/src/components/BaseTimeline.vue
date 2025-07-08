@@ -40,7 +40,6 @@ export default {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: var(--primary-color, #3498db);
   color: white;
   display: flex;
   justify-content: center;
