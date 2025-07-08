@@ -8,21 +8,17 @@
           <img :src="avatar" class="avatar-preview" />
           <!-- 半透明蒙层：hover 时出现 -->
           <div class="avatar-overlay">更换头像</div>
-          <input
-            type="file"
-            class="avatar-input"
-            accept="image/*"
-            @change="onAvatarChange"
-          />
+          <input type="file" class="avatar-input" accept="image/*" @change="onAvatarChange" />
         </label>
       </div>
-      <div class="form-row">
-        <label>用户名</label>
-        <BaseInput v-model="username" />
+      <div class="form-row username-row">
+        <BaseInput icon="fas fa-user" v-model="username" placeholder="用户名" />
+        <div class="username-description">用户名是你在社区的唯一标识</div>
       </div>
       <div class="form-row">
         <label>自我介绍</label>
         <BaseInput v-model="introduction" textarea rows="3" />
+        <div class="introduction-description">自我介绍会出现在你的个人主页，可以简要介绍自己</div>
       </div>
     </div>
     <div v-if="role === 'ADMIN'" class="admin-section">
@@ -141,35 +137,46 @@ export default {
 
 <style scoped>
 .settings-page {
-  padding: 20px;
+  background-color: var(--background-color);
+  padding: 40px;
+  height: calc(100vh - var(--header-height) - 80px);
 }
+
 .settings-title {
   font-size: 20px;
   font-weight: bold;
   margin-bottom: 20px;
 }
+
 .avatar-row {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 15px;
 }
+
 .avatar-preview {
   width: 80px;
   height: 80px;
   border-radius: 40px;
   object-fit: cover;
 }
+
 .form-row {
   margin-bottom: 15px;
   display: flex;
   flex-direction: column;
 }
+
 .admin-section {
   margin-top: 30px;
   padding-top: 10px;
-  border-top: 1px solid #ccc;
 }
+
+.profile-section {
+  margin-bottom: 30px;
+}
+
 .buttons {
   margin-top: 20px;
   display: flex;

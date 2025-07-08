@@ -46,7 +46,6 @@ export default {
   border-radius: 10px;
   border: 1px solid #ccc;
   gap: 10px;
-  margin-bottom: 20px;
 }
 
 .base-input-icon {
