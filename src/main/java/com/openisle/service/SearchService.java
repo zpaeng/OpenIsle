@@ -52,6 +52,7 @@ public class SearchService {
                         u.getId(),
                         u.getUsername(),
                         u.getIntroduction(),
+                        null,
                         null
                 ));
 
@@ -64,7 +65,8 @@ public class SearchService {
                                     p.getId(),
                                     p.getTitle(),
                                     p.getCategory().getName(),
-                                    extractSnippet(p.getContent(), keyword, false)
+                                    extractSnippet(p.getContent(), keyword, false),
+                                    null
                             )),
                     searchPostsByTitle(keyword).stream()
                             .map(p -> new SearchResult(
@@ -72,7 +74,8 @@ public class SearchService {
                                     p.getId(),
                                     p.getTitle(),
                                     p.getCategory().getName(),
-                                    extractSnippet(p.getContent(), keyword, true)
+                                    extractSnippet(p.getContent(), keyword, true),
+                                    null
                             ))
                 )
                 .collect(java.util.stream.Collectors.toMap(
@@ -91,7 +94,8 @@ public class SearchService {
                         c.getId(),
                         extractSnippet(c.getContent(), keyword, false),
                         c.getAuthor().getUsername(),
-                        c.getPost().getTitle()
+                        c.getPost().getTitle(),
+                        c.getPost().getId()
                 ));
 
         return Stream.concat(Stream.concat(users, mergedPosts.stream()), comments)
@@ -114,5 +118,5 @@ public class SearchService {
         return content.substring(start, end);
     }
 
-    public record SearchResult(String type, Long id, String text, String subText, String extra) {}
+    public record SearchResult(String type, Long id, String text, String subText, String extra, Long postId) {}
 }
