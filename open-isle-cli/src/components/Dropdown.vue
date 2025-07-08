@@ -1,6 +1,7 @@
 <template>
   <div class="dropdown" ref="wrapper">
     <div class="dropdown-display" @click="toggle">
+      <slot name="display" :selected="selectedLabels" :toggle="toggle" :search="search">
       <template v-if="multiple">
         <span v-if="selectedLabels.length">
           <template v-for="(label, idx) in selectedLabels" :key="label.id">
@@ -29,8 +30,9 @@
         <span v-else class="placeholder">{{ placeholder }}</span>
       </template>
       <i class="fas fa-caret-down dropdown-caret"></i>
+      </slot>
     </div>
-    <div v-if="open" class="dropdown-menu">
+    <div v-if="open" :class="['dropdown-menu', menuClass]">
       <div class="dropdown-search">
         <i class="fas fa-search search-icon"></i>
         <input type="text" v-model="search" placeholder="搜索" />
@@ -39,13 +41,15 @@
         <l-hatch size="20" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
       </div>
       <template v-else>
-        <div class="dropdown-option" v-for="o in filteredOptions" :key="o.id" @click="select(o.id)"
-          :class="{ 'selected': isSelected(o.id) }">
-          <template v-if="o.icon">
-            <img v-if="isImageIcon(o.icon)" :src="o.icon" class="option-icon" />
-            <i v-else :class="['option-icon', o.icon]"></i>
-          </template>
-          <span>{{ o.name }}</span>
+        <div v-for="o in filteredOptions" :key="o.id" @click="select(o.id)"
+          :class="['dropdown-option', optionClass, { 'selected': isSelected(o.id) }]">
+          <slot name="option" :option="o" :isSelected="isSelected(o.id)">
+            <template v-if="o.icon">
+              <img v-if="isImageIcon(o.icon)" :src="o.icon" class="option-icon" />
+              <i v-else :class="['option-icon', o.icon]"></i>
+            </template>
+            <span>{{ o.name }}</span>
+          </slot>
         </div>
       </template>
     </div>
@@ -63,7 +67,10 @@ export default {
     modelValue: { type: [Array, String, Number], default: () => [] },
     placeholder: { type: String, default: '请选择' },
     multiple: { type: Boolean, default: false },
-    fetchOptions: { type: Function, required: true }
+    fetchOptions: { type: Function, required: true },
+    remote: { type: Boolean, default: false },
+    menuClass: { type: String, default: '' },
+    optionClass: { type: String, default: '' }
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
@@ -99,6 +106,7 @@ export default {
     }
 
     const filteredOptions = computed(() => {
+      if (props.remote) return options.value
       if (!search.value) return options.value
       return options.value.filter(o => o.name.toLowerCase().includes(search.value.toLowerCase()))
     })
@@ -109,13 +117,13 @@ export default {
       }
     }
 
-    const loadOptions = async () => {
-      if (loaded.value) return
+    const loadOptions = async (kw = '') => {
+      if (!props.remote && loaded.value) return
       try {
         loading.value = true
-        const res = await props.fetchOptions()
+        const res = await props.fetchOptions(props.remote ? kw : undefined)
         options.value = Array.isArray(res) ? res : []
-        loaded.value = true
+        if (!props.remote) loaded.value = true
       } catch {
         options.value = []
       } finally {
@@ -124,14 +132,26 @@ export default {
     }
 
     watch(open, async val => {
-      if (val && !loaded.value) {
-        await loadOptions()
+      if (val) {
+        if (props.remote) {
+          await loadOptions(search.value)
+        } else if (!loaded.value) {
+          await loadOptions()
+        }
+      }
+    })
+
+    watch(search, async val => {
+      if (props.remote && open.value) {
+        await loadOptions(val)
       }
     })
 
     onMounted(() => {
       document.addEventListener('click', clickOutside)
-      loadOptions()
+      if (!props.remote) {
+        loadOptions()
+      }
     })
 
     onBeforeUnmount(() => {

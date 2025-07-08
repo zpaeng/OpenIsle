@@ -3,10 +3,7 @@
     <div class="search-container">
       <div class="search-title">Where possible begins</div>
       <div class="search-subtitle">希望你喜欢这里。有问题，请提问，或搜索现有帖子</div>
-      <div class="search-input">
-        <i class="search-input-icon fas fa-search"></i>
-        <input type="text" placeholder="Search">
-      </div>
+      <SearchDropdown />
     </div>
 
 
@@ -92,6 +89,7 @@ import { API_BASE_URL } from '../main'
 import CategorySelect from '../components/CategorySelect.vue'
 import TagSelect from '../components/TagSelect.vue'
 import ArticleTags from '../components/ArticleTags.vue'
+import SearchDropdown from '../components/SearchDropdown.vue'
 import { hatch } from 'ldrs'
 hatch.register()
 
@@ -101,7 +99,8 @@ export default {
   components: {
     CategorySelect,
     TagSelect,
-    ArticleTags
+    ArticleTags,
+    SearchDropdown
   },
   data() {
     return {
@@ -182,26 +181,6 @@ export default {
   font-size: 16px;
 }
 
-.search-input {
-  display: flex;
-  align-items: center;
-
-  border: 1px solid lightgray;
-  border-radius: 10px;
-  padding: 10px;
-
-  width: 100%;
-  max-width: 600px;
-  margin-top: 20px;
-}
-
-.search-input input {
-  border: none;
-  outline: none;
-  font-size: 16px;
-  width: 100%;
-  margin-left: 10px;
-}
 
 .loading-container {
   display: flex;
