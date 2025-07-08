@@ -185,13 +185,13 @@ export default {
 
 <style scoped>
 .signup-page {
-  margin-top: 100px;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  height: 100%;
+  height: calc(100vh - var(--header-height));
   width: 100%;
+  background-color: var(--background-color);
 }
 
 .signup-page-content {
