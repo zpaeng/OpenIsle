@@ -48,7 +48,8 @@ export default {
         text: r.text,
         type: r.type,
         subText: r.subText,
-        extra: r.extra
+        extra: r.extra,
+        postId: r.postId
       }))
       return results.value
     }
@@ -76,7 +77,9 @@ export default {
       } else if (opt.type === 'user') {
         router.push(`/users/${opt.id}`)
       } else if (opt.type === 'comment') {
-        // code here
+        if (opt.postId) {
+          router.push(`/posts/${opt.postId}#comment-${opt.id}`)
+        }
       }
       selected.value = null
       keyword.value = ''
