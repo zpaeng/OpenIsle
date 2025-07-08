@@ -454,12 +454,6 @@ export default {
   align-items: center;
 }
 
-.article-tags-container {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-}
-
 .article-info-item {
   display: flex;
   flex-direction: row;

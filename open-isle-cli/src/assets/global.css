@@ -60,17 +60,6 @@ body {
 /*************************
  * Markdown 渲染样式
  *************************/
-.info-content-text h1,
-.info-content-text h2,
-.info-content-text h3,
-.info-content-text h4,
-.info-content-text h5,
-.info-content-text h6 {
-  margin-top: 1em;
-  margin-bottom: 0.5em;
-  font-weight: bold;
-}
-
 .info-content-text ul,
 .info-content-text ol {
   padding-left: 1.5em;
@@ -87,13 +76,13 @@ body {
   background-color: #f6f8fa;
   padding: 8px 12px;
   border-radius: 4px;
-  overflow: auto;
+  line-height: 1.0;
 }
 
 .info-content-text code {
   font-family: 'Courier New', monospace;
-  background-color: rgba(27, 31, 35, 0.05);
-  padding: 2px 4px;
+  font-size: 13px;
+  /* background-color: rgba(27, 31, 35, 0.05); */
   border-radius: 4px;
 }
 
@@ -104,15 +93,4 @@ body {
 
 .info-content-text a:hover {
   text-decoration: underline;
-}
-
-.info-content-text table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.info-content-text th,
-.info-content-text td {
-  border: 1px solid #d0d7de;
-  padding: 6px 12px;
 }

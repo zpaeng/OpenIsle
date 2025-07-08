@@ -25,4 +25,13 @@ export default {
 }
 </script>
 
-<!-- 此组件不包含样式，使用方可根据需要自行定义 -->
+<style scoped>  
+
+.article-tags-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+</style>
+
