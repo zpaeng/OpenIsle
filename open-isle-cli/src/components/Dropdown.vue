@@ -1,41 +1,35 @@
 <template>
   <div class="dropdown" ref="wrapper">
-      <div class="dropdown-display" @click="toggle">
-        <slot
-          name="display"
-          :selected="selectedLabels"
-          :toggle="toggle"
-          :search="search"
-          :setSearch="setSearch"
-        >
-      <template v-if="multiple">
-        <span v-if="selectedLabels.length">
-          <template v-for="(label, idx) in selectedLabels" :key="label.id">
-            <div class="selected-label">
-              <template v-if="label.icon">
-                <img v-if="isImageIcon(label.icon)" :src="label.icon" class="option-icon" />
-                <i v-else :class="['option-icon', label.icon]"></i>
-              </template>
-              <span>{{ label.name }}</span>
-            </div>
-            <span v-if="idx !== selectedLabels.length - 1">, </span>
-          </template>
-        </span>
-        <span v-else class="placeholder">{{ placeholder }}</span>
-      </template>
-      <template v-else>
-        <span v-if="selectedLabels.length">
-          <div class="selected-label">
-            <template v-if="selectedLabels[0].icon">
-              <img v-if="isImageIcon(selectedLabels[0].icon)" :src="selectedLabels[0].icon" class="option-icon" />
-              <i v-else :class="['option-icon', selectedLabels[0].icon]"></i>
+    <div class="dropdown-display" @click="toggle">
+      <slot name="display" :selected="selectedLabels" :toggle="toggle" :search="search" :setSearch="setSearch">
+        <template v-if="multiple">
+          <span v-if="selectedLabels.length">
+            <template v-for="(label, idx) in selectedLabels" :key="label.id">
+              <div class="selected-label">
+                <template v-if="label.icon">
+                  <img v-if="isImageIcon(label.icon)" :src="label.icon" class="option-icon" />
+                  <i v-else :class="['option-icon', label.icon]"></i>
+                </template>
+                <span>{{ label.name }}</span>
+              </div>
+              <span v-if="idx !== selectedLabels.length - 1">, </span>
             </template>
-            <span>{{ selectedLabels[0].name }}</span>
-          </div>
-        </span>
-        <span v-else class="placeholder">{{ placeholder }}</span>
-      </template>
-      <i class="fas fa-caret-down dropdown-caret"></i>
+          </span>
+          <span v-else class="placeholder">{{ placeholder }}</span>
+        </template>
+        <template v-else>
+          <span v-if="selectedLabels.length">
+            <div class="selected-label">
+              <template v-if="selectedLabels[0].icon">
+                <img v-if="isImageIcon(selectedLabels[0].icon)" :src="selectedLabels[0].icon" class="option-icon" />
+                <i v-else :class="['option-icon', selectedLabels[0].icon]"></i>
+              </template>
+              <span>{{ selectedLabels[0].name }}</span>
+            </div>
+          </span>
+          <span v-else class="placeholder">{{ placeholder }}</span>
+        </template>
+        <i class="fas fa-caret-down dropdown-caret"></i>
       </slot>
     </div>
     <div v-if="open && (loading || filteredOptions.length > 0)" :class="['dropdown-menu', menuClass]">

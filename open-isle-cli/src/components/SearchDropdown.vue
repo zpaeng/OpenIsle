@@ -9,11 +9,13 @@
         </div>
       </template>
       <template #option="{ option }">
-        <i :class="['result-icon', iconMap[option.type] || 'fas fa-question']"></i>
-        <div class="result-body">
-          <div class="result-main" v-html="highlight(option.text)"></div>
-          <div v-if="option.subText" class="result-sub" v-html="highlight(option.subText)"></div>
-          <div v-if="option.extra" class="result-extra" v-html="highlight(option.extra)"></div>
+        <div class="search-option-item">
+          <i :class="['result-icon', iconMap[option.type] || 'fas fa-question']"></i>
+          <div class="result-body">
+            <div class="result-main" v-html="highlight(option.text)"></div>
+            <div v-if="option.subText" class="result-sub" v-html="highlight(option.subText)"></div>
+            <div v-if="option.extra" class="result-extra" v-html="highlight(option.extra)"></div>
+          </div>
         </div>
       </template>
     </Dropdown>
@@ -87,6 +89,11 @@ export default {
 .search-menu {
   width: 100%;
   max-width: 600px;
+}
+
+.search-option-item {
+  display: flex;
+  gap: 10px;
 }
 
 .search-option {
