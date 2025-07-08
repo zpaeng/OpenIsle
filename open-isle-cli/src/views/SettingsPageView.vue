@@ -12,8 +12,9 @@
         </label>
       </div>
       <div class="form-row username-row">
-        <BaseInput icon="fas fa-user" v-model="username" placeholder="用户名" />
+        <BaseInput icon="fas fa-user" v-model="username" @input="usernameError = ''" placeholder="用户名" />
         <div class="setting-description">用户名是你在社区的唯一标识</div>
+        <div v-if="usernameError" class="error-message">{{ usernameError }}</div>
       </div>
       <div class="form-row introduction-row">
         <div class="setting-title">自我介绍</div>
@@ -50,6 +51,7 @@ export default {
     return {
       username: '',
       introduction: '',
+      usernameError: '',
       avatar: '',
       avatarFile: null,
       role: '',
@@ -103,6 +105,16 @@ export default {
     },
     async save() {
       const token = getToken()
+      this.usernameError = ''
+      if (!this.username) {
+        this.usernameError = '用户名不能为空'
+      } else if (this.username.length < 6) {
+        this.usernameError = '用户名至少6位'
+      }
+      if (this.usernameError) {
+        toast.error(this.usernameError)
+        return
+      }
       if (this.avatarFile) {
         const form = new FormData()
         form.append('file', this.avatarFile)
@@ -240,5 +252,13 @@ export default {
 /* hover 触发 */
 .avatar-container:hover .avatar-overlay {
   opacity: 1;
+}
+
+.error-message {
+  color: red;
+  font-size: 14px;
+  width: calc(100% - 40px);
+  margin-top: -10px;
+  margin-bottom: 10px;
 }
 </style>

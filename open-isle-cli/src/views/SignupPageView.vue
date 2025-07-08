@@ -120,6 +120,8 @@ export default {
       }
       if (!this.username) {
         this.usernameError = '用户名不能为空'
+      } else if (this.username.length < 6) {
+        this.usernameError = '用户名至少6位'
       }
       if (this.emailError || this.passwordError || this.usernameError) {
         return
