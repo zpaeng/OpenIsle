@@ -26,6 +26,7 @@
 import { ref } from 'vue'
 import Dropdown from './Dropdown.vue'
 import { API_BASE_URL } from '../main'
+import { stripMarkdown } from '../utils/markdown'
 
 export default {
   name: 'SearchDropdown',
@@ -49,9 +50,11 @@ export default {
     }
 
     const highlight = (text) => {
+      text = stripMarkdown(text)
       if (!keyword.value) return text
       const reg = new RegExp(keyword.value, 'gi')
-      return text.replace(reg, m => `<span class="highlight">${m}</span>`)
+      const res = text.replace(reg, m => `<span class="highlight">${m}</span>`)
+      return res; 
     }
 
     const iconMap = {
