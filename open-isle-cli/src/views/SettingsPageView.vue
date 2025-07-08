@@ -125,53 +125,57 @@ export default {
       }
     },
     async save() {
-      const token = getToken()
-      this.usernameError = ''
-      if (!this.username) {
-        this.usernameError = '用户名不能为空'
-      } else if (this.username.length < 6) {
-        this.usernameError = '用户名至少6位'
-      }
-      if (this.usernameError) {
-        toast.error(this.usernameError)
-        return
-      }
-      if (this.avatarFile) {
-        const form = new FormData()
-        form.append('file', this.avatarFile)
-        const res = await fetch(`${API_BASE_URL}/api/users/me/avatar`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-          body: form
-        })
-        const data = await res.json()
-        if (res.ok) {
-          this.avatar = data.url
-        } else {
-          toast.error(data.error || '上传失败')
-          return
-        }
-      }
       this.isSaving = true
-      const res = await fetch(`${API_BASE_URL}/api/users/me`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ username: this.username, introduction: this.introduction })
-      })
-      this.isSaving = false
-      if (!res.ok) {
-        const data = await res.json()
-        toast.error(data.error || '保存失败')
-        return
-      }
-      if (this.role === 'ADMIN') {
-        await fetch(`${API_BASE_URL}/api/admin/config`, {
-          method: 'POST',
+
+      do {
+        const token = getToken()
+        this.usernameError = ''
+        if (!this.username) {
+          this.usernameError = '用户名不能为空'
+        } else if (this.username.length < 6) {
+          this.usernameError = '用户名至少6位'
+        }
+        if (this.usernameError) {
+          toast.error(this.usernameError)
+          break
+        }
+        if (this.avatarFile) {
+          const form = new FormData()
+          form.append('file', this.avatarFile)
+          const res = await fetch(`${API_BASE_URL}/api/users/me/avatar`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` },
+            body: form
+          })
+          const data = await res.json()
+          if (res.ok) {
+            this.avatar = data.url
+          } else {
+            toast.error(data.error || '上传失败')
+            break
+          }
+        }
+        const res = await fetch(`${API_BASE_URL}/api/users/me`, {
+          method: 'PUT',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ publishMode: this.publishMode, passwordStrength: this.passwordStrength })
+          body: JSON.stringify({ username: this.username, introduction: this.introduction })
         })
-      }
-      toast.success('保存成功')
+        if (!res.ok) {
+          const data = await res.json()
+          toast.error(data.error || '保存失败')
+          break
+        }
+        if (this.role === 'ADMIN') {
+          await fetch(`${API_BASE_URL}/api/admin/config`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ publishMode: this.publishMode, passwordStrength: this.passwordStrength })
+          })
+        }
+        toast.success('保存成功')
+      } while (!this.isSaving)
+
+      this.isSaving = false
     },
   }
 }
