@@ -7,11 +7,7 @@
       <div class="article-title-container">
         <div class="article-title">{{ title }}</div>
         <div class="article-info-container">
-          <div class="article-info-item">
-            <img class="article-info-item-img" :src="category.smallIcon" alt="category">
-            <div class="article-info-item-text">{{ category.name }}</div>
-          </div>
-
+          <ArticleTags :tags="[category]" />
           <ArticleTags :tags="tags" />
         </div>
       </div>
@@ -445,28 +441,6 @@ export default {
   margin-top: 10px;
   gap: 10px;
   align-items: center;
-}
-
-.article-info-item {
-  display: flex;
-  flex-direction: row;
-  gap: 5px;
-  align-items: center;
-}
-
-.article-info-item {
-  display: flex;
-  flex-direction: row;
-  gap: 5px;
-  align-items: center;
-  font-size: 14px;
-  padding: 2px 4px;
-  background-color: #f0f0f0;
-}
-
-.article-info-item-img {
-  width: 16px;
-  height: 16px;
 }
 
 .info-content-container {

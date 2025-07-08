@@ -76,5 +76,7 @@ export default {
   width: 100%;
   font-size: 16px;
   resize: none; 
+  background-color: transparent;
+  color: var(--text-color);
 }
 </style>

@@ -149,6 +149,7 @@ export default {
 .menu-footer-btn {
   width: 30px;
   height: 30px;
+  margin-right: 5px;
   display: flex;
   align-items: center;
   justify-content: center;

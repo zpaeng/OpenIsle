@@ -46,7 +46,10 @@
         class="reply-toggle"
         @click="toggleReplies"
       >
-        {{ showReplies ? '收起' : '展开' }}{{ comment.reply.length }}条回复
+        <i v-if="showReplies" class="fas fa-chevron-up reply-toggle-icon"></i> 
+        <i v-else class="fas fa-chevron-down reply-toggle-icon"></i> 
+        
+        {{ comment.reply.length }}条回复
       </div>
       <div v-if="showReplies" class="reply-list">
         <BaseTimeline :items="comment.reply" >
@@ -189,6 +192,10 @@ export default CommentItem
 
 .comment-highlight {
   animation: highlight 2s;
+}
+
+.reply-toggle-icon {
+  margin-right: 5px;
 }
 
 @keyframes highlight {

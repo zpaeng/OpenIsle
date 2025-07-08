@@ -198,6 +198,7 @@ export default {
   width: 32px;
   height: 32px;
   border-radius: 50%;
+  background-color: lightgray;
 }
 
 .dropdown-icon {
@@ -208,7 +209,7 @@ export default {
   position: absolute;
   top: 40px;
   right: 0;
-  background-color: white;
+  background-color: var(--menu-background-color);
   border: 1px solid #ddd;
   border-radius: 4px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
@@ -221,7 +222,7 @@ export default {
 }
 
 .dropdown-item:hover {
-  background-color: #f2f2f2;
+  background-color: var(--menu-selected-background-color);
 }
 
 </style>

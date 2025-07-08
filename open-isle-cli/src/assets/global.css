@@ -16,6 +16,7 @@
   --text-color: black;
   --menu-width: 200px;
   --page-max-width: 1200px;
+  --article-info-background-color: #f0f0f0;
 }
 
 [data-theme='dark'] {
@@ -23,12 +24,13 @@
   --header-border-color: #555;
   --header-text-color: white;
   --menu-background-color: #333;
-  --background-color: #121212;
+  --background-color: #333;
   --menu-border-color: #555;
   --menu-selected-background-color: rgba(255, 255, 255, 0.1);
   --menu-text-color: white;
   --normal-background-color: #121212;
   --text-color: #eee;
+  --article-info-background-color: #747373;
 }
 
 body {

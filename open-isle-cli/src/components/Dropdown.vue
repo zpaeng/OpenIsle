@@ -32,7 +32,7 @@
         <i class="fas fa-caret-down dropdown-caret"></i>
       </slot>
     </div>
-    <div v-if="open && (loading || filteredOptions.length > 0)" :class="['dropdown-menu', menuClass]">
+    <div v-if="open && (loading || filteredOptions.length > 0 || showSearch)" :class="['dropdown-menu', menuClass]">
       <div v-if="showSearch" class="dropdown-search">
         <i class="fas fa-search search-icon"></i>
         <input type="text" v-model="search" placeholder="搜索" />
@@ -221,7 +221,7 @@ export default {
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
+  background: var(--background-color);
   border: 1px solid #ccc;
   z-index: 10;
   max-height: 200px;
@@ -247,6 +247,8 @@ export default {
   border: none;
   outline: none;
   margin-left: 5px;
+  background-color: var(--menu-background-color);
+  color: var(--text-color);
 }
 
 .dropdown-option {

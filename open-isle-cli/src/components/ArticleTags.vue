@@ -33,5 +33,21 @@ export default {
   gap: 10px;
 }
 
+
+.article-info-item {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+  font-size: 14px;
+  padding: 2px 4px;
+  background-color: var(--article-info-background-color);
+  border-radius: 4px;
+}
+
+.article-info-item-img {
+  width: 16px;
+  height: 16px;
+}
 </style>
 

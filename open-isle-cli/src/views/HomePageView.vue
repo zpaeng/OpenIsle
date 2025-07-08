@@ -53,11 +53,7 @@
           </router-link>
           <div class="article-item-description main-item">{{ sanitizeDescription(article.description) }}</div>
           <div class="article-info-container main-item">
-            <div class="article-info-item">
-              <img class="article-info-item-img" :src="article.category.smallIcon" alt="category">
-              <div class="article-info-item-text">{{ article.category.name }}</div>
-            </div>
-
+            <ArticleTags :tags="[article.category]" />
             <ArticleTags :tags="article.tags" />
           </div>
         </div>
@@ -292,13 +288,7 @@ export default {
   flex-direction: row;
   align-items: center;
   gap: 10px;
-}
-
-.article-info-item {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .article-tags-container {

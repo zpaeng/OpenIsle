@@ -5,7 +5,7 @@
       <template #display="{ toggle, setSearch }">
         <div class="search-input" @click="toggle">
           <i class="search-input-icon fas fa-search"></i>
-          <input type="text" v-model="keyword" placeholder="Search" @focus="toggle" @input="setSearch(keyword)" />
+          <input class="text-input" v-model="keyword" placeholder="Search" @focus="toggle" @input="setSearch(keyword)" />
         </div>
       </template>
       <template #option="{ option }">
@@ -103,7 +103,9 @@ export default {
   width: 100%;
 }
 
-.search-input input {
+.text-input {
+  background-color: var(--menu-background-color);
+  color: var(--text-color);
   border: none;
   outline: none;
   width: 100%;

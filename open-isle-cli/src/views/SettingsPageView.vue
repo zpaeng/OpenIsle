@@ -266,6 +266,8 @@ export default {
   position: relative;
   display: inline-block;
   cursor: pointer;
+  background-color: lightgray;
+  border-radius: 50%;
 }
 
 /* 隐藏默认文件选择按钮 */
