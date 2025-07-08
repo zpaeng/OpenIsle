@@ -10,7 +10,11 @@
       </template>
       <template #option="{ option }">
         <i :class="['result-icon', iconMap[option.type] || 'fas fa-question']"></i>
-        <span v-html="highlight(option.text)"></span>
+        <div class="result-body">
+          <div class="result-main" v-html="highlight(option.text)"></div>
+          <div v-if="option.subText" class="result-sub" v-html="highlight(option.subText)"></div>
+          <div v-if="option.extra" class="result-extra" v-html="highlight(option.extra)"></div>
+        </div>
       </template>
     </Dropdown>
   </div>
@@ -33,7 +37,13 @@ export default {
       const res = await fetch(`${API_BASE_URL}/api/search/global?keyword=${encodeURIComponent(kw)}`)
       if (!res.ok) return []
       const data = await res.json()
-      return data.map(r => ({ id: r.id, text: r.text, type: r.type }))
+      return data.map(r => ({
+        id: r.id,
+        text: r.text,
+        type: r.type,
+        subText: r.subText,
+        extra: r.extra
+      }))
     }
 
     const highlight = (text) => {
@@ -92,5 +102,20 @@ export default {
 
 .result-icon {
   opacity: 0.6;
+}
+
+.result-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.result-main {
+  font-weight: bold;
+}
+
+.result-sub,
+.result-extra {
+  font-size: 12px;
+  color: #666;
 }
 </style>
