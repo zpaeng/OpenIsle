@@ -29,18 +29,11 @@
       <h3>管理员设置</h3>
       <div class="form-row">
         <label>发布规则</label>
-        <select v-model="publishMode">
-          <option value="DIRECT">直接发布</option>
-          <option value="REVIEW">审核后发布</option>
-        </select>
+        <Dropdown v-model="publishMode" :fetch-options="fetchPublishModes" />
       </div>
       <div class="form-row">
         <label>密码强度</label>
-        <select v-model="passwordStrength">
-          <option value="LOW">低</option>
-          <option value="MEDIUM">中</option>
-          <option value="HIGH">高</option>
-        </select>
+        <Dropdown v-model="passwordStrength" :fetch-options="fetchPasswordStrengths" />
       </div>
     </div>
     <div class="buttons">
@@ -53,9 +46,10 @@
 import { API_BASE_URL, toast } from '../main'
 import { getToken, fetchCurrentUser } from '../utils/auth'
 import BaseInput from '../components/BaseInput.vue'
+import Dropdown from '../components/Dropdown.vue'
 export default {
   name: 'SettingsPageView',
-  components: { BaseInput },
+  components: { BaseInput, Dropdown },
   data() {
     return {
       username: '',
@@ -82,6 +76,19 @@ export default {
   methods: {
     onAvatarChange(e) {
       this.avatarFile = e.target.files[0]
+    },
+    fetchPublishModes() {
+      return Promise.resolve([
+        { id: 'DIRECT', name: '直接发布', icon: 'fas fa-bolt' },
+        { id: 'REVIEW', name: '审核后发布', icon: 'fas fa-search' }
+      ])
+    },
+    fetchPasswordStrengths() {
+      return Promise.resolve([
+        { id: 'LOW', name: '低', icon: 'fas fa-lock-open' },
+        { id: 'MEDIUM', name: '中', icon: 'fas fa-lock' },
+        { id: 'HIGH', name: '高', icon: 'fas fa-user-shield' }
+      ])
     },
     async loadAdminConfig() {
       try {
