@@ -4,7 +4,10 @@
       <template v-if="multiple">
         <span v-if="selectedLabels.length">
           <template v-for="(label, idx) in selectedLabels" :key="label.id">
-            <img v-if="label.icon" :src="label.icon" class="option-icon" />
+            <template v-if="label.icon">
+              <img v-if="isImageIcon(label.icon)" :src="label.icon" class="option-icon" />
+              <i v-else :class="['option-icon', label.icon]"></i>
+            </template>
             <span>{{ label.name }}</span>
             <span v-if="idx !== selectedLabels.length - 1">, </span>
           </template>
@@ -13,7 +16,10 @@
       </template>
       <template v-else>
         <span v-if="selectedLabels.length">
-          <img v-if="selectedLabels[0].icon" :src="selectedLabels[0].icon" class="option-icon" />
+          <template v-if="selectedLabels[0].icon">
+            <img v-if="isImageIcon(selectedLabels[0].icon)" :src="selectedLabels[0].icon" class="option-icon" />
+            <i v-else :class="['option-icon', selectedLabels[0].icon]"></i>
+          </template>
           <span>{{ selectedLabels[0].name }}</span>
         </span>
         <span v-else class="placeholder">{{ placeholder }}</span>
@@ -30,7 +36,10 @@
       </div>
       <template v-else>
         <div class="dropdown-option" v-for="o in filteredOptions" :key="o.id" @click="select(o.id)" :class="{ 'selected': isSelected(o.id) }">
-          <img v-if="o.icon" :src="o.icon" class="option-icon" />
+          <template v-if="o.icon">
+            <img v-if="isImageIcon(o.icon)" :src="o.icon" class="option-icon" />
+            <i v-else :class="['option-icon', o.icon]"></i>
+          </template>
           <span>{{ o.name }}</span>
         </div>
       </template>
@@ -130,7 +139,23 @@ export default {
       return selectedLabels.value.some(label => label.id === id)
     }
 
-    return { open, toggle, select, search, filteredOptions, wrapper, selectedLabels, isSelected, loading }
+    const isImageIcon = icon => {
+      if (!icon) return false
+      return /^https?:\/\//.test(icon) || icon.startsWith('/')
+    }
+
+    return {
+      open,
+      toggle,
+      select,
+      search,
+      filteredOptions,
+      wrapper,
+      selectedLabels,
+      isSelected,
+      loading,
+      isImageIcon
+    }
   }
 }
 </script>
@@ -200,6 +225,9 @@ export default {
 .option-icon {
   width: 16px;
   height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .dropdown-loading {
