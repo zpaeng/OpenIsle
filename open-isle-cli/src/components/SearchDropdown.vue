@@ -76,7 +76,7 @@ export default {
       } else if (opt.type === 'user') {
         router.push(`/users/${opt.id}`)
       } else if (opt.type === 'comment') {
-        router.push(`/posts/${opt.postId}#comments-${opt.id}`)
+        // code here
       }
       selected.value = null
       keyword.value = ''
