@@ -25,16 +25,23 @@
         <i class="fas fa-search search-icon"></i>
         <input type="text" v-model="search" placeholder="搜索" />
       </div>
-      <div class="dropdown-option" v-for="o in filteredOptions" :key="o.id" @click="select(o.id)" :class="{ 'selected': isSelected(o.id) }">
-        <img v-if="o.icon" :src="o.icon" class="option-icon" />
-        <span>{{ o.name }}</span>
+      <div v-if="loading" class="dropdown-loading">
+        <l-hatch size="20" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
       </div>
+      <template v-else>
+        <div class="dropdown-option" v-for="o in filteredOptions" :key="o.id" @click="select(o.id)" :class="{ 'selected': isSelected(o.id) }">
+          <img v-if="o.icon" :src="o.icon" class="option-icon" />
+          <span>{{ o.name }}</span>
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script>
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { hatch } from 'ldrs'
+hatch.register()
 
 export default {
   name: 'BaseDropdown',
@@ -50,6 +57,7 @@ export default {
     const search = ref('')
     const options = ref([])
     const loaded = ref(false)
+    const loading = ref(false)
     const wrapper = ref(null)
 
     const toggle = () => {
@@ -90,11 +98,14 @@ export default {
     watch(open, async val => {
       if (val && !loaded.value) {
         try {
+          loading.value = true
           const res = await props.fetchOptions()
           options.value = Array.isArray(res) ? res : []
           loaded.value = true
         } catch {
           options.value = []
+        } finally {
+          loading.value = false
         }
       }
     })
@@ -119,7 +130,7 @@ export default {
       return selectedLabels.value.some(label => label.id === id)
     }
 
-    return { open, toggle, select, search, filteredOptions, wrapper, selectedLabels, isSelected }
+    return { open, toggle, select, search, filteredOptions, wrapper, selectedLabels, isSelected, loading }
   }
 }
 </script>
@@ -189,5 +200,11 @@ export default {
 .option-icon {
   width: 16px;
   height: 16px;
+}
+
+.dropdown-loading {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
 }
 </style>
