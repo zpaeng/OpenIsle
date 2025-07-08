@@ -8,25 +8,18 @@
       </div>
 
       <div class="email-login-page-content">
-        <div class="login-page-input">
-          <i class="login-page-input-icon fas fa-envelope"></i>
-          <input
-            class="login-page-input-text"
-            v-model="username"
-            type="text"
-            placeholder="邮箱/用户名"
-          >
-        </div>
+        <BaseInput
+          icon="fas fa-envelope"
+          v-model="username"
+          placeholder="邮箱/用户名"
+        />
 
-        <div class="login-page-input">
-          <i class="login-page-input-icon fas fa-lock"></i>
-          <input
-            class="login-page-input-text"
-            v-model="password"
-            type="password"
-            placeholder="密码"
-          >
-        </div>
+        <BaseInput
+          icon="fas fa-lock"
+          v-model="password"
+          type="password"
+          placeholder="密码"
+        />
 
 
         <div v-if="!isWaitingForLogin" class="login-page-button-primary" @click="submitLogin">
@@ -58,8 +51,10 @@
 import { API_BASE_URL, toast } from '../main'
 import { setToken } from '../utils/auth'
 import { googleSignIn } from '../utils/google'
+import BaseInput from '../components/BaseInput.vue'
 export default {
   name: 'LoginPageView',
+  components: { BaseInput },
   data() {
     return {
       username: '',

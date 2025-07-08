@@ -8,51 +8,36 @@
       </div>
 
       <div v-if="emailStep === 0" class="email-signup-page-content">
-        <div class="signup-page-input">
-          <i class="signup-page-input-icon fas fa-envelope"></i>
-          <input
-            class="signup-page-input-text"
-            v-model="email"
-            @input="emailError = ''"
-            type="text"
-            placeholder="邮箱"
-          >
-        </div>
+        <BaseInput
+          icon="fas fa-envelope"
+          v-model="email"
+          @input="emailError = ''"
+          placeholder="邮箱"
+        />
         <div v-if="emailError" class="error-message">{{ emailError }}</div>
 
-        <div class="signup-page-input">
-          <i class="signup-page-input-icon fas fa-user"></i>
-          <input
-            class="signup-page-input-text"
-            v-model="username"
-            @input="usernameError = ''"
-            type="text"
-            placeholder="用户名"
-          >
-        </div>
+        <BaseInput
+          icon="fas fa-user"
+          v-model="username"
+          @input="usernameError = ''"
+          placeholder="用户名"
+        />
         <div v-if="usernameError" class="error-message">{{ usernameError }}</div>
 
-        <div class="signup-page-input">
-          <i class="signup-page-input-icon fas fa-lock"></i>
-          <input
-            class="signup-page-input-text"
-            v-model="password"
-            @input="passwordError = ''"
-            type="password"
-            placeholder="密码"
-          >
-        </div>
+        <BaseInput
+          icon="fas fa-lock"
+          v-model="password"
+          @input="passwordError = ''"
+          type="password"
+          placeholder="密码"
+        />
         <div v-if="passwordError" class="error-message">{{ passwordError }}</div>
 
-        <div class="signup-page-input">
-          <i class="signup-page-input-icon fas fa-user"></i>
-          <input
-            class="signup-page-input-text"
-            v-model="nickname"
-            type="text"
-            placeholder="昵称 (可选)"
-          >
-        </div>
+        <BaseInput
+          icon="fas fa-user"
+          v-model="nickname"
+          placeholder="昵称 (可选)"
+        />
 
         <div v-if="!isWaitingForEmailSent" class="signup-page-button-primary" @click="sendVerification">
           <div class="signup-page-button-text">验证邮箱</div>
@@ -69,15 +54,11 @@
       </div>
 
       <div v-if="emailStep === 1" class="email-signup-page-content">
-        <div class="signup-page-input">
-          <i class="signup-page-input-icon fas fa-envelope"></i>
-          <input
-            class="signup-page-input-text"
-            v-model="code"
-            type="text"
-            placeholder="邮箱验证码"
-          >
-        </div>
+        <BaseInput
+          icon="fas fa-envelope"
+          v-model="code"
+          placeholder="邮箱验证码"
+        />
         <div v-if="!isWaitingForEmailVerified" class="signup-page-button-primary" @click="verifyCode">
           <div class="signup-page-button-text">注册</div>
         </div>
@@ -102,8 +83,10 @@
 <script>
 import { API_BASE_URL, toast } from '../main'
 import { googleSignIn } from '../utils/google'
+import BaseInput from '../components/BaseInput.vue'
 export default {
   name: 'SignupPageView',
+  components: { BaseInput },
 
   data() {
     return {
