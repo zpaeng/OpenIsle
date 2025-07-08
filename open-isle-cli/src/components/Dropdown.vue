@@ -38,8 +38,8 @@
       <i class="fas fa-caret-down dropdown-caret"></i>
       </slot>
     </div>
-    <div v-if="open" :class="['dropdown-menu', menuClass]">
-      <div class="dropdown-search">
+    <div v-if="open && (loading || filteredOptions.length > 0)" :class="['dropdown-menu', menuClass]">
+      <div v-if="showSearch" class="dropdown-search">
         <i class="fas fa-search search-icon"></i>
         <input type="text" v-model="search" placeholder="搜索" />
       </div>
@@ -76,7 +76,8 @@ export default {
     fetchOptions: { type: Function, required: true },
     remote: { type: Boolean, default: false },
     menuClass: { type: String, default: '' },
-    optionClass: { type: String, default: '' }
+    optionClass: { type: String, default: '' },
+    showSearch: { type: Boolean, default: true }
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
@@ -204,7 +205,7 @@ export default {
 <style scoped>
 .dropdown {
   position: relative;
-  width: 200px;
+  min-width: 200px;
 }
 
 .dropdown-display {

@@ -1,28 +1,19 @@
 <template>
-  <Dropdown
-    v-model="selected"
-    :fetch-options="fetchResults"
-    remote
-    menu-class="search-menu"
-    option-class="search-option"
-  >
-    <template #display="{ toggle, setSearch }">
-      <div class="search-input" @click="toggle">
-        <i class="search-input-icon fas fa-search"></i>
-        <input
-          type="text"
-          v-model="keyword"
-          placeholder="Search"
-          @focus="toggle"
-          @input="setSearch(keyword)"
-        />
-      </div>
-    </template>
-    <template #option="{ option }">
-      <i :class="['result-icon', iconMap[option.type] || 'fas fa-question']"></i>
-      <span v-html="highlight(option.text)"></span>
-    </template>
-  </Dropdown>
+  <div class="search-dropdown">
+    <Dropdown v-model="selected" :fetch-options="fetchResults" remote menu-class="search-menu"
+      option-class="search-option" :show-search="false">
+      <template #display="{ toggle, setSearch }">
+        <div class="search-input" @click="toggle">
+          <i class="search-input-icon fas fa-search"></i>
+          <input type="text" v-model="keyword" placeholder="Search" @focus="toggle" @input="setSearch(keyword)" />
+        </div>
+      </template>
+      <template #option="{ option }">
+        <i :class="['result-icon', iconMap[option.type] || 'fas fa-question']"></i>
+        <span v-html="highlight(option.text)"></span>
+      </template>
+    </Dropdown>
+  </div>
 </template>
 
 <script>
@@ -63,15 +54,18 @@ export default {
 </script>
 
 <style scoped>
+.search-dropdown {
+  margin-top: 20px;
+  width: 500px;
+}
+
 .search-input {
+  padding: 10px;
   display: flex;
   align-items: center;
-  border: 1px solid lightgray;
-  border-radius: 10px;
-  padding: 10px;
   width: 100%;
-  max-width: 600px;
 }
+
 .search-input input {
   border: none;
   outline: none;
@@ -79,19 +73,23 @@ export default {
   margin-left: 10px;
   font-size: 16px;
 }
+
 .search-menu {
   width: 100%;
   max-width: 600px;
 }
+
 .search-option {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px 20px;
 }
+
 .highlight {
   color: var(--primary-color);
 }
+
 .result-icon {
   opacity: 0.6;
 }
