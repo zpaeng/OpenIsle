@@ -168,6 +168,7 @@ export default {
 .notif-content {
   display: flex;
   flex-direction: column;
+  margin-bottom: 30px;
 }
 
 .notif-type {

@@ -1,6 +1,6 @@
 <template>
   <div class="settings-page">
-    <h2>设置</h2>
+    <div class="settings-title">设置</div>
     <div class="profile-section">
       <div class="avatar-row">
         <img :src="avatar" class="avatar-preview" />
@@ -34,7 +34,6 @@
       </div>
     </div>
     <div class="buttons">
-      <button @click="cancel">取消</button>
       <button @click="save">保存</button>
     </div>
   </div>
@@ -124,9 +123,6 @@ export default {
       }
       toast.success('保存成功')
     },
-    cancel() {
-      window.location.reload()
-    }
   }
 }
 </script>
@@ -134,6 +130,11 @@ export default {
 <style scoped>
 .settings-page {
   padding: 20px;
+}
+.settings-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 20px;
 }
 .avatar-row {
   display: flex;
