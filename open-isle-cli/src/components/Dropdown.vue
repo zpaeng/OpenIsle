@@ -104,23 +104,29 @@ export default {
       }
     }
 
+    const loadOptions = async () => {
+      if (loaded.value) return
+      try {
+        loading.value = true
+        const res = await props.fetchOptions()
+        options.value = Array.isArray(res) ? res : []
+        loaded.value = true
+      } catch {
+        options.value = []
+      } finally {
+        loading.value = false
+      }
+    }
+
     watch(open, async val => {
       if (val && !loaded.value) {
-        try {
-          loading.value = true
-          const res = await props.fetchOptions()
-          options.value = Array.isArray(res) ? res : []
-          loaded.value = true
-        } catch {
-          options.value = []
-        } finally {
-          loading.value = false
-        }
+        await loadOptions()
       }
     })
 
     onMounted(() => {
       document.addEventListener('click', clickOutside)
+      loadOptions()
     })
 
     onBeforeUnmount(() => {

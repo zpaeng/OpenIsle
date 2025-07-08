@@ -61,6 +61,10 @@ export default {
   gap: 10px;
 }
 
+.base-input:focus-within {
+  border-color: var(--primary-color);
+}
+
 .base-input-icon {
   opacity: 0.5;
   font-size: 16px;
