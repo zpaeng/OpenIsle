@@ -1,7 +1,13 @@
 <template>
   <div class="dropdown" ref="wrapper">
-    <div class="dropdown-display" @click="toggle">
-      <slot name="display" :selected="selectedLabels" :toggle="toggle" :search="search">
+      <div class="dropdown-display" @click="toggle">
+        <slot
+          name="display"
+          :selected="selectedLabels"
+          :toggle="toggle"
+          :search="search"
+          :setSearch="setSearch"
+        >
       <template v-if="multiple">
         <span v-if="selectedLabels.length">
           <template v-for="(label, idx) in selectedLabels" :key="label.id">
@@ -76,6 +82,9 @@ export default {
   setup(props, { emit }) {
     const open = ref(false)
     const search = ref('')
+    const setSearch = (val) => {
+      search.value = val
+    }
     const options = ref([])
     const loaded = ref(false)
     const loading = ref(false)
@@ -185,7 +194,8 @@ export default {
       selectedLabels,
       isSelected,
       loading,
-      isImageIcon
+      isImageIcon,
+      setSearch
     }
   }
 }

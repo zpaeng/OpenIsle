@@ -6,10 +6,16 @@
     menu-class="search-menu"
     option-class="search-option"
   >
-    <template #display="{ toggle, search }">
+    <template #display="{ toggle, setSearch }">
       <div class="search-input" @click="toggle">
         <i class="search-input-icon fas fa-search"></i>
-        <input type="text" v-model="keyword" placeholder="Search" @focus="toggle" @input="search.value = keyword" />
+        <input
+          type="text"
+          v-model="keyword"
+          placeholder="Search"
+          @focus="toggle"
+          @input="setSearch(keyword)"
+        />
       </div>
     </template>
     <template #option="{ option }">
