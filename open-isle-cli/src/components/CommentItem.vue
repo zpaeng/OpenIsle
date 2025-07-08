@@ -41,8 +41,12 @@
         </div>
       </div>
       <CommentEditor v-if="showEditor" @submit="submitReply" :loading="isWaitingForReply" />
-      <div v-if="comment.reply && comment.reply.length" class="reply-toggle" @click="toggleReplies">
-        {{ comment.reply.length }}条回复
+      <div
+        v-if="comment.reply && comment.reply.length"
+        class="reply-toggle"
+        @click="toggleReplies"
+      >
+        {{ showReplies ? '收起' : '展开' }}{{ comment.reply.length }}条回复
       </div>
       <div v-if="showReplies" class="reply-list">
         <BaseTimeline :items="comment.reply" >
