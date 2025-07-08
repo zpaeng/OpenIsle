@@ -1,41 +1,46 @@
 <template>
   <div class="settings-page">
-    <div class="settings-title">个人资料设置</div>
-    <div class="profile-section">
-      <div class="avatar-row">
-        <!-- label 充当点击区域，内部隐藏 input -->
-        <label class="avatar-container">
-          <img :src="avatar" class="avatar-preview" />
-          <!-- 半透明蒙层：hover 时出现 -->
-          <div class="avatar-overlay">更换头像</div>
-          <input type="file" class="avatar-input" accept="image/*" @change="onAvatarChange" />
-        </label>
-      </div>
-      <div class="form-row username-row">
-        <BaseInput icon="fas fa-user" v-model="username" @input="usernameError = ''" placeholder="用户名" />
-        <div class="setting-description">用户名是你在社区的唯一标识</div>
-        <div v-if="usernameError" class="error-message">{{ usernameError }}</div>
-      </div>
-      <div class="form-row introduction-row">
-        <div class="setting-title">自我介绍</div>
-        <BaseInput v-model="introduction" textarea rows="3" placeholder="说些什么..." />
-        <div class="setting-description">自我介绍会出现在你的个人主页，可以简要介绍自己</div>
-      </div>
+    <div v-if="isLoadingPage" class="loading-page">
+      <l-hatch size="20" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
     </div>
-    <div v-if="role === 'ADMIN'" class="admin-section">
-      <h3>管理员设置</h3>
-      <div class="form-row">
-        <div class="setting-title">发布规则</div>
-        <Dropdown v-model="publishMode" :fetch-options="fetchPublishModes" />
+    <div v-else>
+      <div class="settings-title">个人资料设置</div>
+      <div class="profile-section">
+        <div class="avatar-row">
+          <!-- label 充当点击区域，内部隐藏 input -->
+          <label class="avatar-container">
+            <img :src="avatar" class="avatar-preview" />
+            <!-- 半透明蒙层：hover 时出现 -->
+            <div class="avatar-overlay">更换头像</div>
+            <input type="file" class="avatar-input" accept="image/*" @change="onAvatarChange" />
+          </label>
+        </div>
+        <div class="form-row username-row">
+          <BaseInput icon="fas fa-user" v-model="username" @input="usernameError = ''" placeholder="用户名" />
+          <div class="setting-description">用户名是你在社区的唯一标识</div>
+          <div v-if="usernameError" class="error-message">{{ usernameError }}</div>
+        </div>
+        <div class="form-row introduction-row">
+          <div class="setting-title">自我介绍</div>
+          <BaseInput v-model="introduction" textarea rows="3" placeholder="说些什么..." />
+          <div class="setting-description">自我介绍会出现在你的个人主页，可以简要介绍自己</div>
+        </div>
       </div>
-      <div class="form-row">
-        <div class="setting-title">密码强度</div>
-        <Dropdown v-model="passwordStrength" :fetch-options="fetchPasswordStrengths" />
+      <div v-if="role === 'ADMIN'" class="admin-section">
+        <h3>管理员设置</h3>
+        <div class="form-row">
+          <div class="setting-title">发布规则</div>
+          <Dropdown v-model="publishMode" :fetch-options="fetchPublishModes" />
+        </div>
+        <div class="form-row">
+          <div class="setting-title">密码强度</div>
+          <Dropdown v-model="passwordStrength" :fetch-options="fetchPasswordStrengths" />
+        </div>
       </div>
-    </div>
-    <div class="buttons">
-      <div v-if="isSaving" class="save-button disabled">保存中...</div>
-      <div v-else @click="save" class="save-button">保存</div>
+      <div class="buttons">
+        <div v-if="isSaving" class="save-button disabled">保存中...</div>
+        <div v-else @click="save" class="save-button">保存</div>
+      </div>
     </div>
   </div>
 </template>
@@ -173,6 +178,14 @@ export default {
 </script>
 
 <style scoped>
+.loading-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 300px;
+}
+
 .settings-page {
   background-color: var(--background-color);
   padding: 40px;
@@ -304,5 +317,4 @@ export default {
   background-color: var(--primary-color-disabled);
   cursor: not-allowed;
 }
-
 </style>
