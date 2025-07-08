@@ -106,7 +106,7 @@ export default {
   padding: 10px 20px;
 }
 
-.highlight {
+:deep(.highlight) {
   color: var(--primary-color);
 }
 
