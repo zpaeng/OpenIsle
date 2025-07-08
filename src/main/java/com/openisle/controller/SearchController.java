@@ -56,6 +56,8 @@ public class SearchController {
                     dto.setType(r.type());
                     dto.setId(r.id());
                     dto.setText(r.text());
+                    dto.setSubText(r.subText());
+                    dto.setExtra(r.extra());
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -92,5 +94,7 @@ public class SearchController {
         private String type;
         private Long id;
         private String text;
+        private String subText;
+        private String extra;
     }
 }

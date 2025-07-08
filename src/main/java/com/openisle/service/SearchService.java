@@ -47,15 +47,33 @@ public class SearchService {
 
     public List<SearchResult> globalSearch(String keyword) {
         Stream<SearchResult> users = searchUsers(keyword).stream()
-                .map(u -> new SearchResult("user", u.getId(), u.getUsername()));
+                .map(u -> new SearchResult(
+                        "user",
+                        u.getId(),
+                        u.getUsername(),
+                        u.getIntroduction(),
+                        null
+                ));
 
         // Merge post results while removing duplicates between search by content
         // and search by title
         List<SearchResult> mergedPosts = Stream.concat(
                     searchPosts(keyword).stream()
-                            .map(p -> new SearchResult("post", p.getId(), p.getTitle())),
+                            .map(p -> new SearchResult(
+                                    "post",
+                                    p.getId(),
+                                    p.getTitle(),
+                                    p.getCategory().getName(),
+                                    extractSnippet(p.getContent(), keyword, false)
+                            )),
                     searchPostsByTitle(keyword).stream()
-                            .map(p -> new SearchResult("post_title", p.getId(), p.getTitle()))
+                            .map(p -> new SearchResult(
+                                    "post_title",
+                                    p.getId(),
+                                    p.getTitle(),
+                                    p.getCategory().getName(),
+                                    extractSnippet(p.getContent(), keyword, true)
+                            ))
                 )
                 .collect(java.util.stream.Collectors.toMap(
                         SearchResult::id,
@@ -68,11 +86,33 @@ public class SearchService {
                 .toList();
 
         Stream<SearchResult> comments = searchComments(keyword).stream()
-                .map(c -> new SearchResult("comment", c.getId(), c.getContent()));
+                .map(c -> new SearchResult(
+                        "comment",
+                        c.getId(),
+                        extractSnippet(c.getContent(), keyword, false),
+                        c.getAuthor().getUsername(),
+                        c.getPost().getTitle()
+                ));
 
         return Stream.concat(Stream.concat(users, mergedPosts.stream()), comments)
                 .toList();
     }
 
-    public record SearchResult(String type, Long id, String text) {}
+    private String extractSnippet(String content, String keyword, boolean fromStart) {
+        if (content == null) return "";
+        if (fromStart) {
+            return content.length() > 50 ? content.substring(0, 50) : content;
+        }
+        String lower = content.toLowerCase();
+        String kw = keyword.toLowerCase();
+        int idx = lower.indexOf(kw);
+        if (idx == -1) {
+            return content.length() > 50 ? content.substring(0, 50) : content;
+        }
+        int start = Math.max(0, idx - 20);
+        int end = Math.min(content.length(), idx + kw.length() + 20);
+        return content.substring(start, end);
+    }
+
+    public record SearchResult(String type, Long id, String text, String subText, String extra) {}
 }
