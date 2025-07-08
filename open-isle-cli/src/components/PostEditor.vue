@@ -60,7 +60,7 @@ export default {
           'redo',
           '|',
           'link',
-          'image'
+          'upload'
         ],
         toolbarConfig: { pin: true },
         cache: { enable: false },
