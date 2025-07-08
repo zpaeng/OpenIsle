@@ -13,22 +13,22 @@
       </div>
       <div class="form-row username-row">
         <BaseInput icon="fas fa-user" v-model="username" placeholder="用户名" />
-        <div class="username-description">用户名是你在社区的唯一标识</div>
+        <div class="setting-description">用户名是你在社区的唯一标识</div>
       </div>
-      <div class="form-row">
-        <label>自我介绍</label>
-        <BaseInput v-model="introduction" textarea rows="3" />
-        <div class="introduction-description">自我介绍会出现在你的个人主页，可以简要介绍自己</div>
+      <div class="form-row introduction-row">
+        <div class="setting-title">自我介绍</div>
+        <BaseInput v-model="introduction" textarea rows="3" placeholder="说些什么..." />
+        <div class="setting-description">自我介绍会出现在你的个人主页，可以简要介绍自己</div>
       </div>
     </div>
     <div v-if="role === 'ADMIN'" class="admin-section">
       <h3>管理员设置</h3>
       <div class="form-row">
-        <label>发布规则</label>
+        <div class="setting-title">发布规则</div>
         <Dropdown v-model="publishMode" :fetch-options="fetchPublishModes" />
       </div>
       <div class="form-row">
-        <label>密码强度</label>
+        <div class="setting-title">密码强度</div>
         <Dropdown v-model="passwordStrength" :fetch-options="fetchPasswordStrengths" />
       </div>
     </div>
@@ -175,9 +175,29 @@ export default {
   flex-direction: column;
 }
 
+.username-row {
+  max-width: 300px;
+}
+
 .admin-section {
   margin-top: 30px;
   padding-top: 10px;
+}
+
+.setting-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.setting-description {
+  font-size: 12px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.introduction-row {
+  max-width: 500px;
 }
 
 .profile-section {
