@@ -66,6 +66,7 @@ import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import CommentEditor from './CommentEditor.vue'
 import { renderMarkdown } from '../utils/markdown'
+import TimeManager from '../utils/time'
 import BaseTimeline from './BaseTimeline.vue'
 import { API_BASE_URL, toast } from '../main'
 import { getToken } from '../utils/auth'
@@ -124,14 +125,14 @@ const CommentItem = {
           replyList.push({
             id: data.id,
             userName: data.author.username,
-            time: new Date(data.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
+            time: TimeManager.format(data.createdAt),
             avatar: data.author.avatar,
             text: data.content,
             reactions: [],
             reply: (data.replies || []).map(r => ({
               id: r.id,
               userName: r.author.username,
-              time: new Date(r.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
+              time: TimeManager.format(r.createdAt),
               avatar: r.author.avatar,
               text: r.content,
               reactions: r.reactions || [],

@@ -51,7 +51,7 @@
               </div>
             </template>
           </span>
-          <span class="notif-time">{{ new Date(item.createdAt).toLocaleString() }}</span>
+          <span class="notif-time">{{ TimeManager.format(item.createdAt) }}</span>
         </div>
       </template>
     </BaseTimeline>
@@ -67,6 +67,7 @@ import { getToken } from '../utils/auth'
 import { markNotificationsRead } from '../utils/notification'
 import { toast } from '../main'
 import { stripMarkdown } from '../utils/markdown'
+import TimeManager from '../utils/time'
 import { hatch } from 'ldrs'
 hatch.register()
 
@@ -163,7 +164,7 @@ export default {
 
     onMounted(fetchNotifications)
 
-    return { notifications, formatType, sanitizeDescription, isLoadingMessage, markRead }
+    return { notifications, formatType, sanitizeDescription, isLoadingMessage, markRead, TimeManager }
   }
 }
 </script>

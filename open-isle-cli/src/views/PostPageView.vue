@@ -82,6 +82,7 @@ import ReactionsGroup from '../components/ReactionsGroup.vue'
 import { renderMarkdown } from '../utils/markdown'
 import { API_BASE_URL, toast } from '../main'
 import { getToken } from '../utils/auth'
+import TimeManager from '../utils/time'
 import { hatch } from 'ldrs'
 import { useRouter } from 'vue-router'
 hatch.register()
@@ -129,7 +130,7 @@ export default {
     const mapComment = c => ({
       id: c.id,
       userName: c.author.username,
-      time: new Date(c.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
+      time: TimeManager.format(c.createdAt),
       avatar: c.author.avatar,
       text: c.content,
       reactions: c.reactions || [],
@@ -181,7 +182,7 @@ export default {
         tags.value = data.tags || []
         postReactions.value = data.reactions || []
         comments.value = (data.comments || []).map(mapComment)
-        postTime.value = new Date(data.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })
+        postTime.value = TimeManager.format(data.createdAt)
         await nextTick()
         gatherPostItems()
       } catch (e) {

@@ -181,6 +181,7 @@ import { useRoute } from 'vue-router'
 import { API_BASE_URL } from '../main'
 import BaseTimeline from '../components/BaseTimeline.vue'
 import { stripMarkdown } from '../utils/markdown'
+import TimeManager from '../utils/time'
 import { hatch } from 'ldrs'
 hatch.register()
 
@@ -200,7 +201,7 @@ export default {
 
     const formatDate = (d) => {
       if (!d) return ''
-      return new Date(d).toLocaleDateString('zh-CN', { year: 'numeric', month: 'numeric', day: 'numeric' })
+      return TimeManager.format(d)
     }
 
     const fetchData = async () => {
