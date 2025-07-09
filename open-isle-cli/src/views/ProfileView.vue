@@ -233,4 +233,7 @@ export default {
 .hot-topic {
   width: 50%;
 }
+.profile-timeline {
+  padding: 20px;
+}
 </style>
