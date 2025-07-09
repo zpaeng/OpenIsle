@@ -107,7 +107,7 @@ class ComplexFlowIntegrationTest {
     @Test
     void reactionsReturnedForPostAndComment() {
         String t1 = registerAndLogin("carol1", "c@example.com");
-        String t2 = registerAndLogin("dave12", "d@example.com");
+        String t2 = registerAndLogin("dave01", "d@example.com");
 
         String adminToken = registerAndLoginAsAdmin("admin2", "admin2@example.com");
         List<Map<String, Object>> categories = (List<Map<String, Object>>) rest.getForObject("/api/categories", List.class);
