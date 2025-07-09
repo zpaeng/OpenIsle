@@ -1,5 +1,5 @@
 <template>
-  <div class="home-page">
+  <div class="home-page" @scroll="handleScroll">
     <div class="search-container">
       <div class="search-title">Where possible begins</div>
       <div class="search-subtitle">希望你喜欢这里。有问题，请提问，或搜索现有帖子</div>
@@ -36,7 +36,7 @@
         </div>
       </div>
 
-      <div v-if="isLoadingPosts" class="loading-container">
+      <div v-if="isLoadingPosts && articles.length === 0" class="loading-container">
         <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
       </div>
 
@@ -72,6 +72,9 @@
         <div class="article-time">
           {{ article.time }}
         </div>
+      </div>
+      <div v-if="isLoadingPosts && articles.length > 0" class="loading-container bottom-loading">
+        <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
       </div>
     </div>
 
@@ -110,27 +113,45 @@ export default {
     const selectedTopic = ref('最新')
 
     const articles = ref([])
+    const page = ref(0)
+    const pageSize = 5
+    const allLoaded = ref(false)
 
     const fetchPosts = async () => {
+      if (isLoadingPosts.value || allLoaded.value) return
       try {
         isLoadingPosts.value = true
-        const res = await fetch(`${API_BASE_URL}/api/posts`)
+        const res = await fetch(`${API_BASE_URL}/api/posts?page=${page.value}&pageSize=${pageSize}`)
         isLoadingPosts.value = false
         if (!res.ok) return
         const data = await res.json()
-        articles.value = data.map(p => ({
-          id: p.id,
-          title: p.title,
-          description: p.content,
-          category: p.category,
-          tags: p.tags || [],
-          members: [],
-          comments: (p.comments || []).length,
-          views: p.views,
-          time: new Date(p.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })
-        }))
+        articles.value.push(
+          ...data.map(p => ({
+            id: p.id,
+            title: p.title,
+            description: p.content,
+            category: p.category,
+            tags: p.tags || [],
+            members: [],
+            comments: (p.comments || []).length,
+            views: p.views,
+            time: new Date(p.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })
+          }))
+        )
+        if (data.length < pageSize) {
+          allLoaded.value = true
+        } else {
+          page.value += 1
+        }
       } catch (e) {
         console.error(e)
+      }
+    }
+
+    const handleScroll = (e) => {
+      const el = e.target
+      if (el.scrollHeight - el.scrollTop <= el.clientHeight + 50) {
+        fetchPosts()
       }
     }
 
@@ -138,7 +159,7 @@ export default {
 
     const sanitizeDescription = (text) => stripMarkdown(text)
 
-    return { topics, selectedTopic, articles, sanitizeDescription, isLoadingPosts }
+    return { topics, selectedTopic, articles, sanitizeDescription, isLoadingPosts, handleScroll }
   }
 }
 </script>
@@ -183,6 +204,10 @@ export default {
   justify-content: center;
   align-items: center;
   height: 200px;
+}
+
+.bottom-loading {
+  height: 100px;
 }
 
 .no-posts-container {
