@@ -123,7 +123,7 @@ export default {
     const selectedCategory = ref('')
     const selectedTags = ref([])
     const isLoadingPosts = ref(false)
-    const topics = ref(['最新', '排行榜', '热门', '类别'])
+    const topics = ref(['最新', '排行榜' /*, '热门', '类别'*/])
     const selectedTopic = ref('最新')
 
     const articles = ref([])
@@ -277,6 +277,7 @@ export default {
 
 .topic-item {
   padding: 2px 10px;
+  cursor: pointer;
 }
 
 .topic-item.selected {
