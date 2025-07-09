@@ -38,6 +38,8 @@ class PostControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private PostController postController;
+
+
     @MockBean
     private PostService postService;
     @MockBean
