@@ -1,10 +1,7 @@
 package com.openisle.controller;
 
 import com.openisle.model.User;
-import com.openisle.service.ImageUploader;
-import com.openisle.service.UserService;
-import com.openisle.service.PostService;
-import com.openisle.service.CommentService;
+import com.openisle.service.*;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +26,10 @@ class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @MockBean
+    private ReactionService reactionService;
+    @MockBean
+    private SubscriptionService subscriptionService;
     @MockBean
     private UserService userService;
     @MockBean
