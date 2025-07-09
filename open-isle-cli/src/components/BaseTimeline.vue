@@ -40,7 +40,7 @@ export default {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  color: var(--text-color);
+  color: white;
   display: flex;
   justify-content: center;
   align-items: center;

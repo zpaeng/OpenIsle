@@ -66,7 +66,7 @@
         <div class="summary-divider">
           <div class="hot-reply">
             <div class="summary-title">热门回复</div>
-            <div v-if="hotReplies.length > 0">
+            <div class="summary-content" v-if="hotReplies.length > 0">
               <BaseTimeline :items="hotReplies">
                 <template #item="{ item }">
                   在
@@ -107,7 +107,7 @@
           </div>
           <div class="hot-topic">
             <div class="summary-title">热门话题</div>
-            <div v-if="hotPosts.length > 0">
+            <div class="summary-content" v-if="hotPosts.length > 0">
               <BaseTimeline :items="hotPosts">
                 <template #item="{ item }">
                   <router-link
@@ -411,6 +411,10 @@ export default {
   margin-top: 10px;
   font-size: 14px;
   opacity: 0.5;
+}
+
+.summary-content {
+  margin-top: 10px;
 }
 
 </style>

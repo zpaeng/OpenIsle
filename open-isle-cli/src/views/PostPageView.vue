@@ -13,7 +13,7 @@
       </div>
 
       <div class="info-content-container author-info-container">
-        <div class="user-avatar-container">
+        <div class="user-avatar-container" @click="gotoProfile">
           <div class="user-avatar-item">
             <img class="user-avatar-item-img" :src="author.avatar" alt="avatar">
           </div>
@@ -102,6 +102,7 @@ import { renderMarkdown } from '../utils/markdown'
 import { API_BASE_URL, toast } from '../main'
 import { getToken } from '../utils/auth'
 import { hatch } from 'ldrs'
+import { useRouter } from 'vue-router'
 hatch.register()
 
 export default {
@@ -110,6 +111,7 @@ export default {
   setup() {
     const route = useRoute()
     const postId = route.params.id
+    const router = useRouter()
 
     const title = ref('')
     const author = ref('')
@@ -293,6 +295,10 @@ export default {
       }
     }
 
+    const gotoProfile = () => {
+      router.push(`/users/${author.value.id}`)
+    }
+
     onMounted(async () => {
       const hash = location.hash
       const id = hash.startsWith('#comment-') ? hash.substring('#comment-'.length) : null
@@ -322,7 +328,8 @@ export default {
       copyPostLink,
       renderMarkdown,
       isWaitingFetchingPost,
-      isWaitingPostingComment
+      isWaitingPostingComment,
+      gotoProfile
     }
   }
 }
@@ -451,7 +458,9 @@ export default {
   border-bottom: 1px solid #e2e2e2;
 }
 
-.user-avatar-container {}
+.user-avatar-container {
+  cursor: pointer;
+}
 
 .user-avatar-item {
   width: 50px;
