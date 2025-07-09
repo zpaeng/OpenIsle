@@ -1,11 +1,7 @@
 package com.openisle.controller;
 
 import com.openisle.model.User;
-import com.openisle.service.ImageUploader;
-import com.openisle.service.UserService;
-import com.openisle.service.PostService;
-import com.openisle.service.CommentService;
-import com.openisle.service.SubscriptionService;
+import com.openisle.service.*;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +21,7 @@ public class UserController {
     private final ImageUploader imageUploader;
     private final PostService postService;
     private final CommentService commentService;
+    private final ReactionService reactionService;
     private final SubscriptionService subscriptionService;
 
     @Value("${app.upload.check-type:true}")
