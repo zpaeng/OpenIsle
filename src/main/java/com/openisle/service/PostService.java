@@ -168,6 +168,31 @@ public class PostService {
         return postRepository.findDistinctByTagsInAndStatus(tags, PostStatus.PUBLISHED);
     }
 
+    public List<Post> listPostsByCategoriesAndTags(java.util.List<Long> categoryIds,
+                                                   java.util.List<Long> tagIds,
+                                                   Integer page,
+                                                   Integer pageSize) {
+        if (categoryIds == null || categoryIds.isEmpty() || tagIds == null || tagIds.isEmpty()) {
+            return java.util.List.of();
+        }
+
+        Pageable pageable = null;
+        if (page != null && pageSize != null) {
+            pageable = PageRequest.of(page, pageSize);
+        }
+
+        java.util.List<Category> categories = categoryRepository.findAllById(categoryIds);
+        java.util.List<com.openisle.model.Tag> tags = tagRepository.findAllById(tagIds);
+        if (categories.isEmpty() || tags.isEmpty()) {
+            return java.util.List.of();
+        }
+
+        if (pageable != null) {
+            return postRepository.findDistinctByCategoryInAndTagsInAndStatus(categories, tags, PostStatus.PUBLISHED, pageable);
+        }
+        return postRepository.findDistinctByCategoryInAndTagsInAndStatus(categories, tags, PostStatus.PUBLISHED);
+    }
+
     public List<Post> listPendingPosts() {
         return postRepository.findByStatus(PostStatus.PENDING);
     }

@@ -190,7 +190,7 @@ class PostControllerTest {
     }
 
     @Test
-    void listPostsByTags() throws Exception {
+    void listPostsByCategoriesAndTags() throws Exception {
         User user = new User();
         user.setUsername("alice");
         Category cat = new Category();
@@ -206,7 +206,7 @@ class PostControllerTest {
         post.setCategory(cat);
         post.setTags(java.util.Set.of(tag));
 
-        Mockito.when(postService.listPostsByTags(eq(java.util.List.of(1L, 2L)), eq(0), eq(5)))
+        Mockito.when(postService.listPostsByCategoriesAndTags(eq(java.util.List.of(1L)), eq(java.util.List.of(1L, 2L)), eq(0), eq(5)))
                 .thenReturn(List.of(post));
 
         mockMvc.perform(get("/api/posts")
@@ -217,7 +217,7 @@ class PostControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(2));
 
-        verify(postService).listPostsByTags(eq(java.util.List.of(1L, 2L)), eq(0), eq(5));
+        verify(postService).listPostsByCategoriesAndTags(eq(java.util.List.of(1L)), eq(java.util.List.of(1L, 2L)), eq(0), eq(5));
         verify(postService, never()).listPostsByCategories(any(), any(), any());
     }
 }

@@ -21,6 +21,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByCategoryInAndStatus(List<Category> categories, PostStatus status, Pageable pageable);
     List<Post> findDistinctByTagsInAndStatus(List<Tag> tags, PostStatus status);
     List<Post> findDistinctByTagsInAndStatus(List<Tag> tags, PostStatus status, Pageable pageable);
+    List<Post> findDistinctByCategoryInAndTagsInAndStatus(List<Category> categories, List<Tag> tags, PostStatus status);
+    List<Post> findDistinctByCategoryInAndTagsInAndStatus(List<Category> categories, List<Tag> tags, PostStatus status, Pageable pageable);
     List<Post> findByTitleContainingIgnoreCaseOrContentContainingIgnoreCaseAndStatus(String titleKeyword, String contentKeyword, PostStatus status);
     List<Post> findByContentContainingIgnoreCaseAndStatus(String keyword, PostStatus status);
     List<Post> findByTitleContainingIgnoreCaseAndStatus(String keyword, PostStatus status);

@@ -64,11 +64,19 @@ public class PostController {
         if (categoryId != null) {
             ids = java.util.List.of(categoryId);
         }
-        if ((tagId != null || (tagIds != null && !tagIds.isEmpty()))) {
-            List<Long> tids = tagIds;
-            if (tagId != null) {
-                tids = java.util.List.of(tagId);
-            }
+        List<Long> tids = tagIds;
+        if (tagId != null) {
+            tids = java.util.List.of(tagId);
+        }
+
+        boolean hasCategories = ids != null && !ids.isEmpty();
+        boolean hasTags = tids != null && !tids.isEmpty();
+
+        if (hasCategories && hasTags) {
+            return postService.listPostsByCategoriesAndTags(ids, tids, page, pageSize)
+                    .stream().map(this::toDto).collect(Collectors.toList());
+        }
+        if (hasTags) {
             return postService.listPostsByTags(tids, page, pageSize)
                     .stream().map(this::toDto).collect(Collectors.toList());
         }
