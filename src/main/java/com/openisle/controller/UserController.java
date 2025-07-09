@@ -36,6 +36,9 @@ public class UserController {
     @Value("${app.user.replies-limit:50}")
     private int defaultRepliesLimit;
 
+    @Value("${app.snippet-length:50}")
+    private int snippetLength;
+
     @GetMapping("/me")
     public ResponseEntity<UserDto> me(Authentication auth) {
         User user = userService.findByUsername(auth.getName()).orElseThrow();
@@ -172,6 +175,12 @@ public class UserController {
         PostMetaDto dto = new PostMetaDto();
         dto.setId(post.getId());
         dto.setTitle(post.getTitle());
+        if (snippetLength >= 0) {
+            String c = post.getContent();
+            dto.setSnippet(c.length() > snippetLength ? c.substring(0, snippetLength) : c);
+        } else {
+            dto.setSnippet(post.getContent());
+        }
         dto.setCreatedAt(post.getCreatedAt());
         dto.setCategory(post.getCategory().getName());
         dto.setViews(post.getViews());
@@ -183,7 +192,14 @@ public class UserController {
         dto.setId(comment.getId());
         dto.setContent(comment.getContent());
         dto.setCreatedAt(comment.getCreatedAt());
-        dto.setPostId(comment.getPost().getId());
+        dto.setPost(toMetaDto(comment.getPost()));
+        if (comment.getParent() != null) {
+            ParentCommentDto pc = new ParentCommentDto();
+            pc.setId(comment.getParent().getId());
+            pc.setAuthor(comment.getParent().getAuthor().getUsername());
+            pc.setContent(comment.getParent().getContent());
+            dto.setParentComment(pc);
+        }
         return dto;
     }
 
@@ -206,6 +222,7 @@ public class UserController {
     private static class PostMetaDto {
         private Long id;
         private String title;
+        private String snippet;
         private java.time.LocalDateTime createdAt;
         private String category;
         private long views;
@@ -216,7 +233,15 @@ public class UserController {
         private Long id;
         private String content;
         private java.time.LocalDateTime createdAt;
-        private Long postId;
+        private PostMetaDto post;
+        private ParentCommentDto parentComment;
+    }
+
+    @Data
+    private static class ParentCommentDto {
+        private Long id;
+        private String author;
+        private String content;
     }
 
     @Data
