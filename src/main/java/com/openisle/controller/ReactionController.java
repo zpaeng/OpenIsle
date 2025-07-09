@@ -28,6 +28,9 @@ public class ReactionController {
                                                   @RequestBody ReactionRequest req,
                                                   Authentication auth) {
         Reaction reaction = reactionService.reactToPost(auth.getName(), postId, req.getType());
+        if (reaction == null) {
+            return ResponseEntity.noContent().build();
+        }
         return ResponseEntity.ok(toDto(reaction));
     }
 
@@ -36,6 +39,9 @@ public class ReactionController {
                                                      @RequestBody ReactionRequest req,
                                                      Authentication auth) {
         Reaction reaction = reactionService.reactToComment(auth.getName(), commentId, req.getType());
+        if (reaction == null) {
+            return ResponseEntity.noContent().build();
+        }
         return ResponseEntity.ok(toDto(reaction));
     }
 
