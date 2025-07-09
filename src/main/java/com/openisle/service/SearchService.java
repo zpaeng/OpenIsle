@@ -22,6 +22,9 @@ public class SearchService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
 
+    @org.springframework.beans.factory.annotation.Value("${app.snippet-length:50}")
+    private int snippetLength;
+
     public List<User> searchUsers(String keyword) {
         return userRepository.findByUsernameContainingIgnoreCase(keyword);
     }
@@ -104,18 +107,29 @@ public class SearchService {
 
     private String extractSnippet(String content, String keyword, boolean fromStart) {
         if (content == null) return "";
+        int limit = snippetLength;
         if (fromStart) {
-            return content.length() > 50 ? content.substring(0, 50) : content;
+            if (limit < 0) {
+                return content;
+            }
+            return content.length() > limit ? content.substring(0, limit) : content;
         }
         String lower = content.toLowerCase();
         String kw = keyword.toLowerCase();
         int idx = lower.indexOf(kw);
         if (idx == -1) {
-            return content.length() > 50 ? content.substring(0, 50) : content;
+            if (limit < 0) {
+                return content;
+            }
+            return content.length() > limit ? content.substring(0, limit) : content;
         }
         int start = Math.max(0, idx - 20);
         int end = Math.min(content.length(), idx + kw.length() + 20);
-        return content.substring(start, end);
+        String snippet = content.substring(start, end);
+        if (limit >= 0 && snippet.length() > limit) {
+            snippet = snippet.substring(0, limit);
+        }
+        return snippet;
     }
 
     public record SearchResult(String type, Long id, String text, String subText, String extra, Long postId) {}
