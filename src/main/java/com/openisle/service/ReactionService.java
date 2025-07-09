@@ -28,11 +28,6 @@ public class ReactionService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
-        java.util.Optional<Reaction> existing = reactionRepository.findByUserAndPostAndType(user, post, type);
-        if (existing.isPresent()) {
-            reactionRepository.delete(existing.get());
-            return null;
-        }
         Reaction reaction = new Reaction();
         reaction.setUser(user);
         reaction.setPost(post);
@@ -49,11 +44,6 @@ public class ReactionService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
-        java.util.Optional<Reaction> existing = reactionRepository.findByUserAndCommentAndType(user, comment, type);
-        if (existing.isPresent()) {
-            reactionRepository.delete(existing.get());
-            return null;
-        }
         Reaction reaction = new Reaction();
         reaction.setUser(user);
         reaction.setComment(comment);
