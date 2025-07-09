@@ -68,75 +68,81 @@ public class UserController {
         return ResponseEntity.ok(toDto(user));
     }
 
-    @GetMapping("/{username}")
-    public ResponseEntity<UserDto> getUser(@PathVariable String username) {
-        User user = userService.findByUsername(username).orElseThrow();
+    @GetMapping("/{identifier}")
+    public ResponseEntity<UserDto> getUser(@PathVariable("identifier") String identifier) {
+        User user = userService.findByIdentifier(identifier).orElseThrow();
         return ResponseEntity.ok(toDto(user));
     }
 
-    @GetMapping("/{username}/posts")
-    public java.util.List<PostMetaDto> userPosts(@PathVariable String username,
+    @GetMapping("/{identifier}/posts")
+    public java.util.List<PostMetaDto> userPosts(@PathVariable("identifier") String identifier,
                                                  @RequestParam(value = "limit", required = false) Integer limit) {
         int l = limit != null ? limit : defaultPostsLimit;
-        return postService.getRecentPostsByUser(username, l).stream()
+        User user = userService.findByIdentifier(identifier).orElseThrow();
+        return postService.getRecentPostsByUser(user.getUsername(), l).stream()
                 .map(this::toMetaDto)
                 .collect(java.util.stream.Collectors.toList());
     }
 
-    @GetMapping("/{username}/replies")
-    public java.util.List<CommentInfoDto> userReplies(@PathVariable String username,
+    @GetMapping("/{identifier}/replies")
+    public java.util.List<CommentInfoDto> userReplies(@PathVariable("identifier") String identifier,
                                                       @RequestParam(value = "limit", required = false) Integer limit) {
         int l = limit != null ? limit : defaultRepliesLimit;
-        return commentService.getRecentCommentsByUser(username, l).stream()
+        User user = userService.findByIdentifier(identifier).orElseThrow();
+        return commentService.getRecentCommentsByUser(user.getUsername(), l).stream()
                 .map(this::toCommentInfoDto)
                 .collect(java.util.stream.Collectors.toList());
     }
 
-    @GetMapping("/{username}/hot-posts")
-    public java.util.List<PostMetaDto> hotPosts(@PathVariable String username,
+    @GetMapping("/{identifier}/hot-posts")
+    public java.util.List<PostMetaDto> hotPosts(@PathVariable("identifier") String identifier,
                                                 @RequestParam(value = "limit", required = false) Integer limit) {
         int l = limit != null ? limit : 10;
-        java.util.List<Long> ids = reactionService.topPostIds(username, l);
+        User user = userService.findByIdentifier(identifier).orElseThrow();
+        java.util.List<Long> ids = reactionService.topPostIds(user.getUsername(), l);
         return postService.getPostsByIds(ids).stream()
                 .map(this::toMetaDto)
                 .collect(java.util.stream.Collectors.toList());
     }
 
-    @GetMapping("/{username}/hot-replies")
-    public java.util.List<CommentInfoDto> hotReplies(@PathVariable String username,
+    @GetMapping("/{identifier}/hot-replies")
+    public java.util.List<CommentInfoDto> hotReplies(@PathVariable("identifier") String identifier,
                                                      @RequestParam(value = "limit", required = false) Integer limit) {
         int l = limit != null ? limit : 10;
-        java.util.List<Long> ids = reactionService.topCommentIds(username, l);
+        User user = userService.findByIdentifier(identifier).orElseThrow();
+        java.util.List<Long> ids = reactionService.topCommentIds(user.getUsername(), l);
         return commentService.getCommentsByIds(ids).stream()
                 .map(this::toCommentInfoDto)
                 .collect(java.util.stream.Collectors.toList());
     }
 
-    @GetMapping("/{username}/following")
-    public java.util.List<UserDto> following(@PathVariable String username) {
-        return subscriptionService.getSubscribedUsers(username).stream()
+    @GetMapping("/{identifier}/following")
+    public java.util.List<UserDto> following(@PathVariable("identifier") String identifier) {
+        User user = userService.findByIdentifier(identifier).orElseThrow();
+        return subscriptionService.getSubscribedUsers(user.getUsername()).stream()
                 .map(this::toDto)
                 .collect(java.util.stream.Collectors.toList());
     }
 
-    @GetMapping("/{username}/followers")
-    public java.util.List<UserDto> followers(@PathVariable String username) {
-        return subscriptionService.getSubscribers(username).stream()
+    @GetMapping("/{identifier}/followers")
+    public java.util.List<UserDto> followers(@PathVariable("identifier") String identifier) {
+        User user = userService.findByIdentifier(identifier).orElseThrow();
+        return subscriptionService.getSubscribers(user.getUsername()).stream()
                 .map(this::toDto)
                 .collect(java.util.stream.Collectors.toList());
     }
 
-    @GetMapping("/{username}/all")
-    public ResponseEntity<UserAggregateDto> userAggregate(@PathVariable String username,
+    @GetMapping("/{identifier}/all")
+    public ResponseEntity<UserAggregateDto> userAggregate(@PathVariable("identifier") String identifier,
                                                           @RequestParam(value = "postsLimit", required = false) Integer postsLimit,
                                                           @RequestParam(value = "repliesLimit", required = false) Integer repliesLimit) {
-        User user = userService.findByUsername(username).orElseThrow();
+        User user = userService.findByIdentifier(identifier).orElseThrow();
         int pLimit = postsLimit != null ? postsLimit : defaultPostsLimit;
         int rLimit = repliesLimit != null ? repliesLimit : defaultRepliesLimit;
-        java.util.List<PostMetaDto> posts = postService.getRecentPostsByUser(username, pLimit).stream()
+        java.util.List<PostMetaDto> posts = postService.getRecentPostsByUser(user.getUsername(), pLimit).stream()
                 .map(this::toMetaDto)
                 .collect(java.util.stream.Collectors.toList());
-        java.util.List<CommentInfoDto> replies = commentService.getRecentCommentsByUser(username, rLimit).stream()
+        java.util.List<CommentInfoDto> replies = commentService.getRecentCommentsByUser(user.getUsername(), rLimit).stream()
                 .map(this::toCommentInfoDto)
                 .collect(java.util.stream.Collectors.toList());
         UserAggregateDto dto = new UserAggregateDto();
