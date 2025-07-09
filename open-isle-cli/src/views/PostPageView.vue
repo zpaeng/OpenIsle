@@ -153,6 +153,7 @@ export default {
       reply: (c.replies || []).map(mapComment),
       openReplies: false,
       src: c.author.avatar,
+      iconClick: () => router.push(`/users/${c.author.id}`)
     })
 
     const getTopRelativeTo = (el, container) => {

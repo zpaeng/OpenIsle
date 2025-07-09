@@ -59,6 +59,7 @@
 
 <script>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { API_BASE_URL } from '../main'
 import BaseTimeline from '../components/BaseTimeline.vue'
 import { getToken } from '../utils/auth'
@@ -71,6 +72,7 @@ export default {
   name: 'MessagePageView',
   components: { BaseTimeline },
   setup() {
+    const router = useRouter()
     const notifications = ref([])
     const isLoadingMessage = ref(false)
 
@@ -112,6 +114,7 @@ export default {
             notifications.value.push({
               ...n,
               src: n.comment.author.avatar,
+              iconClick: () => router.push(`/users/${n.comment.author.id}`)
             })
           } else {
             notifications.value.push({
