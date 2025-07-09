@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { authState, clearToken, fetchCurrentUser } from '../utils/auth'
+import { authState, clearToken, loadCurrentUser } from '../utils/auth'
 import { watch } from 'vue'
 
 export default {
@@ -58,11 +58,11 @@ export default {
   async mounted() {
     const updateAvatar = async () => {
       if (authState.loggedIn) {
-        const user = await fetchCurrentUser()
+        const user = await loadCurrentUser()
         if (user && user.avatar) {
           this.avatar = user.avatar
         }
-      } 
+      }
     }
 
     await updateAvatar()
@@ -101,8 +101,21 @@ export default {
       this.$router.push('/settings')
       this.dropdownVisible = false
     },
-    goToProfile() {
-      this.$router.push(`/profile/`)
+    async goToProfile() {
+      if (!authState.loggedIn) {
+        this.$router.push('/login')
+        return
+      }
+      let id = authState.username || authState.userId
+      if (!id) {
+        const user = await loadCurrentUser()
+        if (user) {
+          id = user.username || user.id
+        }
+      }
+      if (id) {
+        this.$router.push(`/users/${id}`)
+      }
       this.dropdownVisible = false
     },
     goToSignup() {
