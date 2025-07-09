@@ -55,7 +55,43 @@
       </div>
 
       <div v-else class="profile-timeline">
-        <BaseTimeline :items="timelineItems" />
+        <BaseTimeline :items="timelineItems">
+          <template #item="{ item }">
+            <template v-if="item.type === 'post'">
+              发布了文章
+              <router-link :to="`/posts/${item.post.id}`" class="timeline-link">
+                {{ item.post.title }}
+              </router-link>
+              <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
+            </template>
+            <template v-else-if="item.type === 'comment'">
+              在
+              <router-link :to="`/posts/${item.comment.post.id}`" class="timeline-link">
+                {{ item.comment.post.title }}
+              </router-link>
+              下评论了
+              <router-link :to="`/posts/${item.comment.post.id}#comment-${item.comment.id}`" class="timeline-link">
+                {{ item.comment.content }}
+              </router-link>
+              <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
+            </template>
+            <template v-else-if="item.type === 'reply'">
+              在
+              <router-link :to="`/posts/${item.comment.post.id}`" class="timeline-link">
+                {{ item.comment.post.title }}
+              </router-link>
+              下对
+              <router-link :to="`/posts/${item.comment.post.id}#comment-${item.comment.parentComment.id}`" class="timeline-link">
+                {{ item.comment.parentComment.content }}
+              </router-link>
+              回复了
+              <router-link :to="`/posts/${item.comment.post.id}#comment-${item.comment.id}`" class="timeline-link">
+                {{ item.comment.content }}
+              </router-link>
+              <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
+            </template>
+          </template>
+        </BaseTimeline>
       </div>
     </div>
   </div>
@@ -117,8 +153,18 @@ export default {
         const posts = postsRes.ok ? await postsRes.json() : []
         const replies = repliesRes.ok ? await repliesRes.json() : []
         const mapped = [
-          ...posts.map(p => ({ icon: 'fas fa-book', content: p.title, createdAt: p.createdAt })),
-          ...replies.map(r => ({ icon: 'fas fa-comment', content: r.content, createdAt: r.createdAt }))
+          ...posts.map(p => ({
+            type: 'post',
+            icon: 'fas fa-book',
+            post: p,
+            createdAt: p.createdAt
+          })),
+          ...replies.map(r => ({
+            type: r.parentComment ? 'reply' : 'comment',
+            icon: 'fas fa-comment',
+            comment: r,
+            createdAt: r.createdAt
+          }))
         ]
         mapped.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         timelineItems.value = mapped
@@ -235,5 +281,21 @@ export default {
 }
 .profile-timeline {
   padding: 20px;
+}
+
+.timeline-date {
+  font-size: 12px;
+  color: gray;
+  margin-top: 5px;
+}
+
+.timeline-link {
+  font-weight: bold;
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.timeline-link:hover {
+  text-decoration: underline;
 }
 </style>
