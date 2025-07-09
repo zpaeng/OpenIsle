@@ -62,7 +62,10 @@ export default {
 .about-page {
   padding: 20px;
   max-width: var(--page-max-width);
+  background-color: var(--background-color);
   margin: 0 auto;
+  height: calc(100vh - var(--header-height) - 40px);
+  overflow-y: auto;
 }
 
 .about-tabs {
