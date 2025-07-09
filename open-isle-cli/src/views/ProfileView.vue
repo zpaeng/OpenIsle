@@ -42,14 +42,45 @@
       </div>
 
       <div v-if="selectedTab === 'summary'" class="profile-summary">
+        <div class="total-summary">
+          <div class="summary-title">统计信息</div>
+          <div class="total-summary-content">
+            <div class="total-summary-item">
+              <div class="total-summary-item-label">访问天数</div>
+              <div class="total-summary-item-value">0</div>
+            </div>
+            <div class="total-summary-item">
+              <div class="total-summary-item-label">已读帖子</div>
+              <div class="total-summary-item-value">165k</div>
+            </div>
+            <div class="total-summary-item">
+              <div class="total-summary-item-label">已送出</div>
+              <div class="total-summary-item-value">165k</div>
+            </div>
+            <div class="total-summary-item">
+              <div class="total-summary-item-label">已收到</div>
+              <div class="total-summary-item-value">165k</div>
+            </div>
+          </div>
+        </div>
         <div class="summary-divider">
           <div class="hot-reply">
             <div class="summary-title">热门回复</div>
-            <BaseTimeline :items="hotReplies" />
+            <div v-if="hotReplies.length > 0">
+              <BaseTimeline :items="hotReplies" />
+            </div>
+            <div v-else>
+              <div class="summary-empty">暂无热门回复</div>
+            </div>
           </div>
           <div class="hot-topic">
             <div class="summary-title">热门话题</div>
-            <BaseTimeline :items="hotPosts" />
+            <div v-if="hotPosts.length > 0">
+              <BaseTimeline :items="hotPosts" />
+            </div>
+            <div v-else>
+              <div class="summary-empty">暂无热门话题</div>
+            </div>
           </div>
         </div>
       </div>
@@ -268,6 +299,29 @@ export default {
   font-size: 20px;
   font-weight: bold;
 }
+.total-summary {
+  width: 100%;
+}
+.total-summary-content {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+.total-summary-item {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+}
+.total-summary-item-label {
+  font-size: 18px;
+  opacity: 0.7;
+}
+.total-summary-item-value {
+  font-size: 24px;
+  font-weight: bold;
+}
 .summary-divider {
   margin-top: 20px;
   display: flex;
@@ -298,4 +352,11 @@ export default {
 .timeline-link:hover {
   text-decoration: underline;
 }
+
+.summary-empty {
+  margin-top: 10px;
+  font-size: 14px;
+  opacity: 0.5;
+}
+
 </style>
