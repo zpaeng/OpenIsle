@@ -16,6 +16,8 @@ import org.springframework.data.repository.query.Param;
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByStatus(PostStatus status);
     List<Post> findByStatus(PostStatus status, Pageable pageable);
+    List<Post> findByStatusOrderByViewsDesc(PostStatus status);
+    List<Post> findByStatusOrderByViewsDesc(PostStatus status, Pageable pageable);
     List<Post> findByAuthorAndStatusOrderByCreatedAtDesc(User author, PostStatus status, Pageable pageable);
     List<Post> findByCategoryInAndStatus(List<Category> categories, PostStatus status);
     List<Post> findByCategoryInAndStatus(List<Category> categories, PostStatus status, Pageable pageable);
