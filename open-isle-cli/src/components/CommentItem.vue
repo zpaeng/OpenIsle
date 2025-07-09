@@ -18,27 +18,14 @@
       </div>
       <div class="info-content-text" v-html="renderMarkdown(comment.text)"></div>
       <div class="article-footer-container">
-        <div class="reactions-container">
-          <div class="reactions-viewer">
-            <div class="reactions-viewer-item-container">
-              <div class="reactions-viewer-item">🤣</div>
-              <div class="reactions-viewer-item">❤️</div>
-              <div class="reactions-viewer-item">👏</div>
-            </div>
-            <div class="reactions-count">1882</div>
-          </div>
-          <div class="make-reaction-container">
+        <ReactionsGroup v-model="comment.reactions" content-type="comment" :content-id="comment.id">
           <div class="make-reaction-item comment-reaction" @click="toggleEditor">
             <i class="far fa-comment"></i>
           </div>
-            <div class="make-reaction-item like-reaction">
-              <i class="far fa-heart"></i>
-            </div>
-            <div class="make-reaction-item copy-link" @click="copyCommentLink">
-              <i class="fas fa-link"></i>
-            </div>
+          <div class="make-reaction-item copy-link" @click="copyCommentLink">
+            <i class="fas fa-link"></i>
           </div>
-        </div>
+        </ReactionsGroup>
       </div>
       <CommentEditor v-if="showEditor" @submit="submitReply" :loading="isWaitingForReply" />
       <div
@@ -82,6 +69,7 @@ import { renderMarkdown } from '../utils/markdown'
 import BaseTimeline from './BaseTimeline.vue'
 import { API_BASE_URL, toast } from '../main'
 import { getToken } from '../utils/auth'
+import ReactionsGroup from './ReactionsGroup.vue'
 const CommentItem = {
   name: 'CommentItem',
   props: {
@@ -139,12 +127,14 @@ const CommentItem = {
             time: new Date(data.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
             avatar: data.author.avatar,
             text: data.content,
+            reactions: [],
             reply: (data.replies || []).map(r => ({
               id: r.id,
               userName: r.author.username,
               time: new Date(r.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
               avatar: r.author.avatar,
               text: r.content,
+              reactions: r.reactions || [],
               reply: [],
               openReplies: false,
               src: r.author.avatar,
@@ -174,7 +164,7 @@ const CommentItem = {
     return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply }
   }
 }
-CommentItem.components = { CommentItem, CommentEditor, BaseTimeline }
+CommentItem.components = { CommentItem, CommentEditor, BaseTimeline, ReactionsGroup }
 export default CommentItem
 </script>
 

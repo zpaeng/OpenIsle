@@ -9,7 +9,13 @@
 
     <div class="topic-container">
       <div class="topic-item-container">
-        <div v-for="topic in topics" :key="topic" class="topic-item" :class="{ selected: topic === selectedTopic }">
+        <div
+          v-for="topic in topics"
+          :key="topic"
+          class="topic-item"
+          :class="{ selected: topic === selectedTopic }"
+          @click="selectedTopic = topic"
+        >
           {{ topic }}
         </div>
         <CategorySelect v-model="selectedCategory" />
@@ -18,60 +24,71 @@
     </div>
 
     <div class="article-container">
-      <div class="header-container">
-        <div class="header-item main-item">
-          <div class="header-item-text">话题</div>
-        </div>
-        <div class="header-item avatars">
-          <div class="header-item-text">参与人员</div>
-        </div>
-        <div class="header-item">
-          <div class="header-item-text">回复</div>
-        </div>
-        <div class="header-item">
-          <div class="header-item-text">浏览</div>
-        </div>
-        <div class="header-item">
-          <div class="header-item-text">活动</div>
-        </div>
-      </div>
-
-      <div v-if="isLoadingPosts && articles.length === 0" class="loading-container">
-        <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
-      </div>
-
-      <div v-else-if="articles.length === 0">
-        <div class="no-posts-container">
-          <div class="no-posts-text">暂时没有帖子 :( 点击发帖发送第一篇相关帖子吧!</div>
-        </div>
-      </div>
-
-      <div class="article-item" v-for="article in articles" :key="article.id">
-        <div class="article-main-container">
-          <router-link class="article-item-title main-item" :to="`/posts/${article.id}`">
-            {{ article.title }}
-          </router-link>
-          <div class="article-item-description main-item">{{ sanitizeDescription(article.description) }}</div>
-          <div class="article-info-container main-item">
-            <ArticleTags :tags="[article.category]" />
-            <ArticleTags :tags="article.tags" />
+      <template v-if="selectedTopic === '最新'">
+        <div class="header-container">
+          <div class="header-item main-item">
+            <div class="header-item-text">话题</div>
+          </div>
+          <div class="header-item avatars">
+            <div class="header-item-text">参与人员</div>
+          </div>
+          <div class="header-item">
+            <div class="header-item-text">回复</div>
+          </div>
+          <div class="header-item">
+            <div class="header-item-text">浏览</div>
+          </div>
+          <div class="header-item">
+            <div class="header-item-text">活动</div>
           </div>
         </div>
 
-        <div class="article-member-avatars-container">
-          <div class="article-member-avatar-item" v-for="(avatar, idx) in article.members" :key="idx">
-            <img class="article-member-avatar-item-img" :src="avatar" alt="avatar">
+        <div v-if="isLoadingPosts && articles.length === 0" class="loading-container">
+          <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+        </div>
+
+        <div v-else-if="articles.length === 0">
+          <div class="no-posts-container">
+            <div class="no-posts-text">暂时没有帖子 :( 点击发帖发送第一篇相关帖子吧!</div>
           </div>
         </div>
-        <div class="article-comments">
-          {{ article.comments }}
+
+        <div class="article-item" v-for="article in articles" :key="article.id">
+          <div class="article-main-container">
+            <router-link class="article-item-title main-item" :to="`/posts/${article.id}`">
+              {{ article.title }}
+            </router-link>
+            <div class="article-item-description main-item">{{ sanitizeDescription(article.description) }}</div>
+            <div class="article-info-container main-item">
+              <ArticleTags :tags="[article.category]" />
+              <ArticleTags :tags="article.tags" />
+            </div>
+          </div>
+
+          <div class="article-member-avatars-container">
+            <div class="article-member-avatar-item" v-for="(avatar, idx) in article.members" :key="idx">
+              <img class="article-member-avatar-item-img" :src="avatar" alt="avatar">
+            </div>
+          </div>
+          <div class="article-comments">
+            {{ article.comments }}
+          </div>
+          <div class="article-views">
+            {{ article.views }}
+          </div>
+          <div class="article-time">
+            {{ article.time }}
+          </div>
         </div>
-        <div class="article-views">
-          {{ article.views }}
-        </div>
-        <div class="article-time">
-          {{ article.time }}
-        </div>
+      </template>
+      <div v-else-if="selectedTopic === '排行榜'" class="placeholder-container">
+        排行榜功能开发中，敬请期待。
+      </div>
+      <div v-else-if="selectedTopic === '热门'" class="placeholder-container">
+        热门帖子功能开发中，敬请期待。
+      </div>
+      <div v-else class="placeholder-container">
+        分类浏览功能开发中，敬请期待。
       </div>
       <div v-if="isLoadingPosts && articles.length > 0" class="loading-container bottom-loading">
         <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
@@ -349,5 +366,14 @@ export default {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.placeholder-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 16px;
+  opacity: 0.7;
 }
 </style>

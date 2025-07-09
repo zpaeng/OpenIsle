@@ -44,7 +44,7 @@ export default {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  color: white;
+  color: var(--text-color);
   display: flex;
   justify-content: center;
   align-items: center;
