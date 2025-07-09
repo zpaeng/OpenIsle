@@ -67,7 +67,39 @@
           <div class="hot-reply">
             <div class="summary-title">热门回复</div>
             <div v-if="hotReplies.length > 0">
-              <BaseTimeline :items="hotReplies" />
+              <BaseTimeline :items="hotReplies">
+                <template #item="{ item }">
+                  在
+                  <router-link
+                    :to="`/posts/${item.comment.post.id}`"
+                    class="timeline-link"
+                  >
+                    {{ item.comment.post.title }}
+                  </router-link>
+                  <template v-if="item.comment.parentComment">
+                    下对
+                    <router-link
+                      :to="`/posts/${item.comment.post.id}#comment-${item.comment.parentComment.id}`"
+                      class="timeline-link"
+                    >
+                      {{ item.comment.parentComment.content }}
+                    </router-link>
+                    回复了
+                  </template>
+                  <template v-else>
+                    下评论了
+                  </template>
+                  <router-link
+                    :to="`/posts/${item.comment.post.id}#comment-${item.comment.id}`"
+                    class="timeline-link"
+                  >
+                    {{ item.comment.content }}
+                  </router-link>
+                  <div class="timeline-date">
+                    {{ formatDate(item.comment.createdAt) }}
+                  </div>
+                </template>
+              </BaseTimeline>
             </div>
             <div v-else>
               <div class="summary-empty">暂无热门回复</div>
@@ -76,7 +108,22 @@
           <div class="hot-topic">
             <div class="summary-title">热门话题</div>
             <div v-if="hotPosts.length > 0">
-              <BaseTimeline :items="hotPosts" />
+              <BaseTimeline :items="hotPosts">
+                <template #item="{ item }">
+                  <router-link
+                    :to="`/posts/${item.post.id}`"
+                    class="timeline-link"
+                  >
+                    {{ item.post.title }}
+                  </router-link>
+                  <div class="timeline-snippet">
+                    {{ stripMarkdown(item.post.snippet) }}
+                  </div>
+                  <div class="timeline-date">
+                    {{ formatDate(item.post.createdAt) }}
+                  </div>
+                </template>
+              </BaseTimeline>
             </div>
             <div v-else>
               <div class="summary-empty">暂无热门话题</div>
@@ -133,6 +180,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { API_BASE_URL } from '../main'
 import BaseTimeline from '../components/BaseTimeline.vue'
+import { stripMarkdown } from '../utils/markdown'
 import { hatch } from 'ldrs'
 hatch.register()
 
@@ -166,7 +214,7 @@ export default {
           const data = await res.json()
           hotPosts.value = data.map(p => ({
             icon: 'fas fa-book',
-            content: p.title
+            post: p
           }))
         }
 
@@ -175,7 +223,7 @@ export default {
           const data = await res.json()
           hotReplies.value = data.map(c => ({
             icon: 'fas fa-comment',
-            content: c.content
+            comment: c
           }))
         }
 
@@ -207,7 +255,7 @@ export default {
     }
 
     onMounted(fetchData)
-    return { user, hotPosts, hotReplies, timelineItems, isLoading, selectedTab, formatDate }
+    return { user, hotPosts, hotReplies, timelineItems, isLoading, selectedTab, formatDate, stripMarkdown }
   }
 }
 </script>
@@ -340,6 +388,12 @@ export default {
 .timeline-date {
   font-size: 12px;
   color: gray;
+  margin-top: 5px;
+}
+
+.timeline-snippet {
+  font-size: 14px;
+  color: #666;
   margin-top: 5px;
 }
 
