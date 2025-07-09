@@ -102,6 +102,7 @@
 import { ref, onMounted } from 'vue'
 import { stripMarkdown } from '../utils/markdown'
 import { API_BASE_URL } from '../main'
+import TimeManager from '../utils/time'
 import CategorySelect from '../components/CategorySelect.vue'
 import TagSelect from '../components/TagSelect.vue'
 import ArticleTags from '../components/ArticleTags.vue'
@@ -152,7 +153,7 @@ export default {
             members: [],
             comments: (p.comments || []).length,
             views: p.views,
-            time: new Date(p.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })
+            time: TimeManager.format(p.createdAt)
           }))
         )
         if (data.length < pageSize) {
