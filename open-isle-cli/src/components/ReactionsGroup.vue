@@ -4,10 +4,13 @@
       <div class="reactions-viewer-item-container" @click="openPanel" @mouseenter="cancelHide" @mouseleave="scheduleHide">
         <template v-if="displayedReactions.length">
           <div v-for="r in displayedReactions" :key="r.type" class="reactions-viewer-item">{{ iconMap[r.type] }}</div>
+          <div class="reactions-count">{{ totalCount }}</div>
         </template>
-        <div v-else class="reactions-viewer-item placeholder">点击以表态</div>
+        <div v-else class="reactions-viewer-item placeholder">
+          <i class="far fa-smile"></i>
+          <span class="reactions-viewer-item-placeholder-text">点击以表态</span>
+        </div>
       </div>
-      <div class="reactions-count">{{ totalCount }}</div>
     </div>
     <div class="make-reaction-container">
       <div class="make-reaction-item like-reaction" @click="toggleReaction('LIKE')" :class="{ selected: userReacted('LIKE') }">
@@ -163,7 +166,8 @@ export default {
 .reactions-viewer { display: flex; flex-direction: row; gap: 20px; align-items: center; }
 .reactions-viewer-item-container { display: flex; flex-direction: row; gap: 2px; align-items: center; cursor: pointer; }
 .reactions-viewer-item { font-size: 16px; }
-.reactions-viewer-item.placeholder { opacity: 0.5; }
+.reactions-viewer-item.placeholder { opacity: 0.5; display: flex; flex-direction: row; align-items: center; }
+.reactions-viewer-item-placeholder-text { font-size: 14px; padding-left: 5px; }
 .reactions-count { font-size: 16px; opacity: 0.5; }
 .make-reaction-container { display: flex; flex-direction: row; gap: 10px; }
 .make-reaction-item { cursor: pointer; padding: 10px; border-radius: 50%; opacity: 0.5; font-size: 20px; }

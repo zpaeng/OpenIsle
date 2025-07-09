@@ -53,7 +53,7 @@
                     {{ sanitizeDescription(item.post.title) }}
                   </router-link>
                 </span>
-                表达了 "{{ item.emoji }}"
+                进行了表态
               </div>
             </template>
             <template v-else-if="item.type === 'REACTION' && item.comment">
@@ -64,7 +64,7 @@
                     {{ sanitizeDescription(item.comment.content) }}
                   </router-link>
                 </span>
-                表达了 "{{ item.emoji }}"
+                进行了表态
               </div>
             </template>
             <template v-else>
