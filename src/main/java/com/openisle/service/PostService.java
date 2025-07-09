@@ -108,14 +108,59 @@ public class PostService {
     }
 
     public List<Post> listPostsByViews(Integer page, Integer pageSize) {
+        return listPostsByViews(null, null, page, pageSize);
+    }
+
+    public List<Post> listPostsByViews(java.util.List<Long> categoryIds,
+                                       java.util.List<Long> tagIds,
+                                       Integer page,
+                                       Integer pageSize) {
         Pageable pageable = null;
         if (page != null && pageSize != null) {
             pageable = PageRequest.of(page, pageSize);
         }
-        if (pageable != null) {
-            return postRepository.findByStatusOrderByViewsDesc(PostStatus.PUBLISHED, pageable);
+
+        boolean hasCategories = categoryIds != null && !categoryIds.isEmpty();
+        boolean hasTags = tagIds != null && !tagIds.isEmpty();
+
+        if (!hasCategories && !hasTags) {
+            if (pageable != null) {
+                return postRepository.findByStatusOrderByViewsDesc(PostStatus.PUBLISHED, pageable);
+            }
+            return postRepository.findByStatusOrderByViewsDesc(PostStatus.PUBLISHED);
         }
-        return postRepository.findByStatusOrderByViewsDesc(PostStatus.PUBLISHED);
+
+        if (hasCategories) {
+            java.util.List<Category> categories = categoryRepository.findAllById(categoryIds);
+            if (categories.isEmpty()) {
+                return java.util.List.of();
+            }
+            if (hasTags) {
+                java.util.List<com.openisle.model.Tag> tags = tagRepository.findAllById(tagIds);
+                if (tags.isEmpty()) {
+                    return java.util.List.of();
+                }
+                if (pageable != null) {
+                    return postRepository.findDistinctByCategoryInAndTagsInAndStatusOrderByViewsDesc(
+                            categories, tags, PostStatus.PUBLISHED, pageable);
+                }
+                return postRepository.findDistinctByCategoryInAndTagsInAndStatusOrderByViewsDesc(
+                        categories, tags, PostStatus.PUBLISHED);
+            }
+            if (pageable != null) {
+                return postRepository.findByCategoryInAndStatusOrderByViewsDesc(categories, PostStatus.PUBLISHED, pageable);
+            }
+            return postRepository.findByCategoryInAndStatusOrderByViewsDesc(categories, PostStatus.PUBLISHED);
+        }
+
+        java.util.List<com.openisle.model.Tag> tags = tagRepository.findAllById(tagIds);
+        if (tags.isEmpty()) {
+            return java.util.List.of();
+        }
+        if (pageable != null) {
+            return postRepository.findDistinctByTagsInAndStatusOrderByViewsDesc(tags, PostStatus.PUBLISHED, pageable);
+        }
+        return postRepository.findDistinctByTagsInAndStatusOrderByViewsDesc(tags, PostStatus.PUBLISHED);
     }
 
     public List<Post> listPostsByCategories(java.util.List<Long> categoryIds,

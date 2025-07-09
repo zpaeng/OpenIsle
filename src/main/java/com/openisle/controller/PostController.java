@@ -86,9 +86,22 @@ public class PostController {
     }
 
     @GetMapping("/ranking")
-    public List<PostDto> rankingPosts(@RequestParam(value = "page", required = false) Integer page,
+    public List<PostDto> rankingPosts(@RequestParam(value = "categoryId", required = false) Long categoryId,
+                                      @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds,
+                                      @RequestParam(value = "tagId", required = false) Long tagId,
+                                      @RequestParam(value = "tagIds", required = false) List<Long> tagIds,
+                                      @RequestParam(value = "page", required = false) Integer page,
                                       @RequestParam(value = "pageSize", required = false) Integer pageSize) {
-        return postService.listPostsByViews(page, pageSize)
+        List<Long> ids = categoryIds;
+        if (categoryId != null) {
+            ids = java.util.List.of(categoryId);
+        }
+        List<Long> tids = tagIds;
+        if (tagId != null) {
+            tids = java.util.List.of(tagId);
+        }
+
+        return postService.listPostsByViews(ids, tids, page, pageSize)
                 .stream().map(this::toDto).collect(Collectors.toList());
     }
 
