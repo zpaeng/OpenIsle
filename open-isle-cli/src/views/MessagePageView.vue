@@ -13,18 +13,19 @@
 
     <BaseTimeline :items="notifications">
       <template #item="{ item }">
-        <div class="notif-content">
+        <div class="notif-content" :class="{ read: item.read }">
+          <span v-if="!item.read" class="unread-dot"></span>
           <span class="notif-type">
             <template v-if="item.type === 'COMMENT_REPLY' && item.parentComment">
               <div class="notif-content-container">
                 <span class="notif-user">{{ item.comment.author.username }} </span> 对我的评论
                 <span>
-                  <router-link class="notif-content-text"
+                  <router-link class="notif-content-text" @click="markRead(item.id)"
                     :to="`/posts/${item.post.id}#comment-${item.parentComment.id}`">
                     {{ sanitizeDescription(item.parentComment.content) }}
                   </router-link>
                 </span> 回复了 <span>
-                  <router-link class="notif-content-text" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
                     {{ sanitizeDescription(item.comment.content) }}
                   </router-link>
                 </span>
@@ -34,11 +35,11 @@
               <div class="notif-content-container">
                 <span class="notif-user">{{ item.comment.author.username }} </span> 对我的文章
                 <span>
-                  <router-link class="notif-content-text" :to="`/posts/${item.post.id}`">
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
                     {{ sanitizeDescription(item.post.title) }}
                   </router-link>
                 </span> 回复了 <span>
-                  <router-link class="notif-content-text" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
                     {{ sanitizeDescription(item.comment.content) }}
                   </router-link>
                 </span>
@@ -63,6 +64,7 @@ import { useRouter } from 'vue-router'
 import { API_BASE_URL } from '../main'
 import BaseTimeline from '../components/BaseTimeline.vue'
 import { getToken } from '../utils/auth'
+import { markNotificationsRead } from '../utils/notification'
 import { toast } from '../main'
 import { stripMarkdown } from '../utils/markdown'
 import { hatch } from 'ldrs'
@@ -75,6 +77,15 @@ export default {
     const router = useRouter()
     const notifications = ref([])
     const isLoadingMessage = ref(false)
+
+    const markRead = async id => {
+      if (!id) return
+      const ok = await markNotificationsRead([id])
+      if (ok) {
+        const n = notifications.value.find(n => n.id === id)
+        if (n) n.read = true
+      }
+    }
 
     const iconMap = {
       POST_VIEWED: 'fas fa-eye',
@@ -114,7 +125,10 @@ export default {
             notifications.value.push({
               ...n,
               src: n.comment.author.avatar,
-              iconClick: () => router.push(`/users/${n.comment.author.id}`)
+              iconClick: () => {
+                markRead(n.id)
+                router.push(`/users/${n.comment.author.id}`)
+              }
             })
           } else {
             notifications.value.push({
@@ -149,7 +163,7 @@ export default {
 
     onMounted(fetchNotifications)
 
-    return { notifications, formatType, sanitizeDescription, isLoadingMessage }
+    return { notifications, formatType, sanitizeDescription, isLoadingMessage, markRead }
   }
 }
 </script>
@@ -187,6 +201,21 @@ export default {
   display: flex;
   flex-direction: column;
   margin-bottom: 30px;
+  position: relative;
+}
+
+.notif-content.read {
+  opacity: 0.7;
+}
+
+.unread-dot {
+  position: absolute;
+  left: -10px;
+  top: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ff4d4f;
 }
 
 .notif-type {
