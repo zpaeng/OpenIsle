@@ -2,12 +2,18 @@ import { API_BASE_URL } from '../main'
 import { reactive } from 'vue'
 
 const TOKEN_KEY = 'token'
+const USER_ID_KEY = 'userId'
+const USERNAME_KEY = 'username'
 
 export const authState = reactive({
-  loggedIn: false
+  loggedIn: false,
+  userId: null,
+  username: null
 })
 
 authState.loggedIn = localStorage.getItem(TOKEN_KEY) !== null && localStorage.getItem(TOKEN_KEY) !== ''
+authState.userId = localStorage.getItem(USER_ID_KEY)
+authState.username = localStorage.getItem(USERNAME_KEY)
 
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY)
@@ -20,7 +26,22 @@ export function setToken(token) {
 
 export function clearToken() {
   localStorage.removeItem(TOKEN_KEY)
+  clearUserInfo()
   authState.loggedIn = false
+}
+
+export function setUserInfo({ id, username }) {
+  authState.userId = id
+  authState.username = username
+  if (id !== undefined && id !== null) localStorage.setItem(USER_ID_KEY, id)
+  if (username) localStorage.setItem(USERNAME_KEY, username)
+}
+
+export function clearUserInfo() {
+  localStorage.removeItem(USER_ID_KEY)
+  localStorage.removeItem(USERNAME_KEY)
+  authState.userId = null
+  authState.username = null
 }
 
 export async function fetchCurrentUser() {
@@ -35,6 +56,14 @@ export async function fetchCurrentUser() {
   } catch (e) {
     return null
   }
+}
+
+export async function loadCurrentUser() {
+  const user = await fetchCurrentUser()
+  if (user) {
+    setUserInfo({ id: user.id, username: user.username })
+  }
+  return user
 }
 
 export function isLogin() {

@@ -1,5 +1,5 @@
 import { API_BASE_URL, GOOGLE_CLIENT_ID, toast } from '../main'
-import { setToken } from './auth'
+import { setToken, loadCurrentUser } from './auth'
 
 export function googleSignIn(redirect) {
   if (!window.google || !GOOGLE_CLIENT_ID) {
@@ -18,6 +18,7 @@ export function googleSignIn(redirect) {
         const data = await res.json()
         if (res.ok && data.token) {
           setToken(data.token)
+          await loadCurrentUser()
           toast.success('登录成功')
           if (redirect) redirect()
         } else {

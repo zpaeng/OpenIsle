@@ -49,7 +49,7 @@
 
 <script>
 import { API_BASE_URL, toast } from '../main'
-import { setToken } from '../utils/auth'
+import { setToken, loadCurrentUser } from '../utils/auth'
 import { googleSignIn } from '../utils/google'
 import BaseInput from '../components/BaseInput.vue'
 export default {
@@ -75,6 +75,7 @@ export default {
         const data = await res.json()
         if (res.ok && data.token) {
           setToken(data.token)
+          await loadCurrentUser()
           toast.success('登录成功')
           this.$router.push('/')
         } else {
