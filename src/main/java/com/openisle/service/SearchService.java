@@ -67,7 +67,7 @@ public class SearchService {
                                     "post",
                                     p.getId(),
                                     p.getTitle(),
-                                    p.getCategory().getName(),
+                                    p.getCategory() != null ? p.getCategory().getName() : null,
                                     extractSnippet(p.getContent(), keyword, false),
                                     null
                             )),
@@ -76,7 +76,7 @@ public class SearchService {
                                     "post_title",
                                     p.getId(),
                                     p.getTitle(),
-                                    p.getCategory().getName(),
+                                    p.getCategory() != null ? p.getCategory().getName() : null,
                                     extractSnippet(p.getContent(), keyword, true),
                                     null
                             ))
