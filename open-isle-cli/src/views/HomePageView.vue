@@ -24,7 +24,7 @@
     </div>
 
     <div class="article-container">
-      <template v-if="selectedTopic === '最新'">
+      <template v-if="selectedTopic === '最新' || selectedTopic === '排行榜'">
         <div class="header-container">
           <div class="header-item main-item">
             <div class="header-item-text">话题</div>
@@ -81,9 +81,6 @@
           </div>
         </div>
       </template>
-      <div v-else-if="selectedTopic === '排行榜'" class="placeholder-container">
-        排行榜功能开发中，敬请期待。
-      </div>
       <div v-else-if="selectedTopic === '热门'" class="placeholder-container">
         热门帖子功能开发中，敬请期待。
       </div>
@@ -144,6 +141,10 @@ export default {
       return url
     }
 
+    const buildRankUrl = () => {
+      return `${API_BASE_URL}/api/posts/ranking?page=${page.value}&pageSize=${pageSize}`
+    }
+
     const fetchPosts = async (reset = false) => {
       if (reset) {
         page.value = 0
@@ -180,17 +181,73 @@ export default {
       }
     }
 
-    const handleScroll = (e) => {
-      const el = e.target
-      if (el.scrollHeight - el.scrollTop <= el.clientHeight + 50) {
-        fetchPosts()
+    const fetchRanking = async (reset = false) => {
+      if (reset) {
+        page.value = 0
+        allLoaded.value = false
+        articles.value = []
+      }
+      if (isLoadingPosts.value || allLoaded.value) return
+      try {
+        isLoadingPosts.value = true
+        const res = await fetch(buildRankUrl())
+        isLoadingPosts.value = false
+        if (!res.ok) return
+        const data = await res.json()
+        articles.value.push(
+          ...data.map(p => ({
+            id: p.id,
+            title: p.title,
+            description: p.content,
+            category: p.category,
+            tags: p.tags || [],
+            members: [],
+            comments: (p.comments || []).length,
+            views: p.views,
+            time: TimeManager.format(p.createdAt)
+          }))
+        )
+        if (data.length < pageSize) {
+          allLoaded.value = true
+        } else {
+          page.value += 1
+        }
+      } catch (e) {
+        console.error(e)
       }
     }
 
-    onMounted(fetchPosts)
+    const handleScroll = (e) => {
+      const el = e.target
+      if (el.scrollHeight - el.scrollTop <= el.clientHeight + 50) {
+        if (selectedTopic.value === '排行榜') {
+          fetchRanking()
+        } else {
+          fetchPosts()
+        }
+      }
+    }
+
+    onMounted(() => {
+      if (selectedTopic.value === '排行榜') {
+        fetchRanking()
+      } else {
+        fetchPosts()
+      }
+    })
 
     watch([selectedCategory, selectedTags], () => {
-      fetchPosts(true)
+      if (selectedTopic.value === '最新') {
+        fetchPosts(true)
+      }
+    })
+
+    watch(selectedTopic, () => {
+      if (selectedTopic.value === '排行榜') {
+        fetchRanking(true)
+      } else {
+        fetchPosts(true)
+      }
     })
 
     const sanitizeDescription = (text) => stripMarkdown(text)

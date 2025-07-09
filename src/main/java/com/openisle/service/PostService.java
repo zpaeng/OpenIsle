@@ -107,6 +107,17 @@ public class PostService {
         return listPostsByCategories(null, null, null);
     }
 
+    public List<Post> listPostsByViews(Integer page, Integer pageSize) {
+        Pageable pageable = null;
+        if (page != null && pageSize != null) {
+            pageable = PageRequest.of(page, pageSize);
+        }
+        if (pageable != null) {
+            return postRepository.findByStatusOrderByViewsDesc(PostStatus.PUBLISHED, pageable);
+        }
+        return postRepository.findByStatusOrderByViewsDesc(PostStatus.PUBLISHED);
+    }
+
     public List<Post> listPostsByCategories(java.util.List<Long> categoryIds,
                                             Integer page,
                                             Integer pageSize) {

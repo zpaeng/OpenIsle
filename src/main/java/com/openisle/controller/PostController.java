@@ -78,10 +78,17 @@ public class PostController {
         }
         if (hasTags) {
             return postService.listPostsByTags(tids, page, pageSize)
-                    .stream().map(this::toDto).collect(Collectors.toList());
+                .stream().map(this::toDto).collect(Collectors.toList());
         }
 
         return postService.listPostsByCategories(ids, page, pageSize)
+                .stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    @GetMapping("/ranking")
+    public List<PostDto> rankingPosts(@RequestParam(value = "page", required = false) Integer page,
+                                      @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+        return postService.listPostsByViews(page, pageSize)
                 .stream().map(this::toDto).collect(Collectors.toList());
     }
 
