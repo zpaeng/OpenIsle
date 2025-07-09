@@ -95,6 +95,26 @@ public class UserController {
                 .collect(java.util.stream.Collectors.toList());
     }
 
+    @GetMapping("/{username}/hot-posts")
+    public java.util.List<PostMetaDto> hotPosts(@PathVariable String username,
+                                                @RequestParam(value = "limit", required = false) Integer limit) {
+        int l = limit != null ? limit : 10;
+        java.util.List<Long> ids = reactionService.topPostIds(username, l);
+        return postService.getPostsByIds(ids).stream()
+                .map(this::toMetaDto)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @GetMapping("/{username}/hot-replies")
+    public java.util.List<CommentInfoDto> hotReplies(@PathVariable String username,
+                                                     @RequestParam(value = "limit", required = false) Integer limit) {
+        int l = limit != null ? limit : 10;
+        java.util.List<Long> ids = reactionService.topCommentIds(username, l);
+        return commentService.getCommentsByIds(ids).stream()
+                .map(this::toCommentInfoDto)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
     @GetMapping("/{username}/following")
     public java.util.List<UserDto> following(@PathVariable String username) {
         return subscriptionService.getSubscribedUsers(username).stream()
@@ -139,6 +159,9 @@ public class UserController {
         dto.setIntroduction(user.getIntroduction());
         dto.setFollowers(subscriptionService.countSubscribers(user.getUsername()));
         dto.setFollowing(subscriptionService.countSubscribed(user.getUsername()));
+        dto.setCreatedAt(user.getCreatedAt());
+        dto.setLastPostTime(postService.getLastPostTime(user.getUsername()));
+        dto.setTotalViews(postService.getTotalViews(user.getUsername()));
         return dto;
     }
 
@@ -171,6 +194,9 @@ public class UserController {
         private String introduction;
         private long followers;
         private long following;
+        private java.time.LocalDateTime createdAt;
+        private java.time.LocalDateTime lastPostTime;
+        private long totalViews;
     }
 
     @Data

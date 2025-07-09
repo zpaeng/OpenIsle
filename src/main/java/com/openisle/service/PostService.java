@@ -136,6 +136,15 @@ public class PostService {
         return postRepository.findByAuthorAndStatusOrderByCreatedAtDesc(user, PostStatus.PUBLISHED, pageable);
     }
 
+    public java.time.LocalDateTime getLastPostTime(String username) {
+        return postRepository.findLastPostTime(username);
+    }
+
+    public long getTotalViews(String username) {
+        Long v = postRepository.sumViews(username);
+        return v != null ? v : 0;
+    }
+
     public List<Post> listPostsByTags(java.util.List<Long> tagIds,
                                       Integer page,
                                       Integer pageSize) {
@@ -179,5 +188,9 @@ public class PostService {
         post = postRepository.save(post);
         notificationService.createNotification(post.getAuthor(), NotificationType.POST_REVIEWED, post, null, false);
         return post;
+    }
+
+    public java.util.List<Post> getPostsByIds(java.util.List<Long> ids) {
+        return postRepository.findAllById(ids);
     }
 }

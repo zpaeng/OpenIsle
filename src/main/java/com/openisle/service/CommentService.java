@@ -101,4 +101,8 @@ public class CommentService {
         Pageable pageable = PageRequest.of(0, limit);
         return commentRepository.findByAuthorOrderByCreatedAtDesc(user, pageable);
     }
+
+    public java.util.List<Comment> getCommentsByIds(java.util.List<Long> ids) {
+        return commentRepository.findAllById(ids);
+    }
 }
