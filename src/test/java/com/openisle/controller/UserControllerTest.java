@@ -81,7 +81,7 @@ class UserControllerTest {
         User u = new User();
         u.setId(2L);
         u.setUsername("bob");
-        Mockito.when(userService.findByUsername("bob")).thenReturn(Optional.of(u));
+        Mockito.when(userService.findByIdentifier("bob")).thenReturn(Optional.of(u));
 
         mockMvc.perform(get("/api/users/bob"))
                 .andExpect(status().isOk())
@@ -100,6 +100,7 @@ class UserControllerTest {
         post.setCreatedAt(java.time.LocalDateTime.now());
         post.setCategory(cat);
         post.setAuthor(user);
+        Mockito.when(userService.findByIdentifier("bob")).thenReturn(Optional.of(user));
         Mockito.when(postService.getRecentPostsByUser("bob", 10)).thenReturn(java.util.List.of(post));
 
         mockMvc.perform(get("/api/users/bob/posts"))
@@ -119,6 +120,7 @@ class UserControllerTest {
         comment.setCreatedAt(java.time.LocalDateTime.now());
         comment.setAuthor(user);
         comment.setPost(post);
+        Mockito.when(userService.findByIdentifier("bob")).thenReturn(Optional.of(user));
         Mockito.when(commentService.getRecentCommentsByUser("bob", 50)).thenReturn(java.util.List.of(comment));
 
         mockMvc.perform(get("/api/users/bob/replies"))
@@ -147,7 +149,7 @@ class UserControllerTest {
         comment.setAuthor(user);
         comment.setPost(post);
 
-        Mockito.when(userService.findByUsername("bob")).thenReturn(Optional.of(user));
+        Mockito.when(userService.findByIdentifier("bob")).thenReturn(Optional.of(user));
         Mockito.when(postService.getRecentPostsByUser("bob", 10)).thenReturn(java.util.List.of(post));
         Mockito.when(commentService.getRecentCommentsByUser("bob", 50)).thenReturn(java.util.List.of(comment));
 
