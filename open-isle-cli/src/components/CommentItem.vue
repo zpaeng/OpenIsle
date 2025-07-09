@@ -76,6 +76,7 @@
 
 <script>
 import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import CommentEditor from './CommentEditor.vue'
 import { renderMarkdown } from '../utils/markdown'
 import BaseTimeline from './BaseTimeline.vue'
@@ -98,6 +99,7 @@ const CommentItem = {
     }
   },
   setup(props) {
+    const router = useRouter()
     const showReplies = ref(props.defaultShowReplies)
     watch(
       () => props.defaultShowReplies,
@@ -135,18 +137,22 @@ const CommentItem = {
             id: data.id,
             userName: data.author.username,
             time: new Date(data.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
-            avatar: data.avatar.username,
+            avatar: data.author.avatar,
             text: data.content,
             reply: (data.replies || []).map(r => ({
               id: r.id,
               userName: r.author.username,
               time: new Date(r.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
-              avatar: r.avatar,
+              avatar: r.author.avatar,
               text: r.content,
               reply: [],
-              openReplies: false
+              openReplies: false,
+              src: r.author.avatar,
+              iconClick: () => router.push(`/users/${r.author.id}`)
             })),
-            openReplies: false
+            openReplies: false,
+            src: data.author.avatar,
+            iconClick: () => router.push(`/users/${data.author.id}`)
           })
           showEditor.value = false
           toast.success('回复成功')

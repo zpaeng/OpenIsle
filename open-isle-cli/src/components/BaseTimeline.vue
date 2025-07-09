@@ -1,7 +1,11 @@
 <template>
   <div class="timeline">
     <div class="timeline-item" v-for="(item, idx) in items" :key="idx">
-      <div class="timeline-icon">
+      <div
+        class="timeline-icon"
+        :class="{ clickable: !!item.iconClick }"
+        @click="item.iconClick && item.iconClick()"
+      >
         <img v-if="item.src" :src="item.src" class="timeline-img" />
         <i v-else-if="item.icon" :class="item.icon"></i>
       </div>
@@ -46,6 +50,10 @@ export default {
   align-items: center;
   margin-right: 10px;
   flex-shrink: 0;
+}
+
+.timeline-icon.clickable {
+  cursor: pointer;
 }
 
 .timeline-img {
