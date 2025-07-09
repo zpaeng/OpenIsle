@@ -106,7 +106,20 @@ export default {
           return
         }
         const data = await res.json()
-        notifications.value = data.map(n => ({ ...n, icon: iconMap[n.type] }))
+
+        for (const n of data) {
+          if (n.type === 'COMMENT_REPLY') {
+            notifications.value.push({
+              ...n,
+              src: n.comment.author.avatar,
+            })
+          } else {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+            })
+          }
+        }
       } catch (e) {
         console.error(e)
       }

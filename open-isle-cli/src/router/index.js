@@ -7,6 +7,7 @@ import LoginPageView from '../views/LoginPageView.vue'
 import SignupPageView from '../views/SignupPageView.vue'
 import NewPostPageView from '../views/NewPostPageView.vue'
 import SettingsPageView from '../views/SettingsPageView.vue'
+import ProfileView from '../views/ProfileView.vue'
 
 const routes = [
   {
@@ -48,7 +49,12 @@ const routes = [
     path: '/settings',
     name: 'settings',
     component: SettingsPageView
-  }
+  },
+  {
+    path: '/users/:id',
+    name: 'users',
+    component: ProfileView
+  },
 ]
 
 const router = createRouter({

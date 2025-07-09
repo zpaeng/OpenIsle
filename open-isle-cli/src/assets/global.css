@@ -45,7 +45,7 @@ body {
 /*************************
  * Vditor 自定义皮肤覆写
  *************************/
-.comment-editor-container .vditor {
+.vditor {
   /* 去掉整体背景与边框，让它融入父容器 */
   --textarea-background-color: transparent;
   border: none !important;
@@ -53,7 +53,7 @@ body {
 }
 
 /* 工具栏彻底无边框、透明背景 */
-.comment-editor-container .vditor-toolbar {
+.vditor-toolbar {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;

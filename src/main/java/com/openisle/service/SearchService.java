@@ -92,9 +92,9 @@ public class SearchService {
                 .map(c -> new SearchResult(
                         "comment",
                         c.getId(),
-                        extractSnippet(c.getContent(), keyword, false),
-                        c.getAuthor().getUsername(),
                         c.getPost().getTitle(),
+                        c.getAuthor().getUsername(),
+                        extractSnippet(c.getContent(), keyword, false),
                         c.getPost().getId()
                 ));
 
