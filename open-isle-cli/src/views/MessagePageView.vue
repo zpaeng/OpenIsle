@@ -45,6 +45,28 @@
                 </span>
               </div>
             </template>
+            <template v-else-if="item.type === 'REACTION' && item.post && !item.comment">
+              <div class="notif-content-container">
+                <span class="notif-user">{{ item.fromUser.username }} </span> 对我的文章
+                <span>
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                    {{ sanitizeDescription(item.post.title) }}
+                  </router-link>
+                </span>
+                表达了 "{{ item.emoji }}"
+              </div>
+            </template>
+            <template v-else-if="item.type === 'REACTION' && item.comment">
+              <div class="notif-content-container">
+                <span class="notif-user">{{ item.fromUser.username }} </span> 对我的评论
+                <span>
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
+                    {{ sanitizeDescription(item.comment.content) }}
+                  </router-link>
+                </span>
+                表达了 "{{ item.emoji }}"
+              </div>
+            </template>
             <template v-else>
               <div class="notif-content-container">
                 {{ formatType(item.type) }}
@@ -91,10 +113,16 @@ export default {
     const iconMap = {
       POST_VIEWED: 'fas fa-eye',
       COMMENT_REPLY: 'fas fa-reply',
-      REACTION: 'fas fa-thumbs-up',
       POST_REVIEWED: 'fas fa-check',
       POST_UPDATED: 'fas fa-comment-dots',
       USER_ACTIVITY: 'fas fa-user'
+    }
+
+    const reactionEmojiMap = {
+      LIKE: '❤️',
+      DISLIKE: '👎',
+      RECOMMEND: '👏',
+      ANGRY: '😡'
     }
 
     const sanitizeDescription = (text) => {
@@ -129,6 +157,17 @@ export default {
               iconClick: () => {
                 markRead(n.id)
                 router.push(`/users/${n.comment.author.id}`)
+              }
+            })
+          } else if (n.type === 'REACTION') {
+            notifications.value.push({
+              ...n,
+              emoji: reactionEmojiMap[n.reactionType],
+              iconClick: () => {
+                if (n.fromUser) {
+                  markRead(n.id)
+                  router.push(`/users/${n.fromUser.id}`)
+                }
               }
             })
           } else {

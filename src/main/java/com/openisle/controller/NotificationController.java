@@ -2,6 +2,7 @@ package com.openisle.controller;
 
 import com.openisle.model.Notification;
 import com.openisle.model.NotificationType;
+import com.openisle.model.ReactionType;
 import com.openisle.model.Comment;
 import com.openisle.model.Post;
 import com.openisle.service.NotificationService;
@@ -56,6 +57,12 @@ public class NotificationController {
                 dto.setParentComment(toCommentDto(parent));
             }
         }
+        if (n.getFromUser() != null) {
+            dto.setFromUser(toAuthorDto(n.getFromUser()));
+        }
+        if (n.getReactionType() != null) {
+            dto.setReactionType(n.getReactionType());
+        }
         dto.setApproved(n.getApproved());
         dto.setRead(n.isRead());
         dto.setCreatedAt(n.getCreatedAt());
@@ -98,6 +105,8 @@ public class NotificationController {
         private PostDto post;
         private CommentDto comment;
         private CommentDto parentComment;
+        private AuthorDto fromUser;
+        private ReactionType reactionType;
         private Boolean approved;
         private boolean read;
         private LocalDateTime createdAt;

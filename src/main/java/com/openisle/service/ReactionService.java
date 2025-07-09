@@ -34,7 +34,7 @@ public class ReactionService {
         reaction.setType(type);
         reaction = reactionRepository.save(reaction);
         if (!user.getId().equals(post.getAuthor().getId())) {
-            notificationService.createNotification(post.getAuthor(), NotificationType.REACTION, post, null, null);
+            notificationService.createNotification(post.getAuthor(), NotificationType.REACTION, post, null, null, user, type);
         }
         return reaction;
     }
@@ -51,7 +51,7 @@ public class ReactionService {
         reaction.setType(type);
         reaction = reactionRepository.save(reaction);
         if (!user.getId().equals(comment.getAuthor().getId())) {
-            notificationService.createNotification(comment.getAuthor(), NotificationType.REACTION, null, comment, null);
+            notificationService.createNotification(comment.getAuthor(), NotificationType.REACTION, comment.getPost(), comment, null, user, type);
         }
         return reaction;
     }

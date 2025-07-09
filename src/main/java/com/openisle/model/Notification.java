@@ -37,6 +37,14 @@ public class Notification {
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "from_user_id")
+    private User fromUser;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "reaction_type")
+    private ReactionType reactionType;
+
     @Column
     private Boolean approved;
 
