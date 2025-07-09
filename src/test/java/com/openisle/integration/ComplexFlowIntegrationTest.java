@@ -61,10 +61,10 @@ class ComplexFlowIntegrationTest {
 
     @Test
     void nestedCommentsVisibleInPost() {
-        String t1 = registerAndLogin("alice", "a@example.com");
-        String t2 = registerAndLogin("bob", "b@example.com");
+        String t1 = registerAndLogin("alice1", "a@example.com");
+        String t2 = registerAndLogin("bob123", "b@example.com");
 
-        String adminToken = registerAndLoginAsAdmin("admin", "admin@example.com");
+        String adminToken = registerAndLoginAsAdmin("admin1", "admin@example.com");
         ResponseEntity<Map> catResp = postJson("/api/categories",
                 Map.of("name", "general", "description", "d", "icon", "i"), adminToken);
         Long catId = ((Number)catResp.getBody().get("id")).longValue();
@@ -106,8 +106,8 @@ class ComplexFlowIntegrationTest {
 
     @Test
     void reactionsReturnedForPostAndComment() {
-        String t1 = registerAndLogin("carol", "c@example.com");
-        String t2 = registerAndLogin("dave", "d@example.com");
+        String t1 = registerAndLogin("carol1", "c@example.com");
+        String t2 = registerAndLogin("dave12", "d@example.com");
 
         String adminToken = registerAndLoginAsAdmin("admin2", "admin2@example.com");
         List<Map<String, Object>> categories = (List<Map<String, Object>>) rest.getForObject("/api/categories", List.class);

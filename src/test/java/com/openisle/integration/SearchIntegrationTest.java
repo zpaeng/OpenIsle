@@ -57,7 +57,7 @@ class SearchIntegrationTest {
 
     @Test
     void globalSearchReturnsMixedResults() {
-        String admin = registerAndLoginAsAdmin("admin", "a@a.com");
+        String admin = registerAndLoginAsAdmin("admin1", "a@a.com");
         String user = registerAndLogin("bob_nice", "b@b.com");
 
         ResponseEntity<Map> catResp = postJson("/api/categories", Map.of("name", "misc", "description", "d", "icon", "i"), admin);

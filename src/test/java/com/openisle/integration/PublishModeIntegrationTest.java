@@ -66,8 +66,8 @@ class PublishModeIntegrationTest {
 
     @Test
     void postRequiresApproval() {
-        String userToken = registerAndLogin("eve", "e@example.com");
-        String adminToken = registerAndLoginAsAdmin("admin", "admin@example.com");
+        String userToken = registerAndLogin("eve123", "e@example.com");
+        String adminToken = registerAndLoginAsAdmin("admin1", "admin@example.com");
 
         ResponseEntity<Map> catResp = postJson("/api/categories",
                 Map.of("name", "review", "description", "d", "icon", "i"), adminToken);
