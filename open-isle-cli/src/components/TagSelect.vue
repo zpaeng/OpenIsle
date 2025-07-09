@@ -18,15 +18,22 @@ export default {
     const fetchTags = async () => {
       const res = await fetch(`${API_BASE_URL}/api/tags`)
       if (!res.ok) return []
-      return await res.json()
+      const data = await res.json()
+      return [{ id: 0, name: '无标签' }, ...data]
     }
 
     const selected = computed({
       get: () => props.modelValue,
       set: v => {
-        if (Array.isArray(v) && v.length > 2) {
-          toast.error('最多选择两个标签')
-          return
+        if (Array.isArray(v)) {
+          if (v.includes(0)) {
+            emit('update:modelValue', [])
+            return
+          }
+          if (v.length > 2) {
+            toast.error('最多选择两个标签')
+            return
+          }
         }
         emit('update:modelValue', v)
       }

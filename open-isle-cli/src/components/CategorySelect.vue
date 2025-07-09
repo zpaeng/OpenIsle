@@ -18,7 +18,8 @@ export default {
     const fetchCategories = async () => {
       const res = await fetch(`${API_BASE_URL}/api/categories`)
       if (!res.ok) return []
-      return await res.json()
+      const data = await res.json()
+      return [{ id: '', name: '无分类' }, ...data]
     }
 
     const selected = computed({
