@@ -175,11 +175,14 @@ public class UserController {
         PostMetaDto dto = new PostMetaDto();
         dto.setId(post.getId());
         dto.setTitle(post.getTitle());
+        String content = post.getContent();
+        if (content == null) {
+            content = "";
+        }
         if (snippetLength >= 0) {
-            String c = post.getContent();
-            dto.setSnippet(c.length() > snippetLength ? c.substring(0, snippetLength) : c);
+            dto.setSnippet(content.length() > snippetLength ? content.substring(0, snippetLength) : content);
         } else {
-            dto.setSnippet(post.getContent());
+            dto.setSnippet(content);
         }
         dto.setCreatedAt(post.getCreatedAt());
         dto.setCategory(post.getCategory().getName());
