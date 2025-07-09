@@ -91,6 +91,17 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    public Optional<User> findByIdentifier(String identifier) {
+        if (identifier.matches("\\d+")) {
+            return userRepository.findById(Long.parseLong(identifier));
+        }
+        return userRepository.findByUsername(identifier);
+    }
+
     public User updateAvatar(String username, String avatarUrl) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
