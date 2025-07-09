@@ -142,7 +142,16 @@ export default {
     }
 
     const buildRankUrl = () => {
-      return `${API_BASE_URL}/api/posts/ranking?page=${page.value}&pageSize=${pageSize}`
+      let url = `${API_BASE_URL}/api/posts/ranking?page=${page.value}&pageSize=${pageSize}`
+      if (selectedCategory.value) {
+        url += `&categoryId=${selectedCategory.value}`
+      }
+      if (selectedTags.value.length) {
+        selectedTags.value.forEach(t => {
+          url += `&tagIds=${t}`
+        })
+      }
+      return url
     }
 
     const fetchPosts = async (reset = false) => {
@@ -239,6 +248,8 @@ export default {
     watch([selectedCategory, selectedTags], () => {
       if (selectedTopic.value === '最新') {
         fetchPosts(true)
+      } else if (selectedTopic.value === '排行榜') {
+        fetchRanking(true)
       }
     })
 

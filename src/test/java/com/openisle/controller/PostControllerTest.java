@@ -220,4 +220,35 @@ class PostControllerTest {
         verify(postService).listPostsByCategoriesAndTags(eq(java.util.List.of(1L)), eq(java.util.List.of(1L, 2L)), eq(0), eq(5));
         verify(postService, never()).listPostsByCategories(any(), any(), any());
     }
+
+    @Test
+    void rankingPostsFiltered() throws Exception {
+        User user = new User();
+        user.setUsername("alice");
+        Category cat = new Category();
+        cat.setName("tech");
+        Tag tag = new Tag();
+        tag.setId(1L);
+        tag.setName("java");
+        Post post = new Post();
+        post.setId(3L);
+        post.setTitle("rank");
+        post.setCreatedAt(LocalDateTime.now());
+        post.setAuthor(user);
+        post.setCategory(cat);
+        post.setTags(java.util.Set.of(tag));
+
+        Mockito.when(postService.listPostsByViews(eq(java.util.List.of(1L)), eq(java.util.List.of(1L, 2L)), eq(0), eq(5)))
+                .thenReturn(List.of(post));
+
+        mockMvc.perform(get("/api/posts/ranking")
+                        .param("tagIds", "1,2")
+                        .param("page", "0")
+                        .param("pageSize", "5")
+                        .param("categoryId", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(3));
+
+        verify(postService).listPostsByViews(eq(java.util.List.of(1L)), eq(java.util.List.of(1L, 2L)), eq(0), eq(5));
+    }
 }
