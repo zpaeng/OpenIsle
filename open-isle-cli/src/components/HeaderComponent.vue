@@ -18,6 +18,7 @@
           <i class="fas fa-caret-down dropdown-icon"></i>
           <div v-if="dropdownVisible" class="dropdown-menu">
             <div class="dropdown-item" @click="goToSettings">设置</div>
+            <div class="dropdown-item" @click="goToProfile">个人主页</div>
             <div class="dropdown-item" @click="goToLogout">退出</div>
           </div>
         </div>
@@ -98,6 +99,10 @@ export default {
     },
     goToSettings() {
       this.$router.push('/settings')
+      this.dropdownVisible = false
+    },
+    goToProfile() {
+      this.$router.push(`/profile/`)
       this.dropdownVisible = false
     },
     goToSignup() {
