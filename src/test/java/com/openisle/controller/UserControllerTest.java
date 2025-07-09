@@ -114,6 +114,9 @@ class UserControllerTest {
         user.setUsername("bob");
         com.openisle.model.Post post = new com.openisle.model.Post();
         post.setId(5L);
+        com.openisle.model.Category cat = new com.openisle.model.Category();
+        cat.setName("tech");
+        post.setCategory(cat);
         com.openisle.model.Comment comment = new com.openisle.model.Comment();
         comment.setId(4L);
         comment.setContent("hi");
