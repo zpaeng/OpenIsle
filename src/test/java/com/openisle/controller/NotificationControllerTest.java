@@ -47,7 +47,7 @@ class NotificationControllerTest {
                         .principal(new UsernamePasswordAuthenticationToken("alice","p")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].postId").value(2));
+                .andExpect(jsonPath("$[0].post.id").value(2));
     }
 
     @Test
