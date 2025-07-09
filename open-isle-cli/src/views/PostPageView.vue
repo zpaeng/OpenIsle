@@ -27,31 +27,11 @@
           <div class="info-content-text" v-html="renderMarkdown(postContent)"></div>
 
           <div class="article-footer-container">
-            <div class="reactions-container">
-              <div class="reactions-viewer">
-                <div class="reactions-viewer-item-container">
-                  <div class="reactions-viewer-item">
-                    🤣
-                  </div>
-                  <div class="reactions-viewer-item">
-                    ❤️
-                  </div>
-                  <div class="reactions-viewer-item">
-                    👏
-                  </div>
-                </div>
-                <div class="reactions-count">1882</div>
+            <ReactionsGroup v-model="postReactions" content-type="post" :content-id="postId">
+              <div class="make-reaction-item copy-link" @click="copyPostLink">
+                <i class="fas fa-link"></i>
               </div>
-
-              <div class="make-reaction-container">
-                <div class="make-reaction-item like-reaction">
-                  <i class="far fa-heart"></i>
-                </div>
-                <div class="make-reaction-item copy-link" @click="copyPostLink">
-                  <i class="fas fa-link"></i>
-                </div>
-              </div>
-            </div>
+            </ReactionsGroup>
           </div>
         </div>
       </div>
@@ -98,6 +78,7 @@ import CommentItem from '../components/CommentItem.vue'
 import CommentEditor from '../components/CommentEditor.vue'
 import BaseTimeline from '../components/BaseTimeline.vue'
 import ArticleTags from '../components/ArticleTags.vue'
+import ReactionsGroup from '../components/ReactionsGroup.vue'
 import { renderMarkdown } from '../utils/markdown'
 import { API_BASE_URL, toast } from '../main'
 import { getToken } from '../utils/auth'
@@ -107,7 +88,7 @@ hatch.register()
 
 export default {
   name: 'PostPageView',
-  components: { CommentItem, CommentEditor, BaseTimeline, ArticleTags },
+  components: { CommentItem, CommentEditor, BaseTimeline, ArticleTags, ReactionsGroup },
   setup() {
     const route = useRoute()
     const postId = route.params.id
@@ -118,6 +99,7 @@ export default {
     const postContent = ref('')
     const category = ref('')
     const tags = ref([])
+    const postReactions = ref([])
     const comments = ref([])
     const isWaitingFetchingPost = ref(false);
     const isWaitingPostingComment = ref(false);
@@ -150,6 +132,7 @@ export default {
       time: new Date(c.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }),
       avatar: c.author.avatar,
       text: c.content,
+      reactions: c.reactions || [],
       reply: (c.replies || []).map(mapComment),
       openReplies: false,
       src: c.author.avatar,
@@ -196,6 +179,7 @@ export default {
         title.value = data.title
         category.value = data.category
         tags.value = data.tags || []
+        postReactions.value = data.reactions || []
         comments.value = (data.comments || []).map(mapComment)
         postTime.value = new Date(data.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })
         await nextTick()
@@ -323,6 +307,8 @@ export default {
       mainContainer,
       currentIndex,
       totalPosts,
+      postReactions,
+      postId,
       postComment,
       onSliderInput,
       onScroll: updateCurrentIndex,

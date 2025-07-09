@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReactionRepository extends JpaRepository<Reaction, Long> {
-    Optional<Reaction> findByUserAndPost(User user, Post post);
-    Optional<Reaction> findByUserAndComment(User user, Comment comment);
+    Optional<Reaction> findByUserAndPostAndType(User user, Post post, com.openisle.model.ReactionType type);
+    Optional<Reaction> findByUserAndCommentAndType(User user, Comment comment, com.openisle.model.ReactionType type);
     List<Reaction> findByPost(Post post);
     List<Reaction> findByComment(Comment comment);
 
