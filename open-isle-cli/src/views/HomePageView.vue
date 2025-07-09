@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { stripMarkdown } from '../utils/markdown'
 import { API_BASE_URL } from '../main'
 import TimeManager from '../utils/time'
@@ -119,13 +119,9 @@ export default {
     ArticleTags,
     SearchDropdown
   },
-  data() {
-    return {
-      selectedCategory: '',
-      selectedTags: [],
-    }
-  },
   setup() {
+    const selectedCategory = ref('')
+    const selectedTags = ref([])
     const isLoadingPosts = ref(false)
     const topics = ref(['最新', '排行榜', '热门', '类别'])
     const selectedTopic = ref('最新')
@@ -135,11 +131,29 @@ export default {
     const pageSize = 5
     const allLoaded = ref(false)
 
-    const fetchPosts = async () => {
+    const buildUrl = () => {
+      let url = `${API_BASE_URL}/api/posts?page=${page.value}&pageSize=${pageSize}`
+      if (selectedCategory.value) {
+        url += `&categoryId=${selectedCategory.value}`
+      }
+      if (selectedTags.value.length) {
+        selectedTags.value.forEach(t => {
+          url += `&tagIds=${t}`
+        })
+      }
+      return url
+    }
+
+    const fetchPosts = async (reset = false) => {
+      if (reset) {
+        page.value = 0
+        allLoaded.value = false
+        articles.value = []
+      }
       if (isLoadingPosts.value || allLoaded.value) return
       try {
         isLoadingPosts.value = true
-        const res = await fetch(`${API_BASE_URL}/api/posts?page=${page.value}&pageSize=${pageSize}`)
+        const res = await fetch(buildUrl())
         isLoadingPosts.value = false
         if (!res.ok) return
         const data = await res.json()
@@ -175,9 +189,13 @@ export default {
 
     onMounted(fetchPosts)
 
+    watch([selectedCategory, selectedTags], () => {
+      fetchPosts(true)
+    })
+
     const sanitizeDescription = (text) => stripMarkdown(text)
 
-    return { topics, selectedTopic, articles, sanitizeDescription, isLoadingPosts, handleScroll }
+    return { topics, selectedTopic, articles, sanitizeDescription, isLoadingPosts, handleScroll, selectedCategory, selectedTags }
   }
 }
 </script>
