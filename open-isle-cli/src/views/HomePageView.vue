@@ -1,8 +1,8 @@
 <template>
   <div class="home-page" @scroll="handleScroll">
     <div class="search-container">
-      <div class="search-title">Where possible begins</div>
-      <div class="search-subtitle">希望你喜欢这里。有问题，请提问，或搜索现有帖子</div>
+      <div class="search-title">一切可能，从此刻启航</div>
+      <div class="search-subtitle">愿你在此遇见灵感与共鸣。若有疑惑，欢迎发问，亦可在知识的海洋中搜寻答案。</div>
       <SearchDropdown />
     </div>
 
