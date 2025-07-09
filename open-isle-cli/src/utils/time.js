@@ -14,7 +14,7 @@ export default class TimeManager {
 
     if (diffDays === 0) return `今天 ${timePart}`
     if (diffDays === 1) return `昨天 ${timePart}`
-    if (diffDays === 2) return `两天前 ${timePart}`
+    if (diffDays === 2) return `前天 ${timePart}`
 
     const month = date.getMonth() + 1
     const day = date.getDate()
