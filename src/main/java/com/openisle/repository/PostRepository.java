@@ -9,6 +9,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.time.LocalDateTime;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByStatus(PostStatus status);
@@ -21,4 +24,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByTitleContainingIgnoreCaseOrContentContainingIgnoreCaseAndStatus(String titleKeyword, String contentKeyword, PostStatus status);
     List<Post> findByContentContainingIgnoreCaseAndStatus(String keyword, PostStatus status);
     List<Post> findByTitleContainingIgnoreCaseAndStatus(String keyword, PostStatus status);
+
+    @Query("SELECT MAX(p.createdAt) FROM Post p WHERE p.author.username = :username AND p.status = com.openisle.model.PostStatus.PUBLISHED")
+    LocalDateTime findLastPostTime(@Param("username") String username);
+
+    @Query("SELECT SUM(p.views) FROM Post p WHERE p.author.username = :username AND p.status = com.openisle.model.PostStatus.PUBLISHED")
+    Long sumViews(@Param("username") String username);
 }

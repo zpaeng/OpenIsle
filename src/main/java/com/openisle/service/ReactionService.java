@@ -69,4 +69,12 @@ public class ReactionService {
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
         return reactionRepository.findByComment(comment);
     }
+
+    public java.util.List<Long> topPostIds(String username, int limit) {
+        return reactionRepository.findTopPostIds(username, org.springframework.data.domain.PageRequest.of(0, limit));
+    }
+
+    public java.util.List<Long> topCommentIds(String username, int limit) {
+        return reactionRepository.findTopCommentIds(username, org.springframework.data.domain.PageRequest.of(0, limit));
+    }
 }
