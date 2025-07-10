@@ -45,6 +45,10 @@
         </div>
       </div>
 
+      <div v-if="tabLoading" class="tab-loading">
+        <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)" />
+      </div>
+      <template v-else>
       <div v-if="selectedTab === 'summary'" class="profile-summary">
         <div class="total-summary">
           <div class="summary-title">统计信息</div>
@@ -136,7 +140,7 @@
         </div>
       </div>
 
-      <div v-else class="profile-timeline">
+      <div v-else-if="selectedTab === 'timeline'" class="profile-timeline">
         <BaseTimeline :items="timelineItems">
           <template #item="{ item }">
             <template v-if="item.type === 'post'">
@@ -175,15 +179,27 @@
           </template>
         </BaseTimeline>
       </div>
+
+      <div v-else class="follow-container">
+        <div class="follow-tabs">
+          <div :class="['follow-tab-item', { selected: followTab === 'followers' } ]" @click="followTab = 'followers'">关注者</div>
+          <div :class="['follow-tab-item', { selected: followTab === 'following' } ]" @click="followTab = 'following'">正在关注</div>
+        </div>
+        <UserList v-if="followTab === 'followers'" :users="followers" />
+        <UserList v-else :users="followings" />
+      </div>
+
+      </template>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { API_BASE_URL } from '../main'
 import BaseTimeline from '../components/BaseTimeline.vue'
+import UserList from '../components/UserList.vue'
 import { stripMarkdown } from '../utils/markdown'
 import TimeManager from '../utils/time'
 import { hatch } from 'ldrs'
@@ -191,7 +207,7 @@ hatch.register()
 
 export default {
   name: 'ProfileView',
-  components: { BaseTimeline },
+  components: { BaseTimeline, UserList },
   setup() {
     const route = useRoute()
     const username = route.params.id
@@ -200,58 +216,89 @@ export default {
     const hotPosts = ref([])
     const hotReplies = ref([])
     const timelineItems = ref([])
-    const isLoading = ref(false)
+    const followers = ref([])
+    const followings = ref([])
+    const isLoading = ref(true)
+    const tabLoading = ref(false)
     const selectedTab = ref('summary')
+    const followTab = ref('followers')
 
     const formatDate = (d) => {
       if (!d) return ''
       return TimeManager.format(d)
     }
 
-    const fetchData = async () => {
+    const fetchUser = async () => {
+      const res = await fetch(`${API_BASE_URL}/api/users/${username}`)
+      if (res.ok) user.value = await res.json()
+    }
+
+    const fetchSummary = async () => {
+      const postsRes = await fetch(`${API_BASE_URL}/api/users/${username}/hot-posts`)
+      if (postsRes.ok) {
+        const data = await postsRes.json()
+        hotPosts.value = data.map(p => ({ icon: 'fas fa-book', post: p }))
+      }
+
+      const repliesRes = await fetch(`${API_BASE_URL}/api/users/${username}/hot-replies`)
+      if (repliesRes.ok) {
+        const data = await repliesRes.json()
+        hotReplies.value = data.map(c => ({ icon: 'fas fa-comment', comment: c }))
+      }
+    }
+
+    const fetchTimeline = async () => {
+      const postsRes = await fetch(`${API_BASE_URL}/api/users/${username}/posts?limit=50`)
+      const repliesRes = await fetch(`${API_BASE_URL}/api/users/${username}/replies?limit=50`)
+      const posts = postsRes.ok ? await postsRes.json() : []
+      const replies = repliesRes.ok ? await repliesRes.json() : []
+      const mapped = [
+        ...posts.map(p => ({
+          type: 'post',
+          icon: 'fas fa-book',
+          post: p,
+          createdAt: p.createdAt
+        })),
+        ...replies.map(r => ({
+          type: r.parentComment ? 'reply' : 'comment',
+          icon: 'fas fa-comment',
+          comment: r,
+          createdAt: r.createdAt
+        }))
+      ]
+      mapped.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      timelineItems.value = mapped
+    }
+
+    const fetchFollowUsers = async () => {
+      const followerRes = await fetch(`${API_BASE_URL}/api/users/${username}/followers`)
+      const followingRes = await fetch(`${API_BASE_URL}/api/users/${username}/following`)
+      followers.value = followerRes.ok ? await followerRes.json() : []
+      followings.value = followingRes.ok ? await followingRes.json() : []
+    }
+
+    const loadSummary = async () => {
+      tabLoading.value = true
+      await fetchSummary()
+      tabLoading.value = false
+    }
+
+    const loadTimeline = async () => {
+      tabLoading.value = true
+      await fetchTimeline()
+      tabLoading.value = false
+    }
+
+    const loadFollow = async () => {
+      tabLoading.value = true
+      await fetchFollowUsers()
+      tabLoading.value = false
+    }
+
+    const init = async () => {
       try {
-        isLoading.value = true
-        let res = await fetch(`${API_BASE_URL}/api/users/${username}`)
-        if (res.ok) user.value = await res.json()
-
-        res = await fetch(`${API_BASE_URL}/api/users/${username}/hot-posts`)
-        if (res.ok) {
-          const data = await res.json()
-          hotPosts.value = data.map(p => ({
-            icon: 'fas fa-book',
-            post: p
-          }))
-        }
-
-        res = await fetch(`${API_BASE_URL}/api/users/${username}/hot-replies`)
-        if (res.ok) {
-          const data = await res.json()
-          hotReplies.value = data.map(c => ({
-            icon: 'fas fa-comment',
-            comment: c
-          }))
-        }
-
-        const postsRes = await fetch(`${API_BASE_URL}/api/users/${username}/posts?limit=50`)
-        const repliesRes = await fetch(`${API_BASE_URL}/api/users/${username}/replies?limit=50`)
-        const posts = postsRes.ok ? await postsRes.json() : []
-        const replies = repliesRes.ok ? await repliesRes.json() : []
-        const mapped = [
-          ...posts.map(p => ({
-            type: 'post',
-            icon: 'fas fa-book',
-            post: p,
-            createdAt: p.createdAt
-          })),
-          ...replies.map(r => ({
-            type: r.parentComment ? 'reply' : 'comment',
-            icon: 'fas fa-comment',
-            comment: r,
-            createdAt: r.createdAt
-          }))
-        ]
-        mapped.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        timelineItems.value = mapped
+        await fetchUser()
+        await loadSummary()
       } catch (e) {
         console.error(e)
       } finally {
@@ -259,8 +306,32 @@ export default {
       }
     }
 
-    onMounted(fetchData)
-    return { user, hotPosts, hotReplies, timelineItems, isLoading, selectedTab, formatDate, stripMarkdown }
+    onMounted(init)
+
+    watch(selectedTab, async val => {
+      if (val === 'timeline' && timelineItems.value.length === 0) {
+        await loadTimeline()
+      } else if (val === 'following' && followers.value.length === 0 && followings.value.length === 0) {
+        await loadFollow()
+      }
+    })
+    return {
+      user,
+      hotPosts,
+      hotReplies,
+      timelineItems,
+      followers,
+      followings,
+      isLoading,
+      tabLoading,
+      selectedTab,
+      followTab,
+      formatDate,
+      stripMarkdown,
+      loadTimeline,
+      loadFollow,
+      loadSummary
+    }
   }
 }
 </script>
@@ -420,6 +491,34 @@ export default {
 
 .summary-content {
   margin-top: 10px;
+}
+
+.tab-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0;
+}
+
+.follow-container {
+  padding: 20px;
+}
+
+.follow-tabs {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 10px;
+}
+
+.follow-tab-item {
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.follow-tab-item.selected {
+  color: var(--primary-color);
+  border-bottom: 2px solid var(--primary-color);
 }
 
 </style>
