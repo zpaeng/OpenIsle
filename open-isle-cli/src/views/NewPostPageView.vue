@@ -138,6 +138,13 @@ export default {
             selectedTags.value[i] = data.id
             // update local TagSelect options handled by component
           } else {
+            let data
+            try {
+              data = await res.json()
+            } catch (e) {
+              data = null
+            }
+            toast.error((data && data.error) || '创建标签失败')
             throw new Error('create tag failed')
           }
         }
