@@ -18,8 +18,8 @@
         >
           {{ topic }}
         </div>
-        <CategorySelect v-model="selectedCategory" />
-        <TagSelect v-model="selectedTags" />
+        <CategorySelect v-model="selectedCategory" :options="categoryOptions" />
+        <TagSelect v-model="selectedTags" :options="tagOptions" />
       </div>
     </div>
 
@@ -131,6 +131,8 @@ export default {
         .map(v => decodeURIComponent(v))
         .map(v => (isNaN(v) ? v : Number(v)))
     }
+    const tagOptions = ref([])
+    const categoryOptions = ref([])
     const isLoadingPosts = ref(false)
     const topics = ref(['最新', '排行榜' /*, '热门', '类别'*/])
     const selectedTopic = ref(route.query.view === 'ranking' ? '排行榜' : '最新')
@@ -139,6 +141,30 @@ export default {
     const page = ref(0)
     const pageSize = 5
     const allLoaded = ref(false)
+
+    const loadOptions = async () => {
+      if (selectedCategory.value && !isNaN(selectedCategory.value)) {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/categories/${selectedCategory.value}`)
+          if (res.ok) {
+            categoryOptions.value = [await res.json()]
+          }
+        } catch (e) { /* ignore */ }
+      }
+
+      if (selectedTags.value.length) {
+        const arr = []
+        for (const t of selectedTags.value) {
+          if (!isNaN(t)) {
+            try {
+              const r = await fetch(`${API_BASE_URL}/api/tags/${t}`)
+              if (r.ok) arr.push(await r.json())
+            } catch (e) { /* ignore */ }
+          }
+        }
+        tagOptions.value = arr
+      }
+    }
 
     const buildUrl = () => {
       let url = `${API_BASE_URL}/api/posts?page=${page.value}&pageSize=${pageSize}`
@@ -249,7 +275,8 @@ export default {
       }
     }
 
-    onMounted(() => {
+    onMounted(async () => {
+      await loadOptions()
       if (selectedTopic.value === '排行榜') {
         fetchRanking()
       } else {
@@ -275,7 +302,7 @@ export default {
 
     const sanitizeDescription = (text) => stripMarkdown(text)
 
-    return { topics, selectedTopic, articles, sanitizeDescription, isLoadingPosts, handleScroll, selectedCategory, selectedTags }
+    return { topics, selectedTopic, articles, sanitizeDescription, isLoadingPosts, handleScroll, selectedCategory, selectedTags, tagOptions, categoryOptions }
   }
 }
 </script>

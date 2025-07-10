@@ -1,5 +1,5 @@
 <template>
-  <Dropdown v-model="selected" :fetch-options="fetchTags" multiple placeholder="选择标签" remote>
+  <Dropdown v-model="selected" :fetch-options="fetchTags" multiple placeholder="选择标签" remote :initial-options="mergedOptions">
     <template #option="{ option }">
       <div class="option-container">
         <div class="option-main">
@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { API_BASE_URL, toast } from '../main'
 import Dropdown from './Dropdown.vue'
 
@@ -26,11 +26,25 @@ export default {
   components: { Dropdown },
   props: {
     modelValue: { type: Array, default: () => [] },
-    creatable: { type: Boolean, default: false }
+    creatable: { type: Boolean, default: false },
+    options: { type: Array, default: () => [] }
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
     const localTags = ref([])
+    const providedTags = ref(Array.isArray(props.options) ? [...props.options] : [])
+
+    watch(
+      () => props.options,
+      val => {
+        providedTags.value = Array.isArray(val) ? [...val] : []
+      }
+    )
+
+    const mergedOptions = computed(() => {
+      const arr = [...providedTags.value, ...localTags.value]
+      return arr.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i)
+    })
 
     const isImageIcon = icon => {
       if (!icon) return false
@@ -38,17 +52,21 @@ export default {
     }
 
     const fetchTags = async (kw = '') => {
-      const url = new URL(`${API_BASE_URL}/api/tags`)
-      if (kw) url.searchParams.set('keyword', kw)
-      url.searchParams.set('limit', '10')
       let data = []
-      try {
-        const res = await fetch(url.toString())
-        if (res.ok) {
-          data = await res.json()
+      if (!kw && providedTags.value.length) {
+        data = [...providedTags.value]
+      } else {
+        const url = new URL(`${API_BASE_URL}/api/tags`)
+        if (kw) url.searchParams.set('keyword', kw)
+        url.searchParams.set('limit', '10')
+        try {
+          const res = await fetch(url.toString())
+          if (res.ok) {
+            data = await res.json()
+          }
+        } catch {
+          toast.error('获取标签失败')
         }
-      } catch {
-        toast.error('获取标签失败')
       }
 
       let options = [...data, ...localTags.value]
@@ -91,7 +109,7 @@ export default {
       }
     })
 
-    return { fetchTags, selected, isImageIcon }
+    return { fetchTags, selected, isImageIcon, mergedOptions }
   }
 }
 </script>

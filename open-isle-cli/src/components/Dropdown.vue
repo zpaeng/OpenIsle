@@ -71,7 +71,8 @@ export default {
     remote: { type: Boolean, default: false },
     menuClass: { type: String, default: '' },
     optionClass: { type: String, default: '' },
-    showSearch: { type: Boolean, default: true }
+    showSearch: { type: Boolean, default: true },
+    initialOptions: { type: Array, default: () => [] }
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
@@ -80,7 +81,7 @@ export default {
     const setSearch = (val) => {
       search.value = val
     }
-    const options = ref([])
+    const options = ref(Array.isArray(props.initialOptions) ? [...props.initialOptions] : [])
     const loaded = ref(false)
     const loading = ref(false)
     const wrapper = ref(null)
@@ -135,6 +136,15 @@ export default {
         loading.value = false
       }
     }
+
+    watch(
+      () => props.initialOptions,
+      val => {
+        if (Array.isArray(val)) {
+          options.value = [...val]
+        }
+      }
+    )
 
     watch(open, async val => {
       if (val) {
