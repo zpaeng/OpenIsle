@@ -1,5 +1,11 @@
 <template>
   <div class="user-list">
+    <div v-if="users.length === 0" class="no-users">
+      <i class="fas fa-inbox no-users-icon"></i>
+      <div class="no-users-text">
+        暂无用户
+      </div>
+    </div>
     <div v-for="u in users" :key="u.id" class="user-item">
       <img :src="u.avatar" alt="avatar" class="user-avatar" />
       <div class="user-info">
@@ -48,5 +54,20 @@ export default {
 .user-intro {
   font-size: 14px;
   opacity: 0.7;
+}
+
+.no-users {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  opacity: 0.5;
+}
+
+.no-users-text {
+  font-size: 16px;
+  color: var(--text-color);
 }
 </style>
