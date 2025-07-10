@@ -12,11 +12,19 @@
         <div class="profile-page-header-user-info">
           <div class="profile-page-header-user-info-name">{{ user.username }}</div>
           <div class="profile-page-header-user-info-description">{{ user.introduction }}</div>
-          <div class="profile-page-header-subscribe-button">
+          <div
+            v-if="!isMine && !subscribed"
+            class="profile-page-header-subscribe-button"
+            @click="subscribeUser"
+          >
             <i class="fas fa-user-plus"></i>
             关注
           </div>
-          <div class="profile-page-header-unsubscribe-button">
+          <div
+            v-if="!isMine && subscribed"
+            class="profile-page-header-unsubscribe-button"
+            @click="unsubscribeUser"
+          >
             <i class="fas fa-user-minus"></i>
             取消关注
           </div>
@@ -203,9 +211,10 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { API_BASE_URL } from '../main'
+import { API_BASE_URL, toast } from '../main'
+import { getToken, authState } from '../utils/auth'
 import BaseTimeline from '../components/BaseTimeline.vue'
 import UserList from '../components/UserList.vue'
 import { stripMarkdown } from '../utils/markdown'
@@ -226,10 +235,13 @@ export default {
     const timelineItems = ref([])
     const followers = ref([])
     const followings = ref([])
+    const subscribed = ref(false)
     const isLoading = ref(true)
     const tabLoading = ref(false)
     const selectedTab = ref('summary')
     const followTab = ref('followers')
+
+    const isMine = computed(() => authState.username === username)
 
     const formatDate = (d) => {
       if (!d) return ''
@@ -237,8 +249,14 @@ export default {
     }
 
     const fetchUser = async () => {
-      const res = await fetch(`${API_BASE_URL}/api/users/${username}`)
-      if (res.ok) user.value = await res.json()
+      const token = getToken()
+      const headers = token ? { Authorization: `Bearer ${token}` } : {}
+      const res = await fetch(`${API_BASE_URL}/api/users/${username}`, { headers })
+      if (res.ok) {
+        const data = await res.json()
+        user.value = data
+        subscribed.value = !!data.subscribed
+      }
     }
 
     const fetchSummary = async () => {
@@ -303,6 +321,42 @@ export default {
       tabLoading.value = false
     }
 
+    const subscribeUser = async () => {
+      const token = getToken()
+      if (!token) {
+        toast.error('请先登录')
+        return
+      }
+      const res = await fetch(`${API_BASE_URL}/api/subscriptions/users/${username}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.ok) {
+        subscribed.value = true
+        toast.success('已关注')
+      } else {
+        toast.error('操作失败')
+      }
+    }
+
+    const unsubscribeUser = async () => {
+      const token = getToken()
+      if (!token) {
+        toast.error('请先登录')
+        return
+      }
+      const res = await fetch(`${API_BASE_URL}/api/subscriptions/users/${username}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.ok) {
+        subscribed.value = false
+        toast.success('已取消关注')
+      } else {
+        toast.error('操作失败')
+      }
+    }
+
     const init = async () => {
       try {
         await fetchUser()
@@ -330,6 +384,8 @@ export default {
       timelineItems,
       followers,
       followings,
+      subscribed,
+      isMine,
       isLoading,
       tabLoading,
       selectedTab,
@@ -338,7 +394,9 @@ export default {
       stripMarkdown,
       loadTimeline,
       loadFollow,
-      loadSummary
+      loadSummary,
+      subscribeUser,
+      unsubscribeUser
     }
   }
 }

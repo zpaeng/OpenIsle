@@ -42,7 +42,7 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserDto> me(Authentication auth) {
         User user = userService.findByUsername(auth.getName()).orElseThrow();
-        return ResponseEntity.ok(toDto(user));
+        return ResponseEntity.ok(toDto(user, auth));
     }
 
     @PostMapping("/me/avatar")
@@ -68,13 +68,14 @@ public class UserController {
     public ResponseEntity<UserDto> updateProfile(@RequestBody UpdateProfileDto dto,
                                                  Authentication auth) {
         User user = userService.updateProfile(auth.getName(), dto.getUsername(), dto.getIntroduction());
-        return ResponseEntity.ok(toDto(user));
+        return ResponseEntity.ok(toDto(user, auth));
     }
 
     @GetMapping("/{identifier}")
-    public ResponseEntity<UserDto> getUser(@PathVariable("identifier") String identifier) {
+    public ResponseEntity<UserDto> getUser(@PathVariable("identifier") String identifier,
+                                           Authentication auth) {
         User user = userService.findByIdentifier(identifier).orElseThrow();
-        return ResponseEntity.ok(toDto(user));
+        return ResponseEntity.ok(toDto(user, auth));
     }
 
     @GetMapping("/{identifier}/posts")
@@ -138,7 +139,8 @@ public class UserController {
     @GetMapping("/{identifier}/all")
     public ResponseEntity<UserAggregateDto> userAggregate(@PathVariable("identifier") String identifier,
                                                           @RequestParam(value = "postsLimit", required = false) Integer postsLimit,
-                                                          @RequestParam(value = "repliesLimit", required = false) Integer repliesLimit) {
+                                                          @RequestParam(value = "repliesLimit", required = false) Integer repliesLimit,
+                                                          Authentication auth) {
         User user = userService.findByIdentifier(identifier).orElseThrow();
         int pLimit = postsLimit != null ? postsLimit : defaultPostsLimit;
         int rLimit = repliesLimit != null ? repliesLimit : defaultRepliesLimit;
@@ -149,13 +151,13 @@ public class UserController {
                 .map(this::toCommentInfoDto)
                 .collect(java.util.stream.Collectors.toList());
         UserAggregateDto dto = new UserAggregateDto();
-        dto.setUser(toDto(user));
+        dto.setUser(toDto(user, auth));
         dto.setPosts(posts);
         dto.setReplies(replies);
         return ResponseEntity.ok(dto);
     }
 
-    private UserDto toDto(User user) {
+    private UserDto toDto(User user, Authentication viewer) {
         UserDto dto = new UserDto();
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
@@ -168,7 +170,16 @@ public class UserController {
         dto.setCreatedAt(user.getCreatedAt());
         dto.setLastPostTime(postService.getLastPostTime(user.getUsername()));
         dto.setTotalViews(postService.getTotalViews(user.getUsername()));
+        if (viewer != null) {
+            dto.setSubscribed(subscriptionService.isSubscribed(viewer.getName(), user.getUsername()));
+        } else {
+            dto.setSubscribed(false);
+        }
         return dto;
+    }
+
+    private UserDto toDto(User user) {
+        return toDto(user, null);
     }
 
     private PostMetaDto toMetaDto(com.openisle.model.Post post) {
@@ -219,6 +230,7 @@ public class UserController {
         private java.time.LocalDateTime createdAt;
         private java.time.LocalDateTime lastPostTime;
         private long totalViews;
+        private boolean subscribed;
     }
 
     @Data

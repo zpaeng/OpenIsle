@@ -99,4 +99,13 @@ public class SubscriptionService {
         User user = userRepo.findByUsername(username).orElseThrow();
         return userSubRepo.countBySubscriber(user);
     }
+
+    public boolean isSubscribed(String subscriberName, String targetName) {
+        if (subscriberName == null || targetName == null || subscriberName.equals(targetName)) {
+            return false;
+        }
+        User subscriber = userRepo.findByUsername(subscriberName).orElseThrow();
+        User target = userRepo.findByUsername(targetName).orElseThrow();
+        return userSubRepo.findBySubscriberAndTarget(subscriber, target).isPresent();
+    }
 }
