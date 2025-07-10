@@ -201,8 +201,10 @@
           <div :class="['follow-tab-item', { selected: followTab === 'followers' } ]" @click="followTab = 'followers'">关注者</div>
           <div :class="['follow-tab-item', { selected: followTab === 'following' } ]" @click="followTab = 'following'">正在关注</div>
         </div>
-        <UserList v-if="followTab === 'followers'" :users="followers" />
-        <UserList v-else :users="followings" />
+        <div class="follow-list">
+          <UserList v-if="followTab === 'followers'" :users="followers" />
+          <UserList v-else :users="followings" />
+        </div>
       </div>
 
       </template>
@@ -602,7 +604,6 @@ export default {
 }
 
 .follow-container {
-  padding: 20px;
 }
 
 .follow-tabs {
@@ -620,6 +621,10 @@ export default {
 .follow-tab-item.selected {
   color: var(--primary-color);
   border-bottom: 2px solid var(--primary-color);
+}
+
+.follow-list {
+  padding-left: 20px;
 }
 
 </style>
