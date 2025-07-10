@@ -20,13 +20,15 @@ public class TagController {
     @PostMapping
     public TagDto create(@RequestBody TagRequest req) {
         Tag tag = tagService.createTag(req.getName(), req.getDescription(), req.getIcon(), req.getSmallIcon());
-        return toDto(tag);
+        long count = postService.countPostsByTag(tag.getId());
+        return toDto(tag, count);
     }
 
     @PutMapping("/{id}")
     public TagDto update(@PathVariable Long id, @RequestBody TagRequest req) {
         Tag tag = tagService.updateTag(id, req.getName(), req.getDescription(), req.getIcon(), req.getSmallIcon());
-        return toDto(tag);
+        long count = postService.countPostsByTag(tag.getId());
+        return toDto(tag, count);
     }
 
     @DeleteMapping("/{id}")
@@ -35,15 +37,23 @@ public class TagController {
     }
 
     @GetMapping
-    public List<TagDto> list() {
-        return tagService.listTags().stream()
-                .map(this::toDto)
+    public List<TagDto> list(@RequestParam(value = "keyword", required = false) String keyword,
+                             @RequestParam(value = "limit", required = false) Integer limit) {
+        List<TagDto> dtos = tagService.searchTags(keyword).stream()
+                .map(t -> toDto(t, postService.countPostsByTag(t.getId())))
+                .sorted((a, b) -> Long.compare(b.getCount(), a.getCount()))
                 .collect(Collectors.toList());
+        if (limit != null && limit > 0 && dtos.size() > limit) {
+            return dtos.subList(0, limit);
+        }
+        return dtos;
     }
 
     @GetMapping("/{id}")
     public TagDto get(@PathVariable Long id) {
-        return toDto(tagService.getTag(id));
+        Tag tag = tagService.getTag(id);
+        long count = postService.countPostsByTag(tag.getId());
+        return toDto(tag, count);
     }
 
     @GetMapping("/{id}/posts")
@@ -61,13 +71,14 @@ public class TagController {
                 .collect(Collectors.toList());
     }
 
-    private TagDto toDto(Tag tag) {
+    private TagDto toDto(Tag tag, long count) {
         TagDto dto = new TagDto();
         dto.setId(tag.getId());
         dto.setName(tag.getName());
         dto.setIcon(tag.getIcon());
         dto.setSmallIcon(tag.getSmallIcon());
         dto.setDescription(tag.getDescription());
+        dto.setCount(count);
         return dto;
     }
 
@@ -86,6 +97,7 @@ public class TagController {
         private String description;
         private String icon;
         private String smallIcon;
+        private Long count;
     }
 
     @Data

@@ -54,4 +54,11 @@ public class TagService {
     public List<Tag> listTags() {
         return tagRepository.findAll();
     }
+
+    public List<Tag> searchTags(String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return tagRepository.findAll();
+        }
+        return tagRepository.findByNameContainingIgnoreCase(keyword);
+    }
 }

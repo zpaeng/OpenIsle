@@ -41,4 +41,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("SELECT SUM(p.views) FROM Post p WHERE p.author.username = :username AND p.status = com.openisle.model.PostStatus.PUBLISHED")
     Long sumViews(@Param("username") String username);
+
+    long countByCategory_Id(Long categoryId);
+
+    long countDistinctByTags_Id(Long tagId);
 }
