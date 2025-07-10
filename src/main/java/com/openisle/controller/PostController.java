@@ -128,6 +128,9 @@ public class PostController {
                 .collect(Collectors.toList());
         dto.setComments(comments);
 
+        java.util.List<com.openisle.model.User> participants = commentService.getParticipants(post.getId(), 5);
+        dto.setParticipants(participants.stream().map(this::toAuthorDto).collect(Collectors.toList()));
+
         return dto;
     }
 
@@ -219,6 +222,7 @@ public class PostController {
         private long views;
         private List<CommentDto> comments;
         private List<ReactionDto> reactions;
+        private java.util.List<AuthorDto> participants;
     }
 
     @Data

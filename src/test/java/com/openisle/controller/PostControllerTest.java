@@ -73,6 +73,7 @@ class PostControllerTest {
         post.setAuthor(user);
         post.setCategory(cat);
         post.setTags(java.util.Set.of(tag));
+        Mockito.when(commentService.getParticipants(Mockito.anyLong(), Mockito.anyInt())).thenReturn(java.util.List.of());
         Mockito.when(postService.createPost(eq("alice"), eq(1L), eq("t"), eq("c"), eq(java.util.List.of(1L)))).thenReturn(post);
         Mockito.when(postService.viewPost(eq(1L), Mockito.isNull())).thenReturn(post);
 
@@ -110,6 +111,7 @@ class PostControllerTest {
         post.setAuthor(user);
         post.setCategory(cat);
         post.setTags(java.util.Set.of(tag));
+        Mockito.when(commentService.getParticipants(Mockito.anyLong(), Mockito.anyInt())).thenReturn(java.util.List.of());
         Mockito.when(postService.listPostsByCategories(Mockito.isNull(), Mockito.isNull(), Mockito.isNull()))
                 .thenReturn(List.of(post));
 
@@ -182,6 +184,7 @@ class PostControllerTest {
         Mockito.when(commentService.getCommentsForPost(1L)).thenReturn(List.of(comment));
         Mockito.when(commentService.getReplies(2L)).thenReturn(List.of(reply));
         Mockito.when(commentService.getReplies(3L)).thenReturn(List.of());
+        Mockito.when(commentService.getParticipants(Mockito.anyLong(), Mockito.anyInt())).thenReturn(java.util.List.of());
         Mockito.when(reactionService.getReactionsForPost(1L)).thenReturn(List.of(pr));
         Mockito.when(reactionService.getReactionsForComment(2L)).thenReturn(List.of(cr));
         Mockito.when(reactionService.getReactionsForComment(3L)).thenReturn(List.of());
@@ -209,6 +212,7 @@ class PostControllerTest {
         post.setAuthor(user);
         post.setCategory(cat);
         post.setTags(java.util.Set.of(tag));
+        Mockito.when(commentService.getParticipants(Mockito.anyLong(), Mockito.anyInt())).thenReturn(java.util.List.of());
 
         Mockito.when(postService.listPostsByCategoriesAndTags(eq(java.util.List.of(1L)), eq(java.util.List.of(1L, 2L)), eq(0), eq(5)))
                 .thenReturn(List.of(post));
@@ -241,6 +245,7 @@ class PostControllerTest {
         post.setAuthor(user);
         post.setCategory(cat);
         post.setTags(java.util.Set.of(tag));
+        Mockito.when(commentService.getParticipants(Mockito.anyLong(), Mockito.anyInt())).thenReturn(java.util.List.of());
 
         Mockito.when(postService.listPostsByViews(eq(java.util.List.of(1L)), eq(java.util.List.of(1L, 2L)), eq(0), eq(5)))
                 .thenReturn(List.of(post));

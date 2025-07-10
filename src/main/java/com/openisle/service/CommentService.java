@@ -102,6 +102,16 @@ public class CommentService {
         return commentRepository.findByAuthorOrderByCreatedAtDesc(user, pageable);
     }
 
+    public java.util.List<User> getParticipants(Long postId, int limit) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+        java.util.LinkedHashSet<User> set = new java.util.LinkedHashSet<>();
+        set.add(post.getAuthor());
+        set.addAll(commentRepository.findDistinctAuthorsByPost(post));
+        java.util.List<User> list = new java.util.ArrayList<>(set);
+        return list.subList(0, Math.min(limit, list.size()));
+    }
+
     public java.util.List<Comment> getCommentsByIds(java.util.List<Long> ids) {
         return commentRepository.findAllById(ids);
     }
