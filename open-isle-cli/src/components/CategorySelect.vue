@@ -40,9 +40,6 @@ export default {
     )
 
     const fetchCategories = async () => {
-      if (providedOptions.value.length) {
-        return [{ id: '', name: '无分类' }, ...providedOptions.value]
-      }
       const res = await fetch(`${API_BASE_URL}/api/categories`)
       if (!res.ok) return []
       const data = await res.json()

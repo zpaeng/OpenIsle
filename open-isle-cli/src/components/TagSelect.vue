@@ -1,5 +1,6 @@
 <template>
-  <Dropdown v-model="selected" :fetch-options="fetchTags" multiple placeholder="选择标签" remote :initial-options="mergedOptions">
+  <Dropdown v-model="selected" :fetch-options="fetchTags" multiple placeholder="选择标签" remote
+    :initial-options="mergedOptions">
     <template #option="{ option }">
       <div class="option-container">
         <div class="option-main">
@@ -53,21 +54,21 @@ export default {
 
     const fetchTags = async (kw = '') => {
       let data = []
-      if (!kw && providedTags.value.length) {
-        data = [...providedTags.value]
-      } else {
-        const url = new URL(`${API_BASE_URL}/api/tags`)
-        if (kw) url.searchParams.set('keyword', kw)
-        url.searchParams.set('limit', '10')
-        try {
-          const res = await fetch(url.toString())
-          if (res.ok) {
-            data = await res.json()
-          }
-        } catch {
-          toast.error('获取标签失败')
+      // if (!kw && providedTags.value.length) {
+      //   data = [...providedTags.value]
+      // } else {
+      const url = new URL(`${API_BASE_URL}/api/tags`)
+      if (kw) url.searchParams.set('keyword', kw)
+      url.searchParams.set('limit', '10')
+      try {
+        const res = await fetch(url.toString())
+        if (res.ok) {
+          data = await res.json()
         }
+      } catch {
+        toast.error('获取标签失败')
       }
+      // }
 
       let options = [...data, ...localTags.value]
 
