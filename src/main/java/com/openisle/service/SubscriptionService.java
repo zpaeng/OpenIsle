@@ -17,6 +17,7 @@ public class SubscriptionService {
     private final UserRepository userRepo;
     private final PostRepository postRepo;
     private final CommentRepository commentRepo;
+    private final NotificationService notificationService;
 
     public void subscribePost(String username, Long postId) {
         User user = userRepo.findByUsername(username).orElseThrow();
@@ -60,6 +61,8 @@ public class SubscriptionService {
             UserSubscription us = new UserSubscription();
             us.setSubscriber(subscriber);
             us.setTarget(target);
+            notificationService.createNotification(target,
+                    NotificationType.USER_FOLLOWED, null, null, null, subscriber, null);
             return userSubRepo.save(us);
         });
     }
@@ -67,7 +70,11 @@ public class SubscriptionService {
     public void unsubscribeUser(String username, String targetName) {
         User subscriber = userRepo.findByUsername(username).orElseThrow();
         User target = findUser(targetName).orElseThrow();
-        userSubRepo.findBySubscriberAndTarget(subscriber, target).ifPresent(userSubRepo::delete);
+        userSubRepo.findBySubscriberAndTarget(subscriber, target).ifPresent(us -> {
+            userSubRepo.delete(us);
+            notificationService.createNotification(target,
+                    NotificationType.USER_UNFOLLOWED, null, null, null, subscriber, null);
+        });
     }
 
     public List<User> getSubscribedUsers(String username) {

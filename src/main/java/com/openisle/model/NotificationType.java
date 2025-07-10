@@ -14,6 +14,12 @@ public enum NotificationType {
     POST_REVIEWED,
     /** A subscribed post received a new comment */
     POST_UPDATED,
+    /** Someone you follow published a new post */
+    FOLLOWED_POST,
+    /** Someone started following you */
+    USER_FOLLOWED,
+    /** Someone unfollowed you */
+    USER_UNFOLLOWED,
     /** A user you subscribe to created a post or comment */
     USER_ACTIVITY
 }
