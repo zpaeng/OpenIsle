@@ -274,4 +274,12 @@ public class PostService {
     public java.util.List<Post> getPostsByIds(java.util.List<Long> ids) {
         return postRepository.findAllById(ids);
     }
+
+    public long countPostsByCategory(Long categoryId) {
+        return postRepository.countByCategory_Id(categoryId);
+    }
+
+    public long countPostsByTag(Long tagId) {
+        return postRepository.countDistinctByTags_Id(tagId);
+    }
 }

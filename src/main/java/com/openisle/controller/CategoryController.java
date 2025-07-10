@@ -20,13 +20,15 @@ public class CategoryController {
     @PostMapping
     public CategoryDto create(@RequestBody CategoryRequest req) {
         Category c = categoryService.createCategory(req.getName(), req.getDescription(), req.getIcon(), req.getSmallIcon());
-        return toDto(c);
+        long count = postService.countPostsByCategory(c.getId());
+        return toDto(c, count);
     }
 
     @PutMapping("/{id}")
     public CategoryDto update(@PathVariable Long id, @RequestBody CategoryRequest req) {
         Category c = categoryService.updateCategory(id, req.getName(), req.getDescription(), req.getIcon(), req.getSmallIcon());
-        return toDto(c);
+        long count = postService.countPostsByCategory(c.getId());
+        return toDto(c, count);
     }
 
     @DeleteMapping("/{id}")
@@ -37,13 +39,16 @@ public class CategoryController {
     @GetMapping
     public List<CategoryDto> list() {
         return categoryService.listCategories().stream()
-                .map(this::toDto)
+                .map(c -> toDto(c, postService.countPostsByCategory(c.getId())))
+                .sorted((a, b) -> Long.compare(b.getCount(), a.getCount()))
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
     public CategoryDto get(@PathVariable Long id) {
-        return toDto(categoryService.getCategory(id));
+        Category c = categoryService.getCategory(id);
+        long count = postService.countPostsByCategory(c.getId());
+        return toDto(c, count);
     }
 
     @GetMapping("/{id}/posts")
@@ -61,13 +66,14 @@ public class CategoryController {
                 .collect(Collectors.toList());
     }
 
-    private CategoryDto toDto(Category c) {
+    private CategoryDto toDto(Category c, long count) {
         CategoryDto dto = new CategoryDto();
         dto.setId(c.getId());
         dto.setName(c.getName());
         dto.setIcon(c.getIcon());
         dto.setSmallIcon(c.getSmallIcon());
         dto.setDescription(c.getDescription());
+        dto.setCount(count);
         return dto;
     }
 
@@ -86,6 +92,7 @@ public class CategoryController {
         private String description;
         private String icon;
         private String smallIcon;
+        private Long count;
     }
 
     @Data

@@ -5,7 +5,19 @@
     multiple
     placeholder="选择标签"
     remote
-  />
+  >
+    <template #option="{ option }">
+      <div class="option-main">
+        <template v-if="option.icon">
+          <img v-if="isImageIcon(option.icon)" :src="option.icon" class="option-icon" />
+          <i v-else :class="['option-icon', option.icon]"></i>
+        </template>
+        <span>{{ option.name }}</span>
+        <span v-if="option.count > 0"> x {{ option.count }}</span>
+      </div>
+      <div v-if="option.description" class="option-desc">{{ option.description }}</div>
+    </template>
+  </Dropdown>
 </template>
 
 <script>
@@ -22,31 +34,34 @@ export default {
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
-    const tags = ref([])
+    const localTags = ref([])
 
-    const loadTags = async () => {
-      if (tags.value.length) return
-      const res = await fetch(`${API_BASE_URL}/api/tags`)
-      if (!res.ok) return
-      const data = await res.json()
-      tags.value = [{ id: 0, name: '无标签' }, ...data]
+    const isImageIcon = icon => {
+      if (!icon) return false
+      return /^https?:\/\//.test(icon) || icon.startsWith('/')
     }
 
     const fetchTags = async (kw = '') => {
-      await loadTags()
-      let options = tags.value.filter(t =>
-        !kw || t.name.toLowerCase().includes(kw.toLowerCase())
-      )
-      if (
-        props.creatable &&
-        kw &&
-        !tags.value.some(t => t.name.toLowerCase() === kw.toLowerCase())
-      ) {
-        options = [
-          ...options,
-          { id: `__create__:${kw}`, name: `创建"${kw}"` }
-        ]
+      const url = new URL(`${API_BASE_URL}/api/tags`)
+      if (kw) url.searchParams.set('keyword', kw)
+      url.searchParams.set('limit', '10')
+      let data = []
+      try {
+        const res = await fetch(url.toString())
+        if (res.ok) {
+          data = await res.json()
+        }
+      } catch {}
+
+      let options = [...data, ...localTags.value]
+
+      if (props.creatable && kw && !options.some(t => t.name.toLowerCase() === kw.toLowerCase())) {
+        options.push({ id: `__create__:${kw}`, name: `创建"${kw}"` })
       }
+
+      options = options.filter((v, i, arr) => arr.findIndex(t => t.id === v.id) === i)
+
+      options.unshift({ id: 0, name: '无标签' })
       return options
     }
 
@@ -66,8 +81,8 @@ export default {
             if (typeof id === 'string' && id.startsWith('__create__:')) {
               const name = id.slice(11)
               const newId = `__new__:${name}`
-              if (!tags.value.find(t => t.id === newId)) {
-                tags.value.push({ id: newId, name })
+              if (!localTags.value.find(t => t.id === newId)) {
+                localTags.value.push({ id: newId, name })
               }
               return newId
             }
@@ -78,7 +93,21 @@ export default {
       }
     })
 
-    return { fetchTags, selected }
+    return { fetchTags, selected, isImageIcon }
   }
 }
 </script>
+
+<style scoped>
+.option-main {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.option-desc {
+  font-size: 12px;
+  color: #666;
+  margin-left: 21px;
+}
+</style>
