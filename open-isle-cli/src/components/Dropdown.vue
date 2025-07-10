@@ -107,6 +107,7 @@ export default {
         emit('update:modelValue', id)
         close()
       }
+      search.value = ''
     }
 
     const filteredOptions = computed(() => {
