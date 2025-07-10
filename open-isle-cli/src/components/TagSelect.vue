@@ -112,7 +112,6 @@ export default {
 .option-desc {
   font-size: 12px;
   color: #666;
-  margin-left: 21px;
 }
 
 .option-count {
