@@ -66,9 +66,14 @@
           </div>
 
           <div class="article-member-avatars-container">
-            <div class="article-member-avatar-item" v-for="(avatar, idx) in article.members" :key="idx">
-              <img class="article-member-avatar-item-img" :src="avatar" alt="avatar">
-            </div>
+            <router-link
+              v-for="member in article.members"
+              :key="member.id"
+              class="article-member-avatar-item"
+              :to="`/users/${member.id}`"
+            >
+              <img class="article-member-avatar-item-img" :src="member.avatar" alt="avatar" />
+            </router-link>
           </div>
           <div class="article-comments">
             {{ article.comments }}
@@ -216,7 +221,7 @@ export default {
             description: p.content,
             category: p.category,
             tags: p.tags || [],
-            members: [],
+            members: (p.participants || []).map(m => ({ id: m.id, avatar: m.avatar })),
             comments: (p.comments || []).length,
             views: p.views,
             time: TimeManager.format(p.createdAt)
@@ -252,7 +257,7 @@ export default {
             description: p.content,
             category: p.category,
             tags: p.tags || [],
-            members: [],
+            members: (p.participants || []).map(m => ({ id: m.id, avatar: m.avatar })),
             comments: (p.comments || []).length,
             views: p.views,
             time: TimeManager.format(p.createdAt)

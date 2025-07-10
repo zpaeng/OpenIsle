@@ -13,4 +13,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findByParentOrderByCreatedAtAsc(Comment parent);
     List<Comment> findByAuthorOrderByCreatedAtDesc(User author, Pageable pageable);
     List<Comment> findByContentContainingIgnoreCase(String keyword);
+
+    @org.springframework.data.jpa.repository.Query("SELECT DISTINCT c.author FROM Comment c WHERE c.post = :post")
+    java.util.List<User> findDistinctAuthorsByPost(@org.springframework.data.repository.query.Param("post") Post post);
 }
