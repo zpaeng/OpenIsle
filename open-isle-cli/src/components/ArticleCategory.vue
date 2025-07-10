@@ -25,7 +25,9 @@ export default {
     const gotoCategory = () => {
       if (!props.category) return
       const value = encodeURIComponent(props.category.id ?? props.category.name)
-      router.push({ path: '/', query: { category: value } })
+      router.push({ path: '/', query: { category: value } }).then(() => {
+        window.location.reload()
+      })
     }
     return { gotoCategory }
   }
