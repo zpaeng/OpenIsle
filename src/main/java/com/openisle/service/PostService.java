@@ -83,7 +83,14 @@ public class PostService {
         // notify followers of author
         for (User u : subscriptionService.getSubscribers(author.getUsername())) {
             if (!u.getId().equals(author.getId())) {
-                notificationService.createNotification(u, NotificationType.USER_ACTIVITY, post, null, null);
+                notificationService.createNotification(
+                        u,
+                        NotificationType.FOLLOWED_POST,
+                        post,
+                        null,
+                        null,
+                        author,
+                        null);
             }
         }
         return post;
