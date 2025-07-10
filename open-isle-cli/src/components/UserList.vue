@@ -6,7 +6,7 @@
         暂无用户
       </div>
     </div>
-    <div v-for="u in users" :key="u.id" class="user-item">
+    <div v-for="u in users" :key="u.id" class="user-item" @click="handleUserClick(u)">
       <img :src="u.avatar" alt="avatar" class="user-avatar" />
       <div class="user-info">
         <div class="user-name">{{ u.username }}</div>
@@ -21,6 +21,13 @@ export default {
   name: 'UserList',
   props: {
     users: { type: Array, default: () => [] }
+  },
+  methods: {
+    handleUserClick(user) {
+      this.$router.push(`/users/${user.id}`).then(() => {
+        window.location.reload()
+      })
+    }
   }
 }
 </script>
@@ -36,6 +43,7 @@ export default {
   flex-direction: row;
   align-items: center;
   gap: 10px;
+  cursor: pointer;
 }
 .user-avatar {
   width: 40px;
