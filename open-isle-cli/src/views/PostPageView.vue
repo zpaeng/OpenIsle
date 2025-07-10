@@ -7,7 +7,7 @@
       <div class="article-title-container">
         <div class="article-title">{{ title }}</div>
         <div class="article-info-container">
-          <ArticleTags :tags="[category]" />
+          <ArticleCategory :category="category" />
           <ArticleTags :tags="tags" />
         </div>
       </div>
@@ -78,6 +78,7 @@ import CommentItem from '../components/CommentItem.vue'
 import CommentEditor from '../components/CommentEditor.vue'
 import BaseTimeline from '../components/BaseTimeline.vue'
 import ArticleTags from '../components/ArticleTags.vue'
+import ArticleCategory from '../components/ArticleCategory.vue'
 import ReactionsGroup from '../components/ReactionsGroup.vue'
 import { renderMarkdown } from '../utils/markdown'
 import { API_BASE_URL, toast } from '../main'
@@ -89,7 +90,7 @@ hatch.register()
 
 export default {
   name: 'PostPageView',
-  components: { CommentItem, CommentEditor, BaseTimeline, ArticleTags, ReactionsGroup },
+  components: { CommentItem, CommentEditor, BaseTimeline, ArticleTags, ArticleCategory, ReactionsGroup },
   setup() {
     const route = useRoute()
     const postId = route.params.id

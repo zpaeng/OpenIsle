@@ -60,7 +60,7 @@
             </router-link>
             <div class="article-item-description main-item">{{ sanitizeDescription(article.description) }}</div>
             <div class="article-info-container main-item">
-              <ArticleTags :tags="[article.category]" />
+              <ArticleCategory :category="article.category" />
               <ArticleTags :tags="article.tags" />
             </div>
           </div>
@@ -104,6 +104,7 @@ import TimeManager from '../utils/time'
 import CategorySelect from '../components/CategorySelect.vue'
 import TagSelect from '../components/TagSelect.vue'
 import ArticleTags from '../components/ArticleTags.vue'
+import ArticleCategory from '../components/ArticleCategory.vue'
 import SearchDropdown from '../components/SearchDropdown.vue'
 import { hatch } from 'ldrs'
 hatch.register()
@@ -115,15 +116,20 @@ export default {
     CategorySelect,
     TagSelect,
     ArticleTags,
+    ArticleCategory,
     SearchDropdown
   },
   setup() {
     const route = useRoute()
-    const selectedCategory = ref(route.query.category || '')
+    const selectedCategory = ref(route.query.category ? decodeURIComponent(route.query.category) : '')
     const selectedTags = ref([])
     if (route.query.tags) {
       const t = Array.isArray(route.query.tags) ? route.query.tags.join(',') : route.query.tags
-      selectedTags.value = t.split(',').filter(v => v).map(v => isNaN(v) ? v : Number(v))
+      selectedTags.value = t
+        .split(',')
+        .filter(v => v)
+        .map(v => decodeURIComponent(v))
+        .map(v => (isNaN(v) ? v : Number(v)))
     }
     const isLoadingPosts = ref(false)
     const topics = ref(['最新', '排行榜' /*, '热门', '类别'*/])
