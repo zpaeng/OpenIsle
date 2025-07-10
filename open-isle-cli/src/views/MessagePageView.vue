@@ -67,6 +67,34 @@
                 进行了表态
               </div>
             </template>
+            <template v-else-if="item.type === 'USER_FOLLOWED'">
+              <div class="notif-content-container">
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
+                  {{ item.fromUser.username }}
+                </router-link>
+                开始关注你了
+              </div>
+            </template>
+            <template v-else-if="item.type === 'USER_UNFOLLOWED'">
+              <div class="notif-content-container">
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
+                  {{ item.fromUser.username }}
+                </router-link>
+                取消关注你了
+              </div>
+            </template>
+            <template v-else-if="item.type === 'FOLLOWED_POST'">
+              <div class="notif-content-container">
+                你关注的
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
+                  {{ item.fromUser.username }}
+                </router-link>
+                发布了文章
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                  {{ sanitizeDescription(item.post.title) }}
+                </router-link>
+              </div>
+            </template>
             <template v-else>
               <div class="notif-content-container">
                 {{ formatType(item.type) }}
@@ -115,7 +143,10 @@ export default {
       COMMENT_REPLY: 'fas fa-reply',
       POST_REVIEWED: 'fas fa-check',
       POST_UPDATED: 'fas fa-comment-dots',
-      USER_ACTIVITY: 'fas fa-user'
+      USER_ACTIVITY: 'fas fa-user',
+      FOLLOWED_POST: 'fas fa-feather-alt',
+      USER_FOLLOWED: 'fas fa-user-plus',
+      USER_UNFOLLOWED: 'fas fa-user-minus'
     }
 
     const reactionEmojiMap = {
@@ -149,34 +180,56 @@ export default {
         }
         const data = await res.json()
 
-        for (const n of data) {
-          if (n.type === 'COMMENT_REPLY') {
-            notifications.value.push({
-              ...n,
-              src: n.comment.author.avatar,
-              iconClick: () => {
-                markRead(n.id)
-                router.push(`/users/${n.comment.author.id}`)
-              }
-            })
-          } else if (n.type === 'REACTION') {
-            notifications.value.push({
-              ...n,
-              emoji: reactionEmojiMap[n.reactionType],
-              iconClick: () => {
-                if (n.fromUser) {
+          for (const n of data) {
+            if (n.type === 'COMMENT_REPLY') {
+              notifications.value.push({
+                ...n,
+                src: n.comment.author.avatar,
+                iconClick: () => {
                   markRead(n.id)
-                  router.push(`/users/${n.fromUser.id}`)
+                  router.push(`/users/${n.comment.author.id}`)
                 }
-              }
-            })
-          } else {
-            notifications.value.push({
-              ...n,
-              icon: iconMap[n.type],
-            })
+              })
+            } else if (n.type === 'REACTION') {
+              notifications.value.push({
+                ...n,
+                emoji: reactionEmojiMap[n.reactionType],
+                iconClick: () => {
+                  if (n.fromUser) {
+                    markRead(n.id)
+                    router.push(`/users/${n.fromUser.id}`)
+                  }
+                }
+              })
+            } else if (n.type === 'USER_FOLLOWED' || n.type === 'USER_UNFOLLOWED') {
+              notifications.value.push({
+                ...n,
+                icon: iconMap[n.type],
+                iconClick: () => {
+                  if (n.fromUser) {
+                    markRead(n.id)
+                    router.push(`/users/${n.fromUser.id}`)
+                  }
+                }
+              })
+            } else if (n.type === 'FOLLOWED_POST') {
+              notifications.value.push({
+                ...n,
+                icon: iconMap[n.type],
+                iconClick: () => {
+                  if (n.post) {
+                    markRead(n.id)
+                    router.push(`/posts/${n.post.id}`)
+                  }
+                }
+              })
+            } else {
+              notifications.value.push({
+                ...n,
+                icon: iconMap[n.type],
+              })
+            }
           }
-        }
       } catch (e) {
         console.error(e)
       }
@@ -194,6 +247,12 @@ export default {
           return '帖子审核结果'
         case 'POST_UPDATED':
           return '关注的帖子有新评论'
+        case 'FOLLOWED_POST':
+          return '关注的用户发布了新文章'
+        case 'USER_FOLLOWED':
+          return '有人关注了你'
+        case 'USER_UNFOLLOWED':
+          return '有人取消关注你'
         case 'USER_ACTIVITY':
           return '关注的用户有新动态'
         default:
