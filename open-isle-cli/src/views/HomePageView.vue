@@ -121,7 +121,11 @@ export default {
   },
   setup() {
     const route = useRoute()
-    const selectedCategory = ref(route.query.category ? decodeURIComponent(route.query.category) : '')
+    const selectedCategory = ref('')
+    if (route.query.category) {
+      const c = decodeURIComponent(route.query.category)
+      selectedCategory.value = isNaN(c) ? c : Number(c)
+    }
     const selectedTags = ref([])
     if (route.query.tags) {
       const t = Array.isArray(route.query.tags) ? route.query.tags.join(',') : route.query.tags
