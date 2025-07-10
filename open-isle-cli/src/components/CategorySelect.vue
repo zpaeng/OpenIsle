@@ -1,5 +1,5 @@
 <template>
-  <Dropdown v-model="selected" :fetch-options="fetchCategories" placeholder="选择分类">
+  <Dropdown v-model="selected" :fetch-options="fetchCategories" placeholder="选择分类" :initial-options="providedOptions">
     <template #option="{ option }">
       <div class="option-container">
         <div class="option-main">
@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { API_BASE_URL } from '../main'
 import Dropdown from './Dropdown.vue'
 
@@ -25,11 +25,24 @@ export default {
   name: 'CategorySelect',
   components: { Dropdown },
   props: {
-    modelValue: { type: [String, Number], default: '' }
+    modelValue: { type: [String, Number], default: '' },
+    options: { type: Array, default: () => [] }
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
+    const providedOptions = ref(Array.isArray(props.options) ? [...props.options] : [])
+
+    watch(
+      () => props.options,
+      val => {
+        providedOptions.value = Array.isArray(val) ? [...val] : []
+      }
+    )
+
     const fetchCategories = async () => {
+      if (providedOptions.value.length) {
+        return [{ id: '', name: '无分类' }, ...providedOptions.value]
+      }
       const res = await fetch(`${API_BASE_URL}/api/categories`)
       if (!res.ok) return []
       const data = await res.json()
@@ -46,7 +59,7 @@ export default {
       set: v => emit('update:modelValue', v)
     })
 
-    return { fetchCategories, selected, isImageIcon }
+    return { fetchCategories, selected, isImageIcon, providedOptions }
   }
 }
 </script>
