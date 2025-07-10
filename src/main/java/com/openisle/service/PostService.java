@@ -141,11 +141,11 @@ public class PostService {
                     return java.util.List.of();
                 }
                 if (pageable != null) {
-                    return postRepository.findDistinctByCategoryInAndTagsInAndStatusOrderByViewsDesc(
-                            categories, tags, PostStatus.PUBLISHED, pageable);
+                    return postRepository.findByCategoriesAndAllTagsOrderByViewsDesc(
+                            categories, tags, PostStatus.PUBLISHED, tags.size(), pageable);
                 }
-                return postRepository.findDistinctByCategoryInAndTagsInAndStatusOrderByViewsDesc(
-                        categories, tags, PostStatus.PUBLISHED);
+                return postRepository.findByCategoriesAndAllTagsOrderByViewsDesc(
+                        categories, tags, PostStatus.PUBLISHED, tags.size());
             }
             if (pageable != null) {
                 return postRepository.findByCategoryInAndStatusOrderByViewsDesc(categories, PostStatus.PUBLISHED, pageable);
@@ -158,9 +158,9 @@ public class PostService {
             return java.util.List.of();
         }
         if (pageable != null) {
-            return postRepository.findDistinctByTagsInAndStatusOrderByViewsDesc(tags, PostStatus.PUBLISHED, pageable);
+            return postRepository.findByAllTagsOrderByViewsDesc(tags, PostStatus.PUBLISHED, tags.size(), pageable);
         }
-        return postRepository.findDistinctByTagsInAndStatusOrderByViewsDesc(tags, PostStatus.PUBLISHED);
+        return postRepository.findByAllTagsOrderByViewsDesc(tags, PostStatus.PUBLISHED, tags.size());
     }
 
     public List<Post> listPostsByCategories(java.util.List<Long> categoryIds,
@@ -219,9 +219,9 @@ public class PostService {
         }
 
         if (pageable != null) {
-            return postRepository.findDistinctByTagsInAndStatus(tags, PostStatus.PUBLISHED, pageable);
+            return postRepository.findByAllTags(tags, PostStatus.PUBLISHED, tags.size(), pageable);
         }
-        return postRepository.findDistinctByTagsInAndStatus(tags, PostStatus.PUBLISHED);
+        return postRepository.findByAllTags(tags, PostStatus.PUBLISHED, tags.size());
     }
 
     public List<Post> listPostsByCategoriesAndTags(java.util.List<Long> categoryIds,
@@ -244,9 +244,9 @@ public class PostService {
         }
 
         if (pageable != null) {
-            return postRepository.findDistinctByCategoryInAndTagsInAndStatus(categories, tags, PostStatus.PUBLISHED, pageable);
+            return postRepository.findByCategoriesAndAllTags(categories, tags, PostStatus.PUBLISHED, tags.size(), pageable);
         }
-        return postRepository.findDistinctByCategoryInAndTagsInAndStatus(categories, tags, PostStatus.PUBLISHED);
+        return postRepository.findByCategoriesAndAllTags(categories, tags, PostStatus.PUBLISHED, tags.size());
     }
 
     public List<Post> listPendingPosts() {
