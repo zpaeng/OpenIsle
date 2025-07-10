@@ -12,6 +12,14 @@
         <div class="profile-page-header-user-info">
           <div class="profile-page-header-user-info-name">{{ user.username }}</div>
           <div class="profile-page-header-user-info-description">{{ user.introduction }}</div>
+          <div class="profile-page-header-subscribe-button">
+            <i class="fas fa-user-plus"></i>
+            关注
+          </div>
+          <div class="profile-page-header-unsubscribe-button">
+            <i class="fas fa-user-minus"></i>
+            取消关注
+          </div>
         </div>
       </div>
 
@@ -371,6 +379,41 @@ export default {
   font-size: 20px;
   color: #666;
 }
+.profile-page-header-subscribe-button {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+  font-size: 14px;
+  border-radius: 8px;
+  padding: 5px 10px;
+  color: white;
+  background-color: var(--primary-color);
+  margin-top: 15px;
+  width: fit-content;
+  cursor: pointer;
+}
+
+.profile-page-header-subscribe-button:hover {
+  background-color: var(--primary-color-hover);
+}
+
+.profile-page-header-unsubscribe-button {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+  font-size: 14px;
+  border-radius: 8px;
+  padding: 5px 10px;
+  color: var(--primary-color);
+  background-color: var(--background-color);
+  border: 1px solid var(--primary-color);
+  margin-top: 15px;
+  width: fit-content;
+  cursor: pointer;
+}
+
 .profile-info {
   display: flex;
   flex-direction: row;
