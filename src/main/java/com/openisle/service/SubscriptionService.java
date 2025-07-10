@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -54,7 +55,7 @@ public class SubscriptionService {
     public void subscribeUser(String username, String targetName) {
         if (username.equals(targetName)) return;
         User subscriber = userRepo.findByUsername(username).orElseThrow();
-        User target = userRepo.findByUsername(targetName).orElseThrow();
+        User target = findUser(targetName).orElseThrow();
         userSubRepo.findBySubscriberAndTarget(subscriber, target).orElseGet(() -> {
             UserSubscription us = new UserSubscription();
             us.setSubscriber(subscriber);
@@ -65,7 +66,7 @@ public class SubscriptionService {
 
     public void unsubscribeUser(String username, String targetName) {
         User subscriber = userRepo.findByUsername(username).orElseThrow();
-        User target = userRepo.findByUsername(targetName).orElseThrow();
+        User target = findUser(targetName).orElseThrow();
         userSubRepo.findBySubscriberAndTarget(subscriber, target).ifPresent(userSubRepo::delete);
     }
 
@@ -105,7 +106,14 @@ public class SubscriptionService {
             return false;
         }
         User subscriber = userRepo.findByUsername(subscriberName).orElseThrow();
-        User target = userRepo.findByUsername(targetName).orElseThrow();
+        User target = findUser(targetName).orElseThrow();
         return userSubRepo.findBySubscriberAndTarget(subscriber, target).isPresent();
+    }
+
+    private Optional<User> findUser(String identifier) {
+        if (identifier.matches("\\d+")) {
+            return userRepo.findById(Long.parseLong(identifier));
+        }
+        return userRepo.findByUsername(identifier);
     }
 }
