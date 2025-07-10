@@ -400,7 +400,6 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
   width: 100%;
 }
 
@@ -431,13 +430,11 @@ export default {
 }
 
 .article-item-title {
+  margin-top: 10px;
   font-size: 20px;
   text-decoration: none;
   color: var(--text-color);
-  line-clamp: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  max-width: 100%;
 }
 
 .article-item-title:hover {
@@ -476,6 +473,13 @@ export default {
   flex-direction: row;
   align-items: center;
   gap: 10px;
+}
+
+.article-main-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .article-member-avatars-container {
