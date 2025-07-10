@@ -97,6 +97,7 @@
 
 <script>
 import { ref, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { stripMarkdown } from '../utils/markdown'
 import { API_BASE_URL } from '../main'
 import TimeManager from '../utils/time'
@@ -117,11 +118,16 @@ export default {
     SearchDropdown
   },
   setup() {
-    const selectedCategory = ref('')
+    const route = useRoute()
+    const selectedCategory = ref(route.query.category || '')
     const selectedTags = ref([])
+    if (route.query.tags) {
+      const t = Array.isArray(route.query.tags) ? route.query.tags.join(',') : route.query.tags
+      selectedTags.value = t.split(',').filter(v => v).map(v => isNaN(v) ? v : Number(v))
+    }
     const isLoadingPosts = ref(false)
     const topics = ref(['最新', '排行榜' /*, '热门', '类别'*/])
-    const selectedTopic = ref('最新')
+    const selectedTopic = ref(route.query.view === 'ranking' ? '排行榜' : '最新')
 
     const articles = ref([])
     const page = ref(0)
