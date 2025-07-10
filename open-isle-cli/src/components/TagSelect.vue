@@ -1,21 +1,17 @@
 <template>
-  <Dropdown
-    v-model="selected"
-    :fetch-options="fetchTags"
-    multiple
-    placeholder="选择标签"
-    remote
-  >
+  <Dropdown v-model="selected" :fetch-options="fetchTags" multiple placeholder="选择标签" remote>
     <template #option="{ option }">
-      <div class="option-main">
-        <template v-if="option.icon">
-          <img v-if="isImageIcon(option.icon)" :src="option.icon" class="option-icon" />
-          <i v-else :class="['option-icon', option.icon]"></i>
-        </template>
-        <span>{{ option.name }}</span>
-        <span v-if="option.count > 0"> x {{ option.count }}</span>
+      <div class="option-container">
+        <div class="option-main">
+          <template v-if="option.icon">
+            <img v-if="isImageIcon(option.icon)" :src="option.icon" class="option-icon" />
+            <i v-else :class="['option-icon', option.icon]"></i>
+          </template>
+          <span>{{ option.name }}</span>
+          <span class="option-count" v-if="option.count > 0"> x {{ option.count }}</span>
+        </div>
+        <div v-if="option.description" class="option-desc">{{ option.description }}</div>
       </div>
-      <div v-if="option.description" class="option-desc">{{ option.description }}</div>
     </template>
   </Dropdown>
 </template>
@@ -51,7 +47,9 @@ export default {
         if (res.ok) {
           data = await res.json()
         }
-      } catch {}
+      } catch {
+        toast.error('获取标签失败')
+      }
 
       let options = [...data, ...localTags.value]
 
@@ -99,6 +97,12 @@ export default {
 </script>
 
 <style scoped>
+.option-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
 .option-main {
   display: flex;
   align-items: center;
@@ -109,5 +113,10 @@ export default {
   font-size: 12px;
   color: #666;
   margin-left: 21px;
+}
+
+.option-count {
+  font-weight: bold;
+  opacity: 0.4;
 }
 </style>

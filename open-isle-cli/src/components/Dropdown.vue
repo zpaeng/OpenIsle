@@ -197,10 +197,9 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .dropdown {
   position: relative;
-  min-width: 200px;
 }
 
 .dropdown-display {
@@ -211,6 +210,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  min-width: 100px;
 }
 
 .placeholder {
@@ -226,6 +226,7 @@ export default {
   border: 1px solid #ccc;
   z-index: 10;
   max-height: 200px;
+  min-width: 350px;
   overflow-y: auto;
 }
 
