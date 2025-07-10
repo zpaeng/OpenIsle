@@ -235,6 +235,7 @@ export default {
   background-color: var(--background-color);
   padding: 20px;
   height: calc(100vh - var(--header-height) - 40px);
+  overflow-y: auto;
 }
 
 .notif-content {
