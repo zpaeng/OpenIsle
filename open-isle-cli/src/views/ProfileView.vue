@@ -39,6 +39,10 @@
           <i class="fas fa-clock"></i>
           <div class="profile-tabs-item-label">时间线</div>
         </div>
+        <div :class="['profile-tabs-item', { selected: selectedTab === 'following' }]" @click="selectedTab = 'following'">
+          <i class="fas fa-user-plus"></i>
+          <div class="profile-tabs-item-label">关注</div>
+        </div>
       </div>
 
       <div v-if="selectedTab === 'summary'" class="profile-summary">
