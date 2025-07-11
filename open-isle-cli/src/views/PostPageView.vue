@@ -138,11 +138,17 @@ export default {
     const loggedIn = computed(() => authState.loggedIn)
     const isAdmin = computed(() => authState.role === 'ADMIN')
     const isAuthor = computed(() => authState.username === author.value.username)
-    const articleMenuItems = [
-      { text: '删除文章', color: 'red', onClick: () => deletePost() },
-      { text: '通过审核', onClick: () => approvePost() },
-      { text: '驳回', color: 'red', onClick: () => rejectPost() }
-    ]
+    const articleMenuItems = computed(() => {
+      const items = []
+      if (isAuthor.value) {
+        items.push({ text: '删除文章', color: 'red', onClick: () => deletePost() })
+      }
+      if (isAdmin.value && status.value === 'PENDING') {
+        items.push({ text: '通过审核', onClick: () => approvePost() })
+        items.push({ text: '驳回', color: 'red', onClick: () => rejectPost() })
+      }
+      return items
+    })
 
     const gatherPostItems = () => {
       const items = []
