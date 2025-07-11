@@ -13,15 +13,14 @@
       </div>
 
       <div v-if="isLogin" class="header-content-right">
-        <div class="avatar-container" @click="toggleDropdown">
-          <img class="avatar-img" :src="avatar" alt="avatar">
-          <i class="fas fa-caret-down dropdown-icon"></i>
-          <div v-if="dropdownVisible" class="dropdown-menu">
-            <div class="dropdown-item" @click="goToSettings">设置</div>
-            <div class="dropdown-item" @click="goToProfile">个人主页</div>
-            <div class="dropdown-item" @click="goToLogout">退出</div>
-          </div>
-        </div>
+        <DropdownMenu ref="userMenu" :items="headerMenuItems">
+          <template #trigger>
+            <div class="avatar-container">
+              <img class="avatar-img" :src="avatar" alt="avatar">
+              <i class="fas fa-caret-down dropdown-icon"></i>
+            </div>
+          </template>
+        </DropdownMenu>
       </div>
 
       <div v-else class="header-content-right">
@@ -35,9 +34,11 @@
 <script>
 import { authState, clearToken, loadCurrentUser } from '../utils/auth'
 import { watch } from 'vue'
+import DropdownMenu from './DropdownMenu.vue'
 
 export default {
   name: 'HeaderComponent',
+  components: { DropdownMenu },
   props: {
     showMenuBtn: {
       type: Boolean,
@@ -46,13 +47,19 @@ export default {
   },
   data() {
     return {
-      dropdownVisible: false,
       avatar: ''
     }
   },
   computed: {
     isLogin() {
       return authState.loggedIn
+    },
+    headerMenuItems() {
+      return [
+        { text: '设置', onClick: this.goToSettings },
+        { text: '个人主页', onClick: this.goToProfile },
+        { text: '退出', onClick: this.goToLogout }
+      ]
     }
   },
   async mounted() {
@@ -72,25 +79,12 @@ export default {
     })
 
     watch(() => this.$route.fullPath, () => {
-      this.dropdownVisible = false
+      if (this.$refs.userMenu) this.$refs.userMenu.close()
     })
-
-    this.onClickOutside = (e) => {
-      if (!this.$el.contains(e.target)) {
-        this.dropdownVisible = false
-      }
-    }
-    document.addEventListener('click', this.onClickOutside)
   },
 
-  beforeUnmount() {
-    document.removeEventListener('click', this.onClickOutside)
-  },
 
   methods: {
-    toggleDropdown() {
-      this.dropdownVisible = !this.dropdownVisible
-    },
     goToHome() {
       this.$router.push('/')
     },
@@ -99,7 +93,6 @@ export default {
     },
     goToSettings() {
       this.$router.push('/settings')
-      this.dropdownVisible = false
     },
     async goToProfile() {
       if (!authState.loggedIn) {
@@ -116,14 +109,12 @@ export default {
       if (id) {
         this.$router.push(`/users/${id}`)
       }
-      this.dropdownVisible = false
     },
     goToSignup() {
       this.$router.push('/signup')
     },
     goToLogout() {
       clearToken()
-      this.dropdownVisible = false
       this.$router.push('/login')
     }
   }

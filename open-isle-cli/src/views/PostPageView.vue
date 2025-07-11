@@ -27,14 +27,11 @@
             <i class="fas fa-user-minus"></i>
             取消订阅
           </div>
-          <div class="article-arrow-button">
-            <i class="fas fa-arrow-right"></i>
-            通过审核
-          </div>
-          <div class="article-reject-button">
-            <i class="fas fa-times"></i>
-            驳回
-          </div>
+          <DropdownMenu :items="reviewMenuItems">
+            <template #trigger>
+              <i class="fas fa-ellipsis-vertical action-menu-icon"></i>
+            </template>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -106,6 +103,7 @@ import BaseTimeline from '../components/BaseTimeline.vue'
 import ArticleTags from '../components/ArticleTags.vue'
 import ArticleCategory from '../components/ArticleCategory.vue'
 import ReactionsGroup from '../components/ReactionsGroup.vue'
+import DropdownMenu from '../components/DropdownMenu.vue'
 import { renderMarkdown } from '../utils/markdown'
 import { API_BASE_URL, toast } from '../main'
 import { getToken } from '../utils/auth'
@@ -116,7 +114,7 @@ hatch.register()
 
 export default {
   name: 'PostPageView',
-  components: { CommentItem, CommentEditor, BaseTimeline, ArticleTags, ArticleCategory, ReactionsGroup },
+  components: { CommentItem, CommentEditor, BaseTimeline, ArticleTags, ArticleCategory, ReactionsGroup, DropdownMenu },
   setup() {
     const route = useRoute()
     const postId = route.params.id
@@ -135,6 +133,10 @@ export default {
     const postItems = ref([])
     const mainContainer = ref(null)
     const currentIndex = ref(1)
+    const reviewMenuItems = [
+      { text: '通过审核', onClick: () => {} },
+      { text: '驳回', color: 'red', onClick: () => {} }
+    ]
 
     const gatherPostItems = () => {
       const items = []
@@ -336,6 +338,7 @@ export default {
       currentIndex,
       totalPosts,
       postReactions,
+      reviewMenuItems,
       postId,
       postComment,
       onSliderInput,
@@ -522,7 +525,7 @@ export default {
   cursor: pointer;
 }
 
-.article-reject-button { 
+.article-reject-button {
   background-color: red;
   color: white;
   border: 1px solid red;
@@ -530,6 +533,12 @@ export default {
   border-radius: 8px;
   font-size: 14px;
   cursor: pointer;
+}
+
+.action-menu-icon {
+  cursor: pointer;
+  font-size: 18px;
+  padding: 5px;
 }
 
 .article-info-container {
