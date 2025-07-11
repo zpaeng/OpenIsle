@@ -157,6 +157,12 @@
       </div>
 
       <div v-else-if="selectedTab === 'timeline'" class="profile-timeline">
+        <div v-if="timelineItems.length === 0" class="no-timeline">
+          <i class="fas fa-inbox no-timeline-icon"></i>
+          <div class="no-timeline-text">
+            暂无时间线
+          </div>
+        </div>
         <BaseTimeline :items="timelineItems">
           <template #item="{ item }">
             <template v-if="item.type === 'post'">
@@ -627,4 +633,18 @@ export default {
   padding-left: 20px;
 }
 
+.no-timeline {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  opacity: 0.5;
+}
+
+.no-timeline-text {
+  font-size: 16px;
+  color: var(--text-color);
+}
 </style>

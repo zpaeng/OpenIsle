@@ -18,7 +18,7 @@
           <span class="notif-type">
             <template v-if="item.type === 'COMMENT_REPLY' && item.parentComment">
               <div class="notif-content-container">
-                <span class="notif-user">{{ item.comment.author.username }} </span> 对我的评论
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.comment.author.id}`">{{ item.comment.author.username }} </router-link> 对我的评论
                 <span>
                   <router-link class="notif-content-text" @click="markRead(item.id)"
                     :to="`/posts/${item.post.id}#comment-${item.parentComment.id}`">
@@ -33,7 +33,7 @@
             </template>
             <template v-else-if="item.type === 'COMMENT_REPLY' && !item.parentComment">
               <div class="notif-content-container">
-                <span class="notif-user">{{ item.comment.author.username }} </span> 对我的文章
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.comment.author.id}`">{{ item.comment.author.username }} </router-link> 对我的文章
                 <span>
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
                     {{ sanitizeDescription(item.post.title) }}
@@ -58,7 +58,7 @@
             </template>
             <template v-else-if="item.type === 'REACTION' && item.comment">
               <div class="notif-content-container">
-                <span class="notif-user">{{ item.fromUser.username }} </span> 对我的评论
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">{{ item.fromUser.username }} </router-link> 对我的评论
                 <span>
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
                     {{ sanitizeDescription(item.comment.content) }}

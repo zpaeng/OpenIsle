@@ -109,7 +109,9 @@ export default {
         }
       }
       if (id) {
-        this.$router.push(`/users/${id}`)
+        this.$router.push(`/users/${id}`).then(() => {
+          window.location.reload()
+        })
       }
     },
     goToSignup() {

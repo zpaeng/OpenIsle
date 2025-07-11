@@ -260,6 +260,7 @@ export default {
   flex-wrap: wrap;
   z-index: 10;
   gap: 2px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
 }
 
 .reaction-option {
