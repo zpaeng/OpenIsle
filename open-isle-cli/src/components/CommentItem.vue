@@ -14,7 +14,7 @@
           <div class="post-time">{{ comment.time }}</div>
         </div>
         <div class="info-content-header-right">
-          <DropdownMenu :items="commentMenuItems">
+          <DropdownMenu v-if="commentMenuItems.length > 0" :items="commentMenuItems">
             <template #trigger>
               <i class="fas fa-ellipsis-vertical action-menu-icon"></i>
             </template>

@@ -27,7 +27,7 @@
             <i class="fas fa-user-minus"></i>
             取消订阅
           </div>
-          <DropdownMenu :items="articleMenuItems">
+          <DropdownMenu v-if="articleMenuItems.length > 0" :items="articleMenuItems">
             <template #trigger>
               <i class="fas fa-ellipsis-vertical action-menu-icon"></i>
             </template>
