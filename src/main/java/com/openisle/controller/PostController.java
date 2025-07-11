@@ -8,6 +8,7 @@ import com.openisle.service.PostService;
 import com.openisle.service.ReactionService;
 import com.openisle.service.CaptchaService;
 import com.openisle.service.DraftService;
+import com.openisle.service.SubscriptionService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ public class PostController {
     private final PostService postService;
     private final CommentService commentService;
     private final ReactionService reactionService;
+    private final SubscriptionService subscriptionService;
     private final CaptchaService captchaService;
     private final DraftService draftService;
 
@@ -50,7 +52,7 @@ public class PostController {
     public ResponseEntity<PostDto> getPost(@PathVariable Long id, Authentication auth) {
         String viewer = auth != null ? auth.getName() : null;
         Post post = postService.viewPost(id, viewer);
-        return ResponseEntity.ok(toDto(post));
+        return ResponseEntity.ok(toDto(post, viewer));
     }
 
     @GetMapping
@@ -131,6 +133,16 @@ public class PostController {
         java.util.List<com.openisle.model.User> participants = commentService.getParticipants(post.getId(), 5);
         dto.setParticipants(participants.stream().map(this::toAuthorDto).collect(Collectors.toList()));
 
+        return dto;
+    }
+
+    private PostDto toDto(Post post, String viewer) {
+        PostDto dto = toDto(post);
+        if (viewer != null) {
+            dto.setSubscribed(subscriptionService.isPostSubscribed(viewer, post.getId()));
+        } else {
+            dto.setSubscribed(false);
+        }
         return dto;
     }
 
@@ -223,6 +235,7 @@ public class PostController {
         private List<CommentDto> comments;
         private List<ReactionDto> reactions;
         private java.util.List<AuthorDto> participants;
+        private boolean subscribed;
     }
 
     @Data

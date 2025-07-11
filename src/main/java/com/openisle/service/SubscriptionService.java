@@ -26,6 +26,10 @@ public class SubscriptionService {
             PostSubscription ps = new PostSubscription();
             ps.setUser(user);
             ps.setPost(post);
+            if (!user.getId().equals(post.getAuthor().getId())) {
+                notificationService.createNotification(post.getAuthor(),
+                        NotificationType.POST_SUBSCRIBED, post, null, null, user, null);
+            }
             return postSubRepo.save(ps);
         });
     }
@@ -33,7 +37,13 @@ public class SubscriptionService {
     public void unsubscribePost(String username, Long postId) {
         User user = userRepo.findByUsername(username).orElseThrow();
         Post post = postRepo.findById(postId).orElseThrow();
-        postSubRepo.findByUserAndPost(user, post).ifPresent(postSubRepo::delete);
+        postSubRepo.findByUserAndPost(user, post).ifPresent(ps -> {
+            postSubRepo.delete(ps);
+            if (!user.getId().equals(post.getAuthor().getId())) {
+                notificationService.createNotification(post.getAuthor(),
+                        NotificationType.POST_UNSUBSCRIBED, post, null, null, user, null);
+            }
+        });
     }
 
     public void subscribeComment(String username, Long commentId) {
@@ -115,6 +125,15 @@ public class SubscriptionService {
         User subscriber = userRepo.findByUsername(subscriberName).orElseThrow();
         User target = findUser(targetName).orElseThrow();
         return userSubRepo.findBySubscriberAndTarget(subscriber, target).isPresent();
+    }
+
+    public boolean isPostSubscribed(String username, Long postId) {
+        if (username == null || postId == null) {
+            return false;
+        }
+        User user = userRepo.findByUsername(username).orElseThrow();
+        Post post = postRepo.findById(postId).orElseThrow();
+        return postSubRepo.findByUserAndPost(user, post).isPresent();
     }
 
     private Optional<User> findUser(String identifier) {

@@ -19,11 +19,19 @@
           <div class="article-block-button">
             BLOCK
           </div>
-          <div class="article-subscribe-button">
+          <div
+            v-if="loggedIn && !isAuthor && !subscribed"
+            class="article-subscribe-button"
+            @click="subscribePost"
+          >
             <i class="fas fa-user-plus"></i>
             订阅文章
           </div>
-          <div class="article-unsubscribe-button">
+          <div
+            v-if="loggedIn && !isAuthor && subscribed"
+            class="article-unsubscribe-button"
+            @click="unsubscribePost"
+          >
             <i class="fas fa-user-minus"></i>
             取消订阅
           </div>
@@ -106,7 +114,7 @@ import ReactionsGroup from '../components/ReactionsGroup.vue'
 import DropdownMenu from '../components/DropdownMenu.vue'
 import { renderMarkdown } from '../utils/markdown'
 import { API_BASE_URL, toast } from '../main'
-import { getToken } from '../utils/auth'
+import { getToken, authState } from '../utils/auth'
 import TimeManager from '../utils/time'
 import { hatch } from 'ldrs'
 import { useRouter } from 'vue-router'
@@ -133,6 +141,9 @@ export default {
     const postItems = ref([])
     const mainContainer = ref(null)
     const currentIndex = ref(1)
+    const subscribed = ref(false)
+    const loggedIn = computed(() => authState.loggedIn)
+    const isAuthor = computed(() => authState.username === author.value.username)
     const reviewMenuItems = [
       { text: '通过审核', onClick: () => {} },
       { text: '驳回', color: 'red', onClick: () => {} }
@@ -211,6 +222,7 @@ export default {
         tags.value = data.tags || []
         postReactions.value = data.reactions || []
         comments.value = (data.comments || []).map(mapComment)
+        subscribed.value = !!data.subscribed
         postTime.value = TimeManager.format(data.createdAt)
         await nextTick()
         gatherPostItems()
@@ -296,6 +308,42 @@ export default {
       })
     }
 
+    const subscribePost = async () => {
+      const token = getToken()
+      if (!token) {
+        toast.error('请先登录')
+        return
+      }
+      const res = await fetch(`${API_BASE_URL}/api/subscriptions/posts/${postId}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.ok) {
+        subscribed.value = true
+        toast.success('已订阅')
+      } else {
+        toast.error('操作失败')
+      }
+    }
+
+    const unsubscribePost = async () => {
+      const token = getToken()
+      if (!token) {
+        toast.error('请先登录')
+        return
+      }
+      const res = await fetch(`${API_BASE_URL}/api/subscriptions/posts/${postId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.ok) {
+        subscribed.value = false
+        toast.success('已取消订阅')
+      } else {
+        toast.error('操作失败')
+      }
+    }
+
     const jumpToHashComment = async () => {
       const hash = location.hash
       if (hash.startsWith('#comment-')) {
@@ -344,10 +392,15 @@ export default {
       onSliderInput,
       onScroll: updateCurrentIndex,
       copyPostLink,
+      subscribePost,
+      unsubscribePost,
       renderMarkdown,
       isWaitingFetchingPost,
       isWaitingPostingComment,
-      gotoProfile
+      gotoProfile,
+      subscribed,
+      loggedIn,
+      isAuthor
     }
   }
 }
