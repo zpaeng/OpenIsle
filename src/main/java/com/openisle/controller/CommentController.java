@@ -65,6 +65,11 @@ public class CommentController {
         return dto;
     }
 
+    @DeleteMapping("/comments/{id}")
+    public void deleteComment(@PathVariable Long id, Authentication auth) {
+        commentService.deleteComment(auth.getName(), id);
+    }
+
     private CommentDto toDto(Comment comment) {
         CommentDto dto = new CommentDto();
         dto.setId(comment.getId());

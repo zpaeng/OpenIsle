@@ -64,7 +64,7 @@
       <div class="comments-container">
         <BaseTimeline :items="comments">
           <template #item="{ item }">
-            <CommentItem :key="item.id" :comment="item" :level="level + 1" :default-show-replies="item.openReplies" />
+            <CommentItem :key="item.id" :comment="item" :level="level + 1" :default-show-replies="item.openReplies" @deleted="onCommentDeleted" />
           </template>
         </BaseTimeline>
         <!-- <CommentItem
@@ -209,6 +209,24 @@ export default {
       }
     }
 
+    const removeCommentFromList = (id, list) => {
+      for (let i = 0; i < list.length; i++) {
+        const item = list[i]
+        if (item.id === id) {
+          list.splice(i, 1)
+          return true
+        }
+        if (item.reply && item.reply.length) {
+          if (removeCommentFromList(id, item.reply)) return true
+        }
+      }
+      return false
+    }
+
+    const onCommentDeleted = (id) => {
+      removeCommentFromList(Number(id), comments.value)
+    }
+
     const fetchPost = async () => {
       try {
         isWaitingFetchingPost.value = true;
@@ -347,6 +365,21 @@ export default {
     }
 
     const deletePost = async () => {
+      const token = getToken()
+      if (!token) {
+        toast.error('请先登录')
+        return
+      }
+      const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.ok) {
+        toast.success('已删除')
+        router.push('/')
+      } else {
+        toast.error('操作失败')
+      }
     }
 
     const rejectPost = async () => {
@@ -443,6 +476,8 @@ export default {
       status,
       isAdmin,
       approvePost,
+      onCommentDeleted,
+      deletePost,
       rejectPost
     }
   }

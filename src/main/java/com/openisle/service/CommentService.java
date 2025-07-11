@@ -7,8 +7,12 @@ import com.openisle.model.NotificationType;
 import com.openisle.repository.CommentRepository;
 import com.openisle.repository.PostRepository;
 import com.openisle.repository.UserRepository;
+import com.openisle.repository.ReactionRepository;
+import com.openisle.repository.CommentSubscriptionRepository;
+import com.openisle.repository.NotificationRepository;
 import com.openisle.service.NotificationService;
 import com.openisle.service.SubscriptionService;
+import com.openisle.model.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +28,9 @@ public class CommentService {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final SubscriptionService subscriptionService;
+    private final ReactionRepository reactionRepository;
+    private final CommentSubscriptionRepository commentSubscriptionRepository;
+    private final NotificationRepository notificationRepository;
 
     public Comment addComment(String username, Long postId, String content) {
         User author = userRepository.findByUsername(username)
@@ -114,5 +121,29 @@ public class CommentService {
 
     public java.util.List<Comment> getCommentsByIds(java.util.List<Long> ids) {
         return commentRepository.findAllById(ids);
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public void deleteComment(String username, Long id) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+        if (!user.getId().equals(comment.getAuthor().getId()) && user.getRole() != Role.ADMIN) {
+            throw new IllegalArgumentException("Unauthorized");
+        }
+        deleteCommentCascade(comment);
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public void deleteCommentCascade(Comment comment) {
+        List<Comment> replies = commentRepository.findByParentOrderByCreatedAtAsc(comment);
+        for (Comment c : replies) {
+            deleteCommentCascade(c);
+        }
+        reactionRepository.findByComment(comment).forEach(reactionRepository::delete);
+        commentSubscriptionRepository.findByComment(comment).forEach(commentSubscriptionRepository::delete);
+        notificationRepository.findByComment(comment).forEach(n -> { n.setComment(null); notificationRepository.save(n); });
+        commentRepository.delete(comment);
     }
 }

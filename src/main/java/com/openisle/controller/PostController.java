@@ -48,6 +48,11 @@ public class PostController {
         return ResponseEntity.ok(toDto(post));
     }
 
+    @DeleteMapping("/{id}")
+    public void deletePost(@PathVariable Long id, Authentication auth) {
+        postService.deletePost(id, auth.getName());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<PostDto> getPost(@PathVariable Long id, Authentication auth) {
         String viewer = auth != null ? auth.getName() : null;
