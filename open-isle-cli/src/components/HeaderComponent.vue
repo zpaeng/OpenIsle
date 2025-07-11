@@ -86,7 +86,9 @@ export default {
 
   methods: {
     goToHome() {
-      this.$router.push('/')
+      this.$router.push('/').then(() => {
+        window.location.reload()
+      })
     },
     goToLogin() {
       this.$router.push('/login')

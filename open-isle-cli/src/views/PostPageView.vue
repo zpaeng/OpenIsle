@@ -19,19 +19,11 @@
           <div v-if="status === 'REJECTED'" class="article-block-button">
             已拒绝
           </div>
-          <div
-            v-if="loggedIn && !isAuthor && !subscribed"
-            class="article-subscribe-button"
-            @click="subscribePost"
-          >
+          <div v-if="loggedIn && !isAuthor && !subscribed" class="article-subscribe-button" @click="subscribePost">
             <i class="fas fa-user-plus"></i>
             订阅文章
           </div>
-          <div
-            v-if="loggedIn && !isAuthor && subscribed"
-            class="article-unsubscribe-button"
-            @click="unsubscribePost"
-          >
+          <div v-if="loggedIn && !isAuthor && subscribed" class="article-unsubscribe-button" @click="unsubscribePost">
             <i class="fas fa-user-minus"></i>
             取消订阅
           </div>
@@ -132,9 +124,9 @@ export default {
     const author = ref('')
     const postContent = ref('')
     const category = ref('')
-   const tags = ref([])
-   const postReactions = ref([])
-   const comments = ref([])
+    const tags = ref([])
+    const postReactions = ref([])
+    const comments = ref([])
     const status = ref('PUBLISHED')
     const isWaitingFetchingPost = ref(false);
     const isWaitingPostingComment = ref(false);
@@ -143,10 +135,10 @@ export default {
     const mainContainer = ref(null)
     const currentIndex = ref(1)
     const subscribed = ref(false)
-   const loggedIn = computed(() => authState.loggedIn)
+    const loggedIn = computed(() => authState.loggedIn)
     const isAdmin = computed(() => authState.role === 'ADMIN')
     const isAuthor = computed(() => authState.username === author.value.username)
-   const reviewMenuItems = [
+    const reviewMenuItems = [
       { text: '通过审核', onClick: () => approvePost() },
       { text: '驳回', color: 'red', onClick: () => rejectPost() }
     ]
@@ -332,13 +324,6 @@ export default {
       }
     }
 
-   const unsubscribePost = async () => {
-      const token = getToken()
-      if (!token) {
-        toast.error('请先登录')
-        return
-   }
-
     const approvePost = async () => {
       const token = getToken()
       if (!token) return
@@ -368,6 +353,14 @@ export default {
         toast.error('操作失败')
       }
     }
+    const unsubscribePost = async () => {
+      const token = getToken()
+      if (!token) {
+        toast.error('请先登录')
+        return
+      }
+
+
       const res = await fetch(`${API_BASE_URL}/api/subscriptions/posts/${postId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
