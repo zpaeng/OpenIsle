@@ -3,7 +3,7 @@
     <div class="dropdown-trigger" @click="toggle">
       <slot name="trigger"></slot>
     </div>
-    <div v-if="visible" class="dropdown-menu">
+    <div v-if="visible" class="dropdown-menu-container">
       <div
         v-for="(item, idx) in items"
         :key="idx"
@@ -66,7 +66,8 @@ export default {
   display: inline-flex;
   align-items: center;
 }
-.dropdown-menu {
+
+.dropdown-menu-container {
   position: absolute;
   top: 100%;
   right: 0;
@@ -75,7 +76,10 @@ export default {
   border-radius: 4px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   z-index: 10;
+  border-radius: 8px;
+  min-width: 100px;
 }
+
 .dropdown-item {
   padding: 8px 16px;
   white-space: nowrap;

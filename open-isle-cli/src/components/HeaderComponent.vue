@@ -214,17 +214,6 @@ export default {
   margin-left: 5px;
 }
 
-.dropdown-menu {
-  position: absolute;
-  top: 40px;
-  right: 0;
-  background-color: var(--menu-background-color);
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  z-index: 10;
-}
-
 .dropdown-item {
   padding: 8px 16px;
   white-space: nowrap;
