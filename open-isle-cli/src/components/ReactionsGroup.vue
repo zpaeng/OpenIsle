@@ -235,8 +235,8 @@ export default {
 
 .reactions-panel {
   position: absolute;
-  bottom: 30px;
-  left: 0;
+  bottom: 40px;
+  left: -20px;
   background-color: var(--background-color);
   border: 1px solid #ccc;
   border-radius: 5px;
