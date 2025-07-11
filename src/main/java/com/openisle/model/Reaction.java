@@ -12,7 +12,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "reactions")
+@Table(name = "reactions",
+       uniqueConstraints = {
+           @UniqueConstraint(columnNames = {"user_id", "post_id", "type"}),
+           @UniqueConstraint(columnNames = {"user_id", "comment_id", "type"})
+       })
 public class Reaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
