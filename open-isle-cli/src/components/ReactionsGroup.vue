@@ -1,7 +1,8 @@
 <template>
   <div class="reactions-container">
     <div class="reactions-viewer">
-      <div class="reactions-viewer-item-container" @click="openPanel" @mouseenter="cancelHide" @mouseleave="scheduleHide">
+      <div class="reactions-viewer-item-container" @click="openPanel" @mouseenter="cancelHide"
+        @mouseleave="scheduleHide">
         <template v-if="displayedReactions.length">
           <div v-for="r in displayedReactions" :key="r.type" class="reactions-viewer-item">{{ iconMap[r.type] }}</div>
           <div class="reactions-count">{{ totalCount }}</div>
@@ -13,14 +14,16 @@
       </div>
     </div>
     <div class="make-reaction-container">
-      <div class="make-reaction-item like-reaction" @click="toggleReaction('LIKE')" :class="{ selected: userReacted('LIKE') }">
+      <div class="make-reaction-item like-reaction" @click="toggleReaction('LIKE')"
+        :class="{ selected: userReacted('LIKE') }">
         <i class="far fa-heart"></i>
         <span v-if="likeCount">{{ likeCount }}</span>
       </div>
       <slot></slot>
     </div>
     <div v-if="panelVisible" class="reactions-panel" @mouseenter="cancelHide" @mouseleave="scheduleHide">
-      <div v-for="t in panelTypes" :key="t" class="reaction-option" @click="toggleReaction(t)" :class="{ selected: userReacted(t) }">
+      <div v-for="t in panelTypes" :key="t" class="reaction-option" @click="toggleReaction(t)"
+        :class="{ selected: userReacted(t) }">
         {{ iconMap[t] }}<span v-if="counts[t]">{{ counts[t] }}</span>
       </div>
     </div>
@@ -162,18 +165,95 @@ export default {
 </script>
 
 <style scoped>
-.reactions-container { position: relative; display: flex; flex-direction: row; gap: 10px; align-items: center; width: 100%; justify-content: space-between; }
-.reactions-viewer { display: flex; flex-direction: row; gap: 20px; align-items: center; }
-.reactions-viewer-item-container { display: flex; flex-direction: row; gap: 2px; align-items: center; cursor: pointer; }
-.reactions-viewer-item { font-size: 16px; }
-.reactions-viewer-item.placeholder { opacity: 0.5; display: flex; flex-direction: row; align-items: center; }
-.reactions-viewer-item-placeholder-text { font-size: 14px; padding-left: 5px; }
-.reactions-count { font-size: 16px; opacity: 0.5; }
-.make-reaction-container { display: flex; flex-direction: row; gap: 10px; }
-.make-reaction-item { cursor: pointer; padding: 10px; border-radius: 50%; opacity: 0.5; font-size: 20px; }
-.like-reaction { color: #ff0000; }
-.like-reaction.selected { background-color: #ffe2e2; }
-.reactions-panel { position: absolute; bottom: 30px; left: 0; background-color: var(--background-color); border: 1px solid #ccc; border-radius: 5px; padding: 5px; display: flex; flex-direction: row; gap: 5px; z-index: 10; }
-.reaction-option { cursor: pointer; padding: 5px; border-radius: 4px; }
-.reaction-option.selected { background-color: #e2e2e2; }
+.reactions-container {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.reactions-viewer {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
+}
+
+.reactions-viewer-item-container {
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+  align-items: center;
+  cursor: pointer;
+}
+
+.reactions-viewer-item {
+  font-size: 16px;
+}
+
+.reactions-viewer-item.placeholder {
+  opacity: 0.5;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.reactions-viewer-item-placeholder-text {
+  font-size: 14px;
+  padding-left: 5px;
+}
+
+.reactions-count {
+  font-size: 16px;
+  opacity: 0.5;
+}
+
+.make-reaction-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.make-reaction-item {
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 50%;
+  opacity: 0.5;
+  font-size: 20px;
+}
+
+.like-reaction {
+  color: #ff0000;
+}
+
+.like-reaction.selected {
+  background-color: #ffe2e2;
+}
+
+.reactions-panel {
+  position: absolute;
+  bottom: 30px;
+  left: 0;
+  background-color: var(--background-color);
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  z-index: 10;
+}
+
+.reaction-option {
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.reaction-option.selected {
+  background-color: #e2e2e2;
+}
 </style>
