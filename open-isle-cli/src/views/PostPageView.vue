@@ -5,10 +5,36 @@
     </div>
     <div v-else class="post-page-main-container" ref="mainContainer" @scroll="onScroll">
       <div class="article-title-container">
-        <div class="article-title">{{ title }}</div>
-        <div class="article-info-container">
-          <ArticleCategory :category="category" />
-          <ArticleTags :tags="tags" />
+        <div class="article-title-container-left">
+          <div class="article-title">{{ title }}</div>
+          <div class="article-info-container">
+            <ArticleCategory :category="category" />
+            <ArticleTags :tags="tags" />
+          </div>
+        </div>
+        <div class="article-title-container-right">
+          <div class="article-pending-button">
+            PENDING
+          </div>
+          <div class="article-block-button">
+            BLOCK
+          </div>
+          <div class="article-subscribe-button">
+            <i class="fas fa-user-plus"></i>
+            订阅文章
+          </div>
+          <div class="article-unsubscribe-button">
+            <i class="fas fa-user-minus"></i>
+            取消订阅
+          </div>
+          <div class="article-arrow-button">
+            <i class="fas fa-arrow-right"></i>
+            通过审核
+          </div>
+          <div class="article-reject-button">
+            <i class="fas fa-times"></i>
+            驳回
+          </div>
         </div>
       </div>
 
@@ -423,12 +449,87 @@ export default {
 
 .article-title-container {
   display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.article-title-container-left {
+  display: flex;
   flex-direction: column;
+}
+
+.article-title-container-right {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+}
+
+.article-subscribe-button {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.article-subscribe-button:hover {
+  background-color: var(--primary-color-hover);
+}
+
+.article-unsubscribe-button {
+  background-color: var(--background-color);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.article-pending-button {
+  background-color: var(--background-color);
+  color: orange;
+  border: 1px solid orange;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.article-block-button {
+  background-color: var(--background-color);
+  color: red;
+  border: 1px solid red;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 14px;
 }
 
 .article-title {
   font-size: 30px;
   font-weight: bold;
+}
+
+.article-arrow-button {
+  background-color: green;
+  color: white;
+  border: 1px solid green;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.article-reject-button { 
+  background-color: red;
+  color: white;
+  border: 1px solid red;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
 }
 
 .article-info-container {
