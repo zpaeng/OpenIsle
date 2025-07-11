@@ -140,6 +140,45 @@
                 </router-link>
               </div>
             </template>
+            <template v-else-if="item.type === 'POST_REVIEW_REQUEST' && item.fromUser">
+              <div class="notif-content-container">
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
+                  {{ item.fromUser.username }}
+                </router-link>
+                发布了帖子
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                  {{ sanitizeDescription(item.post.title) }}
+                </router-link>
+                ，请审核
+              </div>
+            </template>
+            <template v-else-if="item.type === 'POST_REVIEW_REQUEST'">
+              <div class="notif-content-container">
+                您发布的帖子
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                  {{ sanitizeDescription(item.post.title) }}
+                </router-link>
+                已提交审核
+              </div>
+            </template>
+            <template v-else-if="item.type === 'POST_REVIEWED' && item.approved">
+              <div class="notif-content-container">
+                您发布的帖子
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                  {{ sanitizeDescription(item.post.title) }}
+                </router-link>
+                已审核通过
+              </div>
+            </template>
+            <template v-else-if="item.type === 'POST_REVIEWED' && item.approved === false">
+              <div class="notif-content-container">
+                您发布的帖子
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                  {{ sanitizeDescription(item.post.title) }}
+                </router-link>
+                已被管理员拒绝
+              </div>
+            </template>
             <template v-else>
               <div class="notif-content-container">
                 {{ formatType(item.type) }}
