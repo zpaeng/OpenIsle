@@ -17,7 +17,7 @@
             PENDING
           </div>
           <div class="article-block-button">
-            BLOCK
+            REJECT
           </div>
           <div
             v-if="loggedIn && !isAuthor && !subscribed"
@@ -211,7 +211,10 @@ export default {
     const fetchPost = async () => {
       try {
         isWaitingFetchingPost.value = true;
-        const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`)
+        const token = getToken()
+        const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
+          headers: { Authorization: token ? `Bearer ${token}` : '' }
+        })
         isWaitingFetchingPost.value = false;
         if (!res.ok) return
         const data = await res.json()

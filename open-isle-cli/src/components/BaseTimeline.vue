@@ -77,7 +77,7 @@ export default {
   width: 2px;
   bottom: -20px;
   background: var(--text-color);
-  opacity: 0.2;
+  opacity: 0.08;
 }
 
 .timeline-item:last-child::before {
