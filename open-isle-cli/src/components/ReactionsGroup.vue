@@ -14,9 +14,9 @@
       </div>
     </div>
     <div class="make-reaction-container">
-      <div class="make-reaction-item like-reaction" @click="toggleReaction('LIKE')"
-        :class="{ selected: userReacted('LIKE') }">
-        <i class="far fa-heart"></i>
+      <div class="make-reaction-item like-reaction" @click="toggleReaction('LIKE')">
+        <i v-if="!userReacted('LIKE')" class="far fa-heart"></i>
+        <i v-else class="fas fa-heart"></i>
         <span class="reactions-count" v-if="likeCount">{{ likeCount }}</span>
       </div>
       <slot></slot>
@@ -254,19 +254,25 @@ export default {
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 5px;
+  max-width: 240px;
   display: flex;
   flex-direction: row;
-  gap: 5px;
+  flex-wrap: wrap;
   z-index: 10;
+  gap: 2px;
 }
 
 .reaction-option {
   cursor: pointer;
-  padding: 5px;
+  padding: 2px 4px;
   border-radius: 4px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
 }
 
 .reaction-option.selected {
-  background-color: #e2e2e2;
+  background-color: rgb(236, 236, 236);
 }
 </style>
