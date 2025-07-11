@@ -282,6 +282,13 @@ public class PostService {
     public Post approvePost(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+        // publish all pending tags along with the post
+        for (com.openisle.model.Tag tag : post.getTags()) {
+            if (!tag.isApproved()) {
+                tag.setApproved(true);
+                tagRepository.save(tag);
+            }
+        }
         post.setStatus(PostStatus.PUBLISHED);
         post = postRepository.save(post);
         notificationService.createNotification(post.getAuthor(), NotificationType.POST_REVIEWED, post, null, true);
@@ -291,6 +298,17 @@ public class PostService {
     public Post rejectPost(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+        // remove user created tags that are only linked to this post
+        java.util.Set<com.openisle.model.Tag> tags = new java.util.HashSet<>(post.getTags());
+        for (com.openisle.model.Tag tag : tags) {
+            if (!tag.isApproved()) {
+                long count = postRepository.countDistinctByTags_Id(tag.getId());
+                if (count <= 1) {
+                    post.getTags().remove(tag);
+                    tagRepository.delete(tag);
+                }
+            }
+        }
         post.setStatus(PostStatus.REJECTED);
         post = postRepository.save(post);
         notificationService.createNotification(post.getAuthor(), NotificationType.POST_REVIEWED, post, null, false);
