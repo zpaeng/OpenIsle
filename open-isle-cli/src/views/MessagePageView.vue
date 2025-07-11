@@ -95,6 +95,28 @@
                 </router-link>
               </div>
             </template>
+            <template v-else-if="item.type === 'POST_SUBSCRIBED'">
+              <div class="notif-content-container">
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
+                  {{ item.fromUser.username }}
+                </router-link>
+                订阅了你的文章
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                  {{ sanitizeDescription(item.post.title) }}
+                </router-link>
+              </div>
+            </template>
+            <template v-else-if="item.type === 'POST_UNSUBSCRIBED'">
+              <div class="notif-content-container">
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
+                  {{ item.fromUser.username }}
+                </router-link>
+                取消订阅了你的文章
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                  {{ sanitizeDescription(item.post.title) }}
+                </router-link>
+              </div>
+            </template>
             <template v-else>
               <div class="notif-content-container">
                 {{ formatType(item.type) }}
@@ -146,7 +168,9 @@ export default {
       USER_ACTIVITY: 'fas fa-user',
       FOLLOWED_POST: 'fas fa-feather-alt',
       USER_FOLLOWED: 'fas fa-user-plus',
-      USER_UNFOLLOWED: 'fas fa-user-minus'
+      USER_UNFOLLOWED: 'fas fa-user-minus',
+      POST_SUBSCRIBED: 'fas fa-bookmark',
+      POST_UNSUBSCRIBED: 'fas fa-bookmark'
     }
 
     const reactionEmojiMap = {
@@ -223,6 +247,17 @@ export default {
                   }
                 }
               })
+            } else if (n.type === 'POST_SUBSCRIBED' || n.type === 'POST_UNSUBSCRIBED') {
+              notifications.value.push({
+                ...n,
+                icon: iconMap[n.type],
+                iconClick: () => {
+                  if (n.post) {
+                    markRead(n.id)
+                    router.push(`/posts/${n.post.id}`)
+                  }
+                }
+              })
             } else {
               notifications.value.push({
                 ...n,
@@ -249,6 +284,10 @@ export default {
           return '关注的帖子有新评论'
         case 'FOLLOWED_POST':
           return '关注的用户发布了新文章'
+        case 'POST_SUBSCRIBED':
+          return '有人订阅了你的文章'
+        case 'POST_UNSUBSCRIBED':
+          return '有人取消订阅你的文章'
         case 'USER_FOLLOWED':
           return '有人关注了你'
         case 'USER_UNFOLLOWED':
