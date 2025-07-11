@@ -7,5 +7,13 @@ public enum ReactionType {
     LIKE,
     DISLIKE,
     RECOMMEND,
-    ANGRY
+    ANGRY,
+    FLUSHED,
+    STAR_STRUCK,
+    ROFL,
+    HOLDING_BACK_TEARS,
+    MIND_BLOWN,
+    POOP,
+    CLOWN,
+    SKULL
 }
