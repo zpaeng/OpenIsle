@@ -1,11 +1,6 @@
 <template>
   <div class="user-list">
-    <div v-if="users.length === 0" class="no-users">
-      <i class="fas fa-inbox no-users-icon"></i>
-      <div class="no-users-text">
-        暂无用户
-      </div>
-    </div>
+    <BasePlaceholder v-if="users.length === 0" text="暂无用户" icon="fas fa-inbox" />
     <div v-for="u in users" :key="u.id" class="user-item" @click="handleUserClick(u)">
       <img :src="u.avatar" alt="avatar" class="user-avatar" />
       <div class="user-info">
@@ -17,8 +12,11 @@
 </template>
 
 <script>
+import BasePlaceholder from './BasePlaceholder.vue'
+
 export default {
   name: 'UserList',
+  components: { BasePlaceholder },
   props: {
     users: { type: Array, default: () => [] }
   },
@@ -64,18 +62,4 @@ export default {
   opacity: 0.7;
 }
 
-.no-users {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  justify-content: center;
-  align-items: center;
-  height: 300px;
-  opacity: 0.5;
-}
-
-.no-users-text {
-  font-size: 16px;
-  color: var(--text-color);
-}
 </style>
