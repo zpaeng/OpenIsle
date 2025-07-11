@@ -86,6 +86,8 @@ public class PostService {
                 notificationService.createNotification(admin,
                         NotificationType.POST_REVIEW_REQUEST, post, null, null, author, null);
             }
+            notificationService.createNotification(author,
+                    NotificationType.POST_REVIEW_REQUEST, post, null, null, null, null);
         }
         // notify followers of author
         for (User u : subscriptionService.getSubscribers(author.getUsername())) {
