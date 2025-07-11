@@ -105,7 +105,12 @@ public class PostService {
         post.setViews(post.getViews() + 1);
         post = postRepository.save(post);
         if (viewer != null && !viewer.equals(post.getAuthor().getUsername())) {
-            notificationService.createNotification(post.getAuthor(), NotificationType.POST_VIEWED, post, null, null);
+            User viewerUser = userRepository.findByUsername(viewer).orElse(null);
+            if (viewerUser != null) {
+                notificationService.createNotification(post.getAuthor(), NotificationType.POST_VIEWED, post, null, null, viewerUser, null);
+            } else {
+                notificationService.createNotification(post.getAuthor(), NotificationType.POST_VIEWED, post, null, null);
+            }
         }
         return post;
     }

@@ -67,6 +67,29 @@
                 进行了表态
               </div>
             </template>
+            <template v-else-if="item.type === 'POST_VIEWED'">
+              <div class="notif-content-container">
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
+                  {{ item.fromUser.username }}
+                </router-link>
+                查看了您的帖子
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                  {{ sanitizeDescription(item.post.title) }}
+                </router-link>
+              </div>
+            </template>
+            <template v-else-if="item.type === 'POST_UPDATED'">
+              <div class="notif-content-container">
+                您关注的帖子
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                  {{ sanitizeDescription(item.post.title) }}
+                </router-link>
+                下面有新评论
+                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
+                  {{ sanitizeDescription(item.comment.content) }}
+                </router-link>
+              </div>
+            </template>
             <template v-else-if="item.type === 'USER_FOLLOWED'">
               <div class="notif-content-container">
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
@@ -223,6 +246,27 @@ export default {
                     markRead(n.id)
                     router.push(`/users/${n.fromUser.id}`)
                   }
+                }
+              })
+            } else if (n.type === 'POST_VIEWED') {
+              notifications.value.push({
+                ...n,
+                src: n.fromUser ? n.fromUser.avatar : null,
+                icon: n.fromUser ? undefined : iconMap[n.type],
+                iconClick: () => {
+                  if (n.fromUser) {
+                    markRead(n.id)
+                    router.push(`/users/${n.fromUser.id}`)
+                  }
+                }
+              })
+            } else if (n.type === 'POST_UPDATED') {
+              notifications.value.push({
+                ...n,
+                src: n.comment.author.avatar,
+                iconClick: () => {
+                  markRead(n.id)
+                  router.push(`/users/${n.comment.author.id}`)
                 }
               })
             } else if (n.type === 'USER_FOLLOWED' || n.type === 'USER_UNFOLLOWED') {
