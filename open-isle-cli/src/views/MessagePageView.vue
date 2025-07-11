@@ -187,6 +187,7 @@ export default {
       POST_VIEWED: 'fas fa-eye',
       COMMENT_REPLY: 'fas fa-reply',
       POST_REVIEWED: 'fas fa-check',
+      POST_REVIEW_REQUEST: 'fas fa-gavel',
       POST_UPDATED: 'fas fa-comment-dots',
       USER_ACTIVITY: 'fas fa-user',
       FOLLOWED_POST: 'fas fa-feather-alt',
@@ -310,6 +311,18 @@ export default {
                   }
                 }
               })
+            } else if (n.type === 'POST_REVIEW_REQUEST') {
+              notifications.value.push({
+                ...n,
+                src: n.fromUser ? n.fromUser.avatar : null,
+                icon: n.fromUser ? undefined : iconMap[n.type],
+                iconClick: () => {
+                  if (n.post) {
+                    markRead(n.id)
+                    router.push(`/posts/${n.post.id}`)
+                  }
+                }
+              })
             } else {
               notifications.value.push({
                 ...n,
@@ -330,6 +343,8 @@ export default {
           return '有人回复了你'
         case 'REACTION':
           return '有人点赞'
+        case 'POST_REVIEW_REQUEST':
+          return '帖子待审核'
         case 'POST_REVIEWED':
           return '帖子审核结果'
         case 'POST_UPDATED':

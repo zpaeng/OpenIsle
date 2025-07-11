@@ -13,11 +13,11 @@
           </div>
         </div>
         <div class="article-title-container-right">
-          <div class="article-pending-button">
-            PENDING
+          <div v-if="status === 'PENDING'" class="article-pending-button">
+            审核中
           </div>
-          <div class="article-block-button">
-            REJECT
+          <div v-if="status === 'REJECTED'" class="article-block-button">
+            已拒绝
           </div>
           <div
             v-if="loggedIn && !isAuthor && !subscribed"
@@ -35,7 +35,7 @@
             <i class="fas fa-user-minus"></i>
             取消订阅
           </div>
-          <DropdownMenu :items="reviewMenuItems">
+          <DropdownMenu v-if="isAdmin && status === 'PENDING'" :items="reviewMenuItems">
             <template #trigger>
               <i class="fas fa-ellipsis-vertical action-menu-icon"></i>
             </template>
@@ -132,9 +132,10 @@ export default {
     const author = ref('')
     const postContent = ref('')
     const category = ref('')
-    const tags = ref([])
-    const postReactions = ref([])
-    const comments = ref([])
+   const tags = ref([])
+   const postReactions = ref([])
+   const comments = ref([])
+    const status = ref('PUBLISHED')
     const isWaitingFetchingPost = ref(false);
     const isWaitingPostingComment = ref(false);
     const postTime = ref('')
@@ -142,11 +143,12 @@ export default {
     const mainContainer = ref(null)
     const currentIndex = ref(1)
     const subscribed = ref(false)
-    const loggedIn = computed(() => authState.loggedIn)
+   const loggedIn = computed(() => authState.loggedIn)
+    const isAdmin = computed(() => authState.role === 'ADMIN')
     const isAuthor = computed(() => authState.username === author.value.username)
-    const reviewMenuItems = [
-      { text: '通过审核', onClick: () => {} },
-      { text: '驳回', color: 'red', onClick: () => {} }
+   const reviewMenuItems = [
+      { text: '通过审核', onClick: () => approvePost() },
+      { text: '驳回', color: 'red', onClick: () => rejectPost() }
     ]
 
     const gatherPostItems = () => {
@@ -226,6 +228,7 @@ export default {
         postReactions.value = data.reactions || []
         comments.value = (data.comments || []).map(mapComment)
         subscribed.value = !!data.subscribed
+        status.value = data.status
         postTime.value = TimeManager.format(data.createdAt)
         await nextTick()
         gatherPostItems()
@@ -329,12 +332,42 @@ export default {
       }
     }
 
-    const unsubscribePost = async () => {
+   const unsubscribePost = async () => {
       const token = getToken()
       if (!token) {
         toast.error('请先登录')
         return
+   }
+
+    const approvePost = async () => {
+      const token = getToken()
+      if (!token) return
+      const res = await fetch(`${API_BASE_URL}/api/admin/posts/${postId}/approve`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.ok) {
+        status.value = 'PUBLISHED'
+        toast.success('已通过审核')
+      } else {
+        toast.error('操作失败')
       }
+    }
+
+    const rejectPost = async () => {
+      const token = getToken()
+      if (!token) return
+      const res = await fetch(`${API_BASE_URL}/api/admin/posts/${postId}/reject`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.ok) {
+        status.value = 'REJECTED'
+        toast.success('已驳回')
+      } else {
+        toast.error('操作失败')
+      }
+    }
       const res = await fetch(`${API_BASE_URL}/api/subscriptions/posts/${postId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
@@ -403,7 +436,11 @@ export default {
       gotoProfile,
       subscribed,
       loggedIn,
-      isAuthor
+      isAuthor,
+      status,
+      isAdmin,
+      approvePost,
+      rejectPost
     }
   }
 }
