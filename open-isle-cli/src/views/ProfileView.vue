@@ -157,12 +157,7 @@
       </div>
 
       <div v-else-if="selectedTab === 'timeline'" class="profile-timeline">
-        <div v-if="timelineItems.length === 0" class="no-timeline">
-          <i class="fas fa-inbox no-timeline-icon"></i>
-          <div class="no-timeline-text">
-            暂无时间线
-          </div>
-        </div>
+        <BasePlaceholder v-if="timelineItems.length === 0" text="暂无时间线" icon="fas fa-inbox" />
         <BaseTimeline :items="timelineItems">
           <template #item="{ item }">
             <template v-if="item.type === 'post'">
@@ -225,6 +220,7 @@ import { API_BASE_URL, toast } from '../main'
 import { getToken, authState } from '../utils/auth'
 import BaseTimeline from '../components/BaseTimeline.vue'
 import UserList from '../components/UserList.vue'
+import BasePlaceholder from '../components/BasePlaceholder.vue'
 import { stripMarkdown } from '../utils/markdown'
 import TimeManager from '../utils/time'
 import { hatch } from 'ldrs'
@@ -232,7 +228,7 @@ hatch.register()
 
 export default {
   name: 'ProfileView',
-  components: { BaseTimeline, UserList },
+  components: { BaseTimeline, UserList, BasePlaceholder },
   setup() {
     const route = useRoute()
     const username = route.params.id
@@ -633,18 +629,4 @@ export default {
   padding-left: 20px;
 }
 
-.no-timeline {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  justify-content: center;
-  align-items: center;
-  height: 300px;
-  opacity: 0.5;
-}
-
-.no-timeline-text {
-  font-size: 16px;
-  color: var(--text-color);
-}
 </style>

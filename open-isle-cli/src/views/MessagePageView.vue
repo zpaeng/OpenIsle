@@ -4,12 +4,7 @@
       <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
     </div>
 
-    <div v-else-if="notifications.length === 0" class="no-message">
-      <i class="fas fa-inbox no-message-icon"></i>
-      <div class="no-message-text">
-        暂时没有消息 :)
-      </div>
-    </div>
+    <BasePlaceholder v-else-if="notifications.length === 0" text="暂时没有消息 :)" icon="fas fa-inbox" />
 
     <BaseTimeline :items="notifications">
       <template #item="{ item }">
@@ -197,6 +192,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { API_BASE_URL } from '../main'
 import BaseTimeline from '../components/BaseTimeline.vue'
+import BasePlaceholder from '../components/BasePlaceholder.vue'
 import { getToken } from '../utils/auth'
 import { markNotificationsRead } from '../utils/notification'
 import { toast } from '../main'
@@ -207,7 +203,7 @@ hatch.register()
 
 export default {
   name: 'MessagePageView',
-  components: { BaseTimeline },
+  components: { BaseTimeline, BasePlaceholder },
   setup() {
     const router = useRouter()
     const notifications = ref([])
@@ -420,20 +416,6 @@ export default {
   height: 300px;
 }
 
-.no-message {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  justify-content: center;
-  align-items: center;
-  height: 300px;
-  opacity: 0.5;
-}
-
-.no-message-text {
-  font-size: 16px;
-  color: var(--text-color);
-}
 
 .message-page {
   background-color: var(--background-color);
