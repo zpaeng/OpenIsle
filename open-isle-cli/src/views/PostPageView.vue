@@ -639,31 +639,10 @@ export default {
   font-size: 16px;
 }
 
-.reactions-count {
-  font-size: 16px;
-  opacity: 0.5;
-}
-
 .make-reaction-container {
   display: flex;
   flex-direction: row;
   gap: 10px;
-}
-
-.make-reaction-item {
-  cursor: pointer;
-  padding: 10px;
-  border-radius: 50%;
-  opacity: 0.5;
-  font-size: 20px;
-}
-
-.like-reaction {
-  color: #ff0000;
-}
-
-.like-reaction:hover {
-  background-color: #ffe2e2;
 }
 
 .copy-link:hover {

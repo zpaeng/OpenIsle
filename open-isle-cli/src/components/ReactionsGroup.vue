@@ -17,7 +17,7 @@
       <div class="make-reaction-item like-reaction" @click="toggleReaction('LIKE')"
         :class="{ selected: userReacted('LIKE') }">
         <i class="far fa-heart"></i>
-        <span v-if="likeCount">{{ likeCount }}</span>
+        <span class="reactions-count" v-if="likeCount">{{ likeCount }}</span>
       </div>
       <slot></slot>
     </div>
@@ -164,7 +164,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .reactions-container {
   position: relative;
   display: flex;
@@ -188,6 +188,7 @@ export default {
   gap: 2px;
   align-items: center;
   cursor: pointer;
+  color: #a2a2a2;
 }
 
 .reactions-viewer-item {
@@ -206,11 +207,6 @@ export default {
   padding-left: 5px;
 }
 
-.reactions-count {
-  font-size: 16px;
-  opacity: 0.5;
-}
-
 .make-reaction-container {
   display: flex;
   flex-direction: row;
@@ -220,17 +216,26 @@ export default {
 .make-reaction-item {
   cursor: pointer;
   padding: 10px;
-  border-radius: 50%;
   opacity: 0.5;
+  border-radius: 8px;
   font-size: 20px;
 }
 
 .like-reaction {
   color: #ff0000;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
 }
 
-.like-reaction.selected {
+.make-reaction-item:hover {
   background-color: #ffe2e2;
+}
+
+.reactions-count {
+  font-size: 16px;
+  font-weight: bold;
 }
 
 .reactions-panel {
