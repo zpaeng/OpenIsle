@@ -58,14 +58,14 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import CommentEditor from './CommentEditor.vue'
 import { renderMarkdown } from '../utils/markdown'
 import TimeManager from '../utils/time'
 import BaseTimeline from './BaseTimeline.vue'
 import { API_BASE_URL, toast } from '../main'
-import { getToken } from '../utils/auth'
+import { getToken, authState } from '../utils/auth'
 import ReactionsGroup from './ReactionsGroup.vue'
 import DropdownMenu from './DropdownMenu.vue'
 const CommentItem = {
@@ -101,9 +101,10 @@ const CommentItem = {
     const toggleEditor = () => {
       showEditor.value = !showEditor.value
     }
-    const commentMenuItems = ref([
-      { text: '删除评论', color: 'red', onClick: () => deleteComment() }
-    ])
+    const isAuthor = computed(() => authState.username === props.comment.userName)
+    const commentMenuItems = computed(() =>
+      isAuthor.value ? [{ text: '删除评论', color: 'red', onClick: () => deleteComment() }] : []
+    )
     const deleteComment = () => {
     }
     const submitReply = async (text) => {
