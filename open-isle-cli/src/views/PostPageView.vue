@@ -27,7 +27,7 @@
             <i class="fas fa-user-minus"></i>
             取消订阅
           </div>
-          <DropdownMenu v-if="isAdmin && status === 'PENDING'" :items="reviewMenuItems">
+          <DropdownMenu :items="articleMenuItems">
             <template #trigger>
               <i class="fas fa-ellipsis-vertical action-menu-icon"></i>
             </template>
@@ -138,7 +138,8 @@ export default {
     const loggedIn = computed(() => authState.loggedIn)
     const isAdmin = computed(() => authState.role === 'ADMIN')
     const isAuthor = computed(() => authState.username === author.value.username)
-    const reviewMenuItems = [
+    const articleMenuItems = [
+      { text: '删除文章', color: 'red', onClick: () => deletePost() },
       { text: '通过审核', onClick: () => approvePost() },
       { text: '驳回', color: 'red', onClick: () => rejectPost() }
     ]
@@ -339,6 +340,9 @@ export default {
       }
     }
 
+    const deletePost = async () => {
+    }
+
     const rejectPost = async () => {
       const token = getToken()
       if (!token) return
@@ -415,7 +419,7 @@ export default {
       currentIndex,
       totalPosts,
       postReactions,
-      reviewMenuItems,
+      articleMenuItems,
       postId,
       postComment,
       onSliderInput,

@@ -1,11 +1,7 @@
 <template>
-  <div
-    class="info-content-container"
-    :id="'comment-' + comment.id"
-    :style="{
-      ...(level > 0 ? { /*borderLeft: '1px solid #e0e0e0', */borderBottom: 'none' } : {})
-    }"
-  >
+  <div class="info-content-container" :id="'comment-' + comment.id" :style="{
+    ...(level > 0 ? { /*borderLeft: '1px solid #e0e0e0', */borderBottom: 'none' } : {})
+  }">
     <!-- <div class="user-avatar-container">
       <div class="user-avatar-item">
         <img class="user-avatar-item-img" :src="comment.avatar" alt="avatar" />
@@ -13,8 +9,17 @@
     </div>   -->
     <div class="info-content">
       <div class="info-content-header">
-        <div class="user-name">{{ comment.userName }}</div>
-        <div class="post-time">{{ comment.time }}</div>
+        <div class="info-content-header-left">
+          <div class="user-name">{{ comment.userName }}</div>
+          <div class="post-time">{{ comment.time }}</div>
+        </div>
+        <div class="info-content-header-right">
+          <DropdownMenu :items="commentMenuItems">
+            <template #trigger>
+              <i class="fas fa-ellipsis-vertical action-menu-icon"></i>
+            </template>
+          </DropdownMenu>
+        </div>
       </div>
       <div class="info-content-text" v-html="renderMarkdown(comment.text)"></div>
       <div class="article-footer-container">
@@ -28,25 +33,16 @@
         </ReactionsGroup>
       </div>
       <CommentEditor v-if="showEditor" @submit="submitReply" :loading="isWaitingForReply" />
-      <div
-        v-if="comment.reply && comment.reply.length"
-        class="reply-toggle"
-        @click="toggleReplies"
-      >
-        <i v-if="showReplies" class="fas fa-chevron-up reply-toggle-icon"></i> 
-        <i v-else class="fas fa-chevron-down reply-toggle-icon"></i> 
-        
+      <div v-if="comment.reply && comment.reply.length" class="reply-toggle" @click="toggleReplies">
+        <i v-if="showReplies" class="fas fa-chevron-up reply-toggle-icon"></i>
+        <i v-else class="fas fa-chevron-down reply-toggle-icon"></i>
+
         {{ comment.reply.length }}条回复
       </div>
       <div v-if="showReplies" class="reply-list">
-        <BaseTimeline :items="comment.reply" >
+        <BaseTimeline :items="comment.reply">
           <template #item="{ item }">
-            <CommentItem
-              :key="item.id"
-              :comment="item"
-              :level="level + 1"
-              :default-show-replies="item.openReplies"
-            />
+            <CommentItem :key="item.id" :comment="item" :level="level + 1" :default-show-replies="item.openReplies" />
           </template>
         </BaseTimeline>
         <!-- <CommentItem
@@ -71,6 +67,7 @@ import BaseTimeline from './BaseTimeline.vue'
 import { API_BASE_URL, toast } from '../main'
 import { getToken } from '../utils/auth'
 import ReactionsGroup from './ReactionsGroup.vue'
+import DropdownMenu from './DropdownMenu.vue'
 const CommentItem = {
   name: 'CommentItem',
   props: {
@@ -103,6 +100,11 @@ const CommentItem = {
     }
     const toggleEditor = () => {
       showEditor.value = !showEditor.value
+    }
+    const commentMenuItems = ref([
+      { text: '删除评论', color: 'red', onClick: () => deleteComment() }
+    ])
+    const deleteComment = () => {
     }
     const submitReply = async (text) => {
       if (!text.trim()) return
@@ -162,10 +164,12 @@ const CommentItem = {
         toast.success('已复制')
       })
     }
-    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply }
+    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply, commentMenuItems, deleteComment }
   }
 }
-CommentItem.components = { CommentItem, CommentEditor, BaseTimeline, ReactionsGroup }
+
+CommentItem.components = { CommentItem, CommentEditor, BaseTimeline, ReactionsGroup, DropdownMenu }
+
 export default CommentItem
 </script>
 
@@ -176,8 +180,7 @@ export default CommentItem
   user-select: none;
 }
 
-.reply-list {
-}
+.reply-list {}
 
 .comment-reaction {
   color: var(--primary-color);
@@ -196,8 +199,12 @@ export default CommentItem
 }
 
 @keyframes highlight {
-  from { background-color: yellow; }
-  to { background-color: transparent; }
-}
+  from {
+    background-color: yellow;
+  }
 
+  to {
+    background-color: transparent;
+  }
+}
 </style>

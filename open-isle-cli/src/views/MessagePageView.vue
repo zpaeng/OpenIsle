@@ -225,7 +225,7 @@ export default {
     const iconMap = {
       POST_VIEWED: 'fas fa-eye',
       COMMENT_REPLY: 'fas fa-reply',
-      POST_REVIEWED: 'fas fa-check',
+      POST_REVIEWED: 'fas fa-shield-alt',
       POST_REVIEW_REQUEST: 'fas fa-gavel',
       POST_UPDATED: 'fas fa-comment-dots',
       USER_ACTIVITY: 'fas fa-user',
