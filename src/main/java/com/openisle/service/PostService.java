@@ -80,6 +80,13 @@ public class PostService {
         post.setTags(new java.util.HashSet<>(tags));
         post.setStatus(publishMode == PublishMode.REVIEW ? PostStatus.PENDING : PostStatus.PUBLISHED);
         post = postRepository.save(post);
+        if (post.getStatus() == PostStatus.PENDING) {
+            java.util.List<User> admins = userRepository.findByRole(com.openisle.model.Role.ADMIN);
+            for (User admin : admins) {
+                notificationService.createNotification(admin,
+                        NotificationType.POST_REVIEW_REQUEST, post, null, null, author, null);
+            }
+        }
         // notify followers of author
         for (User u : subscriptionService.getSubscribers(author.getUsername())) {
             if (!u.getId().equals(author.getId())) {
@@ -100,7 +107,14 @@ public class PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
         if (post.getStatus() != PostStatus.PUBLISHED) {
-            throw new IllegalArgumentException("Post not found");
+            if (viewer == null) {
+                throw new IllegalArgumentException("Post not found");
+            }
+            User viewerUser = userRepository.findByUsername(viewer)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+            if (!viewerUser.getRole().equals(com.openisle.model.Role.ADMIN) && !viewerUser.getId().equals(post.getAuthor().getId())) {
+                throw new IllegalArgumentException("Post not found");
+            }
         }
         post.setViews(post.getViews() + 1);
         post = postRepository.save(post);

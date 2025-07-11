@@ -45,6 +45,7 @@ public class AdminPostController {
         dto.setAuthor(post.getAuthor().getUsername());
         dto.setCategory(toCategoryDto(post.getCategory()));
         dto.setViews(post.getViews());
+        dto.setStatus(post.getStatus());
         return dto;
     }
 
@@ -67,6 +68,7 @@ public class AdminPostController {
         private String author;
         private CategoryDto category;
         private long views;
+        private com.openisle.model.PostStatus status;
     }
 
     @Data

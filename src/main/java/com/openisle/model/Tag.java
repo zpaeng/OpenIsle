@@ -26,4 +26,7 @@ public class Tag {
 
     @Column(name = "description", nullable = false)
     private String description;
+
+    @Column(nullable = false)
+    private boolean approved = true;
 }

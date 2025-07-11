@@ -117,6 +117,7 @@ public class PostController {
         dto.setCategory(toCategoryDto(post.getCategory()));
         dto.setTags(post.getTags().stream().map(this::toTagDto).collect(Collectors.toList()));
         dto.setViews(post.getViews());
+        dto.setStatus(post.getStatus());
 
         List<ReactionDto> reactions = reactionService.getReactionsForPost(post.getId())
                 .stream()
@@ -232,6 +233,7 @@ public class PostController {
         private CategoryDto category;
         private java.util.List<TagDto> tags;
         private long views;
+        private com.openisle.model.PostStatus status;
         private List<CommentDto> comments;
         private List<ReactionDto> reactions;
         private java.util.List<AuthorDto> participants;

@@ -13,14 +13,19 @@ public class TagService {
     private final TagRepository tagRepository;
     private final TagValidator tagValidator;
 
-    public Tag createTag(String name, String description, String icon, String smallIcon) {
+    public Tag createTag(String name, String description, String icon, String smallIcon, boolean approved) {
         tagValidator.validate(name);
         Tag tag = new Tag();
         tag.setName(name);
         tag.setDescription(description);
         tag.setIcon(icon);
         tag.setSmallIcon(smallIcon);
+        tag.setApproved(approved);
         return tagRepository.save(tag);
+    }
+
+    public Tag createTag(String name, String description, String icon, String smallIcon) {
+        return createTag(name, description, icon, smallIcon, true);
     }
 
     public Tag updateTag(Long id, String name, String description, String icon, String smallIcon) {
@@ -46,19 +51,30 @@ public class TagService {
         tagRepository.deleteById(id);
     }
 
+    public Tag approveTag(Long id) {
+        Tag tag = tagRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Tag not found"));
+        tag.setApproved(true);
+        return tagRepository.save(tag);
+    }
+
+    public List<Tag> listPendingTags() {
+        return tagRepository.findByApproved(false);
+    }
+
     public Tag getTag(Long id) {
         return tagRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Tag not found"));
     }
 
     public List<Tag> listTags() {
-        return tagRepository.findAll();
+        return tagRepository.findByApprovedTrue();
     }
 
     public List<Tag> searchTags(String keyword) {
         if (keyword == null || keyword.isBlank()) {
-            return tagRepository.findAll();
+            return tagRepository.findByApprovedTrue();
         }
-        return tagRepository.findByNameContainingIgnoreCase(keyword);
+        return tagRepository.findByNameContainingIgnoreCaseAndApprovedTrue(keyword);
     }
 }

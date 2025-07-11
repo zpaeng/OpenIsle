@@ -3,6 +3,9 @@ package com.openisle.controller;
 import com.openisle.model.Tag;
 import com.openisle.service.TagService;
 import com.openisle.service.PostService;
+import com.openisle.repository.UserRepository;
+import com.openisle.model.PublishMode;
+import com.openisle.model.Role;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +19,18 @@ import java.util.stream.Collectors;
 public class TagController {
     private final TagService tagService;
     private final PostService postService;
+    private final UserRepository userRepository;
 
     @PostMapping
-    public TagDto create(@RequestBody TagRequest req) {
-        Tag tag = tagService.createTag(req.getName(), req.getDescription(), req.getIcon(), req.getSmallIcon());
+    public TagDto create(@RequestBody TagRequest req, org.springframework.security.core.Authentication auth) {
+        boolean approved = true;
+        if (postService.getPublishMode() == PublishMode.REVIEW && auth != null) {
+            com.openisle.model.User user = userRepository.findByUsername(auth.getName()).orElseThrow();
+            if (user.getRole() != Role.ADMIN) {
+                approved = false;
+            }
+        }
+        Tag tag = tagService.createTag(req.getName(), req.getDescription(), req.getIcon(), req.getSmallIcon(), approved);
         long count = postService.countPostsByTag(tag.getId());
         return toDto(tag, count);
     }
