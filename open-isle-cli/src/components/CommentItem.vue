@@ -70,6 +70,7 @@ import ReactionsGroup from './ReactionsGroup.vue'
 import DropdownMenu from './DropdownMenu.vue'
 const CommentItem = {
   name: 'CommentItem',
+  emits: ['deleted'],
   props: {
     comment: {
       type: Object,
@@ -84,7 +85,7 @@ const CommentItem = {
       default: false
     }
   },
-  setup(props) {
+  setup(props, { emit }) {
     const router = useRouter()
     const showReplies = ref(props.defaultShowReplies)
     watch(
@@ -105,7 +106,22 @@ const CommentItem = {
     const commentMenuItems = computed(() =>
       isAuthor.value ? [{ text: '删除评论', color: 'red', onClick: () => deleteComment() }] : []
     )
-    const deleteComment = () => {
+    const deleteComment = async () => {
+      const token = getToken()
+      if (!token) {
+        toast.error('请先登录')
+        return
+      }
+      const res = await fetch(`${API_BASE_URL}/api/comments/${props.comment.id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.ok) {
+        toast.success('已删除')
+        emit('deleted', props.comment.id)
+      } else {
+        toast.error('操作失败')
+      }
     }
     const submitReply = async (text) => {
       if (!text.trim()) return

@@ -5,12 +5,19 @@ import com.openisle.model.PostStatus;
 import com.openisle.model.PublishMode;
 import com.openisle.model.User;
 import com.openisle.model.Category;
+import com.openisle.model.Comment;
 import com.openisle.model.NotificationType;
 import com.openisle.repository.PostRepository;
 import com.openisle.repository.UserRepository;
 import com.openisle.repository.CategoryRepository;
 import com.openisle.repository.TagRepository;
 import com.openisle.service.SubscriptionService;
+import com.openisle.service.CommentService;
+import com.openisle.repository.CommentRepository;
+import com.openisle.repository.ReactionRepository;
+import com.openisle.repository.PostSubscriptionRepository;
+import com.openisle.repository.NotificationRepository;
+import com.openisle.model.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +34,11 @@ public class PostService {
     private PublishMode publishMode;
     private final NotificationService notificationService;
     private final SubscriptionService subscriptionService;
+    private final CommentService commentService;
+    private final CommentRepository commentRepository;
+    private final ReactionRepository reactionRepository;
+    private final PostSubscriptionRepository postSubscriptionRepository;
+    private final NotificationRepository notificationRepository;
 
     @org.springframework.beans.factory.annotation.Autowired
     public PostService(PostRepository postRepository,
@@ -35,6 +47,11 @@ public class PostService {
                        TagRepository tagRepository,
                        NotificationService notificationService,
                        SubscriptionService subscriptionService,
+                       CommentService commentService,
+                       CommentRepository commentRepository,
+                       ReactionRepository reactionRepository,
+                       PostSubscriptionRepository postSubscriptionRepository,
+                       NotificationRepository notificationRepository,
                        @Value("${app.post.publish-mode:DIRECT}") PublishMode publishMode) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
@@ -42,6 +59,11 @@ public class PostService {
         this.tagRepository = tagRepository;
         this.notificationService = notificationService;
         this.subscriptionService = subscriptionService;
+        this.commentService = commentService;
+        this.commentRepository = commentRepository;
+        this.reactionRepository = reactionRepository;
+        this.postSubscriptionRepository = postSubscriptionRepository;
+        this.notificationRepository = notificationRepository;
         this.publishMode = publishMode;
     }
 
@@ -315,6 +337,24 @@ public class PostService {
         post = postRepository.save(post);
         notificationService.createNotification(post.getAuthor(), NotificationType.POST_REVIEWED, post, null, false);
         return post;
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public void deletePost(Long id, String username) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if (!user.getId().equals(post.getAuthor().getId()) && user.getRole() != Role.ADMIN) {
+            throw new IllegalArgumentException("Unauthorized");
+        }
+        for (Comment c : commentRepository.findByPostAndParentIsNullOrderByCreatedAtAsc(post)) {
+            commentService.deleteCommentCascade(c);
+        }
+        reactionRepository.findByPost(post).forEach(reactionRepository::delete);
+        postSubscriptionRepository.findByPost(post).forEach(postSubscriptionRepository::delete);
+        notificationRepository.findByPost(post).forEach(n -> { n.setPost(null); notificationRepository.save(n); });
+        postRepository.delete(post);
     }
 
     public java.util.List<Post> getPostsByIds(java.util.List<Long> ids) {
