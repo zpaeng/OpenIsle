@@ -1,0 +1,8 @@
+# open-isle-cli/wrangler.toml
+name              = "openisle"
+compatibility_date = "2025-07-12"
+
+[build]
+command   = "npm run build"
+# 当你用 `wrangler pages deploy dist` 时，下面这行指定静态文件目录
+upload_dir = "./dist"
