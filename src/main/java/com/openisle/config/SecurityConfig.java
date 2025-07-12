@@ -69,8 +69,9 @@ public class SecurityConfig {
         CorsConfiguration cfg = new CorsConfiguration();
         cfg.setAllowedOrigins(List.of(
                 "http://127.0.0.1",           // 前端调试地址
-                "http://129.204.254.110",     // 前端调试地址
-                "https://www.open-isle.com"   // 生产域名
+                // "http://129.204.254.110",     // 前端调试地址
+                "https://www.open-isle.com",   // 生产域名
+                "689d7858-openisle.cjt807916.workers.dev" // cloudflare 部署域名
         ));
         cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
         cfg.setAllowedHeaders(List.of("*"));
