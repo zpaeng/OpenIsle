@@ -12,10 +12,11 @@ import { initTheme } from './utils/theme'
 // export const API_DOMAIN = 'http://127.0.0.1'
 // export const API_PORT = 8081
 
-export const API_DOMAIN = 'http://129.204.254.110'
-export const API_PORT = 8080
+// export const API_DOMAIN = 'http://129.204.254.110'
+// export const API_PORT = 8080
 
-export const API_BASE_URL = API_PORT ? `${API_DOMAIN}:${API_PORT}` : API_DOMAIN
+// export const API_BASE_URL = API_PORT ? `${API_DOMAIN}:${API_PORT}` : API_DOMAIN
+export const API_BASE_URL = "/api";
 export const GOOGLE_CLIENT_ID = '777830451304-nt8afkkap18gui4f9entcha99unal744.apps.googleusercontent.com'
 export const toast = useToast()
 
