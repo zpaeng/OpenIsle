@@ -16,7 +16,7 @@ import { initTheme } from './utils/theme'
 // export const API_PORT = 8080
 
 // export const API_BASE_URL = API_PORT ? `${API_DOMAIN}:${API_PORT}` : API_DOMAIN
-export const API_BASE_URL = "/api";
+export const API_BASE_URL = "/";
 export const GOOGLE_CLIENT_ID = '777830451304-nt8afkkap18gui4f9entcha99unal744.apps.googleusercontent.com'
 export const toast = useToast()
 
