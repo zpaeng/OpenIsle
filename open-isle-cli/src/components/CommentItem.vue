@@ -103,8 +103,9 @@ const CommentItem = {
       showEditor.value = !showEditor.value
     }
     const isAuthor = computed(() => authState.username === props.comment.userName)
+    const isAdmin = computed(() => authState.role === 'ADMIN')
     const commentMenuItems = computed(() =>
-      isAuthor.value ? [{ text: '删除评论', color: 'red', onClick: () => deleteComment() }] : []
+      (isAuthor.value || isAdmin.value) ? [{ text: '删除评论', color: 'red', onClick: () => deleteComment() }] : []
     )
     const deleteComment = async () => {
       const token = getToken()
