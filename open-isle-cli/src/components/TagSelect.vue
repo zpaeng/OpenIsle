@@ -52,35 +52,44 @@ export default {
       return /^https?:\/\//.test(icon) || icon.startsWith('/')
     }
 
+    const buildTagsUrl = (kw = '') => {
+      const base = API_BASE_URL || window.location.origin;          // 若为空自动退回到本域名
+      const url = new URL('/api/tags', base);
+
+      if (kw) url.searchParams.set('keyword', kw);
+      url.searchParams.set('limit', '10');
+
+      return url.toString();
+    };
+
     const fetchTags = async (kw = '') => {
-      let data = []
-      // if (!kw && providedTags.value.length) {
-      //   data = [...providedTags.value]
-      // } else {
-      const url = new URL(`${API_BASE_URL}/api/tags`)
-      if (kw) url.searchParams.set('keyword', kw)
-      url.searchParams.set('limit', '10')
+      const defaultOption = { id: 0, name: '无标签' };
+
+      // 1) 先拼 URL（自动兜底到 window.location.origin）
+      const url = buildTagsUrl(kw);
+
+      // 2) 拉数据
+      let data = [];
       try {
-        const res = await fetch(url.toString())
-        if (res.ok) {
-          data = await res.json()
-        }
+        const res = await fetch(url);
+        if (res.ok) data = await res.json();
       } catch {
-        toast.error('获取标签失败')
-      }
-      // }
-
-      let options = [...data, ...localTags.value]
-
-      if (props.creatable && kw && !options.some(t => t.name.toLowerCase() === kw.toLowerCase())) {
-        options.push({ id: `__create__:${kw}`, name: `创建"${kw}"` })
+        toast.error('获取标签失败');
       }
 
-      options = options.filter((v, i, arr) => arr.findIndex(t => t.id === v.id) === i)
+      // 3) 合并、去重、可创建
+      let options = [...data, ...localTags.value];
 
-      options.unshift({ id: 0, name: '无标签' })
-      return options
-    }
+      if (props.creatable && kw &&
+        !options.some(t => t.name.toLowerCase() === kw.toLowerCase())) {
+        options.push({ id: `__create__:${kw}`, name: `创建"${kw}"` });
+      }
+
+      options = Array.from(new Map(options.map(t => [t.id, t])).values());
+
+      // 4) 最终结果
+      return [defaultOption, ...options];
+    };
 
     const selected = computed({
       get: () => props.modelValue,
