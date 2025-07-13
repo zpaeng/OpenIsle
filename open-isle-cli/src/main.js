@@ -12,7 +12,7 @@ import { initTheme } from './utils/theme'
 // export const API_DOMAIN = 'http://127.0.0.1'
 // export const API_PORT = 8081
 
-export const API_DOMAIN = 'http://129.204.254.110'
+export const API_DOMAIN = 'http://47.82.99.208'
 export const API_PORT = 8080
 
 // export const API_BASE_URL = API_PORT ? `${API_DOMAIN}:${API_PORT}` : API_DOMAIN
