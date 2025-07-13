@@ -143,7 +143,7 @@ public class CommentService {
         }
         reactionRepository.findByComment(comment).forEach(reactionRepository::delete);
         commentSubscriptionRepository.findByComment(comment).forEach(commentSubscriptionRepository::delete);
-        notificationRepository.findByComment(comment).forEach(n -> { n.setComment(null); notificationRepository.save(n); });
+        notificationRepository.deleteAll(notificationRepository.findByComment(comment));
         commentRepository.delete(comment);
     }
 }

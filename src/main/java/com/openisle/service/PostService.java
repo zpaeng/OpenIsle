@@ -353,7 +353,7 @@ public class PostService {
         }
         reactionRepository.findByPost(post).forEach(reactionRepository::delete);
         postSubscriptionRepository.findByPost(post).forEach(postSubscriptionRepository::delete);
-        notificationRepository.findByPost(post).forEach(n -> { n.setPost(null); notificationRepository.save(n); });
+        notificationRepository.deleteAll(notificationRepository.findByPost(post));
         postRepository.delete(post);
     }
 
