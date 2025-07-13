@@ -140,7 +140,7 @@ export default {
     const isAuthor = computed(() => authState.username === author.value.username)
     const articleMenuItems = computed(() => {
       const items = []
-      if (isAuthor.value) {
+      if (isAuthor.value || isAdmin.value) {
         items.push({ text: '删除文章', color: 'red', onClick: () => deletePost() })
       }
       if (isAdmin.value && status.value === 'PENDING') {
