@@ -96,3 +96,56 @@ body {
 .info-content-text a:hover {
   text-decoration: underline;
 }
+
+
+.info-content-text table {
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  margin: 1.2em 0;
+  font-size: 14px;
+  line-height: 1.45;
+  overflow-x: auto;                  /* 小屏可横向滚动 */
+}
+
+.info-content-text thead th {
+  background-color: var(--primary-color);
+  color: #fff;
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 600;
+}
+
+[data-theme='dark'] .info-content-text thead th {
+  background-color: var(--primary-color-hover);  /* 暗色稍暗一点 */
+}
+
+.info-content-text tbody tr:nth-child(even) {
+  background-color: rgba(208, 250, 255, 0.25);   /* 斑马纹 */
+}
+
+[data-theme='dark'] .info-content-text tbody tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.info-content-text th,
+.info-content-text td {
+  border: 1px solid var(--menu-border-color);
+  padding: 8px 14px;
+  vertical-align: top;
+}
+
+.info-content-text tbody td {
+  color: var(--text-color);
+}
+
+/* 首列加粗，便于阅读 */
+.info-content-text tbody td:first-child {
+  font-weight: 500;
+}
+
+/* 鼠标悬停行高亮 */
+.info-content-text tbody tr:hover {
+  background-color: var(--menu-selected-background-color);
+  transition: background-color 0.2s ease;
+}
