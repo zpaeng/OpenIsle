@@ -23,6 +23,62 @@
         </router-link>
       </div>
 
+      <div class="menu-section">
+        <div class="section-header" @click="categoryOpen = !categoryOpen">
+          <span>类别</span>
+          <i :class="categoryOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+        </div>
+        <div v-if="categoryOpen" class="section-items">
+          <div
+            v-for="c in categories"
+            :key="c.id"
+            class="section-item"
+            @click="gotoCategory(c)"
+          >
+            <template v-if="c.smallIcon || c.icon">
+              <img
+                v-if="isImageIcon(c.smallIcon || c.icon)"
+                :src="c.smallIcon || c.icon"
+                class="section-item-icon"
+              />
+              <i
+                v-else
+                :class="['section-item-icon', c.smallIcon || c.icon]"
+              ></i>
+            </template>
+            <span class="section-item-text">{{ c.name }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-section">
+        <div class="section-header" @click="tagOpen = !tagOpen">
+          <span>tag</span>
+          <i :class="tagOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+        </div>
+        <div v-if="tagOpen" class="section-items">
+          <div
+            v-for="t in tags"
+            :key="t.id"
+            class="section-item"
+            @click="gotoTag(t)"
+          >
+            <template v-if="t.smallIcon || t.icon">
+              <img
+                v-if="isImageIcon(t.smallIcon || t.icon)"
+                :src="t.smallIcon || t.icon"
+                class="section-item-icon"
+              />
+              <i
+                v-else
+                :class="['section-item-icon', t.smallIcon || t.icon]"
+              ></i>
+            </template>
+            <span class="section-item-text">{{ t.name }}</span>
+          </div>
+        </div>
+      </div>
+
       <div class="menu-footer">
         <div class="menu-footer-btn" @click="cycleTheme">
           <i :class="iconClass"></i>
@@ -37,6 +93,7 @@ import { themeState, cycleTheme, ThemeMode } from '../utils/theme'
 import { authState } from '../utils/auth'
 import { fetchUnreadCount } from '../utils/notification'
 import { watch } from 'vue'
+import { API_BASE_URL } from '../main'
 export default {
   name: 'MenuComponent',
   props: {
@@ -46,7 +103,13 @@ export default {
     }
   },
   data() {
-    return { unreadCount: 0 }
+    return {
+      unreadCount: 0,
+      categories: [],
+      tags: [],
+      categoryOpen: true,
+      tagOpen: true
+    }
   },
   computed: {
     iconClass() {
@@ -75,8 +138,45 @@ export default {
     watch(() => authState.loggedIn, async () => {
       await updateCount()
     })
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/categories`)
+      if (res.ok) {
+        const data = await res.json()
+        this.categories = data.slice(0, 10)
+      }
+    } catch { /* ignore */ }
+
+    try {
+      const r = await fetch(`${API_BASE_URL}/api/tags?limit=10`)
+      if (r.ok) {
+        this.tags = await r.json()
+      }
+    } catch { /* ignore */ }
   },
-  methods: { cycleTheme }
+  methods: {
+    cycleTheme,
+    isImageIcon(icon) {
+      if (!icon) return false
+      return /^https?:\/\//.test(icon) || icon.startsWith('/')
+    },
+    gotoCategory(c) {
+      const value = encodeURIComponent(c.id ?? c.name)
+      this.$router
+        .push({ path: '/', query: { category: value } })
+        .then(() => {
+          window.location.reload()
+        })
+    },
+    gotoTag(t) {
+      const value = encodeURIComponent(t.id ?? t.name)
+      this.$router
+        .push({ path: '/', query: { tags: value } })
+        .then(() => {
+          window.location.reload()
+        })
+    }
+  }
 }
 </script>
 
@@ -153,6 +253,48 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.menu-section {
+  margin: 10px 0;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: bold;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.section-items {
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+}
+
+.section-item {
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.section-item:hover {
+  background-color: var(--menu-selected-background-color);
+}
+
+.section-item-text {
+  color: var(--menu-text-color);
+}
+
+.section-item-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
 }
 
 /*
