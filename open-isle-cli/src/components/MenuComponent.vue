@@ -29,22 +29,13 @@
           <i :class="categoryOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
         </div>
         <div v-if="categoryOpen" class="section-items">
-          <div
-            v-for="c in categories"
-            :key="c.id"
-            class="section-item"
-            @click="gotoCategory(c)"
-          >
+          <div v-if="isLoadingCategory" class="menu-loading-container">
+            <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+          </div>
+          <div v-else v-for="c in categories" :key="c.id" class="section-item" @click="gotoCategory(c)">
             <template v-if="c.smallIcon || c.icon">
-              <img
-                v-if="isImageIcon(c.smallIcon || c.icon)"
-                :src="c.smallIcon || c.icon"
-                class="section-item-icon"
-              />
-              <i
-                v-else
-                :class="['section-item-icon', c.smallIcon || c.icon]"
-              ></i>
+              <img v-if="isImageIcon(c.smallIcon || c.icon)" :src="c.smallIcon || c.icon" class="section-item-icon" />
+              <i v-else :class="['section-item-icon', c.smallIcon || c.icon]"></i>
             </template>
             <span class="section-item-text">{{ c.name }}</span>
           </div>
@@ -57,24 +48,13 @@
           <i :class="tagOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
         </div>
         <div v-if="tagOpen" class="section-items">
-          <div
-            v-for="t in tags"
-            :key="t.id"
-            class="section-item"
-            @click="gotoTag(t)"
-          >
-            <template v-if="t.smallIcon || t.icon">
-              <img
-                v-if="isImageIcon(t.smallIcon || t.icon)"
-                :src="t.smallIcon || t.icon"
-                class="section-item-icon"
-              />
-              <i
-                v-else
-                :class="['section-item-icon', t.smallIcon || t.icon]"
-              ></i>
-            </template>
-            <span class="section-item-text">{{ t.name }}</span>
+          <div v-if="isLoadingTag" class="menu-loading-container">
+            <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+          </div>
+          <div v-else v-for="t in tags" :key="t.id" class="section-item" @click="gotoTag(t)">
+            <img v-if="isImageIcon(t.smallIcon || t.icon)" :src="t.smallIcon || t.icon" class="section-item-icon" />
+            <i v-else class="section-item-icon fas fa-hashtag"></i>
+            <span class="section-item-text">{{ t.name }} ({{ t.count }})</span>
           </div>
         </div>
       </div>
@@ -94,6 +74,9 @@ import { authState } from '../utils/auth'
 import { fetchUnreadCount } from '../utils/notification'
 import { watch } from 'vue'
 import { API_BASE_URL } from '../main'
+import { hatch } from 'ldrs'
+hatch.register()
+
 export default {
   name: 'MenuComponent',
   props: {
@@ -108,7 +91,9 @@ export default {
       categories: [],
       tags: [],
       categoryOpen: true,
-      tagOpen: true
+      tagOpen: true,
+      isLoadingCategory: false,
+      isLoadingTag: false
     }
   },
   computed: {
@@ -140,18 +125,31 @@ export default {
     })
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/categories`)
-      if (res.ok) {
-        const data = await res.json()
-        this.categories = data.slice(0, 10)
-      }
+      this.isLoadingCategory = true
+      fetch(`${API_BASE_URL}/api/categories`).then(
+        res => {
+          if (res.ok) {
+            res.json().then(data => {
+              this.categories = data.slice(0, 10)
+            })
+          }
+          this.isLoadingCategory = false
+        }
+      )
     } catch { /* ignore */ }
 
     try {
-      const r = await fetch(`${API_BASE_URL}/api/tags?limit=10`)
-      if (r.ok) {
-        this.tags = await r.json()
-      }
+      this.isLoadingTag = true
+      fetch(`${API_BASE_URL}/api/tags?limit=10`).then(
+        res => {
+          if (res.ok) {
+            res.json().then(data => {
+              this.tags = data
+            })
+          }
+          this.isLoadingTag = false
+        }
+      )
     } catch { /* ignore */ }
   },
   methods: {
@@ -188,7 +186,6 @@ export default {
   border-right: 1px solid var(--menu-border-color);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 }
 
 .menu-item-container {
@@ -226,6 +223,7 @@ export default {
   height: 18px;
   text-align: center;
 }
+
 .unread {
   color: white;
   font-size: 9px;
@@ -239,11 +237,13 @@ export default {
 }
 
 .menu-footer {
+  position: fixed;
   height: 30px;
+  bottom: 10px;
+  right: 10px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin-bottom: 10px;
 }
 
 .menu-footer-btn {
@@ -256,7 +256,7 @@ export default {
 }
 
 .menu-section {
-  margin: 10px 0;
+  padding: 10px;
 }
 
 .section-header {
@@ -264,6 +264,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   font-weight: bold;
+  opacity: 0.5;
   padding: 4px 10px;
   cursor: pointer;
 }
@@ -295,6 +296,13 @@ export default {
   width: 16px;
   height: 16px;
   margin-right: 5px;
+}
+
+.menu-loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
 }
 
 /*
