@@ -71,11 +71,11 @@
                 <div class="total-summary-item-value">165k</div>
               </div>
               <div class="total-summary-item">
-                <div class="total-summary-item-label">已送出</div>
+                <div class="total-summary-item-label">已送出的💗/div>
                 <div class="total-summary-item-value">165k</div>
               </div>
               <div class="total-summary-item">
-                <div class="total-summary-item-label">已收到</div>
+                <div class="total-summary-item-label">已收到的💗</div>
                 <div class="total-summary-item-value">165k</div>
               </div>
             </div>
