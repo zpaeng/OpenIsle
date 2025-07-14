@@ -54,7 +54,7 @@
           <div v-else v-for="t in tags" :key="t.id" class="section-item" @click="gotoTag(t)">
             <img v-if="isImageIcon(t.smallIcon || t.icon)" :src="t.smallIcon || t.icon" class="section-item-icon" />
             <i v-else class="section-item-icon fas fa-hashtag"></i>
-            <span class="section-item-text">{{ t.name }} ({{ t.count }})</span>
+            <span class="section-item-text">{{ t.name }} <span class="section-item-text-count">x {{ t.count }}</span></span>
           </div>
         </div>
       </div>
@@ -287,6 +287,13 @@ export default {
 
 .section-item:hover {
   background-color: var(--menu-selected-background-color);
+}
+
+.section-item-text-count {
+  font-size: 12px;
+  color: var(--menu-text-color);
+  opacity: 0.5;
+  font-weight: bold;
 }
 
 .section-item-text {
