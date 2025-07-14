@@ -22,7 +22,7 @@ public class UserService {
     private final UsernameValidator usernameValidator;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public User register(String username, String email, String password) {
+    public User register(String username, String email, String password, String reason, com.openisle.model.RegisterMode mode) {
         usernameValidator.validate(username);
         passwordValidator.validate(password);
         // ── 先按用户名查 ──────────────────────────────────────────
@@ -36,6 +36,8 @@ public class UserService {
             u.setEmail(email);                              // 若不允许改邮箱可去掉
             u.setPassword(passwordEncoder.encode(password));
             u.setVerificationCode(genCode());
+            u.setRegisterReason(reason);
+            u.setApproved(mode == com.openisle.model.RegisterMode.DIRECT);
             return userRepository.save(u);
         }
 
@@ -50,6 +52,8 @@ public class UserService {
             u.setUsername(username);                        // 若不允许改用户名可去掉
             u.setPassword(passwordEncoder.encode(password));
             u.setVerificationCode(genCode());
+            u.setRegisterReason(reason);
+            u.setApproved(mode == com.openisle.model.RegisterMode.DIRECT);
             return userRepository.save(u);
         }
 
@@ -62,6 +66,8 @@ public class UserService {
         user.setVerified(false);
         user.setVerificationCode(genCode());
         user.setAvatar("https://github.com/identicons/" + username + ".png");
+        user.setRegisterReason(reason);
+        user.setApproved(mode == com.openisle.model.RegisterMode.DIRECT);
         return userRepository.save(user);
     }
 
@@ -84,6 +90,7 @@ public class UserService {
     public Optional<User> authenticate(String username, String password) {
         return userRepository.findByUsername(username)
                 .filter(User::isVerified)
+                .filter(User::isApproved)
                 .filter(user -> passwordEncoder.matches(password, user.getPassword()));
     }
 

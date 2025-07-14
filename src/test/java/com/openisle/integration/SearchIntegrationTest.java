@@ -16,7 +16,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = "app.register.mode=DIRECT")
 class SearchIntegrationTest {
     @Autowired
     private TestRestTemplate rest;
@@ -29,7 +30,7 @@ class SearchIntegrationTest {
         HttpHeaders h = new HttpHeaders();
         h.setContentType(MediaType.APPLICATION_JSON);
         rest.postForEntity("/api/auth/register", new HttpEntity<>(
-                Map.of("username", username, "email", email, "password", "pass123"), h), Map.class);
+                Map.of("username", username, "email", email, "password", "pass123", "reason", "integration test reason more than twenty"), h), Map.class);
         User u = users.findByUsername(username).orElseThrow();
         if (u.getVerificationCode() != null) {
             rest.postForEntity("/api/auth/verify", new HttpEntity<>(

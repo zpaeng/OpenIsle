@@ -6,6 +6,8 @@ import com.openisle.service.JwtService;
 import com.openisle.service.UserService;
 import com.openisle.service.CaptchaService;
 import com.openisle.service.GoogleAuthService;
+import com.openisle.service.RegisterModeService;
+import com.openisle.model.RegisterMode;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ public class AuthController {
     private final EmailSender emailService;
     private final CaptchaService captchaService;
     private final GoogleAuthService googleAuthService;
+    private final RegisterModeService registerModeService;
 
     @Value("${app.captcha.enabled:false}")
     private boolean captchaEnabled;
@@ -38,7 +41,8 @@ public class AuthController {
         if (captchaEnabled && registerCaptchaEnabled && !captchaService.verify(req.getCaptcha())) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid captcha"));
         }
-        User user = userService.register(req.getUsername(), req.getEmail(), req.getPassword());
+        User user = userService.register(
+                req.getUsername(), req.getEmail(), req.getPassword(), req.getReason(), registerModeService.getRegisterMode());
         emailService.sendEmail(user.getEmail(), "Verification Code", "Your verification code is " + user.getVerificationCode());
         return ResponseEntity.ok(Map.of("message", "Verification code sent"));
     }
@@ -67,8 +71,11 @@ public class AuthController {
 
     @PostMapping("/google")
     public ResponseEntity<?> loginWithGoogle(@RequestBody GoogleLoginRequest req) {
-        Optional<User> user = googleAuthService.authenticate(req.getIdToken());
+        Optional<User> user = googleAuthService.authenticate(req.getIdToken(), req.getReason(), registerModeService.getRegisterMode());
         if (user.isPresent()) {
+            if (!user.get().isApproved()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Account awaiting approval"));
+            }
             return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
         }
         return ResponseEntity.badRequest().body(Map.of("error", "Invalid google token"));
@@ -85,6 +92,7 @@ public class AuthController {
         private String email;
         private String password;
         private String captcha;
+        private String reason;
     }
 
     @Data
@@ -97,6 +105,7 @@ public class AuthController {
     @Data
     private static class GoogleLoginRequest {
         private String idToken;
+        private String reason;
     }
 
     @Data
