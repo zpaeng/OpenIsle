@@ -176,6 +176,8 @@ export default {
         if (res.ok) {
           const data = await res.json()
           content.value = data.content || ''
+        } else if (res.status === 429) {
+          toast.error('今日AI优化次数已用尽')
         } else {
           toast.error('AI 优化失败')
         }
