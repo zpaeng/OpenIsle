@@ -14,7 +14,14 @@
           <div class="post-clear" @click="clearPost">
             <i class="fa-solid fa-eraser"></i> 清空
           </div>
-          <div class="post-draft" @click="saveDraft">存草稿</div>
+          <div class="ai-generate" @click="aiGenerate">
+            <i class="fa-solid fa-bolt"></i>
+            md格式优化
+          </div>
+          <div class="post-draft" @click="saveDraft">
+            <i class="fa-solid fa-floppy-disk"></i>
+            存草稿
+          </div>
           <div v-if="!isWaitingPosting" class="post-submit" @click="submitPost">发布</div>
           <div v-else class="post-submit-loading"> <i class="fa-solid fa-spinner fa-spin"></i> 发布中...</div>
         </div>
@@ -230,11 +237,24 @@ export default {
 
 .post-draft {
   color: var(--primary-color);
-  padding: 10px 20px;
   border-radius: 10px;
   cursor: pointer;
+}
+
+.post-draft:hover {
   text-decoration: underline;
 }
+
+.ai-generate {
+  color: var(--primary-color);
+  cursor: pointer;
+}
+
+.ai-generate:hover {
+  text-decoration: underline;
+}
+
+
 
 .post-clear {
   color: var(--primary-color);
@@ -272,7 +292,7 @@ export default {
 .post-options-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 30px;
 }
 
 .post-options {
