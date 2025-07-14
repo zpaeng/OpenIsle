@@ -281,6 +281,8 @@ export default {
         const data = await res.json()
         user.value = data
         subscribed.value = !!data.subscribed
+      } else if (res.status === 404) {
+        router.replace('/404')
       }
     }
 

@@ -32,6 +32,10 @@ export default {
     loading: {
       type: Boolean,
       default: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   setup(props, { emit }) {
@@ -43,6 +47,18 @@ export default {
         if (val) {
           vditorInstance.value.disabled()
         } else {
+          vditorInstance.value.enable()
+        }
+      }
+    )
+
+    watch(
+      () => props.disabled,
+      val => {
+        if (!vditorInstance.value) return
+        if (val) {
+          vditorInstance.value.disabled()
+        } else if (!props.loading) {
           vditorInstance.value.enable()
         }
       }
@@ -118,6 +134,9 @@ export default {
         },
         after() {
           vditorInstance.value.setValue(props.modelValue)
+          if (props.loading || props.disabled) {
+            vditorInstance.value.disabled()
+          }
         }
       })
     })
