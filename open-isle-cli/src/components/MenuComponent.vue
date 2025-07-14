@@ -270,6 +270,7 @@ export default {
 }
 
 .section-items {
+  color: var(--menu-text-color);
   display: flex;
   flex-direction: column;
   margin-top: 4px;
@@ -296,6 +297,7 @@ export default {
   width: 16px;
   height: 16px;
   margin-right: 5px;
+  opacity: 0.7;
 }
 
 .menu-loading-container {
