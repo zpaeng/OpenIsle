@@ -87,4 +87,12 @@ public class ReactionService {
     public java.util.List<Long> topCommentIds(String username, int limit) {
         return reactionRepository.findTopCommentIds(username, org.springframework.data.domain.PageRequest.of(0, limit));
     }
+
+    public long countLikesSent(String username) {
+        return reactionRepository.countLikesSent(username);
+    }
+
+    public long countLikesReceived(String username) {
+        return reactionRepository.countLikesReceived(username);
+    }
 }

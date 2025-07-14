@@ -39,6 +39,7 @@ public class PostService {
     private final ReactionRepository reactionRepository;
     private final PostSubscriptionRepository postSubscriptionRepository;
     private final NotificationRepository notificationRepository;
+    private final PostReadService postReadService;
 
     @org.springframework.beans.factory.annotation.Autowired
     public PostService(PostRepository postRepository,
@@ -52,6 +53,7 @@ public class PostService {
                        ReactionRepository reactionRepository,
                        PostSubscriptionRepository postSubscriptionRepository,
                        NotificationRepository notificationRepository,
+                       PostReadService postReadService,
                        @Value("${app.post.publish-mode:DIRECT}") PublishMode publishMode) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
@@ -64,6 +66,7 @@ public class PostService {
         this.reactionRepository = reactionRepository;
         this.postSubscriptionRepository = postSubscriptionRepository;
         this.notificationRepository = notificationRepository;
+        this.postReadService = postReadService;
         this.publishMode = publishMode;
     }
 
@@ -142,6 +145,9 @@ public class PostService {
         }
         post.setViews(post.getViews() + 1);
         post = postRepository.save(post);
+        if (viewer != null) {
+            postReadService.recordRead(viewer, id);
+        }
         if (viewer != null && !viewer.equals(post.getAuthor().getUsername())) {
             User viewerUser = userRepository.findByUsername(viewer).orElse(null);
             if (viewerUser != null) {
