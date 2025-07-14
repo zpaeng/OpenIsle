@@ -136,6 +136,27 @@
                 <div class="summary-empty">暂无热门话题</div>
               </div>
             </div>
+            <div class="hot-tag">
+              <div class="summary-title">TA创建的tag</div>
+              <div class="summary-content" v-if="hotTags.length > 0">
+                <BaseTimeline :items="hotTags">
+                  <template #item="{ item }">
+                    <span class="timeline-link" @click="gotoTag(item.tag)">
+                      {{ item.tag.name }}<span v-if="item.tag.count"> x{{ item.tag.count }}</span>
+                    </span>
+                    <div class="timeline-snippet" v-if="item.tag.description">
+                      {{ item.tag.description }}
+                    </div>
+                    <div class="timeline-date">
+                      {{ formatDate(item.tag.createdAt) }}
+                    </div>
+                  </template>
+                </BaseTimeline>
+              </div>
+              <div v-else>
+                <div class="summary-empty">暂无标签</div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -177,6 +198,16 @@
                 </router-link>
                 <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
               </template>
+              <template v-else-if="item.type === 'tag'">
+                创建了标签
+                <span class="timeline-link" @click="gotoTag(item.tag)">
+                  {{ item.tag.name }}<span v-if="item.tag.count"> x{{ item.tag.count }}</span>
+                </span>
+                <div class="timeline-snippet" v-if="item.tag.description">
+                  {{ item.tag.description }}
+                </div>
+                <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
+              </template>
             </template>
           </BaseTimeline>
         </div>
@@ -203,7 +234,7 @@
 
 <script>
 import { ref, computed, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { API_BASE_URL, toast } from '../main'
 import { getToken, authState } from '../utils/auth'
 import BaseTimeline from '../components/BaseTimeline.vue'
@@ -219,11 +250,13 @@ export default {
   components: { BaseTimeline, UserList, BasePlaceholder },
   setup() {
     const route = useRoute()
+    const router = useRouter()
     const username = route.params.id
 
     const user = ref({})
     const hotPosts = ref([])
     const hotReplies = ref([])
+    const hotTags = ref([])
     const timelineItems = ref([])
     const followers = ref([])
     const followings = ref([])
@@ -263,13 +296,21 @@ export default {
         const data = await repliesRes.json()
         hotReplies.value = data.map(c => ({ icon: 'fas fa-comment', comment: c }))
       }
+
+      const tagsRes = await fetch(`${API_BASE_URL}/api/users/${username}/hot-tags`)
+      if (tagsRes.ok) {
+        const data = await tagsRes.json()
+        hotTags.value = data.map(t => ({ icon: 'fas fa-tag', tag: t }))
+      }
     }
 
     const fetchTimeline = async () => {
       const postsRes = await fetch(`${API_BASE_URL}/api/users/${username}/posts?limit=50`)
       const repliesRes = await fetch(`${API_BASE_URL}/api/users/${username}/replies?limit=50`)
+      const tagsRes = await fetch(`${API_BASE_URL}/api/users/${username}/tags?limit=50`)
       const posts = postsRes.ok ? await postsRes.json() : []
       const replies = repliesRes.ok ? await repliesRes.json() : []
+      const tags = tagsRes.ok ? await tagsRes.json() : []
       const mapped = [
         ...posts.map(p => ({
           type: 'post',
@@ -282,6 +323,12 @@ export default {
           icon: 'fas fa-comment',
           comment: r,
           createdAt: r.createdAt
+        })),
+        ...tags.map(t => ({
+          type: 'tag',
+          icon: 'fas fa-tag',
+          tag: t,
+          createdAt: t.createdAt
         }))
       ]
       mapped.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
@@ -349,6 +396,13 @@ export default {
       }
     }
 
+    const gotoTag = tag => {
+      const value = encodeURIComponent(tag.id ?? tag.name)
+      router.push({ path: '/', query: { tags: value } }).then(() => {
+        window.location.reload()
+      })
+    }
+
     const init = async () => {
       try {
         await fetchUser()
@@ -388,7 +442,9 @@ export default {
       loadFollow,
       loadSummary,
       subscribeUser,
-      unsubscribeUser
+      unsubscribeUser,
+      gotoTag,
+      hotTags
     }
   }
 }
@@ -569,8 +625,9 @@ export default {
 }
 
 .hot-reply,
-.hot-topic {
-  width: 50%;
+.hot-topic,
+.hot-tag {
+  width: 33%;
 }
 
 .profile-timeline {

@@ -30,7 +30,13 @@ public class TagController {
                 approved = false;
             }
         }
-        Tag tag = tagService.createTag(req.getName(), req.getDescription(), req.getIcon(), req.getSmallIcon(), approved);
+        Tag tag = tagService.createTag(
+                req.getName(),
+                req.getDescription(),
+                req.getIcon(),
+                req.getSmallIcon(),
+                approved,
+                auth != null ? auth.getName() : null);
         long count = postService.countPostsByTag(tag.getId());
         return toDto(tag, count);
     }

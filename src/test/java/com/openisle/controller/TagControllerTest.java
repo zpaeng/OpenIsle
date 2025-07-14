@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -38,7 +39,7 @@ class TagControllerTest {
         t.setDescription("d");
         t.setIcon("i");
         t.setSmallIcon("s1");
-        Mockito.when(tagService.createTag(eq("java"), eq("d"), eq("i"), eq("s1"))).thenReturn(t);
+        Mockito.when(tagService.createTag(eq("java"), eq("d"), eq("i"), eq("s1"), eq(true), isNull())).thenReturn(t);
         Mockito.when(tagService.getTag(1L)).thenReturn(t);
 
         mockMvc.perform(post("/api/tags")

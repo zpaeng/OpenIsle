@@ -22,6 +22,7 @@ public class UserController {
     private final PostService postService;
     private final CommentService commentService;
     private final ReactionService reactionService;
+    private final TagService tagService;
     private final SubscriptionService subscriptionService;
     private final PostReadService postReadService;
     private final UserVisitService userVisitService;
@@ -37,6 +38,9 @@ public class UserController {
 
     @Value("${app.user.replies-limit:50}")
     private int defaultRepliesLimit;
+
+    @Value("${app.user.tags-limit:50}")
+    private int defaultTagsLimit;
 
     @Value("${app.snippet-length:50}")
     private int snippetLength;
@@ -119,6 +123,48 @@ public class UserController {
         java.util.List<Long> ids = reactionService.topCommentIds(user.getUsername(), l);
         return commentService.getCommentsByIds(ids).stream()
                 .map(this::toCommentInfoDto)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @GetMapping("/{identifier}/hot-tags")
+    public java.util.List<TagInfoDto> hotTags(@PathVariable("identifier") String identifier,
+                                              @RequestParam(value = "limit", required = false) Integer limit) {
+        int l = limit != null ? limit : 10;
+        User user = userService.findByIdentifier(identifier).orElseThrow();
+        return tagService.getTagsByUser(user.getUsername()).stream()
+                .map(t -> {
+                    TagInfoDto dto = new TagInfoDto();
+                    dto.setId(t.getId());
+                    dto.setName(t.getName());
+                    dto.setDescription(t.getDescription());
+                    dto.setIcon(t.getIcon());
+                    dto.setSmallIcon(t.getSmallIcon());
+                    dto.setCreatedAt(t.getCreatedAt());
+                    dto.setCount(postService.countPostsByTag(t.getId()));
+                    return dto;
+                })
+                .sorted((a, b) -> Long.compare(b.getCount(), a.getCount()))
+                .limit(l)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @GetMapping("/{identifier}/tags")
+    public java.util.List<TagInfoDto> userTags(@PathVariable("identifier") String identifier,
+                                               @RequestParam(value = "limit", required = false) Integer limit) {
+        int l = limit != null ? limit : defaultTagsLimit;
+        User user = userService.findByIdentifier(identifier).orElseThrow();
+        return tagService.getRecentTagsByUser(user.getUsername(), l).stream()
+                .map(t -> {
+                    TagInfoDto dto = new TagInfoDto();
+                    dto.setId(t.getId());
+                    dto.setName(t.getName());
+                    dto.setDescription(t.getDescription());
+                    dto.setIcon(t.getIcon());
+                    dto.setSmallIcon(t.getSmallIcon());
+                    dto.setCreatedAt(t.getCreatedAt());
+                    dto.setCount(postService.countPostsByTag(t.getId()));
+                    return dto;
+                })
                 .collect(java.util.stream.Collectors.toList());
     }
 
@@ -260,6 +306,17 @@ public class UserController {
         private java.time.LocalDateTime createdAt;
         private PostMetaDto post;
         private ParentCommentDto parentComment;
+    }
+
+    @Data
+    private static class TagInfoDto {
+        private Long id;
+        private String name;
+        private String description;
+        private String icon;
+        private String smallIcon;
+        private java.time.LocalDateTime createdAt;
+        private Long count;
     }
 
     @Data

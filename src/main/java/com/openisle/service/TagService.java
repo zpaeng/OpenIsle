@@ -1,7 +1,11 @@
 package com.openisle.service;
 
 import com.openisle.model.Tag;
+import com.openisle.model.User;
 import com.openisle.repository.TagRepository;
+import com.openisle.repository.UserRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +16,9 @@ import java.util.List;
 public class TagService {
     private final TagRepository tagRepository;
     private final TagValidator tagValidator;
+    private final UserRepository userRepository;
 
-    public Tag createTag(String name, String description, String icon, String smallIcon, boolean approved) {
+    public Tag createTag(String name, String description, String icon, String smallIcon, boolean approved, String creatorUsername) {
         tagValidator.validate(name);
         Tag tag = new Tag();
         tag.setName(name);
@@ -21,11 +26,20 @@ public class TagService {
         tag.setIcon(icon);
         tag.setSmallIcon(smallIcon);
         tag.setApproved(approved);
+        if (creatorUsername != null) {
+            User creator = userRepository.findByUsername(creatorUsername)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+            tag.setCreator(creator);
+        }
         return tagRepository.save(tag);
     }
 
+    public Tag createTag(String name, String description, String icon, String smallIcon, boolean approved) {
+        return createTag(name, description, icon, smallIcon, approved, null);
+    }
+
     public Tag createTag(String name, String description, String icon, String smallIcon) {
-        return createTag(name, description, icon, smallIcon, true);
+        return createTag(name, description, icon, smallIcon, true, null);
     }
 
     public Tag updateTag(Long id, String name, String description, String icon, String smallIcon) {
@@ -76,5 +90,18 @@ public class TagService {
             return tagRepository.findByApprovedTrue();
         }
         return tagRepository.findByNameContainingIgnoreCaseAndApprovedTrue(keyword);
+    }
+
+    public List<Tag> getRecentTagsByUser(String username, int limit) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Pageable pageable = PageRequest.of(0, limit);
+        return tagRepository.findByCreatorOrderByCreatedAtDesc(user, pageable);
+    }
+
+    public List<Tag> getTagsByUser(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return tagRepository.findByCreator(user);
     }
 }
