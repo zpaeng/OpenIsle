@@ -8,6 +8,7 @@ import SignupPageView from '../views/SignupPageView.vue'
 import NewPostPageView from '../views/NewPostPageView.vue'
 import SettingsPageView from '../views/SettingsPageView.vue'
 import ProfileView from '../views/ProfileView.vue'
+import NotFoundPageView from '../views/NotFoundPageView.vue'
 
 const routes = [
   {
@@ -55,6 +56,15 @@ const routes = [
     name: 'users',
     component: ProfileView
   },
+  {
+    path: '/404',
+    name: 'not-found',
+    component: NotFoundPageView
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/404'
+  }
 ]
 
 const router = createRouter({

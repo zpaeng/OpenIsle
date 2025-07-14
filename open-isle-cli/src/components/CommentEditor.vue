@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import Vditor from 'vditor'
 import 'vditor/dist/index.css'
 
@@ -34,13 +34,17 @@ export default {
     loading: {
       type: Boolean,
       default: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   setup(props, { emit }) {
     const vditorInstance = ref(null)
     const text = ref('')
 
-    const isDisabled = computed(() => props.loading || !text.value.trim())
+    const isDisabled = computed(() => props.loading || props.disabled || !text.value.trim())
 
     const submit = () => {
       if (!vditorInstance.value || isDisabled.value) return
@@ -79,11 +83,38 @@ export default {
           'image'
         ],
         toolbarConfig: { pin: true },
-        input(value) {
-          text.value = value
-        }
-      })
+       input(value) {
+         text.value = value
+       }
+     })
+      if (props.disabled || props.loading) {
+        vditorInstance.value.disabled()
+      }
     })
+
+    watch(
+      () => props.loading,
+      val => {
+        if (!vditorInstance.value) return
+        if (val) {
+          vditorInstance.value.disabled()
+        } else if (!props.disabled) {
+          vditorInstance.value.enable()
+        }
+      }
+    )
+
+    watch(
+      () => props.disabled,
+      val => {
+        if (!vditorInstance.value) return
+        if (val) {
+          vditorInstance.value.disabled()
+        } else if (!props.loading) {
+          vditorInstance.value.enable()
+        }
+      }
+    )
 
     return { submit, isDisabled }
   }

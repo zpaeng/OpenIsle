@@ -59,7 +59,14 @@
         </div>
       </div>
 
-      <CommentEditor @submit="postComment" :loading="isWaitingPostingComment" />
+      <div class="comment-editor-wrapper">
+        <CommentEditor
+          @submit="postComment"
+          :loading="isWaitingPostingComment"
+          :disabled="!loggedIn"
+        />
+        <LoginOverlay v-if="!loggedIn" />
+      </div>
 
       <div class="comments-container">
         <BaseTimeline :items="comments">
@@ -104,6 +111,7 @@ import ArticleTags from '../components/ArticleTags.vue'
 import ArticleCategory from '../components/ArticleCategory.vue'
 import ReactionsGroup from '../components/ReactionsGroup.vue'
 import DropdownMenu from '../components/DropdownMenu.vue'
+import LoginOverlay from '../components/LoginOverlay.vue'
 import { renderMarkdown } from '../utils/markdown'
 import { API_BASE_URL, toast } from '../main'
 import { getToken, authState } from '../utils/auth'
@@ -114,7 +122,7 @@ hatch.register()
 
 export default {
   name: 'PostPageView',
-  components: { CommentItem, CommentEditor, BaseTimeline, ArticleTags, ArticleCategory, ReactionsGroup, DropdownMenu },
+  components: { CommentItem, CommentEditor, BaseTimeline, ArticleTags, ArticleCategory, ReactionsGroup, DropdownMenu, LoginOverlay },
   setup() {
     const route = useRoute()
     const postId = route.params.id
@@ -235,7 +243,12 @@ export default {
           headers: { Authorization: token ? `Bearer ${token}` : '' }
         })
         isWaitingFetchingPost.value = false;
-        if (!res.ok) return
+        if (!res.ok) {
+          if (res.status === 404) {
+            router.replace('/404')
+          }
+          return
+        }
         const data = await res.json()
         postContent.value = data.content
         author.value = data.author
@@ -778,5 +791,9 @@ export default {
 
 .copy-link:hover {
   background-color: #e2e2e2;
+}
+
+.comment-editor-wrapper {
+  position: relative;
 }
 </style>

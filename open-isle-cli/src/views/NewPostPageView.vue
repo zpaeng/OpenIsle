@@ -3,7 +3,8 @@
     <div class="new-post-form">
       <input class="post-title-input" v-model="title" placeholder="标题" />
       <div class="post-editor-container">
-        <PostEditor v-model="content" :loading="isAiLoading" />
+        <PostEditor v-model="content" :loading="isAiLoading" :disabled="!isLogin" />
+        <LoginOverlay v-if="!isLogin" />
       </div>
       <div class="post-options">
         <div class="post-options-left">
@@ -22,7 +23,12 @@
             <i class="fa-solid fa-floppy-disk"></i>
             存草稿
           </div>
-          <div v-if="!isWaitingPosting" class="post-submit" @click="submitPost">发布</div>
+          <div
+            v-if="!isWaitingPosting"
+            class="post-submit"
+            :class="{ disabled: !isLogin }"
+            @click="isLogin && submitPost"
+          >发布</div>
           <div v-else class="post-submit-loading"> <i class="fa-solid fa-spinner fa-spin"></i> 发布中...</div>
         </div>
       </div>
@@ -31,16 +37,17 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import PostEditor from '../components/PostEditor.vue'
 import CategorySelect from '../components/CategorySelect.vue'
 import TagSelect from '../components/TagSelect.vue'
 import { API_BASE_URL, toast } from '../main'
-import { getToken } from '../utils/auth'
+import { getToken, authState } from '../utils/auth'
+import LoginOverlay from '../components/LoginOverlay.vue'
 
 export default {
   name: 'NewPostPageView',
-  components: { PostEditor, CategorySelect, TagSelect },
+  components: { PostEditor, CategorySelect, TagSelect, LoginOverlay },
   setup() {
     const title = ref('')
     const content = ref('')
@@ -48,6 +55,7 @@ export default {
     const selectedTags = ref([])
     const isWaitingPosting = ref(false)
     const isAiLoading = ref(false)
+    const isLogin = computed(() => authState.loggedIn)
 
     const loadDraft = async () => {
       const token = getToken()
@@ -237,7 +245,7 @@ export default {
         isWaitingPosting.value = false
       }
     }
-    return { title, content, selectedCategory, selectedTags, submitPost, saveDraft, clearPost, isWaitingPosting, aiGenerate, isAiLoading }
+    return { title, content, selectedCategory, selectedTags, submitPost, saveDraft, clearPost, isWaitingPosting, aiGenerate, isAiLoading, isLogin }
   }
 }
 </script>
@@ -296,6 +304,10 @@ export default {
   opacity: 0.7;
 }
 
+.post-editor-container {
+  position: relative;
+}
+
 .post-submit {
   background-color: var(--primary-color);
   color: #fff;
@@ -305,8 +317,16 @@ export default {
   cursor: pointer;
 }
 
+.post-submit.disabled {
+  background-color: var(--primary-color-disabled);
+  cursor: not-allowed;
+}
+
 .post-submit:hover {
   background-color: var(--primary-color-hover);
+}
+.post-submit.disabled:hover {
+  background-color: var(--primary-color-disabled);
 }
 
 .post-submit-loading {
