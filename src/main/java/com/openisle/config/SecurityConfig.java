@@ -1,6 +1,7 @@
 package com.openisle.config;
 
 import com.openisle.service.JwtService;
+import com.openisle.service.UserVisitService;
 import com.openisle.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -38,6 +39,7 @@ public class SecurityConfig {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final AccessDeniedHandler customAccessDeniedHandler;
+    private final UserVisitService userVisitService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -96,6 +98,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/reaction-types").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/categories/**").hasAuthority("ADMIN")
                     .requestMatchers(HttpMethod.POST, "/api/tags/**").authenticated()
                     .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasAuthority("ADMIN")
@@ -103,7 +106,8 @@ public class SecurityConfig {
                     .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                     .anyRequest().authenticated()
             )
-            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(userVisitFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
@@ -123,7 +127,8 @@ public class SecurityConfig {
                 boolean publicGet = "GET".equalsIgnoreCase(request.getMethod()) &&
                         (uri.startsWith("/api/posts") || uri.startsWith("/api/comments") ||
                          uri.startsWith("/api/categories") || uri.startsWith("/api/tags") ||
-                         uri.startsWith("/api/search") || uri.startsWith("/api/users"));
+                         uri.startsWith("/api/search") || uri.startsWith("/api/users") ||
+                         uri.startsWith("/api/reaction-types"));
 
                 if (authHeader != null && authHeader.startsWith("Bearer ")) {
                     String token = authHeader.substring(7);
@@ -146,6 +151,20 @@ public class SecurityConfig {
                     return;
                 }
 
+                filterChain.doFilter(request, response);
+            }
+        };
+    }
+
+    @Bean
+    public OncePerRequestFilter userVisitFilter() {
+        return new OncePerRequestFilter() {
+            @Override
+            protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+                var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+                if (auth != null && auth.isAuthenticated() && !(auth instanceof org.springframework.security.authentication.AnonymousAuthenticationToken)) {
+                    userVisitService.recordVisit(auth.getName());
+                }
                 filterChain.doFilter(request, response);
             }
         };
