@@ -8,6 +8,8 @@
 import { ref, onMounted, watch } from 'vue'
 import Vditor from 'vditor'
 import 'vditor/dist/index.css'
+import { API_BASE_URL } from '../main'
+import { getToken } from '../utils/auth'
 
 export default {
   name: 'PostEditor',
@@ -62,6 +64,19 @@ export default {
           'link',
           'upload'
         ],
+        upload: {
+          fieldName: 'file',
+          url: `${API_BASE_URL}/api/upload`,
+          linkToImgUrl: `${API_BASE_URL}/api/upload/url`,
+          accept: 'image/*,video/*',
+          multiple: false,
+          headers: { Authorization: `Bearer ${getToken()}` },
+          format(files, responseText) {
+            const res = JSON.parse(responseText)
+            if (res.code === 0) return res.data.url
+            throw new Error(res.msg || '上传失败')
+          }
+        },
         toolbarConfig: { pin: true },
         cache: { enable: false },
         input(value) {
