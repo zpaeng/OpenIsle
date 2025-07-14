@@ -186,6 +186,7 @@ export default {
   border-right: 1px solid var(--menu-border-color);
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .menu-item-container {
