@@ -32,7 +32,10 @@
           </div>
         </ReactionsGroup>
       </div>
-      <CommentEditor v-if="showEditor" @submit="submitReply" :loading="isWaitingForReply" />
+      <div class="comment-editor-wrapper">
+        <CommentEditor v-if="showEditor" @submit="submitReply" :loading="isWaitingForReply" :disabled="!isLoggedIn" />
+        <LoginOverlay v-if="showEditor && !loggedIn" />
+      </div>
       <div v-if="comment.reply && comment.reply.length" class="reply-toggle" @click="toggleReplies">
         <i v-if="showReplies" class="fas fa-chevron-up reply-toggle-icon"></i>
         <i v-else class="fas fa-chevron-down reply-toggle-icon"></i>
@@ -75,6 +78,8 @@ import { API_BASE_URL, toast } from '../main'
 import { getToken, authState } from '../utils/auth'
 import ReactionsGroup from './ReactionsGroup.vue'
 import DropdownMenu from './DropdownMenu.vue'
+import LoginOverlay from './LoginOverlay.vue'
+
 const CommentItem = {
   name: 'CommentItem',
   emits: ['deleted'],
@@ -205,7 +210,7 @@ const CommentItem = {
   }
 }
 
-CommentItem.components = { CommentItem, CommentEditor, BaseTimeline, ReactionsGroup, DropdownMenu, VueEasyLightbox }
+CommentItem.components = { CommentItem, CommentEditor, BaseTimeline, ReactionsGroup, DropdownMenu, VueEasyLightbox, LoginOverlay }
 
 export default CommentItem
 </script>
