@@ -2,6 +2,7 @@ package com.openisle.controller;
 
 import com.openisle.model.User;
 import com.openisle.service.*;
+import com.openisle.model.RegisterMode;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,8 @@ class AuthControllerTest {
     private CaptchaService captchaService;
     @MockBean
     private GoogleAuthService googleAuthService;
+    @MockBean
+    private RegisterModeService registerModeService;
 
     @Test
     void registerSendsEmail() throws Exception {
@@ -43,11 +46,12 @@ class AuthControllerTest {
         user.setEmail("a@b.com");
         user.setUsername("u");
         user.setVerificationCode("123456");
-        Mockito.when(userService.register(eq("u"), eq("a@b.com"), eq("p"))).thenReturn(user);
+        Mockito.when(registerModeService.getRegisterMode()).thenReturn(RegisterMode.DIRECT);
+        Mockito.when(userService.register(eq("u"), eq("a@b.com"), eq("p"), any(), eq(RegisterMode.DIRECT))).thenReturn(user);
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"u\",\"email\":\"a@b.com\",\"password\":\"p\"}"))
+                        .content("{\"username\":\"u\",\"email\":\"a@b.com\",\"password\":\"p\",\"reason\":\"test reason more than twenty\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").exists());
 

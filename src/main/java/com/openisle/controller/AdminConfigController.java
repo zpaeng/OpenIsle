@@ -5,6 +5,8 @@ import com.openisle.model.PublishMode;
 import com.openisle.service.PasswordValidator;
 import com.openisle.service.PostService;
 import com.openisle.service.AiUsageService;
+import com.openisle.service.RegisterModeService;
+import com.openisle.model.RegisterMode;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,7 @@ public class AdminConfigController {
     private final PostService postService;
     private final PasswordValidator passwordValidator;
     private final AiUsageService aiUsageService;
+    private final RegisterModeService registerModeService;
 
     @GetMapping
     public ConfigDto getConfig() {
@@ -23,6 +26,7 @@ public class AdminConfigController {
         dto.setPublishMode(postService.getPublishMode());
         dto.setPasswordStrength(passwordValidator.getStrength());
         dto.setAiFormatLimit(aiUsageService.getFormatLimit());
+        dto.setRegisterMode(registerModeService.getRegisterMode());
         return dto;
     }
 
@@ -37,6 +41,9 @@ public class AdminConfigController {
         if (dto.getAiFormatLimit() != null) {
             aiUsageService.setFormatLimit(dto.getAiFormatLimit());
         }
+        if (dto.getRegisterMode() != null) {
+            registerModeService.setRegisterMode(dto.getRegisterMode());
+        }
         return getConfig();
     }
 
@@ -45,5 +52,6 @@ public class AdminConfigController {
         private PublishMode publishMode;
         private PasswordStrength passwordStrength;
         private Integer aiFormatLimit;
+        private RegisterMode registerMode;
     }
 }

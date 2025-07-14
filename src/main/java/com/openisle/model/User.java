@@ -42,6 +42,12 @@ public class User {
     @Column(length = 1000)
     private String introduction;
 
+    @Column(length = 1000)
+    private String registerReason;
+
+    @Column(nullable = false)
+    private boolean approved = true;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role = Role.USER;

@@ -27,5 +27,7 @@ public enum NotificationType {
     /** Someone unfollowed you */
     USER_UNFOLLOWED,
     /** A user you subscribe to created a post or comment */
-    USER_ACTIVITY
+    USER_ACTIVITY,
+    /** A user requested registration approval */
+    REGISTER_REQUEST
 }
