@@ -209,6 +209,7 @@ export default {
   height: calc(100vh - var(--header-height));
   padding-right: 20px;
   padding-left: 20px;
+  overflow-y: auto;
 }
 
 .new-post-form {
