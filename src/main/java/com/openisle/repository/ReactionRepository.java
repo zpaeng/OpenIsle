@@ -23,4 +23,10 @@ public interface ReactionRepository extends JpaRepository<Reaction, Long> {
 
     @Query("SELECT r.comment.id FROM Reaction r WHERE r.comment IS NOT NULL AND r.comment.author.username = :username AND r.type = com.openisle.model.ReactionType.LIKE GROUP BY r.comment.id ORDER BY COUNT(r.id) DESC")
     List<Long> findTopCommentIds(@Param("username") String username, Pageable pageable);
+
+    @Query("SELECT COUNT(r) FROM Reaction r WHERE r.user.username = :username AND r.type = com.openisle.model.ReactionType.LIKE")
+    long countLikesSent(@Param("username") String username);
+
+    @Query("SELECT COUNT(r) FROM Reaction r WHERE r.type = com.openisle.model.ReactionType.LIKE AND ((r.post IS NOT NULL AND r.post.author.username = :username) OR (r.comment IS NOT NULL AND r.comment.author.username = :username))")
+    long countLikesReceived(@Param("username") String username);
 }

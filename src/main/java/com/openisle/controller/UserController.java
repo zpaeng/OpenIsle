@@ -23,6 +23,8 @@ public class UserController {
     private final CommentService commentService;
     private final ReactionService reactionService;
     private final SubscriptionService subscriptionService;
+    private final PostReadService postReadService;
+    private final UserVisitService userVisitService;
 
     @Value("${app.upload.check-type:true}")
     private boolean checkImageType;
@@ -170,6 +172,10 @@ public class UserController {
         dto.setCreatedAt(user.getCreatedAt());
         dto.setLastPostTime(postService.getLastPostTime(user.getUsername()));
         dto.setTotalViews(postService.getTotalViews(user.getUsername()));
+        dto.setVisitedDays(userVisitService.countVisits(user.getUsername()));
+        dto.setReadPosts(postReadService.countReads(user.getUsername()));
+        dto.setLikesSent(reactionService.countLikesSent(user.getUsername()));
+        dto.setLikesReceived(reactionService.countLikesReceived(user.getUsername()));
         if (viewer != null) {
             dto.setSubscribed(subscriptionService.isSubscribed(viewer.getName(), user.getUsername()));
         } else {
@@ -230,6 +236,10 @@ public class UserController {
         private java.time.LocalDateTime createdAt;
         private java.time.LocalDateTime lastPostTime;
         private long totalViews;
+        private long visitedDays;
+        private long readPosts;
+        private long likesSent;
+        private long likesReceived;
         private boolean subscribed;
     }
 

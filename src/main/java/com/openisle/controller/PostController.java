@@ -9,6 +9,7 @@ import com.openisle.service.ReactionService;
 import com.openisle.service.CaptchaService;
 import com.openisle.service.DraftService;
 import com.openisle.service.SubscriptionService;
+import com.openisle.service.UserVisitService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,7 @@ public class PostController {
     private final SubscriptionService subscriptionService;
     private final CaptchaService captchaService;
     private final DraftService draftService;
+    private final UserVisitService userVisitService;
 
     @Value("${app.captcha.enabled:false}")
     private boolean captchaEnabled;
@@ -66,7 +68,8 @@ public class PostController {
                                    @RequestParam(value = "tagId", required = false) Long tagId,
                                    @RequestParam(value = "tagIds", required = false) List<Long> tagIds,
                                    @RequestParam(value = "page", required = false) Integer page,
-                                   @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+                                   @RequestParam(value = "pageSize", required = false) Integer pageSize,
+                                   Authentication auth) {
         List<Long> ids = categoryIds;
         if (categoryId != null) {
             ids = java.util.List.of(categoryId);
@@ -74,6 +77,10 @@ public class PostController {
         List<Long> tids = tagIds;
         if (tagId != null) {
             tids = java.util.List.of(tagId);
+        }
+
+        if (auth != null) {
+            userVisitService.recordVisit(auth.getName());
         }
 
         boolean hasCategories = ids != null && !ids.isEmpty();
@@ -98,7 +105,8 @@ public class PostController {
                                       @RequestParam(value = "tagId", required = false) Long tagId,
                                       @RequestParam(value = "tagIds", required = false) List<Long> tagIds,
                                       @RequestParam(value = "page", required = false) Integer page,
-                                      @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+                                      @RequestParam(value = "pageSize", required = false) Integer pageSize,
+                                      Authentication auth) {
         List<Long> ids = categoryIds;
         if (categoryId != null) {
             ids = java.util.List.of(categoryId);
@@ -106,6 +114,10 @@ public class PostController {
         List<Long> tids = tagIds;
         if (tagId != null) {
             tids = java.util.List.of(tagId);
+        }
+
+        if (auth != null) {
+            userVisitService.recordVisit(auth.getName());
         }
 
         return postService.listPostsByViews(ids, tids, page, pageSize)

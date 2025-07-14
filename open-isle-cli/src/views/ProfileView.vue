@@ -64,19 +64,19 @@
             <div class="total-summary-content">
               <div class="total-summary-item">
                 <div class="total-summary-item-label">访问天数</div>
-                <div class="total-summary-item-value">0</div>
+                <div class="total-summary-item-value">{{ user.visitedDays }}</div>
               </div>
               <div class="total-summary-item">
                 <div class="total-summary-item-label">已读帖子</div>
-                <div class="total-summary-item-value">165k</div>
+                <div class="total-summary-item-value">{{ user.readPosts }}</div>
               </div>
               <div class="total-summary-item">
-                <div class="total-summary-item-label">已送出的💗/div>
-                <div class="total-summary-item-value">165k</div>
+                <div class="total-summary-item-label">已送出的💗</div>
+                <div class="total-summary-item-value">{{ user.likesSent }}</div>
               </div>
               <div class="total-summary-item">
                 <div class="total-summary-item-label">已收到的💗</div>
-                <div class="total-summary-item-value">165k</div>
+                <div class="total-summary-item-value">{{ user.likesReceived }}</div>
               </div>
             </div>
           </div>
