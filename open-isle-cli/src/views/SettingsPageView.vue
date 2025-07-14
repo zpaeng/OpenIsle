@@ -208,6 +208,7 @@ export default {
   background-color: var(--background-color);
   padding: 40px;
   height: calc(100vh - var(--header-height) - 80px);
+  overflow-y: auto;
 }
 
 .settings-title {
