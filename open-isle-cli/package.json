@@ -15,7 +15,9 @@
     "vue": "^3.2.13",
     "vue-router": "^4.5.1",
     "vue-toastification": "^2.0.0-rc.5",
-    "vue-easy-lightbox": "^1.19.0"
+    "vue-easy-lightbox": "^1.19.0",
+    "echarts": "^5.6.0",
+    "vue-echarts": "^7.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

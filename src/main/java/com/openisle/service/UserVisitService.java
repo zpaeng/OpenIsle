@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -36,5 +38,23 @@ public class UserVisitService {
     public long countDau(LocalDate date) {
         LocalDate d = date != null ? date : LocalDate.now();
         return userVisitRepository.countByVisitDate(d);
+    }
+
+    public Map<LocalDate, Long> countDauRange(LocalDate start, LocalDate end) {
+        Map<LocalDate, Long> result = new LinkedHashMap<>();
+        if (start == null || end == null || start.isAfter(end)) {
+            return result;
+        }
+        var list = userVisitRepository.countRange(start, end);
+        for (var obj : list) {
+            LocalDate d = (LocalDate) obj[0];
+            Long c = (Long) obj[1];
+            result.put(d, c);
+        }
+        // fill zero counts for missing dates
+        for (LocalDate d = start; !d.isAfter(end); d = d.plusDays(1)) {
+            result.putIfAbsent(d, 0L);
+        }
+        return result;
     }
 }
