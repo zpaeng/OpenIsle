@@ -17,7 +17,7 @@ public class UserVisitService {
 
     public void recordVisit(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         LocalDate today = LocalDate.now();
         userVisitRepository.findByUserAndVisitDate(user, today).orElseGet(() -> {
             UserVisit visit = new UserVisit();
@@ -29,7 +29,7 @@ public class UserVisitService {
 
     public long countVisits(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         return userVisitRepository.countByUser(user);
     }
 }

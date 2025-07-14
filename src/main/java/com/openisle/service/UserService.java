@@ -104,14 +104,14 @@ public class UserService {
 
     public User updateAvatar(String username, String avatarUrl) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         user.setAvatar(avatarUrl);
         return userRepository.save(user);
     }
 
     public User updateProfile(String currentUsername, String newUsername, String introduction) {
         User user = userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         if (newUsername != null && !newUsername.equals(currentUsername)) {
             usernameValidator.validate(newUsername);
             userRepository.findByUsername(newUsername).ifPresent(u -> {

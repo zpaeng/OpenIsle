@@ -25,9 +25,9 @@ public class ReactionService {
 
     public Reaction reactToPost(String username, Long postId, ReactionType type) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
         java.util.Optional<Reaction> existing =
                 reactionRepository.findByUserAndPostAndType(user, post, type);
         if (existing.isPresent()) {
@@ -47,7 +47,7 @@ public class ReactionService {
 
     public Reaction reactToComment(String username, Long commentId, ReactionType type) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
         java.util.Optional<Reaction> existing =
@@ -70,7 +70,7 @@ public class ReactionService {
 
     public java.util.List<Reaction> getReactionsForPost(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
         return reactionRepository.findByPost(post);
     }
 

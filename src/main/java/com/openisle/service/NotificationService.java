@@ -34,7 +34,7 @@ public class NotificationService {
 
     public List<Notification> listNotifications(String username, Boolean read) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         if (read == null) {
             return notificationRepository.findByUserOrderByCreatedAtDesc(user);
         }
@@ -43,7 +43,7 @@ public class NotificationService {
 
     public void markRead(String username, List<Long> ids) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         List<Notification> notifs = notificationRepository.findAllById(ids);
         for (Notification n : notifs) {
             if (n.getUser().getId().equals(user.getId())) {
@@ -55,7 +55,7 @@ public class NotificationService {
 
     public long countUnread(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         return notificationRepository.countByUserAndRead(user, false);
     }
 }

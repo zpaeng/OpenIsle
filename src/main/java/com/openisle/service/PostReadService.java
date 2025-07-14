@@ -21,9 +21,9 @@ public class PostReadService {
     public void recordRead(String username, Long postId) {
         if (username == null) return;
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
         postReadRepository.findByUserAndPost(user, post).ifPresentOrElse(pr -> {
             pr.setLastReadAt(LocalDateTime.now());
             postReadRepository.save(pr);
@@ -38,7 +38,7 @@ public class PostReadService {
 
     public long countReads(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         return postReadRepository.countByUser(user);
     }
 

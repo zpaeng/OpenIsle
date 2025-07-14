@@ -90,7 +90,7 @@ public class PostService {
             throw new IllegalArgumentException("At most two tags allowed");
         }
         User author = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new IllegalArgumentException("Category not found"));
         java.util.List<com.openisle.model.Tag> tags = tagRepository.findAllById(tagIds);
@@ -132,15 +132,15 @@ public class PostService {
 
     public Post viewPost(Long id, String viewer) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
         if (post.getStatus() != PostStatus.PUBLISHED) {
             if (viewer == null) {
-                throw new IllegalArgumentException("Post not found");
+                throw new com.openisle.exception.NotFoundException("Post not found");
             }
             User viewerUser = userRepository.findByUsername(viewer)
-                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                    .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
             if (!viewerUser.getRole().equals(com.openisle.model.Role.ADMIN) && !viewerUser.getId().equals(post.getAuthor().getId())) {
-                throw new IllegalArgumentException("Post not found");
+                throw new com.openisle.exception.NotFoundException("Post not found");
             }
         }
         post.setViews(post.getViews() + 1);
@@ -243,7 +243,7 @@ public class PostService {
 
     public List<Post> getRecentPostsByUser(String username, int limit) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Pageable pageable = PageRequest.of(0, limit);
         return postRepository.findByAuthorAndStatusOrderByCreatedAtDesc(user, PostStatus.PUBLISHED, pageable);
     }
@@ -311,7 +311,7 @@ public class PostService {
 
     public Post approvePost(Long id) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
         // publish all pending tags along with the post
         for (com.openisle.model.Tag tag : post.getTags()) {
             if (!tag.isApproved()) {
@@ -327,7 +327,7 @@ public class PostService {
 
     public Post rejectPost(Long id) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
         // remove user created tags that are only linked to this post
         java.util.Set<com.openisle.model.Tag> tags = new java.util.HashSet<>(post.getTags());
         for (com.openisle.model.Tag tag : tags) {
@@ -348,9 +348,9 @@ public class PostService {
     @org.springframework.transaction.annotation.Transactional
     public void deletePost(Long id, String username) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         if (!user.getId().equals(post.getAuthor().getId()) && user.getRole() != Role.ADMIN) {
             throw new IllegalArgumentException("Unauthorized");
         }
