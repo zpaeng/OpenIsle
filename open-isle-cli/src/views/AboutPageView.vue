@@ -60,11 +60,10 @@ export default {
 
 <style scoped>
 .about-page {
-  padding: 20px;
   max-width: var(--page-max-width);
   background-color: var(--background-color);
   margin: 0 auto;
-  height: calc(100vh - var(--header-height) - 40px);
+  height: calc(100vh - var(--header-height));
   overflow-y: auto;
 }
 
@@ -87,5 +86,6 @@ export default {
 
 .about-content {
   line-height: 1.6;
+  padding: 20px;
 }
 </style>
