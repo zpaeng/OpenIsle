@@ -98,6 +98,7 @@ export default {
         return
       }
       try {
+        await ensureTags(token)
         const res = await fetch(`${API_BASE_URL}/api/drafts`, {
           method: 'POST',
           headers: {
