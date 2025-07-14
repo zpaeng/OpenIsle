@@ -39,6 +39,7 @@ body {
   font-family: 'Roboto', sans-serif;
   background-color: var(--normal-background-color);
   color: var(--text-color);
+  overflow: hidden; /* 禁止滚动 */
 }
 
 
