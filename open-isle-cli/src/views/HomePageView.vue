@@ -105,6 +105,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { stripMarkdown } from '../utils/markdown'
 import { API_BASE_URL } from '../main'
+import { getToken } from '../utils/auth'
 import TimeManager from '../utils/time'
 import CategorySelect from '../components/CategorySelect.vue'
 import TagSelect from '../components/TagSelect.vue'
@@ -210,7 +211,12 @@ export default {
       if (isLoadingPosts.value || allLoaded.value) return
       try {
         isLoadingPosts.value = true
-        const res = await fetch(buildUrl())
+        const token = getToken()
+        const res = await fetch(buildUrl(), {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : ''
+          }
+        })
         isLoadingPosts.value = false
         if (!res.ok) return
         const data = await res.json()
