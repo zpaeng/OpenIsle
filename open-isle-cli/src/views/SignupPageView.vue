@@ -111,7 +111,7 @@ export default {
         const data = await res.json()
         this.registerMode = data.registerMode
       }
-    } catch {}
+    } catch {/* ignore */}
     if (this.$route.query.verify) {
       this.emailStep = 1
       this.username = sessionStorage.getItem('signup_username') || ''
