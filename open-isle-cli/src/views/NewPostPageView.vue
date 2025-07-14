@@ -163,9 +163,14 @@ export default {
       }
       isAiLoading.value = true
       try {
+        toast.info('AI 优化中...')
+        const token = getToken()
         const res = await fetch(`${API_BASE_URL}/api/ai/format`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
           body: JSON.stringify({ text: content.value })
         })
         if (res.ok) {
@@ -180,6 +185,7 @@ export default {
         isAiLoading.value = false
       }
     }
+
     const submitPost = async () => {
       if (!title.value.trim()) {
         toast.error('标题不能为空')

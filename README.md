@@ -56,7 +56,7 @@ OpenIsle 基于 Spring Boot 构建，提供社区后台常见的注册、登录�
    - `CAPTCHA_POST_ENABLED`：发帖是否需要验证码
    - `CAPTCHA_COMMENT_ENABLED`：评论是否需要验证码
    - `OPENAI_API_KEY`：OpenAI 接口密钥
-   - `OPENAI_MODEL`：调用的模型名称，默认为 `gpt-3.5-turbo`
+   - `OPENAI_MODEL`：调用的模型名称，默认为 `gpt-4o`
 2. 启动项目：
 
 ```bash

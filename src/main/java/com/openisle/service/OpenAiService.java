@@ -17,7 +17,7 @@ public class OpenAiService {
     @Value("${openai.api-key:}")
     private String apiKey;
 
-    @Value("${openai.model:gpt-3.5-turbo}")
+    @Value("${openai.model:gpt-4o}")
     private String model;
 
     private final RestTemplate restTemplate = new RestTemplate();

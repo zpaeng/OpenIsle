@@ -2,7 +2,7 @@
   <div class="post-editor-container">
     <div :id="editorId" ref="vditorElement"></div>
     <div v-if="loading" class="editor-loading-overlay">
-      <i class="fa-solid fa-spinner fa-spin"></i>
+      <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
     </div>
   </div>
 </template>
@@ -13,6 +13,9 @@ import Vditor from 'vditor'
 import 'vditor/dist/index.css'
 import { API_BASE_URL } from '../main'
 import { getToken } from '../utils/auth'
+import { hatch } from 'ldrs'
+hatch.register()
+
 
 export default {
   name: 'PostEditor',
@@ -37,8 +40,10 @@ export default {
     watch(
       () => props.loading,
       val => {
-        if (vditorInstance.value && typeof vditorInstance.value.disabled === 'function') {
-          vditorInstance.value.disabled(val)
+        if (val) {
+          vditorInstance.value.disabled()
+        } else {
+          vditorInstance.value.enable()
         }
       }
     )
@@ -127,6 +132,7 @@ export default {
   border: 1px solid #e2e2e2;
   position: relative;
 }
+
 .editor-loading-overlay {
   position: absolute;
   top: 0;
