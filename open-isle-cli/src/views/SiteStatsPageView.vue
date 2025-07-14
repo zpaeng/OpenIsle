@@ -25,6 +25,7 @@ async function loadData() {
   })
   if (res.ok) {
     const data = await res.json()
+    data.sort((a, b) => new Date(a.date) - new Date(b.date))
     const dates = data.map(d => d.date)
     const values = data.map(d => d.value)
     option.value = {
@@ -45,6 +46,7 @@ onMounted(loadData)
 .site-stats-page {
   padding: 20px;
   max-width: var(--page-max-width);
+  background-color: var(--background-color);
   margin: 0 auto;
   height: calc(100vh - var(--header-height) - 40px);
 }

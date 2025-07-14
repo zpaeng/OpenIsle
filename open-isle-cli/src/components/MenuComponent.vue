@@ -18,7 +18,7 @@
           <span class="menu-item-text">关于</span>
         </router-link>
         <router-link
-          v-if="authState.role === 'ADMIN'"
+          v-if="shouldShowStats"
           class="menu-item"
           exact-active-class="selected"
           to="/about/stats"
@@ -118,6 +118,9 @@ export default {
     },
     showUnreadCount() {
       return this.unreadCount > 99 ? '99+' : this.unreadCount
+    },
+    shouldShowStats() {
+      return authState.role === 'ADMIN'
     }
   },
   async mounted() {

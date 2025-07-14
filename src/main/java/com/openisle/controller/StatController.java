@@ -32,7 +32,10 @@ public class StatController {
         LocalDate start = end.minusDays(days - 1L);
         var data = userVisitService.countDauRange(start, end);
         return data.entrySet().stream()
-                .map(e -> Map.of("date", e.getKey().toString(), "value", e.getValue()))
+                .map(e -> Map.<String,Object>of(
+                        "date",  e.getKey().toString(),
+                        "value", e.getValue()        
+                ))
                 .toList();
     }
 }
