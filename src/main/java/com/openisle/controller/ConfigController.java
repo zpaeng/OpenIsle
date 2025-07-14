@@ -25,6 +25,9 @@ public class ConfigController {
     @Value("${app.captcha.comment-enabled:false}")
     private boolean commentCaptchaEnabled;
 
+    @Value("${app.ai.format-limit:3}")
+    private int aiFormatLimit;
+
     @GetMapping("/config")
     public ConfigResponse getConfig() {
         ConfigResponse resp = new ConfigResponse();
@@ -33,6 +36,7 @@ public class ConfigController {
         resp.setLoginCaptchaEnabled(loginCaptchaEnabled);
         resp.setPostCaptchaEnabled(postCaptchaEnabled);
         resp.setCommentCaptchaEnabled(commentCaptchaEnabled);
+        resp.setAiFormatLimit(aiFormatLimit);
         return resp;
     }
 
@@ -43,5 +47,6 @@ public class ConfigController {
         private boolean loginCaptchaEnabled;
         private boolean postCaptchaEnabled;
         private boolean commentCaptchaEnabled;
+        private int aiFormatLimit;
     }
 }

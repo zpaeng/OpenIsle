@@ -36,6 +36,10 @@
           <div class="setting-title">密码强度</div>
           <Dropdown v-model="passwordStrength" :fetch-options="fetchPasswordStrengths" />
         </div>
+        <div class="form-row dropdown-row">
+          <div class="setting-title">AI 优化次数</div>
+          <Dropdown v-model="aiFormatLimit" :fetch-options="fetchAiLimits" />
+        </div>
       </div>
       <div class="buttons">
         <div v-if="isSaving" class="save-button disabled">保存中...</div>
@@ -65,6 +69,7 @@ export default {
       role: '',
       publishMode: 'DIRECT',
       passwordStrength: 'LOW',
+      aiFormatLimit: 3,
       isLoadingPage: false,
       isSaving: false
     }
@@ -109,6 +114,14 @@ export default {
         { id: 'HIGH', name: '高', icon: 'fas fa-user-shield' }
       ])
     },
+    fetchAiLimits() {
+      return Promise.resolve([
+        { id: 3, name: '3次' },
+        { id: 5, name: '5次' },
+        { id: 10, name: '10次' },
+        { id: -1, name: '无限' }
+      ])
+    },
     async loadAdminConfig() {
       try {
         const token = getToken()
@@ -119,6 +132,7 @@ export default {
           const data = await res.json()
           this.publishMode = data.publishMode
           this.passwordStrength = data.passwordStrength
+          this.aiFormatLimit = data.aiFormatLimit
         }
       } catch (e) {
         // ignore
@@ -169,7 +183,7 @@ export default {
           await fetch(`${API_BASE_URL}/api/admin/config`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ publishMode: this.publishMode, passwordStrength: this.passwordStrength })
+            body: JSON.stringify({ publishMode: this.publishMode, passwordStrength: this.passwordStrength, aiFormatLimit: this.aiFormatLimit })
           })
         }
         toast.success('保存成功')
