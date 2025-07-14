@@ -1,6 +1,7 @@
 package com.openisle.config;
 
 import com.openisle.service.JwtService;
+import com.openisle.service.UserVisitService;
 import com.openisle.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -38,6 +39,7 @@ public class SecurityConfig {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final AccessDeniedHandler customAccessDeniedHandler;
+    private final UserVisitService userVisitService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -103,7 +105,8 @@ public class SecurityConfig {
                     .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                     .anyRequest().authenticated()
             )
-            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(userVisitFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
@@ -146,6 +149,20 @@ public class SecurityConfig {
                     return;
                 }
 
+                filterChain.doFilter(request, response);
+            }
+        };
+    }
+
+    @Bean
+    public OncePerRequestFilter userVisitFilter() {
+        return new OncePerRequestFilter() {
+            @Override
+            protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+                var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+                if (auth != null && auth.isAuthenticated() && !(auth instanceof org.springframework.security.authentication.AnonymousAuthenticationToken)) {
+                    userVisitService.recordVisit(auth.getName());
+                }
                 filterChain.doFilter(request, response);
             }
         };

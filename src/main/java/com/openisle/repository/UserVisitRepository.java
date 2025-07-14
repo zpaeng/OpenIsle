@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface UserVisitRepository extends JpaRepository<UserVisit, Long> {
     Optional<UserVisit> findByUserAndVisitDate(User user, LocalDate visitDate);
     long countByUser(User user);
+    long countByVisitDate(LocalDate visitDate);
 }

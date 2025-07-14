@@ -11,6 +11,7 @@ import com.openisle.config.CustomAccessDeniedHandler;
 import com.openisle.config.SecurityConfig;
 import com.openisle.service.JwtService;
 import com.openisle.repository.UserRepository;
+import com.openisle.service.UserVisitService;
 import com.openisle.model.Role;
 import com.openisle.model.User;
 import java.util.Optional;
@@ -31,6 +32,8 @@ class HelloControllerTest {
     private JwtService jwtService;
     @MockBean
     private UserRepository userRepository;
+    @MockBean
+    private UserVisitService userVisitService;
 
     @Test
     void helloReturnsMessage() throws Exception {
