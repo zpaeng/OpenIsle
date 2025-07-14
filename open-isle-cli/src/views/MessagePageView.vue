@@ -1,8 +1,20 @@
 <template>
   <div class="message-page">
-    <div class="message-tabs">
-      <div :class="['message-tab-item', { selected: selectedTab === 'all' }]" @click="selectedTab = 'all'">消息</div>
-      <div :class="['message-tab-item', { selected: selectedTab === 'unread' }]" @click="selectedTab = 'unread'">未读</div>
+    <div class="message-page-header">
+      <div class="message-tabs">
+        <div :class="['message-tab-item', { selected: selectedTab === 'all' }]" @click="selectedTab = 'all'">消息</div>
+        <div :class="['message-tab-item', { selected: selectedTab === 'unread' }]" @click="selectedTab = 'unread'">未读
+        </div>
+      </div>
+
+      <div class="message-page-header-right">
+        <div class="message-page-header-right-item" @click="markAllRead">
+          <i class="fas fa-bolt message-page-header-right-item-button-icon"></i>
+          <span class="message-page-header-right-item-button-text">
+            已读所有消息
+          </span>
+        </div>
+      </div>
     </div>
 
     <div v-if="isLoadingMessage" class="loading-message">
@@ -11,189 +23,196 @@
 
     <BasePlaceholder v-else-if="filteredNotifications.length === 0" text="暂时没有消息 :)" icon="fas fa-inbox" />
 
-    <div class="timeline-container" v-if="filteredNotifications.length > 0" >
-    <BaseTimeline :items="filteredNotifications">
-      <template #item="{ item }">
-        <div class="notif-content" :class="{ read: item.read }">
-          <span v-if="!item.read" class="unread-dot"></span>
-          <span class="notif-type">
-            <template v-if="item.type === 'COMMENT_REPLY' && item.parentComment">
-              <NotificationContainer :item="item" :markRead="markRead">
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.comment.author.id}`">{{ item.comment.author.username }} </router-link> 对我的评论
-                <span>
+    <div class="timeline-container" v-if="filteredNotifications.length > 0">
+      <BaseTimeline :items="filteredNotifications">
+        <template #item="{ item }">
+          <div class="notif-content" :class="{ read: item.read }">
+            <span v-if="!item.read" class="unread-dot"></span>
+            <span class="notif-type">
+              <template v-if="item.type === 'COMMENT_REPLY' && item.parentComment">
+                <NotificationContainer :item="item" :markRead="markRead">
                   <router-link class="notif-content-text" @click="markRead(item.id)"
-                    :to="`/posts/${item.post.id}#comment-${item.parentComment.id}`">
-                    {{ sanitizeDescription(item.parentComment.content) }}
-                  </router-link>
-                </span> 回复了 <span>
-                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
-                    {{ sanitizeDescription(item.comment.content) }}
-                  </router-link>
-                </span>
-              </NotificationContainer>
-            </template>
-            <template v-else-if="item.type === 'COMMENT_REPLY' && !item.parentComment">
-              <NotificationContainer :item="item" :markRead="markRead">
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.comment.author.id}`">{{ item.comment.author.username }} </router-link> 对我的文章
-                <span>
-                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                    {{ sanitizeDescription(item.post.title) }}
-                  </router-link>
-                </span> 回复了 <span>
-                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
-                    {{ sanitizeDescription(item.comment.content) }}
-                  </router-link>
-                </span>
-              </NotificationContainer>
-            </template>
-            <template v-else-if="item.type === 'REACTION' && item.post && !item.comment">
-              <NotificationContainer :item="item" :markRead="markRead">
-                <span class="notif-user">{{ item.fromUser.username }} </span> 对我的文章
-                <span>
-                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                    {{ sanitizeDescription(item.post.title) }}
-                  </router-link>
+                    :to="`/users/${item.comment.author.id}`">{{ item.comment.author.username }} </router-link> 对我的评论
+                  <span>
+                    <router-link class="notif-content-text" @click="markRead(item.id)"
+                      :to="`/posts/${item.post.id}#comment-${item.parentComment.id}`">
+                      {{ sanitizeDescription(item.parentComment.content) }}
+                    </router-link>
+                  </span> 回复了 <span>
+                    <router-link class="notif-content-text" @click="markRead(item.id)"
+                      :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
+                      {{ sanitizeDescription(item.comment.content) }}
+                    </router-link>
+                  </span>
+                </NotificationContainer>
+              </template>
+              <template v-else-if="item.type === 'COMMENT_REPLY' && !item.parentComment">
+                <NotificationContainer :item="item" :markRead="markRead">
+                  <router-link class="notif-content-text" @click="markRead(item.id)"
+                    :to="`/users/${item.comment.author.id}`">{{ item.comment.author.username }} </router-link> 对我的文章
+                  <span>
+                    <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                      {{ sanitizeDescription(item.post.title) }}
+                    </router-link>
+                  </span> 回复了 <span>
+                    <router-link class="notif-content-text" @click="markRead(item.id)"
+                      :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
+                      {{ sanitizeDescription(item.comment.content) }}
+                    </router-link>
+                  </span>
+                </NotificationContainer>
+              </template>
+              <template v-else-if="item.type === 'REACTION' && item.post && !item.comment">
+                <NotificationContainer :item="item" :markRead="markRead">
+                  <span class="notif-user">{{ item.fromUser.username }} </span> 对我的文章
+                  <span>
+                    <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                      {{ sanitizeDescription(item.post.title) }}
+                    </router-link>
                   </span>
                   进行了表态
-              </NotificationContainer>
-            </template>
-            <template v-else-if="item.type === 'REACTION' && item.comment">
-              <NotificationContainer :item="item" :markRead="markRead">
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">{{ item.fromUser.username }} </router-link> 对我的评论
-                <span>
-                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
+                </NotificationContainer>
+              </template>
+              <template v-else-if="item.type === 'REACTION' && item.comment">
+                <NotificationContainer :item="item" :markRead="markRead">
+                  <router-link class="notif-content-text" @click="markRead(item.id)"
+                    :to="`/users/${item.fromUser.id}`">{{ item.fromUser.username }} </router-link> 对我的评论
+                  <span>
+                    <router-link class="notif-content-text" @click="markRead(item.id)"
+                      :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
+                      {{ sanitizeDescription(item.comment.content) }}
+                    </router-link>
+                  </span>
+                  进行了表态
+                </NotificationContainer>
+              </template>
+              <template v-else-if="item.type === 'POST_VIEWED'">
+                <NotificationContainer :item="item" :markRead="markRead">
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
+                    {{ item.fromUser.username }}
+                  </router-link>
+                  查看了您的帖子
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                    {{ sanitizeDescription(item.post.title) }}
+                  </router-link>
+                </NotificationContainer>
+              </template>
+              <template v-else-if="item.type === 'POST_UPDATED'">
+                <NotificationContainer :item="item" :markRead="markRead">
+                  您关注的帖子
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                    {{ sanitizeDescription(item.post.title) }}
+                  </router-link>
+                  下面有新评论
+                  <router-link class="notif-content-text" @click="markRead(item.id)"
+                    :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
                     {{ sanitizeDescription(item.comment.content) }}
                   </router-link>
-                </span>
-                进行了表态
-              </NotificationContainer>
-            </template>
-            <template v-else-if="item.type === 'POST_VIEWED'">
-              <NotificationContainer :item="item" :markRead="markRead">
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
-                  {{ item.fromUser.username }}
-                </router-link>
-                查看了您的帖子
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                  {{ sanitizeDescription(item.post.title) }}
-                </router-link>
-              </NotificationContainer>
-            </template>
-            <template v-else-if="item.type === 'POST_UPDATED'">
-              <NotificationContainer :item="item" :markRead="markRead">
-                您关注的帖子
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                  {{ sanitizeDescription(item.post.title) }}
-                </router-link>
-                下面有新评论
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
-                  {{ sanitizeDescription(item.comment.content) }}
-                </router-link>
-              </NotificationContainer>
-            </template>
-            <template v-else-if="item.type === 'USER_FOLLOWED'">
-              <NotificationContainer :item="item" :markRead="markRead">
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
-                  {{ item.fromUser.username }}
-                </router-link>
-                开始关注你了
-              </NotificationContainer>
-            </template>
-            <template v-else-if="item.type === 'USER_UNFOLLOWED'">
-              <NotificationContainer :item="item" :markRead="markRead">
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
-                  {{ item.fromUser.username }}
-                </router-link>
-                取消关注你了
-              </NotificationContainer>
-            </template>
-            <template v-else-if="item.type === 'FOLLOWED_POST'">
-              <NotificationContainer :item="item" :markRead="markRead">
-                你关注的
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
-                  {{ item.fromUser.username }}
-                </router-link>
-                发布了文章
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                  {{ sanitizeDescription(item.post.title) }}
-                </router-link>
-              </NotificationContainer>
-            </template>
-            <template v-else-if="item.type === 'POST_SUBSCRIBED'">
-              <NotificationContainer :item="item" :markRead="markRead">
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
-                  {{ item.fromUser.username }}
-                </router-link>
-                订阅了你的文章
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                  {{ sanitizeDescription(item.post.title) }}
-                </router-link>
-              </NotificationContainer>
-            </template>
-            <template v-else-if="item.type === 'POST_UNSUBSCRIBED'">
-              <NotificationContainer :item="item" :markRead="markRead">
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
-                  {{ item.fromUser.username }}
-                </router-link>
-                取消订阅了你的文章
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                  {{ sanitizeDescription(item.post.title) }}
-                </router-link>
-              </NotificationContainer>
-            </template>
-            <template v-else-if="item.type === 'POST_REVIEW_REQUEST' && item.fromUser">
-              <NotificationContainer :item="item" :markRead="markRead">
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
-                  {{ item.fromUser.username }}
-                </router-link>
-                发布了帖子
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                  {{ sanitizeDescription(item.post.title) }}
-                </router-link>
-                ，请审核
-              </NotificationContainer>
-            </template>
-            <template v-else-if="item.type === 'POST_REVIEW_REQUEST'">
-              <NotificationContainer :item="item" :markRead="markRead">
-                您发布的帖子
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                  {{ sanitizeDescription(item.post.title) }}
-                </router-link>
-                已提交审核
-              </NotificationContainer>
-            </template>
-            <template v-else-if="item.type === 'POST_REVIEWED' && item.approved">
-              <NotificationContainer :item="item" :markRead="markRead">
-                您发布的帖子
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                  {{ sanitizeDescription(item.post.title) }}
-                </router-link>
-                已审核通过
-                <template #actions>
-                  <div class="mark-read-button">
-                    <button class="mark-read-button-item" v-if="!item.read" @click="markRead(item.id)">标记为已读</button>
-                    <button class="read-button-item" v-else @click="markRead(item.id)">已读</button>
-                  </div>
-                </template>
-              </NotificationContainer>
-            </template>
-            <template v-else-if="item.type === 'POST_REVIEWED' && item.approved === false">
-              <NotificationContainer :item="item" :markRead="markRead">
-                您发布的帖子
-                <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                  {{ sanitizeDescription(item.post.title) }}
-                </router-link>
-                已被管理员拒绝
-              </NotificationContainer>
-            </template>
-            <template v-else>
-              <NotificationContainer :item="item" :markRead="markRead">
-                {{ formatType(item.type) }}
-              </NotificationContainer>
-            </template>
-          </span>
-          <span class="notif-time">{{ TimeManager.format(item.createdAt) }}</span>
-        </div>
+                </NotificationContainer>
+              </template>
+              <template v-else-if="item.type === 'USER_FOLLOWED'">
+                <NotificationContainer :item="item" :markRead="markRead">
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
+                    {{ item.fromUser.username }}
+                  </router-link>
+                  开始关注你了
+                </NotificationContainer>
+              </template>
+              <template v-else-if="item.type === 'USER_UNFOLLOWED'">
+                <NotificationContainer :item="item" :markRead="markRead">
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
+                    {{ item.fromUser.username }}
+                  </router-link>
+                  取消关注你了
+                </NotificationContainer>
+              </template>
+              <template v-else-if="item.type === 'FOLLOWED_POST'">
+                <NotificationContainer :item="item" :markRead="markRead">
+                  你关注的
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
+                    {{ item.fromUser.username }}
+                  </router-link>
+                  发布了文章
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                    {{ sanitizeDescription(item.post.title) }}
+                  </router-link>
+                </NotificationContainer>
+              </template>
+              <template v-else-if="item.type === 'POST_SUBSCRIBED'">
+                <NotificationContainer :item="item" :markRead="markRead">
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
+                    {{ item.fromUser.username }}
+                  </router-link>
+                  订阅了你的文章
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                    {{ sanitizeDescription(item.post.title) }}
+                  </router-link>
+                </NotificationContainer>
+              </template>
+              <template v-else-if="item.type === 'POST_UNSUBSCRIBED'">
+                <NotificationContainer :item="item" :markRead="markRead">
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
+                    {{ item.fromUser.username }}
+                  </router-link>
+                  取消订阅了你的文章
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                    {{ sanitizeDescription(item.post.title) }}
+                  </router-link>
+                </NotificationContainer>
+              </template>
+              <template v-else-if="item.type === 'POST_REVIEW_REQUEST' && item.fromUser">
+                <NotificationContainer :item="item" :markRead="markRead">
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
+                    {{ item.fromUser.username }}
+                  </router-link>
+                  发布了帖子
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                    {{ sanitizeDescription(item.post.title) }}
+                  </router-link>
+                  ，请审核
+                </NotificationContainer>
+              </template>
+              <template v-else-if="item.type === 'POST_REVIEW_REQUEST'">
+                <NotificationContainer :item="item" :markRead="markRead">
+                  您发布的帖子
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                    {{ sanitizeDescription(item.post.title) }}
+                  </router-link>
+                  已提交审核
+                </NotificationContainer>
+              </template>
+              <template v-else-if="item.type === 'POST_REVIEWED' && item.approved">
+                <NotificationContainer :item="item" :markRead="markRead">
+                  您发布的帖子
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                    {{ sanitizeDescription(item.post.title) }}
+                  </router-link>
+                  已审核通过
+                  <template #actions>
+                    <div class="mark-read-button">
+                      <button class="mark-read-button-item" v-if="!item.read" @click="markRead(item.id)">标记为已读</button>
+                      <button class="read-button-item" v-else @click="markRead(item.id)">已读</button>
+                    </div>
+                  </template>
+                </NotificationContainer>
+              </template>
+              <template v-else-if="item.type === 'POST_REVIEWED' && item.approved === false">
+                <NotificationContainer :item="item" :markRead="markRead">
+                  您发布的帖子
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                    {{ sanitizeDescription(item.post.title) }}
+                  </router-link>
+                  已被管理员拒绝
+                </NotificationContainer>
+              </template>
+              <template v-else>
+                <NotificationContainer :item="item" :markRead="markRead">
+                  {{ formatType(item.type) }}
+                </NotificationContainer>
+              </template>
+            </span>
+            <span class="notif-time">{{ TimeManager.format(item.createdAt) }}</span>
+          </div>
         </template>
       </BaseTimeline>
     </div>
@@ -235,6 +254,14 @@ export default {
       if (ok) {
         const n = notifications.value.find(n => n.id === id)
         if (n) n.read = true
+      }
+    }
+
+    const markAllRead = async () => {
+      const ok = await markNotificationsRead(notifications.value.map(n => n.id))
+      if (ok) {
+        notifications.value.forEach(n => n.read = true)
+        toast.success('已读所有消息')
       }
     }
 
@@ -291,100 +318,100 @@ export default {
         }
         const data = await res.json()
 
-          for (const n of data) {
-            if (n.type === 'COMMENT_REPLY') {
-              notifications.value.push({
-                ...n,
-                src: n.comment.author.avatar,
-                iconClick: () => {
+        for (const n of data) {
+          if (n.type === 'COMMENT_REPLY') {
+            notifications.value.push({
+              ...n,
+              src: n.comment.author.avatar,
+              iconClick: () => {
+                markRead(n.id)
+                router.push(`/users/${n.comment.author.id}`)
+              }
+            })
+          } else if (n.type === 'REACTION') {
+            notifications.value.push({
+              ...n,
+              emoji: reactionEmojiMap[n.reactionType],
+              iconClick: () => {
+                if (n.fromUser) {
                   markRead(n.id)
-                  router.push(`/users/${n.comment.author.id}`)
+                  router.push(`/users/${n.fromUser.id}`)
                 }
-              })
-            } else if (n.type === 'REACTION') {
-              notifications.value.push({
-                ...n,
-                emoji: reactionEmojiMap[n.reactionType],
-                iconClick: () => {
-                  if (n.fromUser) {
-                    markRead(n.id)
-                    router.push(`/users/${n.fromUser.id}`)
-                  }
-                }
-              })
-            } else if (n.type === 'POST_VIEWED') {
-              notifications.value.push({
-                ...n,
-                src: n.fromUser ? n.fromUser.avatar : null,
-                icon: n.fromUser ? undefined : iconMap[n.type],
-                iconClick: () => {
-                  if (n.fromUser) {
-                    markRead(n.id)
-                    router.push(`/users/${n.fromUser.id}`)
-                  }
-                }
-              })
-            } else if (n.type === 'POST_UPDATED') {
-              notifications.value.push({
-                ...n,
-                src: n.comment.author.avatar,
-                iconClick: () => {
+              }
+            })
+          } else if (n.type === 'POST_VIEWED') {
+            notifications.value.push({
+              ...n,
+              src: n.fromUser ? n.fromUser.avatar : null,
+              icon: n.fromUser ? undefined : iconMap[n.type],
+              iconClick: () => {
+                if (n.fromUser) {
                   markRead(n.id)
-                  router.push(`/users/${n.comment.author.id}`)
+                  router.push(`/users/${n.fromUser.id}`)
                 }
-              })
-            } else if (n.type === 'USER_FOLLOWED' || n.type === 'USER_UNFOLLOWED') {
-              notifications.value.push({
-                ...n,
-                icon: iconMap[n.type],
-                iconClick: () => {
-                  if (n.fromUser) {
-                    markRead(n.id)
-                    router.push(`/users/${n.fromUser.id}`)
-                  }
+              }
+            })
+          } else if (n.type === 'POST_UPDATED') {
+            notifications.value.push({
+              ...n,
+              src: n.comment.author.avatar,
+              iconClick: () => {
+                markRead(n.id)
+                router.push(`/users/${n.comment.author.id}`)
+              }
+            })
+          } else if (n.type === 'USER_FOLLOWED' || n.type === 'USER_UNFOLLOWED') {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+              iconClick: () => {
+                if (n.fromUser) {
+                  markRead(n.id)
+                  router.push(`/users/${n.fromUser.id}`)
                 }
-              })
-            } else if (n.type === 'FOLLOWED_POST') {
-              notifications.value.push({
-                ...n,
-                icon: iconMap[n.type],
-                iconClick: () => {
-                  if (n.post) {
-                    markRead(n.id)
-                    router.push(`/posts/${n.post.id}`)
-                  }
+              }
+            })
+          } else if (n.type === 'FOLLOWED_POST') {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+              iconClick: () => {
+                if (n.post) {
+                  markRead(n.id)
+                  router.push(`/posts/${n.post.id}`)
                 }
-              })
-            } else if (n.type === 'POST_SUBSCRIBED' || n.type === 'POST_UNSUBSCRIBED') {
-              notifications.value.push({
-                ...n,
-                icon: iconMap[n.type],
-                iconClick: () => {
-                  if (n.post) {
-                    markRead(n.id)
-                    router.push(`/posts/${n.post.id}`)
-                  }
+              }
+            })
+          } else if (n.type === 'POST_SUBSCRIBED' || n.type === 'POST_UNSUBSCRIBED') {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+              iconClick: () => {
+                if (n.post) {
+                  markRead(n.id)
+                  router.push(`/posts/${n.post.id}`)
                 }
-              })
-            } else if (n.type === 'POST_REVIEW_REQUEST') {
-              notifications.value.push({
-                ...n,
-                src: n.fromUser ? n.fromUser.avatar : null,
-                icon: n.fromUser ? undefined : iconMap[n.type],
-                iconClick: () => {
-                  if (n.post) {
-                    markRead(n.id)
-                    router.push(`/posts/${n.post.id}`)
-                  }
+              }
+            })
+          } else if (n.type === 'POST_REVIEW_REQUEST') {
+            notifications.value.push({
+              ...n,
+              src: n.fromUser ? n.fromUser.avatar : null,
+              icon: n.fromUser ? undefined : iconMap[n.type],
+              iconClick: () => {
+                if (n.post) {
+                  markRead(n.id)
+                  router.push(`/posts/${n.post.id}`)
                 }
-              })
-            } else {
-              notifications.value.push({
-                ...n,
-                icon: iconMap[n.type],
-              })
-            }
+              }
+            })
+          } else {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+            })
           }
+        }
       } catch (e) {
         console.error(e)
       }
@@ -431,7 +458,8 @@ export default {
       markRead,
       TimeManager,
       selectedTab,
-      filteredNotifications
+      filteredNotifications,
+      markAllRead
     }
   }
 }
@@ -450,6 +478,41 @@ export default {
   background-color: var(--background-color);
   height: calc(100vh - var(--header-height));
   overflow-y: auto;
+}
+
+.message-page-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.message-page-header-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.message-page-header-right-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+  color: var(--primary-color);
+  padding-right: 10px;
+  gap: 5px;
+}
+
+.message-page-header-right-item-button-icon {
+  font-size: 12px;
+}
+
+.message-page-header-right-item-button-text {
+  font-size: 12px;
+}
+
+.message-page-header-right-item-button-text:hover {
+  text-decoration: underline;
 }
 
 .timeline-container {
@@ -507,7 +570,6 @@ export default {
   display: flex;
   flex-direction: row;
   border-bottom: 1px solid #e0e0e0;
-  margin-bottom: 20px;
 }
 
 .message-tab-item {
@@ -519,6 +581,4 @@ export default {
   color: var(--primary-color);
   border-bottom: 2px solid var(--primary-color);
 }
-
-
 </style>
