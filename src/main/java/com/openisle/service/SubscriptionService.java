@@ -28,7 +28,7 @@ public class SubscriptionService {
             ps.setPost(post);
             if (!user.getId().equals(post.getAuthor().getId())) {
                 notificationService.createNotification(post.getAuthor(),
-                        NotificationType.POST_SUBSCRIBED, post, null, null, user, null);
+                        NotificationType.POST_SUBSCRIBED, post, null, null, user, null, null);
             }
             return postSubRepo.save(ps);
         });
@@ -41,7 +41,7 @@ public class SubscriptionService {
             postSubRepo.delete(ps);
             if (!user.getId().equals(post.getAuthor().getId())) {
                 notificationService.createNotification(post.getAuthor(),
-                        NotificationType.POST_UNSUBSCRIBED, post, null, null, user, null);
+                        NotificationType.POST_UNSUBSCRIBED, post, null, null, user, null, null);
             }
         });
     }
@@ -72,7 +72,7 @@ public class SubscriptionService {
             us.setSubscriber(subscriber);
             us.setTarget(target);
             notificationService.createNotification(target,
-                    NotificationType.USER_FOLLOWED, null, null, null, subscriber, null);
+                    NotificationType.USER_FOLLOWED, null, null, null, subscriber, null, null);
             return userSubRepo.save(us);
         });
     }
@@ -83,7 +83,7 @@ public class SubscriptionService {
         userSubRepo.findBySubscriberAndTarget(subscriber, target).ifPresent(us -> {
             userSubRepo.delete(us);
             notificationService.createNotification(target,
-                    NotificationType.USER_UNFOLLOWED, null, null, null, subscriber, null);
+                    NotificationType.USER_UNFOLLOWED, null, null, null, subscriber, null, null);
         });
     }
 

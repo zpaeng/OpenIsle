@@ -109,10 +109,10 @@ public class PostService {
             java.util.List<User> admins = userRepository.findByRole(com.openisle.model.Role.ADMIN);
             for (User admin : admins) {
                 notificationService.createNotification(admin,
-                        NotificationType.POST_REVIEW_REQUEST, post, null, null, author, null);
+                        NotificationType.POST_REVIEW_REQUEST, post, null, null, author, null, null);
             }
             notificationService.createNotification(author,
-                    NotificationType.POST_REVIEW_REQUEST, post, null, null, null, null);
+                    NotificationType.POST_REVIEW_REQUEST, post, null, null, null, null, null);
         }
         // notify followers of author
         for (User u : subscriptionService.getSubscribers(author.getUsername())) {
@@ -124,6 +124,7 @@ public class PostService {
                         null,
                         null,
                         author,
+                        null,
                         null);
             }
         }
@@ -151,9 +152,9 @@ public class PostService {
         if (viewer != null && !viewer.equals(post.getAuthor().getUsername())) {
             User viewerUser = userRepository.findByUsername(viewer).orElse(null);
             if (viewerUser != null) {
-                notificationService.createNotification(post.getAuthor(), NotificationType.POST_VIEWED, post, null, null, viewerUser, null);
+                notificationService.createNotification(post.getAuthor(), NotificationType.POST_VIEWED, post, null, null, viewerUser, null, null);
             } else {
-                notificationService.createNotification(post.getAuthor(), NotificationType.POST_VIEWED, post, null, null);
+                notificationService.createNotification(post.getAuthor(), NotificationType.POST_VIEWED, post, null, null, null, null, null);
             }
         }
         return post;
@@ -321,7 +322,7 @@ public class PostService {
         }
         post.setStatus(PostStatus.PUBLISHED);
         post = postRepository.save(post);
-        notificationService.createNotification(post.getAuthor(), NotificationType.POST_REVIEWED, post, null, true);
+        notificationService.createNotification(post.getAuthor(), NotificationType.POST_REVIEWED, post, null, true, null, null, null);
         return post;
     }
 
@@ -341,7 +342,7 @@ public class PostService {
         }
         post.setStatus(PostStatus.REJECTED);
         post = postRepository.save(post);
-        notificationService.createNotification(post.getAuthor(), NotificationType.POST_REVIEWED, post, null, false);
+        notificationService.createNotification(post.getAuthor(), NotificationType.POST_REVIEWED, post, null, false, null, null, null);
         return post;
     }
 

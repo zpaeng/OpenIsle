@@ -45,6 +45,9 @@ public class Notification {
     @Column(name = "reaction_type")
     private ReactionType reactionType;
 
+    @Column(length = 1000)
+    private String content;
+
     @Column
     private Boolean approved;
 

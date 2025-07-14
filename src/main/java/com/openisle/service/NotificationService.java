@@ -16,11 +16,11 @@ public class NotificationService {
     private final UserRepository userRepository;
 
     public Notification createNotification(User user, NotificationType type, Post post, Comment comment, Boolean approved) {
-        return createNotification(user, type, post, comment, approved, null, null);
+        return createNotification(user, type, post, comment, approved, null, null, null);
     }
 
     public Notification createNotification(User user, NotificationType type, Post post, Comment comment, Boolean approved,
-                                           User fromUser, ReactionType reactionType) {
+                                           User fromUser, ReactionType reactionType, String content) {
         Notification n = new Notification();
         n.setUser(user);
         n.setType(type);
@@ -29,6 +29,7 @@ public class NotificationService {
         n.setApproved(approved);
         n.setFromUser(fromUser);
         n.setReactionType(reactionType);
+        n.setContent(content);
         return notificationRepository.save(n);
     }
 

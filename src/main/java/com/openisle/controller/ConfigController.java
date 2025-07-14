@@ -2,12 +2,15 @@ package com.openisle.controller;
 
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
+import com.openisle.service.RegisterModeService;
+import com.openisle.model.RegisterMode;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
+@lombok.RequiredArgsConstructor
 public class ConfigController {
 
     @Value("${app.captcha.enabled:false}")
@@ -28,6 +31,8 @@ public class ConfigController {
     @Value("${app.ai.format-limit:3}")
     private int aiFormatLimit;
 
+    private final RegisterModeService registerModeService;
+
     @GetMapping("/config")
     public ConfigResponse getConfig() {
         ConfigResponse resp = new ConfigResponse();
@@ -37,6 +42,7 @@ public class ConfigController {
         resp.setPostCaptchaEnabled(postCaptchaEnabled);
         resp.setCommentCaptchaEnabled(commentCaptchaEnabled);
         resp.setAiFormatLimit(aiFormatLimit);
+        resp.setRegisterMode(registerModeService.getRegisterMode());
         return resp;
     }
 
@@ -48,5 +54,6 @@ public class ConfigController {
         private boolean postCaptchaEnabled;
         private boolean commentCaptchaEnabled;
         private int aiFormatLimit;
+        private RegisterMode registerMode;
     }
 }
