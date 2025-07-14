@@ -34,9 +34,9 @@ public class CommentService {
 
     public Comment addComment(String username, Long postId, String content) {
         User author = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
         Comment comment = new Comment();
         comment.setAuthor(author);
         comment.setPost(post);
@@ -60,7 +60,7 @@ public class CommentService {
 
     public Comment addReply(String username, Long parentId, String content) {
         User author = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Comment parent = commentRepository.findById(parentId)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
         Comment comment = new Comment();
@@ -92,7 +92,7 @@ public class CommentService {
 
     public List<Comment> getCommentsForPost(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
         return commentRepository.findByPostAndParentIsNullOrderByCreatedAtAsc(post);
     }
 
@@ -104,14 +104,14 @@ public class CommentService {
 
     public List<Comment> getRecentCommentsByUser(String username, int limit) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Pageable pageable = PageRequest.of(0, limit);
         return commentRepository.findByAuthorOrderByCreatedAtDesc(user, pageable);
     }
 
     public java.util.List<User> getParticipants(Long postId, int limit) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
         java.util.LinkedHashSet<User> set = new java.util.LinkedHashSet<>();
         set.add(post.getAuthor());
         set.addAll(commentRepository.findDistinctAuthorsByPost(post));
@@ -126,7 +126,7 @@ public class CommentService {
     @org.springframework.transaction.annotation.Transactional
     public void deleteComment(String username, Long id) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
         if (!user.getId().equals(comment.getAuthor().getId()) && user.getRole() != Role.ADMIN) {

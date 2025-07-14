@@ -28,7 +28,7 @@ public class DraftService {
     @Transactional
     public Draft saveDraft(String username, Long categoryId, String title, String content, List<Long> tagIds) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Draft draft = draftRepository.findByAuthor(user).orElse(new Draft());
         draft.setAuthor(user);
         draft.setTitle(title);

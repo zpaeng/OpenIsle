@@ -29,7 +29,7 @@ public class AiUsageService {
 
     public int incrementAndGetCount(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         LocalDate today = LocalDate.now();
         AiFormatUsage usage = usageRepository.findByUserAndUseDate(user, today)
                 .orElseGet(() -> {
@@ -46,7 +46,7 @@ public class AiUsageService {
 
     public int getCount(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         return usageRepository.findByUserAndUseDate(user, LocalDate.now())
                 .map(AiFormatUsage::getCount)
                 .orElse(0);

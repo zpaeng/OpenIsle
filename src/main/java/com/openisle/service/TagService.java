@@ -28,7 +28,7 @@ public class TagService {
         tag.setApproved(approved);
         if (creatorUsername != null) {
             User creator = userRepository.findByUsername(creatorUsername)
-                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                    .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
             tag.setCreator(creator);
         }
         return tagRepository.save(tag);
@@ -94,14 +94,14 @@ public class TagService {
 
     public List<Tag> getRecentTagsByUser(String username, int limit) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Pageable pageable = PageRequest.of(0, limit);
         return tagRepository.findByCreatorOrderByCreatedAtDesc(user, pageable);
     }
 
     public List<Tag> getTagsByUser(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         return tagRepository.findByCreator(user);
     }
 }
