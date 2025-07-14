@@ -3,7 +3,7 @@
     <div class="new-post-form">
       <input class="post-title-input" v-model="title" placeholder="标题" />
       <div class="post-editor-container">
-        <PostEditor v-model="content" />
+        <PostEditor v-model="content" :loading="isAiLoading" />
       </div>
       <div class="post-options">
         <div class="post-options-left">
@@ -47,6 +47,7 @@ export default {
     const selectedCategory = ref('')
     const selectedTags = ref([])
     const isWaitingPosting = ref(false)
+    const isAiLoading = ref(false)
 
     const loadDraft = async () => {
       const token = getToken()
@@ -154,6 +155,31 @@ export default {
         }
       }
     }
+
+    const aiGenerate = async () => {
+      if (!content.value.trim()) {
+        toast.error('内容为空，无法优化')
+        return
+      }
+      isAiLoading.value = true
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/ai/format`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: content.value })
+        })
+        if (res.ok) {
+          const data = await res.json()
+          content.value = data.content || ''
+        } else {
+          toast.error('AI 优化失败')
+        }
+      } catch (e) {
+        toast.error('AI 优化失败')
+      } finally {
+        isAiLoading.value = false
+      }
+    }
     const submitPost = async () => {
       if (!title.value.trim()) {
         toast.error('标题不能为空')
@@ -203,7 +229,7 @@ export default {
         isWaitingPosting.value = false
       }
     }
-    return { title, content, selectedCategory, selectedTags, submitPost, saveDraft, clearPost, isWaitingPosting }
+    return { title, content, selectedCategory, selectedTags, submitPost, saveDraft, clearPost, isWaitingPosting, aiGenerate, isAiLoading }
   }
 }
 </script>

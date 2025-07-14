@@ -1,6 +1,9 @@
 <template>
   <div class="post-editor-container">
     <div :id="editorId" ref="vditorElement"></div>
+    <div v-if="loading" class="editor-loading-overlay">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+    </div>
   </div>
 </template>
 
@@ -22,10 +25,23 @@ export default {
     editorId: {
       type: String,
       default: () => 'post-editor-' + Math.random().toString(36).slice(2)
+    },
+    loading: {
+      type: Boolean,
+      default: false
     }
   },
   setup(props, { emit }) {
     const vditorInstance = ref(null)
+
+    watch(
+      () => props.loading,
+      val => {
+        if (vditorInstance.value && typeof vditorInstance.value.disabled === 'function') {
+          vditorInstance.value.disabled(val)
+        }
+      }
+    )
 
     watch(
       () => props.modelValue,
@@ -109,5 +125,19 @@ export default {
 <style scoped>
 .post-editor-container {
   border: 1px solid #e2e2e2;
+  position: relative;
+}
+.editor-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+  z-index: 10;
 }
 </style>
