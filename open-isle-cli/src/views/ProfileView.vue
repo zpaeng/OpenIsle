@@ -622,12 +622,13 @@ export default {
   flex-direction: row;
   gap: 20px;
   width: 100%;
+  flex-wrap: wrap;
 }
 
 .hot-reply,
 .hot-topic,
 .hot-tag {
-  width: 33%;
+  width: 40%;
 }
 
 .profile-timeline {
