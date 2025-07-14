@@ -98,6 +98,7 @@ export default {
         return
       }
       try {
+        const tagIds = selectedTags.value.filter(t => typeof t === 'number')
         const res = await fetch(`${API_BASE_URL}/api/drafts`, {
           method: 'POST',
           headers: {
@@ -108,7 +109,7 @@ export default {
             title: title.value,
             content: content.value,
             categoryId: selectedCategory.value || null,
-            tagIds: selectedTags.value
+            tagIds
           })
         })
         if (res.ok) {
