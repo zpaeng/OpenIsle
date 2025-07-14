@@ -32,4 +32,9 @@ public class UserVisitService {
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         return userVisitRepository.countByUser(user);
     }
+
+    public long countDau(LocalDate date) {
+        LocalDate d = date != null ? date : LocalDate.now();
+        return userVisitRepository.countByVisitDate(d);
+    }
 }
