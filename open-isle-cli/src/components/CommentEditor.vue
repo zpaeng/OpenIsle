@@ -2,11 +2,7 @@
   <div class="comment-editor-container">
     <div :id="editorId" ref="vditorElement"></div>
     <div class="comment-bottom-container">
-      <div
-        class="comment-submit"
-        :class="{ disabled: isDisabled }"
-        @click="submit"
-      >
+      <div class="comment-submit" :class="{ disabled: isDisabled }" @click="submit">
         <template v-if="!loading">
           发布评论
         </template>
@@ -83,13 +79,10 @@ export default {
           'image'
         ],
         toolbarConfig: { pin: true },
-       input(value) {
-         text.value = value
-       }
-     })
-      if (props.disabled || props.loading) {
-        vditorInstance.value.disabled()
-      }
+        input(value) {
+          text.value = value
+        }
+      })
     })
 
     watch(
@@ -127,12 +120,14 @@ export default {
   margin-bottom: 50px;
   border: 1px solid #e2e2e2;
 }
+
 .comment-bottom-container {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
   padding: 10px;
 }
+
 .comment-submit {
   background-color: var(--primary-color);
   color: #fff;
@@ -141,14 +136,17 @@ export default {
   font-size: 14px;
   cursor: pointer;
 }
+
 .comment-submit.disabled {
   background-color: var(--primary-color-disabled);
   opacity: 0.5;
   cursor: not-allowed;
 }
+
 .comment-submit.disabled:hover {
   background-color: var(--primary-color-disabled);
 }
+
 .comment-submit:hover {
   background-color: var(--primary-color-hover);
 }
