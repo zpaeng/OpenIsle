@@ -12,8 +12,7 @@
           <span v-if="!item.read" class="unread-dot"></span>
           <span class="notif-type">
             <template v-if="item.type === 'COMMENT_REPLY' && item.parentComment">
-              <div class="notif-content-container">
-                <div class="notif-content-container-item">
+              <NotificationContainer :item="item" :markRead="markRead">
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.comment.author.id}`">{{ item.comment.author.username }} </router-link> 对我的评论
                 <span>
                   <router-link class="notif-content-text" @click="markRead(item.id)"
@@ -25,18 +24,10 @@
                     {{ sanitizeDescription(item.comment.content) }}
                   </router-link>
                 </span>
-                </div>
-                <div v-if="!item.read" class="mark-read-button" @click="markRead(item.id)">
-                  标记为已读
-                </div>
-                <div v-else class="has-read-button">
-                  已读
-                </div>
-              </div>
+              </NotificationContainer>
             </template>
             <template v-else-if="item.type === 'COMMENT_REPLY' && !item.parentComment">
-              <div class="notif-content-container">
-                <div class="notif-content-container-item">
+              <NotificationContainer :item="item" :markRead="markRead">
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.comment.author.id}`">{{ item.comment.author.username }} </router-link> 对我的文章
                 <span>
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
@@ -47,18 +38,10 @@
                     {{ sanitizeDescription(item.comment.content) }}
                   </router-link>
                 </span>
-                </div>
-                <div v-if="!item.read" class="mark-read-button" @click="markRead(item.id)">
-                  标记为已读
-                </div>
-                <div v-else class="has-read-button">
-                  已读
-                </div>
-              </div>
+              </NotificationContainer>
             </template>
             <template v-else-if="item.type === 'REACTION' && item.post && !item.comment">
-              <div class="notif-content-container">
-                <div class="notif-content-container-item">
+              <NotificationContainer :item="item" :markRead="markRead">
                 <span class="notif-user">{{ item.fromUser.username }} </span> 对我的文章
                 <span>
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
@@ -66,18 +49,10 @@
                   </router-link>
                   </span>
                   进行了表态
-                </div>
-                <div v-if="!item.read" class="mark-read-button" @click="markRead(item.id)">
-                  标记为已读
-                </div>
-                <div v-else class="has-read-button">
-                  已读
-                </div>
-              </div>
+              </NotificationContainer>
             </template>
             <template v-else-if="item.type === 'REACTION' && item.comment">
-              <div class="notif-content-container">
-                <div class="notif-content-container-item">
+              <NotificationContainer :item="item" :markRead="markRead">
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">{{ item.fromUser.username }} </router-link> 对我的评论
                 <span>
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
@@ -85,18 +60,10 @@
                   </router-link>
                 </span>
                 进行了表态
-                </div>
-                <div v-if="!item.read" class="mark-read-button" @click="markRead(item.id)">
-                  标记为已读
-                </div>
-                <div v-else class="has-read-button">
-                  已读
-                </div>
-              </div>
+              </NotificationContainer>
             </template>
             <template v-else-if="item.type === 'POST_VIEWED'">
-              <div class="notif-content-container">
-                <div class="notif-content-container-item">
+              <NotificationContainer :item="item" :markRead="markRead">
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
                   {{ item.fromUser.username }}
                 </router-link>
@@ -104,18 +71,10 @@
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
                   {{ sanitizeDescription(item.post.title) }}
                 </router-link>
-                </div>
-                <div v-if="!item.read" class="mark-read-button" @click="markRead(item.id)">
-                  标记为已读
-                </div>
-                <div v-else class="has-read-button">
-                  已读
-                </div>
-              </div>
+              </NotificationContainer>
             </template>
             <template v-else-if="item.type === 'POST_UPDATED'">
-              <div class="notif-content-container">
-                <div class="notif-content-container-item">
+              <NotificationContainer :item="item" :markRead="markRead">
                 您关注的帖子
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
                   {{ sanitizeDescription(item.post.title) }}
@@ -124,50 +83,26 @@
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
                   {{ sanitizeDescription(item.comment.content) }}
                 </router-link>
-                </div>
-                <div v-if="!item.read" class="mark-read-button" @click="markRead(item.id)">
-                  标记为已读
-                </div>
-                <div v-else class="has-read-button">
-                  已读
-                </div>
-              </div>
+              </NotificationContainer>
             </template>
             <template v-else-if="item.type === 'USER_FOLLOWED'">
-              <div class="notif-content-container">
-                <div class="notif-content-container-item">
+              <NotificationContainer :item="item" :markRead="markRead">
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
                   {{ item.fromUser.username }}
                 </router-link>
                 开始关注你了
-                </div>
-                <div v-if="!item.read" class="mark-read-button" @click="markRead(item.id)">
-                  标记为已读
-                </div>
-                <div v-else class="has-read-button">
-                  已读
-                </div>
-              </div>
+              </NotificationContainer>
             </template>
             <template v-else-if="item.type === 'USER_UNFOLLOWED'">
-              <div class="notif-content-container">
-                <div class="notif-content-container-item">
+              <NotificationContainer :item="item" :markRead="markRead">
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
                   {{ item.fromUser.username }}
                 </router-link>
                 取消关注你了
-                </div>
-                <div v-if="!item.read" class="mark-read-button" @click="markRead(item.id)">
-                  标记为已读
-                </div>
-                <div v-else class="has-read-button">
-                  已读
-                </div>
-              </div>
+              </NotificationContainer>
             </template>
             <template v-else-if="item.type === 'FOLLOWED_POST'">
-              <div class="notif-content-container">
-                <div class="notif-content-container-item">
+              <NotificationContainer :item="item" :markRead="markRead">
                 你关注的
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
                   {{ item.fromUser.username }}
@@ -176,18 +111,10 @@
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
                   {{ sanitizeDescription(item.post.title) }}
                 </router-link>
-                </div>
-                <div v-if="!item.read" class="mark-read-button" @click="markRead(item.id)">
-                  标记为已读
-                </div>
-                <div v-else class="has-read-button">
-                  已读
-                </div>
-              </div>
+              </NotificationContainer>
             </template>
             <template v-else-if="item.type === 'POST_SUBSCRIBED'">
-              <div class="notif-content-container">
-                <div class="notif-content-container-item">  
+              <NotificationContainer :item="item" :markRead="markRead">
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
                   {{ item.fromUser.username }}
                 </router-link>
@@ -195,18 +122,10 @@
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
                   {{ sanitizeDescription(item.post.title) }}
                 </router-link>
-                </div>
-                <div v-if="!item.read" class="mark-read-button" @click="markRead(item.id)">
-                  标记为已读
-                </div>
-                <div v-else class="has-read-button">
-                  已读
-                </div>
-              </div>
+              </NotificationContainer>
             </template>
             <template v-else-if="item.type === 'POST_UNSUBSCRIBED'">
-              <div class="notif-content-container">
-                <div class="notif-content-container-item">
+              <NotificationContainer :item="item" :markRead="markRead">
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
                   {{ item.fromUser.username }}
                 </router-link>
@@ -214,18 +133,10 @@
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
                   {{ sanitizeDescription(item.post.title) }}
                 </router-link>
-                </div>
-                <div v-if="!item.read" class="mark-read-button" @click="markRead(item.id)">
-                  标记为已读
-                </div>
-                <div v-else class="has-read-button">
-                  已读
-                </div>
-              </div>
+              </NotificationContainer>
             </template>
             <template v-else-if="item.type === 'POST_REVIEW_REQUEST' && item.fromUser">
-              <div class="notif-content-container">
-                <div class="notif-content-container-item">
+              <NotificationContainer :item="item" :markRead="markRead">
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
                   {{ item.fromUser.username }}
                 </router-link>
@@ -234,76 +145,45 @@
                   {{ sanitizeDescription(item.post.title) }}
                 </router-link>
                 ，请审核
-                </div>
-                <div v-if="!item.read" class="mark-read-button" @click="markRead(item.id)">
-                  标记为已读
-                </div>
-                <div v-else class="has-read-button">
-                  已读
-                </div>
-              </div>
+              </NotificationContainer>
             </template>
             <template v-else-if="item.type === 'POST_REVIEW_REQUEST'">
-              <div class="notif-content-container">
-                <div class="notif-content-container-item">
+              <NotificationContainer :item="item" :markRead="markRead">
                 您发布的帖子
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
                   {{ sanitizeDescription(item.post.title) }}
                 </router-link>
                 已提交审核
-                </div>
-                <div v-if="!item.read" class="mark-read-button" @click="markRead(item.id)">
-                  标记为已读
-                </div>
-                <div v-else class="has-read-button">
-                  已读
-                </div>
-              </div>
+              </NotificationContainer>
             </template>
             <template v-else-if="item.type === 'POST_REVIEWED' && item.approved">
-              <div class="notif-content-container">
-                <div class="notif-content-container-item">
+              <NotificationContainer :item="item" :markRead="markRead">
                 您发布的帖子
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
                   {{ sanitizeDescription(item.post.title) }}
                 </router-link>
                 已审核通过
-                </div>
-                <div class="mark-read-button">
-                  <button class="mark-read-button-item" v-if="!item.read" @click="markRead(item.id)">标记为已读</button>
-                  <button class="read-button-item" v-else @click="markRead(item.id)">已读</button>
-                </div>
-              </div>
+                <template #actions>
+                  <div class="mark-read-button">
+                    <button class="mark-read-button-item" v-if="!item.read" @click="markRead(item.id)">标记为已读</button>
+                    <button class="read-button-item" v-else @click="markRead(item.id)">已读</button>
+                  </div>
+                </template>
+              </NotificationContainer>
             </template>
             <template v-else-if="item.type === 'POST_REVIEWED' && item.approved === false">
-              <div class="notif-content-container">
-                <div class="notif-content-container-item">
+              <NotificationContainer :item="item" :markRead="markRead">
                 您发布的帖子
                 <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
                   {{ sanitizeDescription(item.post.title) }}
                 </router-link>
                 已被管理员拒绝
-                </div>
-                <div v-if="!item.read" class="mark-read-button" @click="markRead(item.id)">
-                  标记为已读
-                </div>
-                <div v-else class="has-read-button">
-                  已读
-                </div>
-              </div>
+              </NotificationContainer>
             </template>
             <template v-else>
-              <div class="notif-content-container">
-                <div class="notif-content-container-item">
+              <NotificationContainer :item="item" :markRead="markRead">
                 {{ formatType(item.type) }}
-                </div>
-                <div v-if="!item.read" class="mark-read-button" @click="markRead(item.id)">
-                  标记为已读
-                </div>
-                <div v-else class="has-read-button">
-                  已读
-                </div>
-              </div>
+              </NotificationContainer>
             </template>
           </span>
           <span class="notif-time">{{ TimeManager.format(item.createdAt) }}</span>
@@ -319,6 +199,7 @@ import { useRouter } from 'vue-router'
 import { API_BASE_URL } from '../main'
 import BaseTimeline from '../components/BaseTimeline.vue'
 import BasePlaceholder from '../components/BasePlaceholder.vue'
+import NotificationContainer from '../components/NotificationContainer.vue'
 import { getToken } from '../utils/auth'
 import { markNotificationsRead } from '../utils/notification'
 import { toast } from '../main'
@@ -329,7 +210,7 @@ hatch.register()
 
 export default {
   name: 'MessagePageView',
-  components: { BaseTimeline, BasePlaceholder },
+  components: { BaseTimeline, BasePlaceholder, NotificationContainer },
   setup() {
     const router = useRouter()
     const notifications = ref([])
@@ -580,16 +461,6 @@ export default {
   color: gray;
 }
 
-.notif-content-container {
-  color: rgb(140, 140, 140);
-  font-weight: normal;
-  font-size: 14px;
-  opacity: 0.8;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .notif-content-text {
   font-weight: bold;
   color: var(--primary-color) !important;
@@ -606,18 +477,5 @@ export default {
   color: var(--text-color);
 }
 
-.mark-read-button {
-  color: var(--primary-color);
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.mark-read-button:hover {
-  text-decoration: underline;
-}
-
-.has-read-button {
-  font-size: 12px;
-}
 
 </style>
