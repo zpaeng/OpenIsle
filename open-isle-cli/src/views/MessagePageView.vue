@@ -1,12 +1,17 @@
 <template>
   <div class="message-page">
+    <div class="message-tabs">
+      <div :class="['message-tab-item', { selected: selectedTab === 'all' }]" @click="selectedTab = 'all'">消息</div>
+      <div :class="['message-tab-item', { selected: selectedTab === 'unread' }]" @click="selectedTab = 'unread'">未读</div>
+    </div>
+
     <div v-if="isLoadingMessage" class="loading-message">
       <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
     </div>
 
-    <BasePlaceholder v-else-if="notifications.length === 0" text="暂时没有消息 :)" icon="fas fa-inbox" />
+    <BasePlaceholder v-else-if="filteredNotifications.length === 0" text="暂时没有消息 :)" icon="fas fa-inbox" />
 
-    <BaseTimeline v-if="notifications.length > 0" :items="notifications">
+    <BaseTimeline v-if="filteredNotifications.length > 0" :items="filteredNotifications">
       <template #item="{ item }">
         <div class="notif-content" :class="{ read: item.read }">
           <span v-if="!item.read" class="unread-dot"></span>
@@ -194,7 +199,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { API_BASE_URL } from '../main'
 import BaseTimeline from '../components/BaseTimeline.vue'
@@ -215,6 +220,12 @@ export default {
     const router = useRouter()
     const notifications = ref([])
     const isLoadingMessage = ref(false)
+    const selectedTab = ref('all')
+    const filteredNotifications = computed(() =>
+      selectedTab.value === 'all'
+        ? notifications.value
+        : notifications.value.filter(n => !n.read)
+    )
 
     const markRead = async id => {
       if (!id) return
@@ -410,7 +421,16 @@ export default {
 
     onMounted(fetchNotifications)
 
-    return { notifications, formatType, sanitizeDescription, isLoadingMessage, markRead, TimeManager }
+    return {
+      notifications,
+      formatType,
+      sanitizeDescription,
+      isLoadingMessage,
+      markRead,
+      TimeManager,
+      selectedTab,
+      filteredNotifications
+    }
   }
 }
 </script>
@@ -475,6 +495,23 @@ export default {
 .notif-user {
   font-weight: bold;
   color: var(--text-color);
+}
+
+.message-tabs {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 20px;
+}
+
+.message-tab-item {
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.message-tab-item.selected {
+  color: var(--primary-color);
+  border-bottom: 2px solid var(--primary-color);
 }
 
 
