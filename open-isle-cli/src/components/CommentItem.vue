@@ -21,7 +21,7 @@
           </DropdownMenu>
         </div>
       </div>
-      <div class="info-content-text" v-html="renderMarkdown(comment.text)"></div>
+      <div class="info-content-text" v-html="renderMarkdown(comment.text)" @click="handleImageClick"></div>
       <div class="article-footer-container">
         <ReactionsGroup v-model="comment.reactions" content-type="comment" :content-id="comment.id">
           <div class="make-reaction-item comment-reaction" @click="toggleEditor">
@@ -53,12 +53,19 @@
           :default-show-replies="r.openReplies"
         /> -->
       </div>
+      <vue-easy-lightbox
+        :visible="lightboxVisible"
+        :imgs="lightboxImgs"
+        :index="lightboxIndex"
+        @hide="lightboxVisible = false"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import { ref, watch, computed } from 'vue'
+import VueEasyLightbox from 'vue-easy-lightbox'
 import { useRouter } from 'vue-router'
 import CommentEditor from './CommentEditor.vue'
 import { renderMarkdown } from '../utils/markdown'
@@ -96,6 +103,9 @@ const CommentItem = {
     )
     const showEditor = ref(false)
     const isWaitingForReply = ref(false)
+    const lightboxVisible = ref(false)
+    const lightboxIndex = ref(0)
+    const lightboxImgs = ref([])
     const toggleReplies = () => {
       showReplies.value = !showReplies.value
     }
@@ -182,11 +192,20 @@ const CommentItem = {
         toast.success('已复制')
       })
     }
-    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply, commentMenuItems, deleteComment }
+    const handleImageClick = e => {
+      if (e.target.tagName === 'IMG') {
+        const container = e.target.parentNode
+        const imgs = [...container.querySelectorAll('img')].map(i => i.src)
+        lightboxImgs.value = imgs
+        lightboxIndex.value = imgs.indexOf(e.target.src)
+        lightboxVisible.value = true
+      }
+    }
+    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply, commentMenuItems, deleteComment, lightboxVisible, lightboxIndex, lightboxImgs, handleImageClick }
   }
 }
 
-CommentItem.components = { CommentItem, CommentEditor, BaseTimeline, ReactionsGroup, DropdownMenu }
+CommentItem.components = { CommentItem, CommentEditor, BaseTimeline, ReactionsGroup, DropdownMenu, VueEasyLightbox }
 
 export default CommentItem
 </script>

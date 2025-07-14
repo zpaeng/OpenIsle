@@ -47,7 +47,7 @@
             <div class="user-name">{{ author.username }}</div>
             <div class="post-time">{{ postTime }}</div>
           </div>
-          <div class="info-content-text" v-html="renderMarkdown(postContent)"></div>
+          <div class="info-content-text" v-html="renderMarkdown(postContent)" @click="handleImageClick"></div>
 
           <div class="article-footer-container">
             <ReactionsGroup v-model="postReactions" content-type="post" :content-id="postId">
@@ -98,11 +98,18 @@
         <div v-else class="scroller-time">{{ lastReplyTime }}</div>
       </div>
     </div>
+    <vue-easy-lightbox
+      :visible="lightboxVisible"
+      :index="lightboxIndex"
+      :imgs="lightboxImgs"
+      @hide="lightboxVisible = false"
+    />
   </div>
 </template>
 
 <script>
 import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import VueEasyLightbox from 'vue-easy-lightbox'
 import { useRoute } from 'vue-router'
 import CommentItem from '../components/CommentItem.vue'
 import CommentEditor from '../components/CommentEditor.vue'
@@ -122,7 +129,7 @@ hatch.register()
 
 export default {
   name: 'PostPageView',
-  components: { CommentItem, CommentEditor, BaseTimeline, ArticleTags, ArticleCategory, ReactionsGroup, DropdownMenu, LoginOverlay },
+  components: { CommentItem, CommentEditor, BaseTimeline, ArticleTags, ArticleCategory, ReactionsGroup, DropdownMenu, LoginOverlay, VueEasyLightbox },
   setup() {
     const route = useRoute()
     const postId = route.params.id
@@ -143,6 +150,10 @@ export default {
     const mainContainer = ref(null)
     const currentIndex = ref(1)
     const subscribed = ref(false)
+
+    const lightboxVisible = ref(false)
+    const lightboxIndex = ref(0)
+    const lightboxImgs = ref([])
     const loggedIn = computed(() => authState.loggedIn)
     const isAdmin = computed(() => authState.role === 'ADMIN')
     const isAuthor = computed(() => authState.username === author.value.username)
@@ -229,6 +240,16 @@ export default {
         }
       }
       return false
+    }
+
+    const handleImageClick = e => {
+      if (e.target.tagName === 'IMG') {
+        const container = e.target.parentNode
+        const imgs = [...container.querySelectorAll('img')].map(i => i.src)
+        lightboxImgs.value = imgs
+        lightboxIndex.value = imgs.indexOf(e.target.src)
+        lightboxVisible.value = true
+      }
     }
 
     const onCommentDeleted = (id) => {
@@ -491,7 +512,11 @@ export default {
       approvePost,
       onCommentDeleted,
       deletePost,
-      rejectPost
+      rejectPost,
+      lightboxVisible,
+      lightboxIndex,
+      lightboxImgs,
+      handleImageClick
     }
   }
 }
