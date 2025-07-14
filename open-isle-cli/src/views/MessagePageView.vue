@@ -6,7 +6,7 @@
 
     <BasePlaceholder v-else-if="notifications.length === 0" text="暂时没有消息 :)" icon="fas fa-inbox" />
 
-    <BaseTimeline :items="notifications">
+    <BaseTimeline v-if="notifications.length > 0" :items="notifications">
       <template #item="{ item }">
         <div class="notif-content" :class="{ read: item.read }">
           <span v-if="!item.read" class="unread-dot"></span>
