@@ -33,17 +33,13 @@ import { getToken } from '../utils/auth'
 
 export default {
   name: 'NewPostPageView',
-  data() {
-    return {
-      isWaitingPosting: false
-    }
-  },
   components: { PostEditor, CategorySelect, TagSelect },
   setup() {
     const title = ref('')
     const content = ref('')
     const selectedCategory = ref('')
     const selectedTags = ref([])
+    const isWaitingPosting = ref(false)
 
     const loadDraft = async () => {
       const token = getToken()
@@ -171,6 +167,7 @@ export default {
       try {
         const token = getToken()
         await ensureTags(token)
+        isWaitingPosting.value = true
         const res = await fetch(`${API_BASE_URL}/api/posts`, {
           method: 'POST',
           headers: {
@@ -195,9 +192,11 @@ export default {
         }
       } catch (e) {
         toast.error('发布失败')
+      } finally {
+        isWaitingPosting.value = false
       }
     }
-    return { title, content, selectedCategory, selectedTags, submitPost, saveDraft, clearPost }
+    return { title, content, selectedCategory, selectedTags, submitPost, saveDraft, clearPost, isWaitingPosting }
   }
 }
 </script>
@@ -282,6 +281,4 @@ export default {
   align-items: center;
   margin-top: 20px;
 }
-
 </style>
-
