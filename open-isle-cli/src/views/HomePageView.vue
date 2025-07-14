@@ -75,13 +75,13 @@
               <img class="article-member-avatar-item-img" :src="member.avatar" alt="avatar" />
             </router-link>
           </div>
-          <div class="article-comments">
+          <div class="article-comments main-info-text">
             {{ article.comments }}
           </div>
-          <div class="article-views">
+          <div class="article-views main-info-text">
             {{ article.views }}
           </div>
-          <div class="article-time">
+          <div class="article-time main-info-text">
             {{ article.time }}
           </div>
         </div>
@@ -514,6 +514,11 @@ export default {
   align-items: center;
   height: 200px;
   font-size: 16px;
+  opacity: 0.7;
+}
+
+.main-info-text {
+  font-size: 14px;
   opacity: 0.7;
 }
 </style>
