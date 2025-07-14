@@ -34,7 +34,7 @@ public class StatController {
         return data.entrySet().stream()
                 .map(e -> Map.<String,Object>of(
                         "date",  e.getKey().toString(),
-                        "value", e.getValue()        
+                        "value", e.getValue()
                 ))
                 .toList();
     }

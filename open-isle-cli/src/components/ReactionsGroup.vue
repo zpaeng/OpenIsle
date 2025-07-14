@@ -41,7 +41,7 @@ const fetchTypes = async () => {
   try {
     const token = getToken()
     const res = await fetch(`${API_BASE_URL}/api/reaction-types`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: token ? `Bearer ${token}` : '' }
     })
     if (res.ok) {
       cachedTypes = await res.json()
