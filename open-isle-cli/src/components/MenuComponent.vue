@@ -17,6 +17,15 @@
           <i class="menu-item-icon fas fa-info-circle"></i>
           <span class="menu-item-text">关于</span>
         </router-link>
+        <router-link
+          v-if="authState.role === 'ADMIN'"
+          class="menu-item"
+          exact-active-class="selected"
+          to="/about/stats"
+        >
+          <i class="menu-item-icon fas fa-chart-line"></i>
+          <span class="menu-item-text">站点统计</span>
+        </router-link>
         <router-link class="menu-item" exact-active-class="selected" to="/new-post">
           <i class="menu-item-icon fas fa-edit"></i>
           <span class="menu-item-text">发帖</span>

@@ -51,4 +51,24 @@ class StatControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.dau").value(3));
     }
+
+    @Test
+    void dauRangeReturnsSeries() throws Exception {
+        Mockito.when(jwtService.validateAndGetSubject("token")).thenReturn("user");
+        User user = new User();
+        user.setUsername("user");
+        user.setPassword("p");
+        user.setEmail("u@example.com");
+        user.setRole(Role.USER);
+        Mockito.when(userRepository.findByUsername("user")).thenReturn(Optional.of(user));
+        java.util.Map<java.time.LocalDate, Long> map = new java.util.LinkedHashMap<>();
+        map.put(java.time.LocalDate.now().minusDays(1), 1L);
+        map.put(java.time.LocalDate.now(), 2L);
+        Mockito.when(userVisitService.countDauRange(Mockito.any(), Mockito.any())).thenReturn(map);
+
+        mockMvc.perform(get("/api/stats/dau-range").param("days", "2").header("Authorization", "Bearer token"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].value").value(1))
+                .andExpect(jsonPath("$[1].value").value(2));
+    }
 }
