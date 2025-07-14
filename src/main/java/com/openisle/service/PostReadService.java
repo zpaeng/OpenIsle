@@ -41,4 +41,9 @@ public class PostReadService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         return postReadRepository.countByUser(user);
     }
+
+    @org.springframework.transaction.annotation.Transactional
+    public void deleteByPost(Post post) {
+        postReadRepository.deleteByPost(post);
+    }
 }

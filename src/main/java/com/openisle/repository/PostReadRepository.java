@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface PostReadRepository extends JpaRepository<PostRead, Long> {
     Optional<PostRead> findByUserAndPost(User user, Post post);
     long countByUser(User user);
+    void deleteByPost(Post post);
 }

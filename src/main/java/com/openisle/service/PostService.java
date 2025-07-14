@@ -360,6 +360,7 @@ public class PostService {
         reactionRepository.findByPost(post).forEach(reactionRepository::delete);
         postSubscriptionRepository.findByPost(post).forEach(postSubscriptionRepository::delete);
         notificationRepository.deleteAll(notificationRepository.findByPost(post));
+        postReadService.deleteByPost(post);
         postRepository.delete(post);
     }
 
