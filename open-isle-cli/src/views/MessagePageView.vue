@@ -11,7 +11,8 @@
 
     <BasePlaceholder v-else-if="filteredNotifications.length === 0" text="暂时没有消息 :)" icon="fas fa-inbox" />
 
-    <BaseTimeline v-if="filteredNotifications.length > 0" :items="filteredNotifications">
+    <div class="timeline-container" v-if="filteredNotifications.length > 0" >
+    <BaseTimeline :items="filteredNotifications">
       <template #item="{ item }">
         <div class="notif-content" :class="{ read: item.read }">
           <span v-if="!item.read" class="unread-dot"></span>
@@ -193,8 +194,9 @@
           </span>
           <span class="notif-time">{{ TimeManager.format(item.createdAt) }}</span>
         </div>
-      </template>
-    </BaseTimeline>
+        </template>
+      </BaseTimeline>
+    </div>
   </div>
 </template>
 
@@ -220,7 +222,7 @@ export default {
     const router = useRouter()
     const notifications = ref([])
     const isLoadingMessage = ref(false)
-    const selectedTab = ref('all')
+    const selectedTab = ref('unread')
     const filteredNotifications = computed(() =>
       selectedTab.value === 'all'
         ? notifications.value
@@ -446,9 +448,13 @@ export default {
 
 .message-page {
   background-color: var(--background-color);
-  padding: 20px;
-  height: calc(100vh - var(--header-height) - 40px);
+  height: calc(100vh - var(--header-height));
   overflow-y: auto;
+}
+
+.timeline-container {
+  padding: 10px 20px;
+  height: 100%;
 }
 
 .notif-content {
