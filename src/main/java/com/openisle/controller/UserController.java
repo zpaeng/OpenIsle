@@ -1,5 +1,6 @@
 package com.openisle.controller;
 
+import com.openisle.exception.NotFoundException;
 import com.openisle.model.User;
 import com.openisle.service.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -80,7 +81,7 @@ public class UserController {
     @GetMapping("/{identifier}")
     public ResponseEntity<UserDto> getUser(@PathVariable("identifier") String identifier,
                                            Authentication auth) {
-        User user = userService.findByIdentifier(identifier).orElseThrow();
+        User user = userService.findByIdentifier(identifier).orElseThrow(() -> new NotFoundException("User not found"));
         return ResponseEntity.ok(toDto(user, auth));
     }
 

@@ -26,7 +26,7 @@ export default {
   },
   computed: {
     hideMenu() {
-      return ['/login', '/signup'].includes(this.$route.path)
+      return ['/login', '/signup', '/404'].includes(this.$route.path)
     }
   }
 }
