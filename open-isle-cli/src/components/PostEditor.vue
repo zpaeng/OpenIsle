@@ -67,14 +67,27 @@ export default {
         upload: {
           fieldName: 'file',
           url: `${API_BASE_URL}/api/upload`,
-          linkToImgUrl: `${API_BASE_URL}/api/upload/url`,
           accept: 'image/*,video/*',
           multiple: false,
           headers: { Authorization: `Bearer ${getToken()}` },
           format(files, responseText) {
             const res = JSON.parse(responseText)
-            if (res.code === 0) return res.data.url
-            throw new Error(res.msg || '上传失败')
+            if (res.code === 0) {
+              return JSON.stringify({
+                code: 0,
+                msg: '',
+                data: {
+                  errFiles: [],
+                  succMap: { [files[0].name]: res.data.url }
+                }
+              })
+            } else {
+              return JSON.stringify({
+                code: 1,
+                msg: '上传失败',
+                data: { errFiles: files.map(f => f.name), succMap: {} }
+              })
+            }
           }
         },
         toolbarConfig: { pin: true },
@@ -98,4 +111,3 @@ export default {
   border: 1px solid #e2e2e2;
 }
 </style>
-
