@@ -69,6 +69,9 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid captcha"));
         }
         Optional<User> userOpt = userService.findByUsername(req.getUsernameOrEmail());
+        if (userOpt.isEmpty()) {
+            userOpt = userService.findByEmail(req.getUsernameOrEmail());
+        }
         if (userOpt.isEmpty() || !userService.matchesPassword(userOpt.get(), req.getPassword())) {
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "Invalid credentials",
