@@ -76,6 +76,10 @@
         <img class="signup-page-button-icon" src="../assets/icons/google.svg" alt="Google Logo" />
         <div class="signup-page-button-text">Google 注册</div>
       </div>
+      <div class="signup-page-button" @click="signupWithGithub">
+        <img class="signup-page-button-icon" src="../assets/icons/github.svg" alt="GitHub Logo" />
+        <div class="signup-page-button-text">GitHub 注册</div>
+      </div>
     </div>
   </div>
 </template>
@@ -83,6 +87,7 @@
 <script>
 import { API_BASE_URL, toast } from '../main'
 import { googleSignIn, googleGetIdToken } from '../utils/google'
+import { githubAuthorize } from '../utils/github'
 import BaseInput from '../components/BaseInput.vue'
 export default {
   name: 'SignupPageView',
@@ -211,6 +216,9 @@ export default {
           this.$router.push('/signup-reason?google=1')
         })
       }
+    },
+    signupWithGithub() {
+      githubAuthorize()
     }
   }
 }

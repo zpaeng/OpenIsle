@@ -20,6 +20,7 @@
 import BaseInput from '../components/BaseInput.vue'
 import { API_BASE_URL, toast } from '../main'
 import { googleAuthWithToken } from '../utils/google'
+import { githubExchange } from '../utils/github'
 
 export default {
   name: 'SignupReasonPageView',
@@ -29,15 +30,23 @@ export default {
       reason: '',
       error: '',
       isGoogle: false,
+      isGithub: false,
       isWaitingForRegister: false,
-      googleToken: ''
+      googleToken: '',
+      githubCode: ''
     }
   },
   mounted() {
     this.isGoogle = this.$route.query.google === '1'
+    this.isGithub = this.$route.query.github === '1'
     if (this.isGoogle) {
       this.googleToken = sessionStorage.getItem('google_id_token') || ''
       if (!this.googleToken) {
+        this.$router.push('/signup')
+      }
+    } else if (this.isGithub) {
+      this.githubCode = sessionStorage.getItem('github_code') || ''
+      if (!this.githubCode) {
         this.$router.push('/signup')
       }
     } else if (!sessionStorage.getItem('signup_username')) {
@@ -63,6 +72,23 @@ export default {
         )
         this.isWaitingForRegister = false
         sessionStorage.removeItem('google_id_token')
+        return
+      }
+      if (this.isGithub) {
+        this.isWaitingForRegister = true
+        const code = this.githubCode || sessionStorage.getItem('github_code')
+        if (!code) {
+          toast.error('GitHub 登录失败')
+          return
+        }
+        const result = await githubExchange(code, '', this.reason)
+        this.isWaitingForRegister = false
+        sessionStorage.removeItem('github_code')
+        if (result) {
+          this.$router.push('/')
+        } else {
+          this.error = 'GitHub 登录失败'
+        }
         return
       }
       try {

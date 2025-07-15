@@ -11,6 +11,7 @@ import NewPostPageView from '../views/NewPostPageView.vue'
 import SettingsPageView from '../views/SettingsPageView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import NotFoundPageView from '../views/NotFoundPageView.vue'
+import GithubCallbackPageView from '../views/GithubCallbackPageView.vue'
 
 const routes = [
   {
@@ -67,6 +68,11 @@ const routes = [
     path: '/users/:id',
     name: 'users',
     component: ProfileView
+  },
+  {
+    path: '/github-callback',
+    name: 'github-callback',
+    component: GithubCallbackPageView
   },
   {
     path: '/404',
