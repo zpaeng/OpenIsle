@@ -5,8 +5,10 @@
       <div class="reason-description">
         为了我们社区的良性发展，请填写注册理由，我们将根据你的理由审核你的注册, 谢谢!
       </div>
-      <BaseInput textarea rows="4" v-model="reason" placeholder="20个字以上" />
-      <div class="char-count">{{ reason.length }} 字</div>
+      <div class="reason-input-container">
+        <BaseInput textarea rows="4" v-model="reason" placeholder="20个字以上" ></BaseInput>
+        <div class="char-count">{{ reason.length }}/20</div>
+      </div>
       <div v-if="error" class="error-message">{{ error }}</div>
       <div v-if="!isWaitingForRegister" class="signup-page-button-primary" @click="submit">提交</div>
       <div v-else class="signup-page-button-primary disabled">提交中...</div>
