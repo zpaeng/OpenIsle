@@ -93,9 +93,14 @@ public class AuthController {
         Optional<User> user = googleAuthService.authenticate(req.getIdToken(), req.getReason(), registerModeService.getRegisterMode());
         if (user.isPresent()) {
             if (!user.get().isApproved()) {
-                if (req.getReason() != null && !req.getReason().isEmpty()) {
-                    // do not send empty notification (while try login)
+                if (user.get().getRegisterReason() != null && !user.get().getRegisterReason().isEmpty()) {
+                    // do not send empty notifition (while try login)
                     notificationService.createRegisterRequestNotifications(user.get(), req.getReason());
+
+                    return ResponseEntity.badRequest().body(Map.of(
+                            "error", "Account awaiting approval",
+                            "reason_code", "IS_APPROVING"
+                    ));
                 }
                 return ResponseEntity.badRequest().body(Map.of(
                         "error", "Account awaiting approval",

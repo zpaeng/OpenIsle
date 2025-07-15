@@ -54,7 +54,10 @@ export default {
           toast.error('Google 登录失败')
           return
         }
-        await googleAuthWithToken(token, this.reason, () => { this.$router.push('/') })
+        await googleAuthWithToken(token, this.reason,
+          () => { this.$router.push('/') },
+          () => { this.error = 'Google 登录失败' }
+        )
         this.isWaitingForRegister = false
         sessionStorage.removeItem('google_id_token')
         return
@@ -138,5 +141,4 @@ export default {
 .signup-page-button-primary.disabled:hover {
   cursor: not-allowed;
 }
-
 </style>

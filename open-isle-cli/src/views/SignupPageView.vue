@@ -204,6 +204,8 @@ export default {
       } else {
         googleSignIn(() => {
           this.$router.push('/')
+        }, () => {
+          this.$router.push('/signup-reason')
         })
       }
     }

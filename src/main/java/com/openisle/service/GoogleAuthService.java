@@ -50,6 +50,12 @@ public class GoogleAuthService {
                 user.setVerificationCode(null);
                 userRepository.save(user);
             }
+
+            if (!user.isApproved() && reason != null && !reason.isEmpty()) {
+                user.setRegisterReason(reason);
+                userRepository.save(user);
+            }
+
             return user;
         }
         User user = new User();

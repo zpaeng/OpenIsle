@@ -88,6 +88,8 @@ export default {
     loginWithGoogle() {
       googleSignIn(() => {
         this.$router.push('/')
+      }, () => {
+        this.$router.push('/signup-reason?google=1')
       })
     }
   }
