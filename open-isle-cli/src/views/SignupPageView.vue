@@ -105,6 +105,7 @@ export default {
     }
   },
   async mounted() {
+    this.username = this.$route.query.u || ''
     try {
       const res = await fetch(`${API_BASE_URL}/api/config`)
       if (res.ok) {
@@ -114,7 +115,6 @@ export default {
     } catch {/* ignore */}
     if (this.$route.query.verify) {
       this.emailStep = 1
-      this.username = sessionStorage.getItem('signup_username') || ''
     }
   },
   methods: {
@@ -181,7 +181,10 @@ export default {
         const res = await fetch(`${API_BASE_URL}/api/auth/verify`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: this.username, code: this.code })
+          body: JSON.stringify({
+            code: this.code,
+            username: this.username
+          })
         })
         this.isWaitingForEmailVerified = false
         const data = await res.json()
@@ -205,7 +208,7 @@ export default {
         googleSignIn(() => {
           this.$router.push('/')
         }, () => {
-          this.$router.push('/signup-reason')
+          this.$router.push('/signup-reason?google=1')
         })
       }
     }
