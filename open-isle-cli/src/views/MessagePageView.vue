@@ -185,8 +185,10 @@
                 <NotificationContainer :item="item" :markRead="markRead">
                   {{ item.fromUser.username }} 希望注册为会员，理由是：{{ item.content }}
                   <template #actions v-if="authState.role === 'ADMIN'">
-                    <button class="mark-read-button-item" @click="approve(item.fromUser.id, item.id)">同意</button>
-                    <button class="mark-read-button-item" @click="reject(item.fromUser.id, item.id)">拒绝</button>
+                    <div class="optional-buttons">
+                      <div class="mark-approve-button-item" @click="approve(item.fromUser.id, item.id)">同意</div>
+                      <div class="mark-reject-button-item" @click="reject(item.fromUser.id, item.id)">拒绝</div>
+                    </div>
                   </template>
                 </NotificationContainer>
               </template>
@@ -403,7 +405,7 @@ export default {
                 }
               }
             })
-         } else if (n.type === 'POST_REVIEW_REQUEST') {
+          } else if (n.type === 'POST_REVIEW_REQUEST') {
             notifications.value.push({
               ...n,
               src: n.fromUser ? n.fromUser.avatar : null,
@@ -419,7 +421,7 @@ export default {
             notifications.value.push({
               ...n,
               icon: iconMap[n.type],
-              iconClick: () => {}
+              iconClick: () => { }
             })
           } else {
             notifications.value.push({
@@ -604,6 +606,32 @@ export default {
   color: var(--primary-color) !important;
   text-decoration: none !important;
 }
+
+.optional-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.mark-approve-button-item {
+  color: green;
+  cursor: pointer;
+}
+
+.mark-reject-button-item {
+  color: red;
+  cursor: pointer;
+}
+
+.mark-approve-button-item:hover {
+  text-decoration: underline;
+}
+
+.mark-reject-button-item:hover {
+  text-decoration: underline;
+}
+
+
 
 .notif-content-text:hover {
   color: var(--primary-color) !important;

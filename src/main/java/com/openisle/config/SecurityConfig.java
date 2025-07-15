@@ -96,6 +96,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/config/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/reaction-types").permitAll()
@@ -128,7 +129,7 @@ public class SecurityConfig {
                         (uri.startsWith("/api/posts") || uri.startsWith("/api/comments") ||
                          uri.startsWith("/api/categories") || uri.startsWith("/api/tags") ||
                          uri.startsWith("/api/search") || uri.startsWith("/api/users") ||
-                         uri.startsWith("/api/reaction-types"));
+                         uri.startsWith("/api/reaction-types") || uri.startsWith("/api/config"));
 
                 if (authHeader != null && authHeader.startsWith("Bearer ")) {
                     String token = authHeader.substring(7);

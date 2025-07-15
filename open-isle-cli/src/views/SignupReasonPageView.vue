@@ -1,9 +1,14 @@
 <template>
   <div class="reason-page">
     <div class="reason-content">
+      <div class="reason-title">注册理由</div>
+      <div class="reason-description">
+        为了我们社区的良性发展，请填写注册理由，我们将根据你的理由审核你的注册, 谢谢!
+      </div>
       <BaseInput textarea rows="4" v-model="reason" placeholder="请填写注册理由" />
       <div v-if="error" class="error-message">{{ error }}</div>
-      <div class="signup-page-button-primary" @click="submit" >提交</div>
+      <div v-if="!isWaitingForRegister" class="signup-page-button-primary" @click="submit">提交</div>
+      <div v-else class="signup-page-button-primary disabled">提交中...</div>
     </div>
   </div>
 </template>
@@ -20,7 +25,8 @@ export default {
     return {
       reason: '',
       error: '',
-      isGoogle: false
+      isGoogle: false, 
+      isWaitingForRegister: false
     }
   },
   mounted() {
@@ -42,6 +48,7 @@ export default {
         return
       }
       try {
+        this.isWaitingForRegister = true
         const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -61,6 +68,8 @@ export default {
         }
       } catch (e) {
         toast.error('发送失败')
+      } finally {
+        this.isWaitingForRegister = false
       }
     }
   }
@@ -68,9 +77,54 @@ export default {
 </script>
 
 <style scoped>
-.reason-page { display: flex; justify-content: center; align-items: center; height: calc(100vh - var(--header-height)); }
-.reason-content { display: flex; flex-direction: column; gap: 20px; width: 400px; }
-.error-message { color: red; font-size: 14px; }
-.signup-page-button-primary { background-color: var(--primary-color); color: white; padding: 10px 20px; border-radius: 10px; text-align: center; cursor: pointer; }
-.signup-page-button-primary:hover { background-color: var(--primary-color-hover); }
+.reason-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--background-color);
+  height: calc(100vh - var(--header-height));
+}
+
+.reason-title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.reason-description {
+  font-size: 14px;
+}
+
+.reason-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 400px;
+}
+
+.error-message {
+  color: red;
+  font-size: 14px;
+}
+
+.signup-page-button-primary {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.signup-page-button-primary:hover {
+  background-color: var(--primary-color-hover);
+}
+
+.signup-page-button-primary.disabled {
+  background-color: var(--primary-color-disabled);
+}
+
+.signup-page-button-primary.disabled:hover {
+  cursor: not-allowed;
+}
+
 </style>
