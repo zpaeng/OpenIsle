@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class PostService {
@@ -174,7 +175,7 @@ public class PostService {
                                        Integer pageSize) {
         Pageable pageable = null;
         if (page != null && pageSize != null) {
-            pageable = PageRequest.of(page, pageSize);
+            pageable = PageRequest.of(page, pageSize, Sort.Direction.DESC, "createdAt");
         }
 
         boolean hasCategories = categoryIds != null && !categoryIds.isEmpty();
@@ -225,21 +226,21 @@ public class PostService {
                                             Integer pageSize) {
         Pageable pageable = null;
         if (page != null && pageSize != null) {
-            pageable = PageRequest.of(page, pageSize);
+            pageable = PageRequest.of(page, pageSize, Sort.Direction.DESC, "createdAt");
         }
 
         if (categoryIds == null || categoryIds.isEmpty()) {
             if (pageable != null) {
-                return postRepository.findByStatus(PostStatus.PUBLISHED, pageable);
+                return postRepository.findByStatusOrderByCreatedAtDesc(PostStatus.PUBLISHED, pageable);
             }
-            return postRepository.findByStatus(PostStatus.PUBLISHED);
+            return postRepository.findByStatusOrderByCreatedAtDesc(PostStatus.PUBLISHED);
         }
 
         java.util.List<Category> categories = categoryRepository.findAllById(categoryIds);
         if (pageable != null) {
-            return postRepository.findByCategoryInAndStatus(categories, PostStatus.PUBLISHED, pageable);
+            return postRepository.findByCategoryInAndStatusOrderByCreatedAtDesc(categories, PostStatus.PUBLISHED, pageable);
         }
-        return postRepository.findByCategoryInAndStatus(categories, PostStatus.PUBLISHED);
+        return postRepository.findByCategoryInAndStatusOrderByCreatedAtDesc(categories, PostStatus.PUBLISHED);
     }
 
     public List<Post> getRecentPostsByUser(String username, int limit) {
@@ -267,7 +268,7 @@ public class PostService {
 
         Pageable pageable = null;
         if (page != null && pageSize != null) {
-            pageable = PageRequest.of(page, pageSize);
+            pageable = PageRequest.of(page, pageSize, Sort.Direction.DESC, "createdAt");
         }
 
         java.util.List<com.openisle.model.Tag> tags = tagRepository.findAllById(tagIds);
@@ -276,9 +277,9 @@ public class PostService {
         }
 
         if (pageable != null) {
-            return postRepository.findByAllTags(tags, PostStatus.PUBLISHED, tags.size(), pageable);
+            return postRepository.findByAllTagsOrderByCreatedAtDesc(tags, PostStatus.PUBLISHED, tags.size(), pageable);
         }
-        return postRepository.findByAllTags(tags, PostStatus.PUBLISHED, tags.size());
+        return postRepository.findByAllTagsOrderByCreatedAtDesc(tags, PostStatus.PUBLISHED, tags.size());
     }
 
     public List<Post> listPostsByCategoriesAndTags(java.util.List<Long> categoryIds,
@@ -301,9 +302,9 @@ public class PostService {
         }
 
         if (pageable != null) {
-            return postRepository.findByCategoriesAndAllTags(categories, tags, PostStatus.PUBLISHED, tags.size(), pageable);
+            return postRepository.findByCategoriesAndAllTagsOrderByCreatedAtDesc(categories, tags, PostStatus.PUBLISHED, tags.size(), pageable);
         }
-        return postRepository.findByCategoriesAndAllTags(categories, tags, PostStatus.PUBLISHED, tags.size());
+        return postRepository.findByCategoriesAndAllTagsOrderByCreatedAtDesc(categories, tags, PostStatus.PUBLISHED, tags.size());
     }
 
     public List<Post> listPendingPosts() {
