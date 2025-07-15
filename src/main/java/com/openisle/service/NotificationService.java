@@ -33,6 +33,18 @@ public class NotificationService {
         return notificationRepository.save(n);
     }
 
+    /**
+     * Create notifications for all admins when a user submits a register request.
+     * Old register request notifications from the same applicant are removed first.
+     */
+    public void createRegisterRequestNotifications(User applicant, String reason) {
+        notificationRepository.deleteByTypeAndFromUser(NotificationType.REGISTER_REQUEST, applicant);
+        for (User admin : userRepository.findByRole(Role.ADMIN)) {
+            createNotification(admin, NotificationType.REGISTER_REQUEST, null, null,
+                    null, applicant, null, reason);
+        }
+    }
+
     public List<Notification> listNotifications(String username, Boolean read) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));

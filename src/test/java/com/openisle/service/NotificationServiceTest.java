@@ -1,7 +1,6 @@
 package com.openisle.service;
 
-import com.openisle.model.Notification;
-import com.openisle.model.User;
+import com.openisle.model.*;
 import com.openisle.repository.NotificationRepository;
 import com.openisle.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -77,5 +76,24 @@ class NotificationServiceTest {
 
         assertEquals(5L, count);
         verify(nRepo).countByUserAndRead(user, false);
+    }
+
+    @Test
+    void createRegisterRequestNotificationsDeletesOldOnes() {
+        NotificationRepository nRepo = mock(NotificationRepository.class);
+        UserRepository uRepo = mock(UserRepository.class);
+        NotificationService service = new NotificationService(nRepo, uRepo);
+
+        User admin = new User();
+        admin.setId(10L);
+        User applicant = new User();
+        applicant.setId(20L);
+
+        when(uRepo.findByRole(Role.ADMIN)).thenReturn(List.of(admin));
+
+        service.createRegisterRequestNotifications(applicant, "reason");
+
+        verify(nRepo).deleteByTypeAndFromUser(NotificationType.REGISTER_REQUEST, applicant);
+        verify(nRepo).save(any(Notification.class));
     }
 }

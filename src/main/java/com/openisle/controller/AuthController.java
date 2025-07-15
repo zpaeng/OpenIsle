@@ -9,7 +9,6 @@ import com.openisle.service.GoogleAuthService;
 import com.openisle.service.RegisterModeService;
 import com.openisle.service.NotificationService;
 import com.openisle.model.RegisterMode;
-import com.openisle.model.NotificationType;
 import com.openisle.repository.UserRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -50,10 +49,7 @@ public class AuthController {
                 req.getUsername(), req.getEmail(), req.getPassword(), req.getReason(), registerModeService.getRegisterMode());
         emailService.sendEmail(user.getEmail(), "Verification Code", "Your verification code is " + user.getVerificationCode());
         if (!user.isApproved()) {
-            for (User admin : userRepository.findByRole(com.openisle.model.Role.ADMIN)) {
-                notificationService.createNotification(admin, NotificationType.REGISTER_REQUEST, null, null,
-                        null, user, null, user.getRegisterReason());
-            }
+            notificationService.createRegisterRequestNotifications(user, user.getRegisterReason());
         }
         return ResponseEntity.ok(Map.of("message", "Verification code sent"));
     }
@@ -101,11 +97,7 @@ public class AuthController {
             }
             if (!user.get().isApproved()) {
                 if (req.reason != null && !req.reason.isEmpty()) {
-                    // do not send empty notifition (while try login)
-                    for (User admin : userRepository.findByRole(com.openisle.model.Role.ADMIN)) {
-                        notificationService.createNotification(admin, NotificationType.REGISTER_REQUEST, null, null,
-                                null, user.get(), null, req.getReason());
-                    }
+                    notificationService.createRegisterRequestNotifications(user.get(), req.getReason());
                 }
                 if (user.get().getRegisterReason() != null && !user.get().getRegisterReason().isEmpty()) {
                     return ResponseEntity.badRequest().body(Map.of(
