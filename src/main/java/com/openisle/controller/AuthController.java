@@ -97,12 +97,17 @@ public class AuthController {
         Optional<User> user = googleAuthService.authenticate(req.getIdToken(), req.getReason(), registerModeService.getRegisterMode());
         if (user.isPresent()) {
             if (!user.get().isApproved()) {
-                if (req.getReason() != null && !req.getReason().isEmpty()) {
+                if (user.get().getRegisterReason() != null && !user.get().getRegisterReason().isEmpty()) {
                     // do not send empty notifition (while try login)
                     for (User admin : userRepository.findByRole(com.openisle.model.Role.ADMIN)) {
                         notificationService.createNotification(admin, NotificationType.REGISTER_REQUEST, null, null,
                                 null, user.get(), null, req.getReason());
                     }
+
+                    return ResponseEntity.badRequest().body(Map.of(
+                            "error", "Account awaiting approval",
+                            "reason_code", "IS_APPROVING"
+                    ));
                 }
                 return ResponseEntity.badRequest().body(Map.of(
                         "error", "Account awaiting approval",
