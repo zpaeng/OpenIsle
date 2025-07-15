@@ -77,7 +77,7 @@ export default {
         const data = await res.json()
         if (res.ok) {
           toast.success('验证码已发送，请查收邮箱')
-          this.$router.push('/signup?verify=1')
+          this.$router.push({ path: '/signup', query: { verify: 1, u: sessionStorage.getItem('signup_username') } })
         } else {
           toast.error(data.error || '发送失败')
         }

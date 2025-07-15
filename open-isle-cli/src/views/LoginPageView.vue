@@ -70,8 +70,12 @@ export default {
           toast.success('登录成功')
           this.$router.push('/')
         } else if (data.reason_code === 'NOT_VERIFIED') {
-          toast.info('当前邮箱未验证，请先重新填写注册页面并验证')
-          this.$router.push('/signup')
+          sessionStorage.setItem('signup_username', data.username)
+          toast.info('当前邮箱未验证，已经为您重新发送验证码')
+          this.$router.push({ path: '/signup', query: { verify: 1, u: this.username } })
+        } else if (data.reason_code === 'NOT_APPROVED') {
+          toast.info('您的注册正在审批中, 请留意邮件')
+          this.$router.push('/')
         } else {
           toast.error(data.error || '登录失败')
         }

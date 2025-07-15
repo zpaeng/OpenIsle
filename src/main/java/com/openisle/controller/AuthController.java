@@ -68,9 +68,9 @@ public class AuthController {
         if (captchaEnabled && loginCaptchaEnabled && !captchaService.verify(req.getCaptcha())) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid captcha"));
         }
-        Optional<User> userOpt = userService.findByUsername(req.getUsernameOrEmail());
+        Optional<User> userOpt = userService.findByUsername(req.getUsername());
         if (userOpt.isEmpty()) {
-            userOpt = userService.findByEmail(req.getUsernameOrEmail());
+            userOpt = userService.findByEmail(req.getUsername());
         }
         if (userOpt.isEmpty() || !userService.matchesPassword(userOpt.get(), req.getPassword())) {
             return ResponseEntity.badRequest().body(Map.of(
@@ -79,9 +79,12 @@ public class AuthController {
         }
         User user = userOpt.get();
         if (!user.isVerified()) {
+            user = userService.register(user.getUsername(), user.getEmail(), user.getPassword(), user.getRegisterReason(), registerModeService.getRegisterMode());
+            emailService.sendEmail(user.getEmail(), "Verification Code", "Your verification code is " + user.getVerificationCode());
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "User not verified",
-                    "reason_code", "NOT_VERIFIED"));
+                    "reason_code", "NOT_VERIFIED",
+                    "user_name", user.getUsername()));
         }
         if (RegisterMode.WHITELIST.equals(registerModeService.getRegisterMode()) && !user.isApproved()) {
             return ResponseEntity.badRequest().body(Map.of(
@@ -136,7 +139,7 @@ public class AuthController {
 
     @Data
     private static class LoginRequest {
-        private String usernameOrEmail;
+        private String username;
         private String password;
         private String captcha;
     }
