@@ -179,6 +179,7 @@ export default {
   align-items: center;
   justify-content: center;
   width: 30%;
+  gap: 20px;
 }
 
 .login-page-button-primary {
