@@ -17,7 +17,7 @@ export const API_PORT = 8081
 
 // export const API_BASE_URL = API_PORT ? `${API_DOMAIN}:${API_PORT}` : API_DOMAIN
 export const API_BASE_URL = "";
-export const config = { googleClientId: '' }
+export const GOOGLE_CLIENT_ID = '777830451304-nt8afkkap18gui4f9entcha99unal744.apps.googleusercontent.com'
 export const toast = useToast()
 
 initTheme()
@@ -32,10 +32,3 @@ checkToken().then(valid => {
     clearToken()
   }
 })
-
-fetch(`${API_BASE_URL}/api/config`).then(async res => {
-  if (res.ok) {
-    const data = await res.json()
-    config.googleClientId = data.googleClientId || ''
-  }
-}).catch(() => {/* ignore */})

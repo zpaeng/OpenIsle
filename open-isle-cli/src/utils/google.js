@@ -1,28 +1,17 @@
-import { API_BASE_URL, config, toast } from '../main'
+import { API_BASE_URL, GOOGLE_CLIENT_ID, toast } from '../main'
 import { setToken, loadCurrentUser } from './auth'
 
 export async function googleGetIdToken() {
-  if (!config.googleClientId) {
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/config`)
-      if (res.ok) {
-        const data = await res.json()
-        if (data.googleClientId) {
-          config.googleClientId = data.googleClientId
-        }
-      }
-    } catch { /* ignore */ }
-  }
   return new Promise((resolve, reject) => {
-    if (!window.google || !config.googleClientId) {
+    if (!window.google || !GOOGLE_CLIENT_ID) {
       toast.error('Google 登录不可用')
       reject()
       return
     }
     window.google.accounts.id.initialize({
-      client_id: config.googleClientId,
+      client_id: GOOGLE_CLIENT_ID,
       callback: ({ credential }) => resolve(credential),
-      use_fedcm: true
+      use_fedcm: true 
     })
     window.google.accounts.id.prompt()
   })
