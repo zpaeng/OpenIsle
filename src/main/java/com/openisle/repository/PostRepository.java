@@ -16,15 +16,23 @@ import org.springframework.data.repository.query.Param;
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByStatus(PostStatus status);
     List<Post> findByStatus(PostStatus status, Pageable pageable);
+    List<Post> findByStatusOrderByCreatedAtDesc(PostStatus status);
+    List<Post> findByStatusOrderByCreatedAtDesc(PostStatus status, Pageable pageable);
     List<Post> findByStatusOrderByViewsDesc(PostStatus status);
     List<Post> findByStatusOrderByViewsDesc(PostStatus status, Pageable pageable);
     List<Post> findByAuthorAndStatusOrderByCreatedAtDesc(User author, PostStatus status, Pageable pageable);
     List<Post> findByCategoryInAndStatus(List<Category> categories, PostStatus status);
     List<Post> findByCategoryInAndStatus(List<Category> categories, PostStatus status, Pageable pageable);
+    List<Post> findByCategoryInAndStatusOrderByCreatedAtDesc(List<Category> categories, PostStatus status);
+    List<Post> findByCategoryInAndStatusOrderByCreatedAtDesc(List<Category> categories, PostStatus status, Pageable pageable);
     List<Post> findDistinctByTagsInAndStatus(List<Tag> tags, PostStatus status);
     List<Post> findDistinctByTagsInAndStatus(List<Tag> tags, PostStatus status, Pageable pageable);
+    List<Post> findDistinctByTagsInAndStatusOrderByCreatedAtDesc(List<Tag> tags, PostStatus status);
+    List<Post> findDistinctByTagsInAndStatusOrderByCreatedAtDesc(List<Tag> tags, PostStatus status, Pageable pageable);
     List<Post> findDistinctByCategoryInAndTagsInAndStatus(List<Category> categories, List<Tag> tags, PostStatus status);
     List<Post> findDistinctByCategoryInAndTagsInAndStatus(List<Category> categories, List<Tag> tags, PostStatus status, Pageable pageable);
+    List<Post> findDistinctByCategoryInAndTagsInAndStatusOrderByCreatedAtDesc(List<Category> categories, List<Tag> tags, PostStatus status);
+    List<Post> findDistinctByCategoryInAndTagsInAndStatusOrderByCreatedAtDesc(List<Category> categories, List<Tag> tags, PostStatus status, Pageable pageable);
 
     // Queries requiring all provided tags to be present
     @Query("SELECT p FROM Post p JOIN p.tags t WHERE t IN :tags AND p.status = :status GROUP BY p.id HAVING COUNT(DISTINCT t.id) = :tagCount")
@@ -32,6 +40,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query(value = "SELECT p FROM Post p JOIN p.tags t WHERE t IN :tags AND p.status = :status GROUP BY p.id HAVING COUNT(DISTINCT t.id) = :tagCount")
     List<Post> findByAllTags(@Param("tags") List<Tag> tags, @Param("status") PostStatus status, @Param("tagCount") long tagCount, Pageable pageable);
+
+    @Query("SELECT p FROM Post p JOIN p.tags t WHERE t IN :tags AND p.status = :status GROUP BY p.id HAVING COUNT(DISTINCT t.id) = :tagCount ORDER BY p.createdAt DESC")
+    List<Post> findByAllTagsOrderByCreatedAtDesc(@Param("tags") List<Tag> tags, @Param("status") PostStatus status, @Param("tagCount") long tagCount);
+
+    @Query(value = "SELECT p FROM Post p JOIN p.tags t WHERE t IN :tags AND p.status = :status GROUP BY p.id HAVING COUNT(DISTINCT t.id) = :tagCount ORDER BY p.createdAt DESC")
+    List<Post> findByAllTagsOrderByCreatedAtDesc(@Param("tags") List<Tag> tags, @Param("status") PostStatus status, @Param("tagCount") long tagCount, Pageable pageable);
 
     @Query("SELECT p FROM Post p JOIN p.tags t WHERE t IN :tags AND p.status = :status GROUP BY p.id HAVING COUNT(DISTINCT t.id) = :tagCount ORDER BY p.views DESC")
     List<Post> findByAllTagsOrderByViewsDesc(@Param("tags") List<Tag> tags, @Param("status") PostStatus status, @Param("tagCount") long tagCount);
@@ -50,6 +64,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query(value = "SELECT p FROM Post p JOIN p.tags t WHERE p.category IN :categories AND t IN :tags AND p.status = :status GROUP BY p.id HAVING COUNT(DISTINCT t.id) = :tagCount ORDER BY p.views DESC")
     List<Post> findByCategoriesAndAllTagsOrderByViewsDesc(@Param("categories") List<Category> categories, @Param("tags") List<Tag> tags, @Param("status") PostStatus status, @Param("tagCount") long tagCount, Pageable pageable);
+
+    @Query("SELECT p FROM Post p JOIN p.tags t WHERE p.category IN :categories AND t IN :tags AND p.status = :status GROUP BY p.id HAVING COUNT(DISTINCT t.id) = :tagCount ORDER BY p.createdAt DESC")
+    List<Post> findByCategoriesAndAllTagsOrderByCreatedAtDesc(@Param("categories") List<Category> categories, @Param("tags") List<Tag> tags, @Param("status") PostStatus status, @Param("tagCount") long tagCount);
+
+    @Query(value = "SELECT p FROM Post p JOIN p.tags t WHERE p.category IN :categories AND t IN :tags AND p.status = :status GROUP BY p.id HAVING COUNT(DISTINCT t.id) = :tagCount ORDER BY p.createdAt DESC")
+    List<Post> findByCategoriesAndAllTagsOrderByCreatedAtDesc(@Param("categories") List<Category> categories, @Param("tags") List<Tag> tags, @Param("status") PostStatus status, @Param("tagCount") long tagCount, Pageable pageable);
 
     List<Post> findByCategoryInAndStatusOrderByViewsDesc(List<Category> categories, PostStatus status);
     List<Post> findByCategoryInAndStatusOrderByViewsDesc(List<Category> categories, PostStatus status, Pageable pageable);
