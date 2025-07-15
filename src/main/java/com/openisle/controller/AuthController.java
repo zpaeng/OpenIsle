@@ -116,6 +116,8 @@ public class AuthController {
                         "reason_code", "NOT_APPROVED"
                 ));
             }
+
+            return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
         }
         return ResponseEntity.badRequest().body(Map.of(
                 "error", "Invalid google token",
