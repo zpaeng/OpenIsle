@@ -84,7 +84,7 @@ public class AuthController {
                     "error", "User not verified",
                     "reason_code", "NOT_VERIFIED"));
         }
-        if (!user.isApproved()) {
+        if (RegisterMode.WHITELIST.equals(registerModeService.getRegisterMode()) && !user.isApproved()) {
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "Register reason not approved",
                     "reason_code", "NOT_APPROVED"));
@@ -96,14 +96,18 @@ public class AuthController {
     public ResponseEntity<?> loginWithGoogle(@RequestBody GoogleLoginRequest req) {
         Optional<User> user = googleAuthService.authenticate(req.getIdToken(), req.getReason(), registerModeService.getRegisterMode());
         if (user.isPresent()) {
+            if (RegisterMode.DIRECT.equals(registerModeService.getRegisterMode())) {
+                return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
+            }
             if (!user.get().isApproved()) {
-                if (user.get().getRegisterReason() != null && !user.get().getRegisterReason().isEmpty()) {
+                if (req.reason != null && !req.reason.isEmpty()) {
                     // do not send empty notifition (while try login)
                     for (User admin : userRepository.findByRole(com.openisle.model.Role.ADMIN)) {
                         notificationService.createNotification(admin, NotificationType.REGISTER_REQUEST, null, null,
                                 null, user.get(), null, req.getReason());
                     }
-
+                }
+                if (user.get().getRegisterReason() != null && !user.get().getRegisterReason().isEmpty()) {
                     return ResponseEntity.badRequest().body(Map.of(
                             "error", "Account awaiting approval",
                             "reason_code", "IS_APPROVING"
@@ -114,7 +118,6 @@ public class AuthController {
                         "reason_code", "NOT_APPROVED"
                 ));
             }
-            return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
         }
         return ResponseEntity.badRequest().body(Map.of(
                 "error", "Invalid google token",
