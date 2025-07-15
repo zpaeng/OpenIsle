@@ -10,7 +10,8 @@ export async function googleGetIdToken() {
     }
     window.google.accounts.id.initialize({
       client_id: GOOGLE_CLIENT_ID,
-      callback: ({ credential }) => resolve(credential)
+      callback: ({ credential }) => resolve(credential),
+      use_fedcm: true 
     })
     window.google.accounts.id.prompt()
   })
