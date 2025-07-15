@@ -31,6 +31,9 @@ public class ConfigController {
     @Value("${app.ai.format-limit:3}")
     private int aiFormatLimit;
 
+    @Value("${google.client-id:}")
+    private String googleClientId;
+
     private final RegisterModeService registerModeService;
 
     @GetMapping("/config")
@@ -43,6 +46,7 @@ public class ConfigController {
         resp.setCommentCaptchaEnabled(commentCaptchaEnabled);
         resp.setAiFormatLimit(aiFormatLimit);
         resp.setRegisterMode(registerModeService.getRegisterMode());
+        resp.setGoogleClientId(googleClientId);
         return resp;
     }
 
@@ -55,5 +59,6 @@ public class ConfigController {
         private boolean commentCaptchaEnabled;
         private int aiFormatLimit;
         private RegisterMode registerMode;
+        private String googleClientId;
     }
 }
