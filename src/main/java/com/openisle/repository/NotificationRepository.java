@@ -4,6 +4,7 @@ import com.openisle.model.Notification;
 import com.openisle.model.User;
 import com.openisle.model.Post;
 import com.openisle.model.Comment;
+import com.openisle.model.NotificationType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -15,4 +16,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     long countByUserAndRead(User user, boolean read);
     List<Notification> findByPost(Post post);
     List<Notification> findByComment(Comment comment);
+
+    void deleteByTypeAndFromUser(NotificationType type, User fromUser);
 }
