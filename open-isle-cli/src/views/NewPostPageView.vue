@@ -27,7 +27,7 @@
             v-if="!isWaitingPosting"
             class="post-submit"
             :class="{ disabled: !isLogin }"
-            @click="isLogin && submitPost"
+            @click="submitPost"
           >发布</div>
           <div v-else class="post-submit-loading"> <i class="fa-solid fa-spinner fa-spin"></i> 发布中...</div>
         </div>
