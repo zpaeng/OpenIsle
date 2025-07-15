@@ -67,14 +67,14 @@ export default {
 
 .base-input-icon {
   opacity: 0.5;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .base-input-text {
   border: none;
   outline: none;
   width: 100%;
-  font-size: 16px;
+  font-size: 14px;
   resize: none; 
   background-color: transparent;
   color: var(--text-color);
