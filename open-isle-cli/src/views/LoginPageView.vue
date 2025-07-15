@@ -8,18 +8,9 @@
       </div>
 
       <div class="email-login-page-content">
-        <BaseInput
-          icon="fas fa-envelope"
-          v-model="username"
-          placeholder="邮箱/用户名"
-        />
+        <BaseInput icon="fas fa-envelope" v-model="username" placeholder="邮箱/用户名" />
 
-        <BaseInput
-          icon="fas fa-lock"
-          v-model="password"
-          type="password"
-          placeholder="密码"
-        />
+        <BaseInput icon="fas fa-lock" v-model="password" type="password" placeholder="密码" />
 
 
         <div v-if="!isWaitingForLogin" class="login-page-button-primary" @click="submitLogin">
@@ -78,6 +69,9 @@ export default {
           await loadCurrentUser()
           toast.success('登录成功')
           this.$router.push('/')
+        } else if (data.reason_code === 'NOT_VERIFIED') {
+          toast.info('当前邮箱未验证，请先重新填写注册页面并验证')
+          this.$router.push('/signup')
         } else {
           toast.error(data.error || '登录失败')
         }

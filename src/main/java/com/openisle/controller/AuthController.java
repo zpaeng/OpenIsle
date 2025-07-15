@@ -68,7 +68,7 @@ public class AuthController {
         if (captchaEnabled && loginCaptchaEnabled && !captchaService.verify(req.getCaptcha())) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid captcha"));
         }
-        Optional<User> userOpt = userService.findByUsername(req.getUsername());
+        Optional<User> userOpt = userService.findByUsername(req.getUsernameOrEmail());
         if (userOpt.isEmpty() || !userService.matchesPassword(userOpt.get(), req.getPassword())) {
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "Invalid credentials",
@@ -133,7 +133,7 @@ public class AuthController {
 
     @Data
     private static class LoginRequest {
-        private String username;
+        private String usernameOrEmail;
         private String password;
         private String captcha;
     }
