@@ -29,8 +29,9 @@ export async function googleAuthWithToken(idToken, reason, redirect) {
       await loadCurrentUser()
       toast.success('登录成功')
       if (redirect) redirect()
-    } else {
-      toast.error(data.error || '登录失败')
+    } else if (data.reason_code === 'NOT_APPROVED') {
+      toast.info('您的注册理由正在审批中')
+      if (redirect) redirect()
     }
   } catch (e) {
     toast.error('登录失败')

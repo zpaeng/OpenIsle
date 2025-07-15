@@ -48,12 +48,14 @@ export default {
         return
       }
       if (this.isGoogle) {
+        this.isWaitingForRegister = true
         const token = this.googleToken || sessionStorage.getItem('google_id_token')
         if (!token) {
           toast.error('Google 登录失败')
           return
         }
         await googleAuthWithToken(token, this.reason, () => { this.$router.push('/') })
+        this.isWaitingForRegister = false
         sessionStorage.removeItem('google_id_token')
         return
       }

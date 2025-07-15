@@ -185,10 +185,11 @@
                 <NotificationContainer :item="item" :markRead="markRead">
                   {{ item.fromUser.username }} 希望注册为会员，理由是：{{ item.content }}
                   <template #actions v-if="authState.role === 'ADMIN'">
-                    <div class="optional-buttons">
+                    <div v-if="!item.read" class="optional-buttons">
                       <div class="mark-approve-button-item" @click="approve(item.fromUser.id, item.id)">同意</div>
                       <div class="mark-reject-button-item" @click="reject(item.fromUser.id, item.id)">拒绝</div>
                     </div>
+                    <div v-else class="mark-read-button-item" @click="markRead(item.id)">已读</div>
                   </template>
                 </NotificationContainer>
               </template>
@@ -269,10 +270,14 @@ export default {
     }
 
     const markAllRead = async () => {
-      const ok = await markNotificationsRead(notifications.value.map(n => n.id))
+      // 除了 REGISTER_REQUEST 类型消息
+      const idsToMark = notifications.value.filter(n => n.type !== 'REGISTER_REQUEST').map(n => n.id)
+      const ok = await markNotificationsRead(idsToMark)
       if (ok) {
-        notifications.value.forEach(n => n.read = true)
-        toast.success('已读所有消息')
+        notifications.value.forEach(n => {
+          if (n.type !== 'REGISTER_REQUEST') n.read = true
+        })
+        toast.success('已读所有消息（注册请求除外）')
       }
     }
 
