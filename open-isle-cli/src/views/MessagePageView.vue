@@ -189,7 +189,7 @@
                       <div class="mark-approve-button-item" @click="approve(item.fromUser.id, item.id)">同意</div>
                       <div class="mark-reject-button-item" @click="reject(item.fromUser.id, item.id)">拒绝</div>
                     </div>
-                    <div v-else class="mark-read-button-item" @click="markRead(item.id)">已读</div>
+                    <div v-else class="has_read_button" @click="markRead(item.id)">已读</div>
                   </template>
                 </NotificationContainer>
               </template>
@@ -200,12 +200,6 @@
                     {{ sanitizeDescription(item.post.title) }}
                   </router-link>
                   已审核通过
-                  <template #actions>
-                    <div class="mark-read-button">
-                      <button class="mark-read-button-item" v-if="!item.read" @click="markRead(item.id)">标记为已读</button>
-                      <button class="read-button-item" v-else @click="markRead(item.id)">已读</button>
-                    </div>
-                  </template>
                 </NotificationContainer>
               </template>
               <template v-else-if="item.type === 'POST_REVIEWED' && item.approved === false">
@@ -636,7 +630,9 @@ export default {
   text-decoration: underline;
 }
 
-
+.has_read_button {
+  font-size: 12px;
+}
 
 .notif-content-text:hover {
   color: var(--primary-color) !important;
