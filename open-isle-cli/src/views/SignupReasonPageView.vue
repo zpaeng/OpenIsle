@@ -16,7 +16,7 @@
 <script>
 import BaseInput from '../components/BaseInput.vue'
 import { API_BASE_URL, toast } from '../main'
-import { googleSignIn } from '../utils/google'
+import { googleAuthWithToken } from '../utils/google'
 
 export default {
   name: 'SignupReasonPageView',
@@ -25,16 +25,20 @@ export default {
     return {
       reason: '',
       error: '',
-      isGoogle: false, 
-      isWaitingForRegister: false
+      isGoogle: false,
+      isWaitingForRegister: false,
+      googleToken: ''
     }
   },
   mounted() {
     this.isGoogle = this.$route.query.google === '1'
-    if (!this.isGoogle) {
-      if (!sessionStorage.getItem('signup_username')) {
+    if (this.isGoogle) {
+      this.googleToken = sessionStorage.getItem('google_id_token') || ''
+      if (!this.googleToken) {
         this.$router.push('/signup')
       }
+    } else if (!sessionStorage.getItem('signup_username')) {
+      this.$router.push('/signup')
     }
   },
   methods: {
@@ -44,7 +48,13 @@ export default {
         return
       }
       if (this.isGoogle) {
-        googleSignIn(() => { this.$router.push('/') }, this.reason)
+        const token = this.googleToken || sessionStorage.getItem('google_id_token')
+        if (!token) {
+          toast.error('Google 登录失败')
+          return
+        }
+        await googleAuthWithToken(token, this.reason, () => { this.$router.push('/') })
+        sessionStorage.removeItem('google_id_token')
         return
       }
       try {

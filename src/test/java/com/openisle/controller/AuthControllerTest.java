@@ -73,7 +73,8 @@ class AuthControllerTest {
     void loginReturnsToken() throws Exception {
         User user = new User();
         user.setUsername("u");
-        Mockito.when(userService.authenticate("u", "p")).thenReturn(Optional.of(user));
+        Mockito.when(userService.findByUsername("u")).thenReturn(Optional.of(user));
+        Mockito.when(userService.matchesPassword(user, "p")).thenReturn(true);
         Mockito.when(jwtService.generateToken("u")).thenReturn("token");
 
         mockMvc.perform(post("/api/auth/login")
@@ -85,12 +86,12 @@ class AuthControllerTest {
 
     @Test
     void loginFails() throws Exception {
-        Mockito.when(userService.authenticate("u", "bad")).thenReturn(Optional.empty());
+        Mockito.when(userService.findByUsername("u")).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"username\":\"u\",\"password\":\"bad\"}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Invalid credentials or user not verified"));
+                .andExpect(jsonPath("$.reason_code").value("INVALID_CREDENTIALS"));
     }
 }

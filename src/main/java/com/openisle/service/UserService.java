@@ -94,6 +94,10 @@ public class UserService {
                 .filter(user -> passwordEncoder.matches(password, user.getPassword()));
     }
 
+    public boolean matchesPassword(User user, String rawPassword) {
+        return passwordEncoder.matches(rawPassword, user.getPassword());
+    }
+
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }

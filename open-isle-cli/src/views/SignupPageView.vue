@@ -82,7 +82,7 @@
 
 <script>
 import { API_BASE_URL, toast } from '../main'
-import { googleSignIn } from '../utils/google'
+import { googleSignIn, googleGetIdToken } from '../utils/google'
 import BaseInput from '../components/BaseInput.vue'
 export default {
   name: 'SignupPageView',
@@ -197,7 +197,10 @@ export default {
     },
     signupWithGoogle() {
       if (this.registerMode === 'WHITELIST') {
-        this.$router.push('/signup-reason?google=1')
+        googleGetIdToken().then(token => {
+          sessionStorage.setItem('google_id_token', token)
+          this.$router.push('/signup-reason?google=1')
+        }).catch(() => {})
       } else {
         googleSignIn(() => {
           this.$router.push('/')

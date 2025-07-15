@@ -72,12 +72,24 @@ public class AuthController {
         if (captchaEnabled && loginCaptchaEnabled && !captchaService.verify(req.getCaptcha())) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid captcha"));
         }
-        Optional<User> user = userService.authenticate(req.getUsername(), req.getPassword());
-        if (user.isPresent()) {
-            return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
-        } else {
-            return ResponseEntity.badRequest().body(Map.of("error", "Invalid credentials or user not verified"));
+        Optional<User> userOpt = userService.findByUsername(req.getUsername());
+        if (userOpt.isEmpty() || !userService.matchesPassword(userOpt.get(), req.getPassword())) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "Invalid credentials",
+                    "reason_code", "INVALID_CREDENTIALS"));
         }
+        User user = userOpt.get();
+        if (!user.isVerified()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "User not verified",
+                    "reason_code", "NOT_VERIFIED"));
+        }
+        if (!user.isApproved()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "Register reason not approved",
+                    "reason_code", "NOT_APPROVED"));
+        }
+        return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.getUsername())));
     }
 
     @PostMapping("/google")
