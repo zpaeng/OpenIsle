@@ -24,12 +24,15 @@ export async function twitterAuthorize(state = '') {
     toast.error('Twitter 登录不可用')
     return
   }
+  if (state === '') {
+    state = Math.random().toString(36).substring(2, 15)
+  }
   const redirectUri = `${window.location.origin}/twitter-callback`
   const codeVerifier = generateCodeVerifier()
   sessionStorage.setItem('twitter_code_verifier', codeVerifier)
   const codeChallenge = await generateCodeChallenge(codeVerifier)
   const url =
-    `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${TWITTER_CLIENT_ID}` +
+    `https://x.com/i/oauth2/authorize?response_type=code&client_id=${TWITTER_CLIENT_ID}` +
     `&redirect_uri=${encodeURIComponent(redirectUri)}&scope=tweet.read%20users.read` +
     `&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256`
   window.location.href = url
