@@ -50,6 +50,9 @@ OpenIsle 基于 Spring Boot 构建，提供社区后台常见的注册、登录�
   - `GITHUB_CLIENT_ID`：GitHub OAuth 客户端 ID
   - `GITHUB_CLIENT_SECRET`：GitHub OAuth 客户端密钥
   - `VUE_APP_GITHUB_CLIENT_ID`：前端 GitHub OAuth 客户端 ID
+  - `TWITTER_CLIENT_ID`：Twitter OAuth 客户端 ID
+  - `TWITTER_CLIENT_SECRET`：Twitter OAuth 客户端密钥
+  - `VUE_APP_TWITTER_CLIENT_ID`：前端 Twitter OAuth 客户端 ID
   - `JWT_SECRET`：JWT 签名密钥
    - `JWT_EXPIRATION`：JWT 过期时间（毫秒）
    - `PASSWORD_STRENGTH`：密码强度（LOW、MEDIUM、HIGH）
@@ -73,6 +76,7 @@ mvn spring-boot:run
 - `POST /api/auth/login`：登录并获取 Token
 - `POST /api/auth/google`：Google 登录并获取 Token
 - `POST /api/auth/github`：GitHub 登录并获取 Token
+- `POST /api/auth/twitter`：Twitter 登录并获取 Token
 - `GET /api/config`：查看验证码开关配置
 - 需要认证的接口示例：`GET /api/hello`（需 `Authorization` 头）
 - 管理员接口示例：`GET /api/admin/hello`

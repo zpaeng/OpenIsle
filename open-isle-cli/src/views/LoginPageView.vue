@@ -38,6 +38,10 @@
         <img class="login-page-button-icon" src="../assets/icons/github.svg" alt="GitHub Logo" />
         <div class="login-page-button-text">GitHub 登录</div>
       </div>
+      <div class="login-page-button" @click="loginWithTwitter">
+        <img class="login-page-button-icon" src="../assets/icons/twitter.svg" alt="Twitter Logo" />
+        <div class="login-page-button-text">Twitter 登录</div>
+      </div>
     </div>
   </div>
 </template>
@@ -47,6 +51,7 @@ import { API_BASE_URL, toast } from '../main'
 import { setToken, loadCurrentUser } from '../utils/auth'
 import { googleSignIn } from '../utils/google'
 import { githubAuthorize } from '../utils/github'
+import { twitterAuthorize } from '../utils/twitter'
 import BaseInput from '../components/BaseInput.vue'
 export default {
   name: 'LoginPageView',
@@ -101,6 +106,9 @@ export default {
     },
     loginWithGithub() {
       githubAuthorize()
+    },
+    loginWithTwitter() {
+      twitterAuthorize()
     }
   }
 }
