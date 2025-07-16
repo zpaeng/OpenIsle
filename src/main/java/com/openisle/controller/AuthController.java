@@ -233,7 +233,11 @@ public class AuthController {
       
     @PostMapping("/twitter")
     public ResponseEntity<?> loginWithTwitter(@RequestBody TwitterLoginRequest req) {
-        Optional<User> user = twitterAuthService.authenticate(req.getCode(), registerModeService.getRegisterMode(), req.getRedirectUri());
+        Optional<User> user = twitterAuthService.authenticate(
+                req.getCode(),
+                req.getCodeVerifier(),
+                registerModeService.getRegisterMode(),
+                req.getRedirectUri());
         if (user.isPresent()) {
             if (RegisterMode.DIRECT.equals(registerModeService.getRegisterMode())) {
                 return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
@@ -302,6 +306,7 @@ public class AuthController {
     private static class TwitterLoginRequest {
         private String code;
         private String redirectUri;
+        private String codeVerifier;
     }
 
     @Data
