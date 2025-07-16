@@ -63,7 +63,7 @@ public class TwitterAuthService {
             tokenRes = restTemplate.postForEntity(tokenUrl, new HttpEntity<>(body, headers), JsonNode.class);
             logger.debug("Token response: {}", tokenRes.getBody());
         } catch (HttpClientErrorException e) {
-            logger.debug("Token request failed", e);
+            logger.warn("Token request failed with status {} and body {}", e.getStatusCode(), e.getResponseBodyAsString());
             return Optional.empty();
         }
 
