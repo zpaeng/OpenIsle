@@ -1,6 +1,7 @@
 package com.openisle.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.openisle.model.RegisterMode;
 import com.openisle.model.Role;
 import com.openisle.model.User;
 import com.openisle.repository.UserRepository;
