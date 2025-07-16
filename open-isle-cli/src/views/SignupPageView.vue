@@ -348,6 +348,7 @@ export default {
   border: 1px solid #ccc;
   border-radius: 10px;
   cursor: pointer;
+  min-width: 150px;
   gap: 10px;
 }
 

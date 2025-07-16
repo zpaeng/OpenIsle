@@ -237,6 +237,7 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 10px 20px;
+  min-width: 150px;
   background-color: var(--normal-background-color);
   border: 1px solid #ccc;
   border-radius: 10px;
