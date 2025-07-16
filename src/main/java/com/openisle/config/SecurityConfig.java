@@ -102,6 +102,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/config/**").permitAll()
                     .requestMatchers(HttpMethod.POST,"/api/auth/google").permitAll()
+                    .requestMatchers(HttpMethod.POST,"/api/auth/reason").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/reaction-types").permitAll()

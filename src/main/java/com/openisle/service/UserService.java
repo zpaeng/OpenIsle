@@ -124,6 +124,13 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User updateReason(String username, String reason) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
+        user.setRegisterReason(reason);
+        return userRepository.save(user);
+    }
+
     public User updateProfile(String currentUsername, String newUsername, String introduction) {
         User user = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));

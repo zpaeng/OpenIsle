@@ -153,7 +153,7 @@ public class AuthController {
             return ResponseEntity.ok().body(Map.of("valid", true));
         }
 
-        userService.register(user.getUsername(), user.getEmail(), user.getPassword(), req.getReason(), registerModeService.getRegisterMode());
+        user = userService.updateReason(user.getUsername(), req.getReason());
         notificationService.createRegisterRequestNotifications(user, req.getReason());
         return ResponseEntity.ok().body(Map.of("valid", true));
     }
