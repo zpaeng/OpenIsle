@@ -86,7 +86,7 @@ public class TwitterAuthService {
         try {
             logger.debug("Fetching user info with access token");
             userRes = restTemplate.exchange(
-                    "https://api.twitter.com/2/users/me",
+                    "https://api.twitter.com/2/users/me?user.fields=profile_image_url",
                     HttpMethod.GET,
                     new HttpEntity<>(authHeaders),
                     JsonNode.class);
@@ -98,6 +98,7 @@ public class TwitterAuthService {
 
         JsonNode data = userRes.getBody() == null ? null : userRes.getBody().path("data");
         String username = data != null ? data.path("username").asText(null) : null;
+        String avatar = data != null ? data.path("profile_image_url").asText(null) : null;
         if (username == null) {
             return Optional.empty();
         }
@@ -105,10 +106,10 @@ public class TwitterAuthService {
         // Twitter v2 默认拿不到 email；如果你申请到 email.scope，可改用 /2/users/:id?user.fields=email
         String email = username + "@twitter.com";
         logger.debug("Processing user {} with email {}", username, email);
-        return Optional.of(processUser(email, username, mode));
+        return Optional.of(processUser(email, username, avatar, mode));
     }
 
-    private User processUser(String email, String username, com.openisle.model.RegisterMode mode) {
+    private User processUser(String email, String username, String avatar, com.openisle.model.RegisterMode mode) {
         Optional<User> existing = userRepository.findByEmail(email);
         if (existing.isPresent()) {
             User user = existing.get();
@@ -133,7 +134,11 @@ public class TwitterAuthService {
         user.setRole(Role.USER);
         user.setVerified(true);
         user.setApproved(mode == com.openisle.model.RegisterMode.DIRECT);
-        user.setAvatar("https://twitter.com/" + finalUsername + "/profile_image");
+        if (avatar != null) {
+            user.setAvatar(avatar);
+        } else {
+            user.setAvatar("https://twitter.com/" + finalUsername + "/profile_image");
+        }
         logger.debug("Creating new user {}", finalUsername);
         return userRepository.save(user);
     }
