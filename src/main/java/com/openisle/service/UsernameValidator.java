@@ -14,8 +14,8 @@ public class UsernameValidator {
      * @param username the username to validate
      */
     public void validate(String username) {
-        if (username == null || username.length() < 6) {
-            throw new FieldException("username", "Username must be at least 6 characters long");
+        if (username == null || username.isEmpty()) {
+            throw new FieldException("username", "Username cannot be empty");
         }
     }
 }
