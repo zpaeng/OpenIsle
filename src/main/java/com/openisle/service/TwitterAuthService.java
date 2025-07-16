@@ -13,6 +13,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.LinkedMultiValueMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -21,6 +23,7 @@ import java.util.*;
 public class TwitterAuthService {
     private final UserRepository userRepository;
     private final RestTemplate restTemplate = new RestTemplate();
+    private static final Logger logger = LoggerFactory.getLogger(TwitterAuthService.class);
 
     @Value("${twitter.client-id:}")
     private String clientId;
@@ -30,6 +33,8 @@ public class TwitterAuthService {
             String codeVerifier,
             RegisterMode mode,
             String redirectUri) {
+
+        logger.debug("Starting authentication with code {} and verifier {}", code, codeVerifier);
 
         // 1. 交换 token
         String tokenUrl = "https://api.twitter.com/2/oauth2/token";
@@ -49,8 +54,11 @@ public class TwitterAuthService {
 
         ResponseEntity<JsonNode> tokenRes;
         try {
+            logger.debug("Requesting token from {}", tokenUrl);
             tokenRes = restTemplate.postForEntity(tokenUrl, new HttpEntity<>(body, headers), JsonNode.class);
+            logger.debug("Token response: {}", tokenRes.getBody());
         } catch (HttpClientErrorException e) {
+            logger.debug("Token request failed", e);
             return Optional.empty();
         }
 
@@ -65,12 +73,15 @@ public class TwitterAuthService {
         authHeaders.setBearerAuth(accessToken);
         ResponseEntity<JsonNode> userRes;
         try {
+            logger.debug("Fetching user info with access token");
             userRes = restTemplate.exchange(
                     "https://api.twitter.com/2/users/me",
                     HttpMethod.GET,
                     new HttpEntity<>(authHeaders),
                     JsonNode.class);
+            logger.debug("User info response: {}", userRes.getBody());
         } catch (HttpClientErrorException e) {
+            logger.debug("User info request failed", e);
             return Optional.empty();
         }
 
@@ -82,6 +93,7 @@ public class TwitterAuthService {
 
         // Twitter v2 默认拿不到 email；如果你申请到 email.scope，可改用 /2/users/:id?user.fields=email
         String email = username + "@twitter.com";
+        logger.debug("Processing user {} with email {}", username, email);
         return Optional.of(processUser(email, username, mode));
     }
 
@@ -94,6 +106,7 @@ public class TwitterAuthService {
                 user.setVerificationCode(null);
                 userRepository.save(user);
             }
+            logger.debug("Existing user {} authenticated", user.getUsername());
             return user;
         }
         String baseUsername = username != null ? username : email.split("@")[0];
@@ -110,6 +123,7 @@ public class TwitterAuthService {
         user.setVerified(true);
         user.setApproved(mode == com.openisle.model.RegisterMode.DIRECT);
         user.setAvatar("https://twitter.com/" + finalUsername + "/profile_image");
+        logger.debug("Creating new user {}", finalUsername);
         return userRepository.save(user);
     }
 }
