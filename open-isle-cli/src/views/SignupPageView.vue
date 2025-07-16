@@ -33,11 +33,6 @@
         />
         <div v-if="passwordError" class="error-message">{{ passwordError }}</div>
 
-        <BaseInput
-          icon="fas fa-user"
-          v-model="nickname"
-          placeholder="昵称 (可选)"
-        />
 
         <div v-if="!isWaitingForEmailSent" class="signup-page-button-primary" @click="sendVerification">
           <div class="signup-page-button-text">验证邮箱</div>
@@ -113,7 +108,6 @@ export default {
       emailError: '',
       usernameError: '',
       passwordError: '',
-      nickname: '',
       code: '',
       isWaitingForEmailSent: false,
       isWaitingForEmailVerified: false
@@ -149,8 +143,6 @@ export default {
       }
       if (!this.username) {
         this.usernameError = '用户名不能为空'
-      } else if (this.username.length < 6) {
-        this.usernameError = '用户名至少6位'
       }
       if (this.emailError || this.passwordError || this.usernameError) {
         return
