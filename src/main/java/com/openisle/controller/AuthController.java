@@ -93,6 +93,12 @@ public class AuthController {
                     "user_name", user.getUsername()));
         }
         if (RegisterMode.WHITELIST.equals(registerModeService.getRegisterMode()) && !user.isApproved()) {
+            if (user.getRegisterReason() != null && !user.getRegisterReason().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "error", "Account awaiting approval",
+                        "reason_code", "IS_APPROVING"
+                ));
+            }
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "Register reason not approved",
                     "reason_code", "NOT_APPROVED",
@@ -112,12 +118,14 @@ public class AuthController {
                 if (user.get().getRegisterReason() != null && !user.get().getRegisterReason().isEmpty()) {
                     return ResponseEntity.badRequest().body(Map.of(
                             "error", "Account awaiting approval",
-                            "reason_code", "IS_APPROVING"
+                            "reason_code", "IS_APPROVING",
+                            "token", jwtService.generateReasonToken(user.get().getUsername())
                     ));
                 }
                 return ResponseEntity.badRequest().body(Map.of(
                         "error", "Account awaiting approval",
-                        "reason_code", "NOT_APPROVED"
+                        "reason_code", "NOT_APPROVED",
+                        "token", jwtService.generateReasonToken(user.get().getUsername())
                 ));
             }
 
