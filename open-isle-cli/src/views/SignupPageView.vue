@@ -221,7 +221,7 @@ export default {
     },
     signupWithDiscord() {
       discordAuthorize()
-    }
+    },
     signupWithTwitter() {
       twitterAuthorize()
     }
