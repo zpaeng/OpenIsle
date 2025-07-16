@@ -37,6 +37,7 @@ public class NotificationService {
      * Create notifications for all admins when a user submits a register request.
      * Old register request notifications from the same applicant are removed first.
      */
+    @org.springframework.transaction.annotation.Transactional
     public void createRegisterRequestNotifications(User applicant, String reason) {
         notificationRepository.deleteByTypeAndFromUser(NotificationType.REGISTER_REQUEST, applicant);
         for (User admin : userRepository.findByRole(Role.ADMIN)) {
