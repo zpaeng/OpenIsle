@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.LinkedMultiValueMap;
 
 import java.util.*;
 
@@ -21,25 +23,22 @@ public class TwitterAuthService {
     @Value("${twitter.client-id:}")
     private String clientId;
 
-    @Value("${twitter.client-secret:}")
-    private String clientSecret;
-
-    public Optional<User> authenticate(String code, com.openisle.model.RegisterMode mode, String redirectUri) {
+    public Optional<User> authenticate(String code, String codeVerifier, com.openisle.model.RegisterMode mode, String redirectUri) {
         try {
             String tokenUrl = "https://api.twitter.com/2/oauth2/token";
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-            Map<String, String> body = new HashMap<>();
-            body.put("client_id", clientId);
-            body.put("client_secret", clientSecret);
-            body.put("code", code);
-            body.put("grant_type", "authorization_code");
+            MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+            body.add("client_id", clientId);
+            body.add("code", code);
+            body.add("grant_type", "authorization_code");
+            body.add("code_verifier", codeVerifier);
             if (redirectUri != null) {
-                body.put("redirect_uri", redirectUri);
+                body.add("redirect_uri", redirectUri);
             }
 
-            HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
             ResponseEntity<JsonNode> tokenRes = restTemplate.postForEntity(tokenUrl, request, JsonNode.class);
             if (!tokenRes.getStatusCode().is2xxSuccessful() || tokenRes.getBody() == null || !tokenRes.getBody().has("access_token")) {
                 return Optional.empty();

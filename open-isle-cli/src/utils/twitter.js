@@ -1,22 +1,54 @@
 import { API_BASE_URL, TWITTER_CLIENT_ID, toast } from '../main'
 import { setToken, loadCurrentUser } from './auth'
 
-export function twitterAuthorize(state = '') {
+function generateCodeVerifier() {
+  const array = new Uint8Array(32)
+  window.crypto.getRandomValues(array)
+  return Array.from(array)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+}
+
+async function generateCodeChallenge(codeVerifier) {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(codeVerifier)
+  const digest = await window.crypto.subtle.digest('SHA-256', data)
+  return btoa(String.fromCharCode(...new Uint8Array(digest)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '')
+}
+
+export async function twitterAuthorize(state = '') {
   if (!TWITTER_CLIENT_ID) {
     toast.error('Twitter 登录不可用')
     return
   }
   const redirectUri = `${window.location.origin}/twitter-callback`
-  const url = `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${TWITTER_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=tweet.read%20users.read&state=${state}`
+  const codeVerifier = generateCodeVerifier()
+  sessionStorage.setItem('twitter_code_verifier', codeVerifier)
+  const codeChallenge = await generateCodeChallenge(codeVerifier)
+  const url =
+    `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${TWITTER_CLIENT_ID}` +
+    `&redirect_uri=${encodeURIComponent(redirectUri)}&scope=tweet.read%20users.read` +
+    `&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256`
   window.location.href = url
 }
 
 export async function twitterExchange(code, state, reason) {
   try {
+    const codeVerifier = sessionStorage.getItem('twitter_code_verifier')
+    sessionStorage.removeItem('twitter_code_verifier')
     const res = await fetch(`${API_BASE_URL}/api/auth/twitter`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, redirectUri: `${window.location.origin}/twitter-callback`, reason, state })
+      body: JSON.stringify({
+        code,
+        redirectUri: `${window.location.origin}/twitter-callback`,
+        reason,
+        state,
+        codeVerifier
+      })
     })
     const data = await res.json()
     if (res.ok && data.token) {
