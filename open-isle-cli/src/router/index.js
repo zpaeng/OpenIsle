@@ -12,6 +12,7 @@ import SettingsPageView from '../views/SettingsPageView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import NotFoundPageView from '../views/NotFoundPageView.vue'
 import GithubCallbackPageView from '../views/GithubCallbackPageView.vue'
+import DiscordCallbackPageView from '../views/DiscordCallbackPageView.vue'
 import TwitterCallbackPageView from '../views/TwitterCallbackPageView.vue'
 
 const routes = [
@@ -74,6 +75,11 @@ const routes = [
     path: '/github-callback',
     name: 'github-callback',
     component: GithubCallbackPageView
+  },
+  {
+    path: '/discord-callback',
+    name: 'discord-callback',
+    component: DiscordCallbackPageView
   },
   {
     path: '/twitter-callback',
