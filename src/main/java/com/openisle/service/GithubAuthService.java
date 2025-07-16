@@ -9,8 +9,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Collections;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Optional;
 
 @Service
@@ -30,12 +33,17 @@ public class GithubAuthService {
             String tokenUrl = "https://github.com/login/oauth/access_token";
             HttpHeaders headers = new HttpHeaders();
             headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-            HttpEntity<String> request = new HttpEntity<>(
-                    "client_id=" + clientId +
-                            "&client_secret=" + clientSecret +
-                            "&code=" + code +
-                            (redirectUri != null ? "&redirect_uri=" + redirectUri : ""),
-                    headers);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            Map<String, String> body = new HashMap<>();
+            body.put("client_id", clientId);
+            body.put("client_secret", clientSecret);
+            body.put("code", code);
+            if (redirectUri != null) {
+                body.put("redirect_uri", redirectUri);
+            }
+
+            HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
             ResponseEntity<JsonNode> tokenRes = restTemplate.postForEntity(tokenUrl, request, JsonNode.class);
             if (!tokenRes.getStatusCode().is2xxSuccessful() || tokenRes.getBody() == null || !tokenRes.getBody().has("access_token")) {
                 return Optional.empty();
@@ -43,6 +51,7 @@ public class GithubAuthService {
             String accessToken = tokenRes.getBody().get("access_token").asText();
             HttpHeaders authHeaders = new HttpHeaders();
             authHeaders.setBearerAuth(accessToken);
+            authHeaders.set(HttpHeaders.USER_AGENT, "OpenIsle");
             HttpEntity<Void> entity = new HttpEntity<>(authHeaders);
             ResponseEntity<JsonNode> userRes = restTemplate.exchange(
                     "https://api.github.com/user", HttpMethod.GET, entity, JsonNode.class);
@@ -56,15 +65,19 @@ public class GithubAuthService {
                 email = userNode.get("email").asText();
             }
             if (email == null || email.isEmpty()) {
-                ResponseEntity<JsonNode> emailsRes = restTemplate.exchange(
-                        "https://api.github.com/user/emails", HttpMethod.GET, entity, JsonNode.class);
-                if (emailsRes.getStatusCode().is2xxSuccessful() && emailsRes.getBody() != null && emailsRes.getBody().isArray()) {
-                    for (JsonNode n : emailsRes.getBody()) {
-                        if (n.has("primary") && n.get("primary").asBoolean()) {
-                            email = n.get("email").asText();
-                            break;
+                try {
+                    ResponseEntity<JsonNode> emailsRes = restTemplate.exchange(
+                            "https://api.github.com/user/emails", HttpMethod.GET, entity, JsonNode.class);
+                    if (emailsRes.getStatusCode().is2xxSuccessful() && emailsRes.getBody() != null && emailsRes.getBody().isArray()) {
+                        for (JsonNode n : emailsRes.getBody()) {
+                            if (n.has("primary") && n.get("primary").asBoolean()) {
+                                email = n.get("email").asText();
+                                break;
+                            }
                         }
                     }
+                } catch (HttpClientErrorException ignored) {
+                    // ignore when the email API is not accessible
                 }
             }
             if (email == null) {
