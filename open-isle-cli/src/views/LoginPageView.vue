@@ -75,7 +75,6 @@ export default {
           toast.success('登录成功')
           this.$router.push('/')
         } else if (data.reason_code === 'NOT_VERIFIED') {
-          sessionStorage.setItem('signup_username', data.username)
           toast.info('当前邮箱未验证，已经为您重新发送验证码')
           this.$router.push({ path: '/signup', query: { verify: 1, u: this.username } })
         } else if (data.reason_code === 'NOT_APPROVED') {
@@ -89,11 +88,14 @@ export default {
       }
     },
     loginWithGoogle() {
-      googleSignIn(() => {
-        this.$router.push('/')
-      }, () => {
-        this.$router.push('/signup-reason?google=1')
-      })
+      googleSignIn(
+        () => {
+          this.$router.push('/')
+        },
+        (token) => {
+          this.$router.push('/signup-reason?token=' + token)
+        }
+      )
     },
     loginWithGithub() {
       githubAuthorize()

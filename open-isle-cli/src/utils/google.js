@@ -17,12 +17,12 @@ export async function googleGetIdToken() {
   })
 }
 
-export async function googleAuthWithToken(idToken, reason, redirect_success, redirect_not_approved) {
+export async function googleAuthWithToken(idToken, redirect_success, redirect_not_approved) {
   try {
     const res = await fetch(`${API_BASE_URL}/api/auth/google`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ idToken, reason })
+      body: JSON.stringify({ idToken })
     })
     const data = await res.json()
     if (res.ok && data.token) {
@@ -32,8 +32,7 @@ export async function googleAuthWithToken(idToken, reason, redirect_success, red
       if (redirect_success) redirect_success()
     } else if (data.reason_code === 'NOT_APPROVED') {
       toast.info('当前为注册审核模式，请填写注册理由')
-      sessionStorage.setItem('google_id_token', idToken)
-      if (redirect_not_approved) redirect_not_approved()
+      if (redirect_not_approved) redirect_not_approved(data.token)
     } else if (data.reason_code === 'IS_APPROVING') {
       toast.info('您的注册理由正在审批中')      
       if (redirect_success) redirect_success()
@@ -46,7 +45,7 @@ export async function googleAuthWithToken(idToken, reason, redirect_success, red
 export async function googleSignIn(redirect_success, redirect_not_approved) {
   try {
     const token = await googleGetIdToken()
-    await googleAuthWithToken(token, '', redirect_success, redirect_not_approved)
+    await googleAuthWithToken(token, redirect_success, redirect_not_approved)
   } catch {
     /* ignore */
   }

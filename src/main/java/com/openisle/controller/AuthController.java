@@ -14,6 +14,7 @@ import com.openisle.repository.UserRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Value;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid captcha"));
         }
         User user = userService.register(
-                req.getUsername(), req.getEmail(), req.getPassword(), req.getReason(), registerModeService.getRegisterMode());
+                req.getUsername(), req.getEmail(), req.getPassword(), "", registerModeService.getRegisterMode());
         emailService.sendEmail(user.getEmail(), "Verification Code", "Your verification code is " + user.getVerificationCode());
         if (!user.isApproved()) {
             notificationService.createRegisterRequestNotifications(user, user.getRegisterReason());
@@ -60,7 +61,10 @@ public class AuthController {
     public ResponseEntity<?> verify(@RequestBody VerifyRequest req) {
         boolean ok = userService.verifyCode(req.getUsername(), req.getCode());
         if (ok) {
-            return ResponseEntity.ok(Map.of("message", "Verified"));
+            return ResponseEntity.ok(Map.of(
+                    "message", "Verified",
+                    "token", jwtService.generateReasonToken(req.getUsername())
+            ));
         }
         return ResponseEntity.badRequest().body(Map.of("error", "Invalid verification code"));
     }
@@ -91,22 +95,20 @@ public class AuthController {
         if (RegisterMode.WHITELIST.equals(registerModeService.getRegisterMode()) && !user.isApproved()) {
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "Register reason not approved",
-                    "reason_code", "NOT_APPROVED"));
+                    "reason_code", "NOT_APPROVED",
+                    "token", jwtService.generateReasonToken(user.getUsername())));
         }
         return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.getUsername())));
     }
 
     @PostMapping("/google")
     public ResponseEntity<?> loginWithGoogle(@RequestBody GoogleLoginRequest req) {
-        Optional<User> user = googleAuthService.authenticate(req.getIdToken(), req.getReason(), registerModeService.getRegisterMode());
+        Optional<User> user = googleAuthService.authenticate(req.getIdToken(), registerModeService.getRegisterMode());
         if (user.isPresent()) {
             if (RegisterMode.DIRECT.equals(registerModeService.getRegisterMode())) {
                 return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
             }
             if (!user.get().isApproved()) {
-                if (req.reason != null && !req.reason.isEmpty()) {
-                    notificationService.createRegisterRequestNotifications(user.get(), req.getReason());
-                }
                 if (user.get().getRegisterReason() != null && !user.get().getRegisterReason().isEmpty()) {
                     return ResponseEntity.badRequest().body(Map.of(
                             "error", "Account awaiting approval",
@@ -127,26 +129,55 @@ public class AuthController {
         ));
     }
 
+
+    @PostMapping("/reason")
+    public ResponseEntity<?> reason(@RequestBody MakeReasonRequest req) {
+        String username = jwtService.validateAndGetSubjectForReason(req.getToken());
+        Optional<User> userOpt = userService.findByUsername(username);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "Invalid token, Please re-login",
+                    "reason_code", "INVALID_CREDENTIALS"
+            ));
+        }
+
+        if (req.reason == null || req.reason.length() <= 20) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "Reason's length must longer than 20",
+                    "reason_code", "INVALID_CREDENTIALS"
+            ));
+        }
+
+        User user = userOpt.get();
+        if (user.isApproved() || registerModeService.getRegisterMode() == RegisterMode.DIRECT) {
+            return ResponseEntity.ok().body(Map.of("valid", true));
+        }
+
+        userService.register(user.getUsername(), user.getEmail(), user.getPassword(), req.getReason(), registerModeService.getRegisterMode());
+        notificationService.createRegisterRequestNotifications(user, req.getReason());
+        return ResponseEntity.ok().body(Map.of("valid", true));
+    }
+
     @PostMapping("/github")
     public ResponseEntity<?> loginWithGithub(@RequestBody GithubLoginRequest req) {
-        Optional<User> user = githubAuthService.authenticate(req.getCode(), req.getReason(), registerModeService.getRegisterMode(), req.getRedirectUri());
+        Optional<User> user = githubAuthService.authenticate(req.getCode(), registerModeService.getRegisterMode(), req.getRedirectUri());
         if (user.isPresent()) {
             if (RegisterMode.DIRECT.equals(registerModeService.getRegisterMode())) {
                 return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
             }
             if (!user.get().isApproved()) {
-                if (req.reason != null && !req.reason.isEmpty()) {
-                    notificationService.createRegisterRequestNotifications(user.get(), req.getReason());
-                }
                 if (user.get().getRegisterReason() != null && !user.get().getRegisterReason().isEmpty()) {
+                    // 已填写注册理由
                     return ResponseEntity.badRequest().body(Map.of(
                             "error", "Account awaiting approval",
-                            "reason_code", "IS_APPROVING"
+                            "reason_code", "IS_APPROVING",
+                            "token", jwtService.generateReasonToken(user.get().getUsername())
                     ));
                 }
                 return ResponseEntity.badRequest().body(Map.of(
                         "error", "Account awaiting approval",
-                        "reason_code", "NOT_APPROVED"
+                        "reason_code", "NOT_APPROVED",
+                        "token", jwtService.generateReasonToken(user.get().getUsername())
                 ));
             }
 
@@ -169,7 +200,6 @@ public class AuthController {
         private String email;
         private String password;
         private String captcha;
-        private String reason;
     }
 
     @Data
@@ -182,19 +212,23 @@ public class AuthController {
     @Data
     private static class GoogleLoginRequest {
         private String idToken;
-        private String reason;
     }
 
     @Data
     private static class GithubLoginRequest {
         private String code;
         private String redirectUri;
-        private String reason;
     }
 
     @Data
     private static class VerifyRequest {
         private String username;
         private String code;
+    }
+
+    @Data
+    private static class MakeReasonRequest {
+        private String token;
+        private String reason;
     }
 }

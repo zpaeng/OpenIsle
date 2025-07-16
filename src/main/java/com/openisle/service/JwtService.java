@@ -18,13 +18,16 @@ public class JwtService {
     @Value("${app.jwt.secret}")
     private String secret;
 
+    @Value("${app.jwt.reason-secret}")
+    private String reasonSecret;
+
     @Value("${app.jwt.expiration}")
     private long expiration;
 
-    private Key getSigningKey() {
+    private Key getSigningKeyForSecret(String signSecret) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] keyBytes = digest.digest(secret.getBytes(StandardCharsets.UTF_8));
+            byte[] keyBytes = digest.digest(signSecret.getBytes(StandardCharsets.UTF_8));
             return Keys.hmacShaKeyFor(keyBytes);
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("SHA-256 not available", e);
@@ -38,13 +41,33 @@ public class JwtService {
                 .setSubject(subject)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(getSigningKey())
+                .signWith(getSigningKeyForSecret(secret))
+                .compact();
+    }
+
+    public String generateReasonToken(String subject) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + expiration);
+        return Jwts.builder()
+                .setSubject(subject)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(getSigningKeyForSecret(reasonSecret))
                 .compact();
     }
 
     public String validateAndGetSubject(String token) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+                .setSigningKey(getSigningKeyForSecret(secret))
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject();
+    }
+
+    public String validateAndGetSubjectForReason(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKeyForSecret(reasonSecret))
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

@@ -19,8 +19,6 @@
 <script>
 import BaseInput from '../components/BaseInput.vue'
 import { API_BASE_URL, toast } from '../main'
-import { googleAuthWithToken } from '../utils/google'
-import { githubExchange } from '../utils/github'
 
 export default {
   name: 'SignupReasonPageView',
@@ -29,28 +27,14 @@ export default {
     return {
       reason: '',
       error: '',
-      isGoogle: false,
-      isGithub: false,
       isWaitingForRegister: false,
-      googleToken: '',
-      githubCode: ''
+      token: '',
     }
   },
   mounted() {
-    this.isGoogle = this.$route.query.google === '1'
-    this.isGithub = this.$route.query.github === '1'
-    if (this.isGoogle) {
-      this.googleToken = sessionStorage.getItem('google_id_token') || ''
-      if (!this.googleToken) {
+    this.token = this.$route.query.token || ''
+    if (!this.token) {
         this.$router.push('/signup')
-      }
-    } else if (this.isGithub) {
-      this.githubCode = sessionStorage.getItem('github_code') || ''
-      if (!this.githubCode) {
-        this.$router.push('/signup')
-      }
-    } else if (!sessionStorage.getItem('signup_username')) {
-      this.$router.push('/signup')
     }
   },
   methods: {
@@ -59,61 +43,33 @@ export default {
         this.error = '请至少输入20个字'
         return
       }
-      if (this.isGoogle) {
-        this.isWaitingForRegister = true
-        const token = this.googleToken || sessionStorage.getItem('google_id_token')
-        if (!token) {
-          toast.error('Google 登录失败')
-          return
-        }
-        await googleAuthWithToken(token, this.reason,
-          () => { this.$router.push('/') },
-          () => { this.error = 'Google 登录失败' }
-        )
-        this.isWaitingForRegister = false
-        sessionStorage.removeItem('google_id_token')
-        return
-      }
-      if (this.isGithub) {
-        this.isWaitingForRegister = true
-        const code = this.githubCode || sessionStorage.getItem('github_code')
-        if (!code) {
-          toast.error('GitHub 登录失败')
-          return
-        }
-        const result = await githubExchange(code, '', this.reason)
-        this.isWaitingForRegister = false
-        sessionStorage.removeItem('github_code')
-        if (result) {
-          this.$router.push('/')
-        } else {
-          this.error = 'GitHub 登录失败'
-        }
-        return
-      }
+
       try {
         this.isWaitingForRegister = true
-        const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
+        const res = await fetch(`${API_BASE_URL}/api/auth/reason`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.token}`
+          },
           body: JSON.stringify({
-            username: sessionStorage.getItem('signup_username'),
-            email: sessionStorage.getItem('signup_email'),
-            password: sessionStorage.getItem('signup_password'),
             reason: this.reason
           })
         })
+        this.isWaitingForRegister = false
         const data = await res.json()
         if (res.ok) {
-          toast.success('验证码已发送，请查收邮箱')
-          this.$router.push({ path: '/signup', query: { verify: 1, u: sessionStorage.getItem('signup_username') } })
+          toast.success('注册理由已提交,请等待审核')
+          this.$router.push('/')
+        } else if (data.reason_code === 'INVALID_CREDENTIALS') {
+          toast.error('登录已过期,请重新登录')
+          this.$router.push('/login')
         } else {
-          toast.error(data.error || '发送失败')
+          toast.error(data.error || '提交失败')
         }
       } catch (e) {
-        toast.error('发送失败')
-      } finally {
         this.isWaitingForRegister = false
+        toast.error('提交失败')
       }
     }
   }

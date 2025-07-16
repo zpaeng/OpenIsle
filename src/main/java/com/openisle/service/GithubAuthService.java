@@ -28,7 +28,7 @@ public class GithubAuthService {
     @Value("${github.client-secret:}")
     private String clientSecret;
 
-    public Optional<User> authenticate(String code, String reason, com.openisle.model.RegisterMode mode, String redirectUri) {
+    public Optional<User> authenticate(String code, com.openisle.model.RegisterMode mode, String redirectUri) {
         try {
             String tokenUrl = "https://github.com/login/oauth/access_token";
             HttpHeaders headers = new HttpHeaders();
@@ -83,23 +83,19 @@ public class GithubAuthService {
             if (email == null) {
                 email = username + "@users.noreply.github.com";
             }
-            return Optional.of(processUser(email, username, reason, mode));
+            return Optional.of(processUser(email, username, mode));
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
-    private User processUser(String email, String username, String reason, com.openisle.model.RegisterMode mode) {
+    private User processUser(String email, String username, com.openisle.model.RegisterMode mode) {
         Optional<User> existing = userRepository.findByEmail(email);
         if (existing.isPresent()) {
             User user = existing.get();
             if (!user.isVerified()) {
                 user.setVerified(true);
                 user.setVerificationCode(null);
-                userRepository.save(user);
-            }
-            if (!user.isApproved() && reason != null && !reason.isEmpty()) {
-                user.setRegisterReason(reason);
                 userRepository.save(user);
             }
             return user;
@@ -116,7 +112,6 @@ public class GithubAuthService {
         user.setPassword("");
         user.setRole(Role.USER);
         user.setVerified(true);
-        user.setRegisterReason(reason);
         user.setApproved(mode == com.openisle.model.RegisterMode.DIRECT);
         user.setAvatar("https://github.com/" + finalUsername + ".png");
         return userRepository.save(user);

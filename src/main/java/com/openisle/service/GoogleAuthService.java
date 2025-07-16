@@ -23,7 +23,7 @@ public class GoogleAuthService {
     @Value("${google.client-id:}")
     private String clientId;
 
-    public Optional<User> authenticate(String idTokenString, String reason, com.openisle.model.RegisterMode mode) {
+    public Optional<User> authenticate(String idTokenString, com.openisle.model.RegisterMode mode) {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
                 .setAudience(Collections.singletonList(clientId))
                 .build();
@@ -35,24 +35,19 @@ public class GoogleAuthService {
             GoogleIdToken.Payload payload = idToken.getPayload();
             String email = payload.getEmail();
             String name = (String) payload.get("name");
-            return Optional.of(processUser(email, name, reason, mode));
+            return Optional.of(processUser(email, name, mode));
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
-    private User processUser(String email, String name, String reason, com.openisle.model.RegisterMode mode) {
+    private User processUser(String email, String name, com.openisle.model.RegisterMode mode) {
         Optional<User> existing = userRepository.findByEmail(email);
         if (existing.isPresent()) {
             User user = existing.get();
             if (!user.isVerified()) {
                 user.setVerified(true);
                 user.setVerificationCode(null);
-                userRepository.save(user);
-            }
-
-            if (!user.isApproved() && reason != null && !reason.isEmpty()) {
-                user.setRegisterReason(reason);
                 userRepository.save(user);
             }
 
@@ -70,7 +65,6 @@ public class GoogleAuthService {
         user.setPassword("");
         user.setRole(Role.USER);
         user.setVerified(true);
-        user.setRegisterReason(reason);
         user.setApproved(mode == com.openisle.model.RegisterMode.DIRECT);
         user.setAvatar("https://github.com/identicons/" + username + ".png");
         return userRepository.save(user);

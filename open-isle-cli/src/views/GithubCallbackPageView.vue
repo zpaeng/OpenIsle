@@ -12,8 +12,9 @@ export default {
     const code = url.searchParams.get('code')
     const state = url.searchParams.get('state')
     const result = await githubExchange(code, state, '')
-    if (result === 'NEED_REASON') {
-      this.$router.push('/signup-reason?github=1')
+
+    if (result.needReason) {
+      this.$router.push('/signup-reason?token=' + result.token)
     } else {
       this.$router.push('/')
     }

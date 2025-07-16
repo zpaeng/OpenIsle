@@ -86,7 +86,7 @@
 
 <script>
 import { API_BASE_URL, toast } from '../main'
-import { googleSignIn, googleGetIdToken } from '../utils/google'
+import { googleSignIn } from '../utils/google'
 import { githubAuthorize } from '../utils/github'
 import BaseInput from '../components/BaseInput.vue'
 export default {
@@ -145,15 +145,7 @@ export default {
       if (this.emailError || this.passwordError || this.usernameError) {
         return
       }
-      if (this.registerMode === 'WHITELIST') {
-        sessionStorage.setItem('signup_username', this.username)
-        sessionStorage.setItem('signup_email', this.email)
-        sessionStorage.setItem('signup_password', this.password)
-        this.$router.push('/signup-reason')
-        return
-      }
       try {
-        console.log('base url: ', API_BASE_URL)
         this.isWaitingForEmailSent = true
         const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
           method: 'POST',
@@ -194,8 +186,12 @@ export default {
         this.isWaitingForEmailVerified = false
         const data = await res.json()
         if (res.ok) {
-          toast.success('注册成功，请登录')
-          this.$router.push('/login')
+          if (this.registerMode === 'WHITELIST') {
+            this.$router.push('/signup-reason?token=' + data.token)
+          } else {
+            toast.success('注册成功，请登录')
+            this.$router.push('/login')
+          }
         } else {
           toast.error(data.error || '注册失败')
         }
@@ -204,18 +200,11 @@ export default {
       }
     },
     signupWithGoogle() {
-      if (this.registerMode === 'WHITELIST') {
-        googleGetIdToken().then(token => {
-          sessionStorage.setItem('google_id_token', token)
-          this.$router.push('/signup-reason?google=1')
-        }).catch(() => {})
-      } else {
-        googleSignIn(() => {
+      googleSignIn(() => {
           this.$router.push('/')
-        }, () => {
-          this.$router.push('/signup-reason?google=1')
+        }, (token) => {
+          this.$router.push('/signup-reason?token=' + token)
         })
-      }
     },
     signupWithGithub() {
       githubAuthorize()

@@ -23,19 +23,37 @@ export async function githubExchange(code, state, reason) {
       setToken(data.token)
       await loadCurrentUser()
       toast.success('登录成功')
-      return true
+      return {
+        success: true,
+        needReason: false
+      }
     } else if (data.reason_code === 'NOT_APPROVED') {
       toast.info('当前为注册审核模式，请填写注册理由')
-      sessionStorage.setItem('github_code', code)
-      return 'NEED_REASON'
+      return {
+        success: false,
+        needReason: true,
+        token: data.token
+      }
     } else if (data.reason_code === 'IS_APPROVING') {
       toast.info('您的注册理由正在审批中')
-      return true
+      return {
+        success: true,
+        needReason: false
+      }
     } else {
       toast.error(data.error || '登录失败')
+      return {
+        success: false,
+        needReason: false,
+        error: data.error || '登录失败'
+      }
     }
   } catch (e) {
     toast.error('登录失败')
+    return {
+      success: false,
+      needReason: false,
+      error: '登录失败'
+    }
   }
-  return false
 }
