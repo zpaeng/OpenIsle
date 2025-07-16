@@ -42,6 +42,10 @@
         <img class="login-page-button-icon" src="../assets/icons/discord.svg" alt="Discord Logo" />
         <div class="login-page-button-text">Discord 登录</div>
       </div>
+      <div class="login-page-button" @click="loginWithTwitter">
+        <img class="login-page-button-icon" src="../assets/icons/twitter.svg" alt="Twitter Logo" />
+        <div class="login-page-button-text">Twitter 登录</div>
+      </div>
     </div>
   </div>
 </template>
@@ -52,6 +56,7 @@ import { setToken, loadCurrentUser } from '../utils/auth'
 import { googleSignIn } from '../utils/google'
 import { githubAuthorize } from '../utils/github'
 import { discordAuthorize } from '../utils/discord'
+import { twitterAuthorize } from '../utils/twitter'
 import BaseInput from '../components/BaseInput.vue'
 export default {
   name: 'LoginPageView',
@@ -109,6 +114,9 @@ export default {
     },
     loginWithDiscord() {
       discordAuthorize()
+    },
+    loginWithTwitter() {
+      twitterAuthorize()
     }
   }
 }

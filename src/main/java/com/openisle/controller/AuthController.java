@@ -8,6 +8,7 @@ import com.openisle.service.CaptchaService;
 import com.openisle.service.GoogleAuthService;
 import com.openisle.service.GithubAuthService;
 import com.openisle.service.DiscordAuthService;
+import com.openisle.service.TwitterAuthService;
 import com.openisle.service.RegisterModeService;
 import com.openisle.service.NotificationService;
 import com.openisle.model.RegisterMode;
@@ -32,6 +33,7 @@ public class AuthController {
     private final GoogleAuthService googleAuthService;
     private final GithubAuthService githubAuthService;
     private final DiscordAuthService discordAuthService;
+    private final TwitterAuthService twitterAuthService;
     private final RegisterModeService registerModeService;
     private final NotificationService notificationService;
     private final UserRepository userRepository;
@@ -228,6 +230,36 @@ public class AuthController {
                 "reason_code", "INVALID_CREDENTIALS"
         ));
     }
+      
+    @PostMapping("/twitter")
+    public ResponseEntity<?> loginWithTwitter(@RequestBody TwitterLoginRequest req) {
+        Optional<User> user = twitterAuthService.authenticate(req.getCode(), registerModeService.getRegisterMode(), req.getRedirectUri());
+        if (user.isPresent()) {
+            if (RegisterMode.DIRECT.equals(registerModeService.getRegisterMode())) {
+                return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
+            }
+            if (!user.get().isApproved()) {
+                if (user.get().getRegisterReason() != null && !user.get().getRegisterReason().isEmpty()) {
+                    return ResponseEntity.badRequest().body(Map.of(
+                            "error", "Account awaiting approval",
+                            "reason_code", "IS_APPROVING",
+                            "token", jwtService.generateReasonToken(user.get().getUsername())
+                    ));
+                }
+                return ResponseEntity.badRequest().body(Map.of(
+                        "error", "Account awaiting approval",
+                        "reason_code", "NOT_APPROVED",
+                        "token", jwtService.generateReasonToken(user.get().getUsername())
+                ));
+            }
+
+            return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
+        }
+        return ResponseEntity.badRequest().body(Map.of(
+                "error", "Invalid twitter code",
+                "reason_code", "INVALID_CREDENTIALS"
+        ));
+    }
 
     @GetMapping("/check")
     public ResponseEntity<?> checkToken() {
@@ -262,6 +294,12 @@ public class AuthController {
 
     @Data
     private static class DiscordLoginRequest {
+        private String code;
+        private String redirectUri;
+    }
+  
+    @Data
+    private static class TwitterLoginRequest {
         private String code;
         private String redirectUri;
     }
