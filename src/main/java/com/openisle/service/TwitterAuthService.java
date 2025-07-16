@@ -53,9 +53,7 @@ public class TwitterAuthService {
         body.add("code_verifier", codeVerifier);
         body.add("redirect_uri", redirectUri);      // 一律必填
         // 如果你的 app 属于机密客户端，必须带 client_secret
-        if (clientSecret != null && !clientSecret.isBlank()) {
-            body.add("client_secret", clientSecret);
-        }
+        body.add("client_secret", clientSecret);
 
         ResponseEntity<JsonNode> tokenRes;
         try {
