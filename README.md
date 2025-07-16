@@ -21,6 +21,7 @@ OpenIsle 基于 Spring Boot 构建，提供社区后台常见的注册、登录�
 * **JWT 认证**：登录后获得 Token，接口通过 `Authorization: Bearer` 认证
 * **Google 登录**：支持使用 Google OAuth 登录
 * **GitHub 登录**：支持使用 GitHub OAuth 登录
+* **Discord 登录**：支持使用 Discord OAuth 登录
 * **邮件通知**：抽象 `EmailSender`，默认实现基于 Resend
 * **角色权限**：内置 `ADMIN` 与 `USER`，管理员接口以 `/api/admin/**` 提供
 * **文章与评论**：支持分类、评论及多级回复
@@ -50,6 +51,9 @@ OpenIsle 基于 Spring Boot 构建，提供社区后台常见的注册、登录�
   - `GITHUB_CLIENT_ID`：GitHub OAuth 客户端 ID
   - `GITHUB_CLIENT_SECRET`：GitHub OAuth 客户端密钥
   - `VUE_APP_GITHUB_CLIENT_ID`：前端 GitHub OAuth 客户端 ID
+  - `DISCORD_CLIENT_ID`：Discord OAuth 客户端 ID
+  - `DISCORD_CLIENT_SECRET`：Discord OAuth 客户端密钥
+  - `VUE_APP_DISCORD_CLIENT_ID`：前端 Discord OAuth 客户端 ID
   - `JWT_SECRET`：JWT 签名密钥
    - `JWT_EXPIRATION`：JWT 过期时间（毫秒）
    - `PASSWORD_STRENGTH`：密码强度（LOW、MEDIUM、HIGH）
@@ -73,6 +77,7 @@ mvn spring-boot:run
 - `POST /api/auth/login`：登录并获取 Token
 - `POST /api/auth/google`：Google 登录并获取 Token
 - `POST /api/auth/github`：GitHub 登录并获取 Token
+- `POST /api/auth/discord`：Discord 登录并获取 Token
 - `GET /api/config`：查看验证码开关配置
 - 需要认证的接口示例：`GET /api/hello`（需 `Authorization` 头）
 - 管理员接口示例：`GET /api/admin/hello`

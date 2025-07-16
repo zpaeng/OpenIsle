@@ -80,6 +80,10 @@
         <img class="signup-page-button-icon" src="../assets/icons/github.svg" alt="GitHub Logo" />
         <div class="signup-page-button-text">GitHub 注册</div>
       </div>
+      <div class="signup-page-button" @click="signupWithDiscord">
+        <img class="signup-page-button-icon" src="../assets/icons/discord.svg" alt="Discord Logo" />
+        <div class="signup-page-button-text">Discord 注册</div>
+      </div>
     </div>
   </div>
 </template>
@@ -88,6 +92,7 @@
 import { API_BASE_URL, toast } from '../main'
 import { googleSignIn } from '../utils/google'
 import { githubAuthorize } from '../utils/github'
+import { discordAuthorize } from '../utils/discord'
 import BaseInput from '../components/BaseInput.vue'
 export default {
   name: 'SignupPageView',
@@ -208,6 +213,9 @@ export default {
     },
     signupWithGithub() {
       githubAuthorize()
+    },
+    signupWithDiscord() {
+      discordAuthorize()
     }
   }
 }
