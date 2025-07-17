@@ -227,4 +227,22 @@ export default {
   background-color: var(--menu-selected-background-color);
 }
 
+@media (max-width: 1200px) {
+  .header-content {
+    padding-left: 15px;
+    padding-right: 15px;
+    width: calc(100% - 30px);
+  }
+}
+
+@media (max-width: 768px) {
+  .header-content-item-secondary {
+    display: none;
+  }
+
+  .logo-text {
+    display: none;
+  }
+}
+
 </style>

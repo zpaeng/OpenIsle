@@ -17,12 +17,7 @@
           <i class="menu-item-icon fas fa-info-circle"></i>
           <span class="menu-item-text">关于</span>
         </router-link>
-        <router-link
-          v-if="shouldShowStats"
-          class="menu-item"
-          exact-active-class="selected"
-          to="/about/stats"
-        >
+        <router-link v-if="shouldShowStats" class="menu-item" exact-active-class="selected" to="/about/stats">
           <i class="menu-item-icon fas fa-chart-line"></i>
           <span class="menu-item-text">站点统计</span>
         </router-link>
@@ -63,7 +58,8 @@
           <div v-else v-for="t in tags" :key="t.id" class="section-item" @click="gotoTag(t)">
             <img v-if="isImageIcon(t.smallIcon || t.icon)" :src="t.smallIcon || t.icon" class="section-item-icon" />
             <i v-else class="section-item-icon fas fa-hashtag"></i>
-            <span class="section-item-text">{{ t.name }} <span class="section-item-text-count">x {{ t.count }}</span></span>
+            <span class="section-item-text">{{ t.name }} <span class="section-item-text-count">x {{ t.count
+                }}</span></span>
           </div>
         </div>
       </div>
@@ -327,20 +323,32 @@ export default {
   padding: 10px;
 }
 
-/*
-.slide-enter-active, .slide-leave-active {
-  transition: 
-    transform 0.3s ease,
-    opacity 0.3s ease,
-    width 0.3s ease;
+
+@media (max-width: 768px) {
+  .menu {
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+  }
+
+  .slide-enter-active,
+  .slide-leave-active {
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease,
+      width 0.3s ease;
+  }
+
+  .slide-enter-from,
+  .slide-leave-to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+
+  .slide-enter-to,
+  .slide-leave-from {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
-.slide-enter-from, .slide-leave-to {
-  transform: translateX(-100%);
-  opacity: 0;
-}
-.slide-enter-to, .slide-leave-from {
-  transform: translateX(0);
-  opacity: 1;
-}
-  */
 </style>

@@ -527,4 +527,12 @@ export default {
   font-size: 14px;
   opacity: 0.7;
 }
+
+@media (max-width: var(--page-max-width)) {
+
+}
+
+@media (max-width: var(--page-max-width-mobile)) {
+
+}
 </style>
