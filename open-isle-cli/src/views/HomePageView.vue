@@ -32,13 +32,13 @@
           <div class="header-item avatars">
             <div class="header-item-text">参与人员</div>
           </div>
-          <div class="header-item">
+          <div class="header-item comments">
             <div class="header-item-text">回复</div>
           </div>
-          <div class="header-item">
+          <div class="header-item views">
             <div class="header-item-text">浏览</div>
           </div>
-          <div class="header-item">
+          <div class="header-item activity">
             <div class="header-item-text">活动</div>
           </div>
         </div>
@@ -75,12 +75,15 @@
               <img class="article-member-avatar-item-img" :src="member.avatar" alt="avatar" />
             </router-link>
           </div>
+
           <div class="article-comments main-info-text">
             {{ article.comments }}
           </div>
+
           <div class="article-views main-info-text">
             {{ article.views }}
           </div>
+
           <div class="article-time main-info-text">
             {{ article.time }}
           </div>
@@ -334,12 +337,6 @@ export default {
   /* enable container queries */
   container-type: inline-size;
   container-name: home-page;
-  /* width variables shared between header and article rows */
-  --main-width: 60%;
-  --avatars-width: 20%;
-  --comments-width: 5%;
-  --views-width: 5%;
-  --activity-width: 10%;
 }
 
 .search-container {
@@ -419,8 +416,8 @@ export default {
 }
 
 .header-container {
-  display: grid;
-  grid-template-columns: var(--main-width) var(--avatars-width) var(--comments-width) var(--views-width) var(--activity-width);
+  display: flex;
+  flex-direction: row;
   align-items: center;
   width: 100%;
   color: gray;
@@ -429,19 +426,38 @@ export default {
 }
 
 .article-item {
-  display: grid;
-  grid-template-columns: var(--main-width) var(--avatars-width) var(--comments-width) var(--views-width) var(--activity-width);
+  display: flex;
+  flex-direction: row;
   align-items: center;
   width: 100%;
   border-bottom: 1px solid var(--normal-border-color);
 }
 
-.header-item.avatars {
-  margin-left: 20px;
+
+.article-main-container,
+.header-item.main-item {
+  width: calc(60% - 20px);
+  padding-left: 20px;
 }
 
-.main-item {
-  padding-left: 20px;
+.article-member-avatars-container,
+.header-item.avatars {
+  width: 20%;
+}
+
+.article-comments,
+.header-item.comments {
+  width: 5%;
+}
+
+.article-views,
+.header-item.views {
+  width: 5%;
+}
+
+.article-time,
+.header-item.activity {
+  width: 10%;
 }
 
 .article-item-title {
@@ -491,7 +507,6 @@ export default {
 }
 
 .article-main-container {
-  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -533,9 +548,30 @@ export default {
 }
 
 @container home-page (max-width: 900px) {
-  .home-page {
-    --main-width: 65%;
-    --avatars-width: 15%;
+  .article-main-container,
+  .header-item.main-item {
+    width: calc(70% - 20px);
+    padding-left: 20px;
+  }
+  
+  .article-member-avatars-container,
+  .header-item.avatars {
+    width: 10%;
+  }
+  
+  .article-comments,
+  .header-item.comments {
+    width: 5%;
+  }
+  
+  .article-views,
+  .header-item.views {
+    width: 5%;
+  }
+  
+  .article-time,
+  .header-item.activity {
+    width: 10%;
   }
   .article-member-avatar-item:nth-child(n+4) {
     display: none;
@@ -543,10 +579,33 @@ export default {
 }
 
 @container home-page (max-width: 768px) {
-  .home-page {
-    --main-width: 70%;
-    --avatars-width: 10%;
+  .article-main-container,
+  .header-item.main-item {
+    width: calc(80% - 20px);
+    padding-left: 20px;
   }
+  
+  .article-member-avatars-container,
+  .header-item.avatars {
+    width: 10%;
+  }
+  
+  .article-comments,
+  .header-item.comments {
+    display: none;
+  }
+  
+  .article-views,
+  .header-item.views {
+    display: none;
+  }
+  
+  .article-time,
+  .header-item.activity {
+    width: 10%;
+  }
+
+
   .article-member-avatar-item:nth-child(n+2) {
     display: none;
   }
