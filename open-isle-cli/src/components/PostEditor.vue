@@ -9,6 +9,7 @@
 
 <script>
 import { ref, onMounted, watch } from 'vue'
+import { themeState } from '../utils/theme'
 import Vditor from 'vditor'
 import 'vditor/dist/index.css'
 import { API_BASE_URL } from '../main'
@@ -40,6 +41,15 @@ export default {
   },
   setup(props, { emit }) {
     const vditorInstance = ref(null)
+    const getEditorTheme = () =>
+      document.documentElement.dataset.theme === 'dark' ? 'dark' : 'classic'
+    const getPreviewTheme = () =>
+      document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'
+    const applyTheme = () => {
+      if (vditorInstance.value) {
+        vditorInstance.value.setTheme(getEditorTheme(), getPreviewTheme())
+      }
+    }
 
     watch(
       () => props.loading,
@@ -73,10 +83,21 @@ export default {
       }
     )
 
+    watch(
+      () => themeState.mode,
+      () => {
+        applyTheme()
+      }
+    )
+
     onMounted(() => {
       vditorInstance.value = new Vditor(props.editorId, {
         placeholder: '请输入正文...',
         height: 450,
+        theme: getEditorTheme(),
+        preview: {
+          theme: { current: getPreviewTheme() },
+        },
         toolbar: [
           'emoji',
           'bold',
@@ -131,8 +152,10 @@ export default {
           if (props.loading || props.disabled) {
             vditorInstance.value.disabled()
           }
+          applyTheme()
         }
       })
+      applyTheme()
     })
 
     return {}
