@@ -420,7 +420,7 @@ export default {
   align-items: center;
   width: 100%;
   color: gray;
-  border-bottom: 1px solid lightgray;
+  border-bottom: 1px solid var(--normal-border-color);
   padding-bottom: 10px;
 }
 
@@ -429,7 +429,7 @@ export default {
   grid-template-columns: var(--main-width) var(--avatars-width) var(--comments-width) var(--views-width) var(--activity-width);
   align-items: center;
   width: 100%;
-  border-bottom: 1px solid lightgray;
+  border-bottom: 1px solid var(--normal-border-color);
 }
 
 .header-item.avatars {

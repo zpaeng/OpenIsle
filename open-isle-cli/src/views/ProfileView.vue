@@ -476,7 +476,6 @@ export default {
   width: 200px;
   height: 200px;
   border-radius: 50%;
-  background-color: lightblue;
   object-fit: cover;
 }
 
@@ -534,8 +533,8 @@ export default {
   flex-direction: row;
   padding: 0 20px;
   gap: 20px;
-  border-top: 1px solid #e0e0e0;
-  border-bottom: 1px solid #e0e0e0;
+  border-top: 1px solid var(--normal-border-color);
+  border-bottom: 1px solid var(--normal-border-color);
 }
 
 .profile-info-item {
@@ -559,7 +558,7 @@ export default {
   display: flex;
   flex-direction: row;
   padding: 0 20px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--normal-border-color);
 }
 
 .profile-tabs-item {
@@ -681,7 +680,7 @@ export default {
 .follow-tabs {
   display: flex;
   flex-direction: row;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--normal-border-color);
   margin-bottom: 10px;
 }
 

@@ -77,12 +77,6 @@ export default {
       vditorInstance.value = new Vditor(props.editorId, {
         placeholder: '请输入正文...',
         height: 450,
-        theme: 'classic',
-        preview: {
-          theme: { current: 'light' },
-          actions: [],
-          markdown: { toc: false }
-        },
         toolbar: [
           'emoji',
           'bold',
@@ -148,7 +142,7 @@ export default {
 
 <style scoped>
 .post-editor-container {
-  border: 1px solid #e2e2e2;
+  border: 1px solid var(--normal-border-color);
   position: relative;
 }
 
@@ -158,7 +152,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--menu-selected-background-color);
   display: flex;
   align-items: center;
   justify-content: center;

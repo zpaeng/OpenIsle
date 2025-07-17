@@ -9,10 +9,13 @@
   --menu-background-color: white;
   --background-color: white;
   --menu-border-color: lightgray;
+  --normal-border-color: lightgray;
   --menu-selected-background-color: rgba(208, 250, 255, 0.659);
   --menu-text-color: black;
   --scroller-background-color: rgba(130, 175, 180, 0.5);
   --normal-background-color: rgb(241, 241, 241);
+  --login-background-color: rgb(241, 241, 241);
+  --login-background-color-hover: #e0e0e0;
   --text-color: black;
   --menu-width: 200px;
   --page-max-width: 1200px;
@@ -22,13 +25,18 @@
 [data-theme='dark'] {
   --header-background-color: #2b2b2b;
   --header-border-color: #555;
+  --primary-color: rgb(17, 182, 197);
+  --primary-color-hover: rgb(13, 137, 151);
   --header-text-color: white;
   --menu-background-color: #333;
   --background-color: #333;
   --menu-border-color: #555;
+  --normal-border-color: #555;
   --menu-selected-background-color: rgba(255, 255, 255, 0.1);
   --menu-text-color: white;
-  --normal-background-color: #121212;
+  --normal-background-color: #000000;
+  --login-background-color: #575757;
+  --login-background-color-hover: #717171;
   --text-color: #eee;
   --article-info-background-color: #747373;
 }
@@ -46,19 +54,22 @@ body {
 /*************************
  * Vditor 自定义皮肤覆写
  *************************/
-.vditor {
-  /* 去掉整体背景与边框，让它融入父容器 */
+ 
+/* .vditor {
   --textarea-background-color: transparent;
   border: none !important;
   box-shadow: none !important;
 }
 
-/* 工具栏彻底无边框、透明背景 */
+.vditor-reset {
+  color: var(--text-color);
+}
+
 .vditor-toolbar {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
-}
+} */
 
 /*************************
  * Markdown 渲染样式

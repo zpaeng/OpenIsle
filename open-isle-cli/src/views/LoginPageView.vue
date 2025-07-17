@@ -139,7 +139,7 @@ export default {
   align-items: center;
   justify-content: center;
   width: calc(40% - 120px);
-  border-right: 1px solid #ccc;
+  border-right: 1px solid var(--normal-border-color);
   padding-right: 120px;
 }
 
@@ -238,15 +238,15 @@ export default {
   justify-content: center;
   padding: 10px 20px;
   min-width: 150px;
-  background-color: var(--normal-background-color);
-  border: 1px solid #ccc;
+  background-color: var(--login-background-color);
+  border: 1px solid var(--normal-border-color);
   border-radius: 10px;
   cursor: pointer;
   gap: 10px;
 }
 
 .login-page-button:hover {
-  background-color: #e0e0e0;
+  background-color: var(--login-background-color-hover);
 }
 
 .login-page-button-icon {

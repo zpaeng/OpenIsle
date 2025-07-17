@@ -72,7 +72,7 @@ export default {
   top: 100%;
   right: 0;
   background-color: var(--menu-background-color);
-  border: 1px solid #ddd;
+  border: 1px solid var(--normal-border-color);
   border-radius: 4px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   z-index: 10;

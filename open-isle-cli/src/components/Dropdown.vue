@@ -213,7 +213,7 @@ export default {
 }
 
 .dropdown-display {
-  border: 1px solid #ccc;
+  border: 1px solid var(--normal-border-color);
   border-radius: 5px;
   padding: 5px 10px;
   cursor: pointer;
@@ -233,7 +233,7 @@ export default {
   left: 0;
   right: 0;
   background: var(--background-color);
-  border: 1px solid #ccc;
+  border: 1px solid var(--normal-border-color);
   z-index: 10;
   max-height: 200px;
   min-width: 350px;
@@ -251,7 +251,7 @@ export default {
   display: flex;
   align-items: center;
   padding: 5px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--normal-border-color);
 }
 
 .dropdown-search input {
@@ -272,11 +272,11 @@ export default {
 }
 
 .dropdown-option.selected {
-  background-color: #f5f5f5;
+  background-color: var(--menu-selected-background-color);
 }
 
 .dropdown-option:hover {
-  background-color: #f5f5f5;
+  background-color: var(--menu-selected-background-color);
 }
 
 .option-icon {

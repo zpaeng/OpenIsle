@@ -57,7 +57,7 @@ export default {
   width: calc(100% - 40px);
   padding: 15px 20px;
   border-radius: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--normal-border-color);
   gap: 10px;
 }
 
