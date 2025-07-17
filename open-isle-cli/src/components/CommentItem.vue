@@ -33,8 +33,7 @@
         </ReactionsGroup>
       </div>
       <div class="comment-editor-wrapper">
-        <CommentEditor v-if="showEditor" @submit="submitReply" :loading="isWaitingForReply" :disabled="!isLoggedIn" />
-        <LoginOverlay v-if="showEditor && !loggedIn" />
+        <CommentEditor v-if="showEditor" @submit="submitReply" :loading="isWaitingForReply" :disabled="!isLoggedIn" :show-login-overlay="!isLoggedIn" />
       </div>
       <div v-if="comment.reply && comment.reply.length" class="reply-toggle" @click="toggleReplies">
         <i v-if="showReplies" class="fas fa-chevron-up reply-toggle-icon"></i>

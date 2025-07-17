@@ -155,7 +155,7 @@ export default {
           applyTheme()
         }
       })
-      applyTheme()
+      // applyTheme()
     })
 
     return {}

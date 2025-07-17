@@ -59,19 +59,14 @@
         </div>
       </div>
 
-      <div class="comment-editor-wrapper">
-        <CommentEditor
-          @submit="postComment"
-          :loading="isWaitingPostingComment"
-          :disabled="!loggedIn"
-        />
-        <LoginOverlay v-if="!loggedIn" />
-      </div>
+      <CommentEditor @submit="postComment" :loading="isWaitingPostingComment" :disabled="!loggedIn"
+        :show-login-overlay="!loggedIn" />
 
       <div class="comments-container">
         <BaseTimeline :items="comments">
           <template #item="{ item }">
-            <CommentItem :key="item.id" :comment="item" :level="level + 1" :default-show-replies="item.openReplies" @deleted="onCommentDeleted" />
+            <CommentItem :key="item.id" :comment="item" :level="level + 1" :default-show-replies="item.openReplies"
+              @deleted="onCommentDeleted" />
           </template>
         </BaseTimeline>
         <!-- <CommentItem
@@ -98,12 +93,8 @@
         <div v-else class="scroller-time">{{ lastReplyTime }}</div>
       </div>
     </div>
-    <vue-easy-lightbox
-      :visible="lightboxVisible"
-      :index="lightboxIndex"
-      :imgs="lightboxImgs"
-      @hide="lightboxVisible = false"
-    />
+    <vue-easy-lightbox :visible="lightboxVisible" :index="lightboxIndex" :imgs="lightboxImgs"
+      @hide="lightboxVisible = false" />
   </div>
 </template>
 
@@ -118,7 +109,6 @@ import ArticleTags from '../components/ArticleTags.vue'
 import ArticleCategory from '../components/ArticleCategory.vue'
 import ReactionsGroup from '../components/ReactionsGroup.vue'
 import DropdownMenu from '../components/DropdownMenu.vue'
-import LoginOverlay from '../components/LoginOverlay.vue'
 import { renderMarkdown } from '../utils/markdown'
 import { API_BASE_URL, toast } from '../main'
 import { getToken, authState } from '../utils/auth'
@@ -129,7 +119,7 @@ hatch.register()
 
 export default {
   name: 'PostPageView',
-  components: { CommentItem, CommentEditor, BaseTimeline, ArticleTags, ArticleCategory, ReactionsGroup, DropdownMenu, LoginOverlay, VueEasyLightbox },
+  components: { CommentItem, CommentEditor, BaseTimeline, ArticleTags, ArticleCategory, ReactionsGroup, DropdownMenu, VueEasyLightbox },
   setup() {
     const route = useRoute()
     const postId = route.params.id
@@ -723,7 +713,7 @@ export default {
   flex-direction: row;
   gap: 10px;
   padding: 0px;
-  border-bottom: 1px solid #e2e2e2;
+  border-bottom: 1px solid var(--normal-border-color);
 }
 
 .user-avatar-container {

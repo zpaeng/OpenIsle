@@ -1,6 +1,9 @@
 <template>
   <div class="comment-editor-container">
-    <div :id="editorId" ref="vditorElement"></div>
+    <div class="comment-editor-wrapper">      
+      <div :id="editorId" ref="vditorElement"></div>
+      <LoginOverlay v-if="showLoginOverlay" />
+    </div>
     <div class="comment-bottom-container">
       <div class="comment-submit" :class="{ disabled: isDisabled }" @click="submit">
         <template v-if="!loading">
@@ -19,6 +22,7 @@ import { ref, onMounted, computed, watch } from 'vue'
 import Vditor from 'vditor'
 import { themeState } from '../utils/theme'
 import 'vditor/dist/index.css'
+import LoginOverlay from './LoginOverlay.vue'
 
 export default {
   name: 'CommentEditor',
@@ -35,8 +39,13 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    },
+    showLoginOverlay: {
+      type: Boolean,
+      default: false
     }
   },
+  components: { LoginOverlay },
   setup(props, { emit }) {
     const vditorInstance = ref(null)
     const text = ref('')
@@ -63,7 +72,7 @@ export default {
     onMounted(() => {
       vditorInstance.value = new Vditor(props.editorId, {
         placeholder: '说点什么...',
-        height: 120,
+        height: 200,
         theme: getEditorTheme(),
         preview: {
           actions: [],
@@ -93,7 +102,7 @@ export default {
           text.value = value
         }
       })
-      applyTheme()
+      // applyTheme()
     })
 
     watch(
@@ -136,14 +145,13 @@ export default {
 .comment-editor-container {
   margin-top: 20px;
   margin-bottom: 50px;
-  border: 1px solid #e2e2e2;
 }
 
 .comment-bottom-container {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  padding: 10px;
+  padding-top: 10px;
 }
 
 .comment-submit {
