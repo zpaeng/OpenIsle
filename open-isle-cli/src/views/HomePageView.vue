@@ -18,8 +18,10 @@
         >
           {{ topic }}
         </div>
-        <CategorySelect v-model="selectedCategory" :options="categoryOptions" />
-        <TagSelect v-model="selectedTags" :options="tagOptions" />
+        <div class="topic-select-container">
+          <CategorySelect v-model="selectedCategory" :options="categoryOptions" />
+          <TagSelect v-model="selectedTags" :options="tagOptions" />
+        </div>
       </div>
     </div>
 
@@ -396,6 +398,15 @@ export default {
   flex-direction: row;
   align-items: center;
   gap: 10px;
+  font-size: 16px;
+  flex-wrap: wrap;
+}
+
+.topic-select-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
 }
 
 .topic-item {
@@ -438,6 +449,20 @@ export default {
 .header-item.main-item {
   width: calc(60% - 20px);
   padding-left: 20px;
+}
+
+/* .article-member-avatars-container,
+.header-item.avatars, */
+.article-comments,
+.header-item.comments,
+.article-views,
+.header-item.views,
+.article-time,
+.header-item.activity {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 
 .article-member-avatars-container,
@@ -581,7 +606,7 @@ export default {
 @container home-page (max-width: 768px) {
   .article-main-container,
   .header-item.main-item {
-    width: calc(80% - 20px);
+    width: calc(70% - 20px);
     padding-left: 20px;
   }
   
@@ -603,11 +628,34 @@ export default {
   .article-time,
   .header-item.activity {
     width: 10%;
+    margin-right: 3%;
   }
 
+  .header-container {
+    display: none;
+  }
 
   .article-member-avatar-item:nth-child(n+2) {
     display: none;
+  }
+  
+  .header-item-text {
+    font-size: 12px;
+  }
+
+  .article-item-title {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .article-item-description {
+    margin-top: 2px;
+    font-size: 10px;
+  }
+
+  .main-info-text {
+    font-size: 10px;
+    opacity: 0.5;
   }
 }
 

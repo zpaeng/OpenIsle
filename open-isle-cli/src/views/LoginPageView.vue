@@ -267,4 +267,37 @@ export default {
 .login-page-button-secondary-link {
   color: var(--primary-color);
 }
+
+@media (max-width: 768px) {
+  .login-page {
+    flex-direction: column;
+  }
+
+  .login-page-content {
+    width: calc(100% - 40px);
+    border-right: none;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .login-page-button-primary {
+    margin-top: 0px;
+  }
+
+  .login-page-button-secondary {
+    margin-top: 0px;
+    font-size: 13px;
+  }
+
+  .other-login-page-content {
+    margin-top: 20px;
+    margin-left: 0px;
+    width: calc(100% - 40px);
+    gap: 10px;
+  }
+
+  .login-page-button {
+    width: calc(100% - 40px);
+  }
+}
 </style>

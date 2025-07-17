@@ -374,4 +374,42 @@ export default {
   margin-top: -10px;
   margin-bottom: 10px;
 }
+
+@media (max-width: 768px) {
+  .signup-page {
+    flex-direction: column;
+  }
+
+  .email-signup-page-content {
+    margin-top: 20px;
+    gap: 15px;
+  }
+
+  .signup-page-content {
+    width: calc(100% - 40px);
+    border-right: none;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .signup-page-button-primary {
+    margin-top: 0px;
+  }
+
+  .signup-page-button-secondary {
+    margin-top: 0px;
+    font-size: 13px;
+  }
+
+  .other-signup-page-content {
+    margin-top: 20px;
+    margin-left: 0px;
+    width: calc(100% - 40px);
+    gap: 10px;
+  }
+
+  .signup-page-button {
+    width: calc(100% - 40px);
+  }
+}
 </style>

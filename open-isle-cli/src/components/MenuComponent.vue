@@ -221,15 +221,15 @@ export default {
 .menu {
   width: 200px;
   background-color: var(--menu-background-color);
-  height: calc(100vh - var(--header-height));
+  height: calc(100vh - var(--header-height) - 20px);
   border-right: 1px solid var(--menu-border-color);
   display: flex;
   flex-direction: column;
+  padding: 10px;
   overflow-y: auto;
 }
 
 .menu-item-container {
-  padding: 10px;
 }
 
 .menu-item {
@@ -296,7 +296,7 @@ export default {
 }
 
 .menu-section {
-  padding: 10px;
+  margin-top: 10px;
 }
 
 .section-header {
@@ -358,7 +358,7 @@ export default {
 @media (max-width: 768px) {
   .menu {
     position: fixed;
-    width: 100%;
+    width: calc(100% - 20px);
     z-index: 1000;
   }
 
