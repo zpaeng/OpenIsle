@@ -6,7 +6,10 @@
     />
 
     <div class="main-container">
-      <MenuComponent :visible="!hideMenu && menuVisible" />
+      <MenuComponent
+        :visible="!hideMenu && menuVisible"
+        @item-click="menuVisible = false"
+      />
       <div class="content">
         <router-view />
       </div>
