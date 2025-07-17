@@ -271,9 +271,11 @@ export default {
 @media (max-width: 768px) {
   .login-page {
     flex-direction: column;
+    justify-content: flex-start;
   }
 
   .login-page-content {
+    margin-top: 20px;
     width: calc(100% - 40px);
     border-right: none;
     padding-left: 20px;

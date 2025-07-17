@@ -166,3 +166,21 @@ body {
   background-color: var(--menu-selected-background-color);
   transition: background-color 0.2s ease;
 }
+
+@media (max-width: 768px) {
+  .info-content-text h1 {
+    font-size: 20px;
+  }
+
+  .info-content-text h2 {
+    font-size: 18px;
+  }
+
+  .info-content-text p {
+    font-size: 12px;
+  }
+
+  .info-content-text li {
+    font-size: 12px;
+  }
+}

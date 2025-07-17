@@ -378,14 +378,16 @@ export default {
 @media (max-width: 768px) {
   .signup-page {
     flex-direction: column;
+    justify-content: flex-start;
   }
 
   .email-signup-page-content {
     margin-top: 20px;
-    gap: 15px;
+    gap: 20px;
   }
 
   .signup-page-content {
+    margin-top: 20px;
     width: calc(100% - 40px);
     border-right: none;
     padding-left: 20px;

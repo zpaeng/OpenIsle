@@ -63,5 +63,17 @@ export default {
   width: 16px;
   height: 16px;
 }
+
+@media (max-width: 768px) {
+  .article-info-item-img {
+    width: 10px;
+    height: 10px;
+  }
+
+  .article-info-item {
+    font-size: 10px;
+  }
+}
+
 </style>
 

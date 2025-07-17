@@ -811,4 +811,15 @@ export default {
 .comment-editor-wrapper {
   position: relative;
 }
+
+@media (max-width: 768px) {
+  .post-page-main-container {
+    width: calc(100% - 20px);
+    padding: 10px;
+  }
+
+  .post-page-scroller-container {
+    display: none;
+  }
+}
 </style>
