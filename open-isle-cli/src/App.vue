@@ -25,7 +25,7 @@ export default {
   name: 'App',
   components: { HeaderComponent, MenuComponent },
   data() {
-    return { menuVisible: true }
+    return { menuVisible: window.innerWidth > 768 }
   },
   computed: {
     hideMenu() {
