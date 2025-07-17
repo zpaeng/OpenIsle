@@ -54,9 +54,7 @@ export default {
       vditorInstance.value = new Vditor(props.editorId, {
         placeholder: '说点什么...',
         height: 120,
-        theme: 'classic',
         preview: {
-          theme: { current: 'light' },
           actions: [],
           markdown: { toc: false }
         },
