@@ -17,6 +17,7 @@
 <script>
 import { ref, onMounted, computed, watch } from 'vue'
 import Vditor from 'vditor'
+import { themeState } from '../utils/theme'
 import 'vditor/dist/index.css'
 
 export default {
@@ -39,6 +40,15 @@ export default {
   setup(props, { emit }) {
     const vditorInstance = ref(null)
     const text = ref('')
+    const getEditorTheme = () =>
+      document.documentElement.dataset.theme === 'dark' ? 'dark' : 'classic'
+    const getPreviewTheme = () =>
+      document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'
+    const applyTheme = () => {
+      if (vditorInstance.value) {
+        vditorInstance.value.setTheme(getEditorTheme(), getPreviewTheme())
+      }
+    }
 
     const isDisabled = computed(() => props.loading || props.disabled || !text.value.trim())
 
@@ -54,9 +64,11 @@ export default {
       vditorInstance.value = new Vditor(props.editorId, {
         placeholder: '说点什么...',
         height: 120,
+        theme: getEditorTheme(),
         preview: {
           actions: [],
-          markdown: { toc: false }
+          markdown: { toc: false },
+          theme: { current: getPreviewTheme() }
         },
         toolbar: [
           'emoji',
@@ -81,6 +93,7 @@ export default {
           text.value = value
         }
       })
+      applyTheme()
     })
 
     watch(
@@ -104,6 +117,13 @@ export default {
         } else if (!props.loading) {
           vditorInstance.value.enable()
         }
+      }
+    )
+
+    watch(
+      () => themeState.mode,
+      () => {
+        applyTheme()
       }
     )
 
