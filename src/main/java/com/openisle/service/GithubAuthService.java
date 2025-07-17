@@ -60,6 +60,7 @@ public class GithubAuthService {
             }
             JsonNode userNode = userRes.getBody();
             String username = userNode.hasNonNull("login") ? userNode.get("login").asText() : null;
+            String avatarUrl = userNode.hasNonNull("avatar_url") ? userNode.get("avatar_url").asText() : null;
             String email = null;
             if (userNode.hasNonNull("email")) {
                 email = userNode.get("email").asText();
@@ -83,13 +84,13 @@ public class GithubAuthService {
             if (email == null) {
                 email = username + "@users.noreply.github.com";
             }
-            return Optional.of(processUser(email, username, mode));
+            return Optional.of(processUser(email, username, avatarUrl, mode));
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
-    private User processUser(String email, String username, com.openisle.model.RegisterMode mode) {
+    private User processUser(String email, String username, String avatar, com.openisle.model.RegisterMode mode) {
         Optional<User> existing = userRepository.findByEmail(email);
         if (existing.isPresent()) {
             User user = existing.get();
@@ -113,7 +114,11 @@ public class GithubAuthService {
         user.setRole(Role.USER);
         user.setVerified(true);
         user.setApproved(mode == com.openisle.model.RegisterMode.DIRECT);
-        user.setAvatar("https://github.com/" + finalUsername + ".png");
+        if (avatar != null) {
+            user.setAvatar(avatar);
+        } else {
+            user.setAvatar("https://github.com/" + finalUsername + ".png");
+        }
         return userRepository.save(user);
     }
 }

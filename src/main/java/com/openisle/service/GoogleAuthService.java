@@ -35,13 +35,14 @@ public class GoogleAuthService {
             GoogleIdToken.Payload payload = idToken.getPayload();
             String email = payload.getEmail();
             String name = (String) payload.get("name");
-            return Optional.of(processUser(email, name, mode));
+            String picture = (String) payload.get("picture");
+            return Optional.of(processUser(email, name, picture, mode));
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
-    private User processUser(String email, String name, com.openisle.model.RegisterMode mode) {
+    private User processUser(String email, String name, String avatar, com.openisle.model.RegisterMode mode) {
         Optional<User> existing = userRepository.findByEmail(email);
         if (existing.isPresent()) {
             User user = existing.get();
@@ -66,7 +67,11 @@ public class GoogleAuthService {
         user.setRole(Role.USER);
         user.setVerified(true);
         user.setApproved(mode == com.openisle.model.RegisterMode.DIRECT);
-        user.setAvatar("https://github.com/identicons/" + username + ".png");
+        if (avatar != null) {
+            user.setAvatar(avatar);
+        } else {
+            user.setAvatar("https://github.com/identicons/" + username + ".png");
+        }
         return userRepository.save(user);
     }
 }
