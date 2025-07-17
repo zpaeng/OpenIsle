@@ -331,6 +331,9 @@ export default {
   flex-direction: column;
   align-items: center;
   overflow-y: auto;
+  /* enable container queries */
+  container-type: inline-size;
+  container-name: home-page;
   /* width variables shared between header and article rows */
   --main-width: 60%;
   --avatars-width: 20%;
@@ -529,7 +532,24 @@ export default {
   opacity: 0.7;
 }
 
-@container home-page (min-width: 900px) {
+@container home-page (max-width: 900px) {
+  .home-page {
+    --main-width: 65%;
+    --avatars-width: 15%;
+  }
+  .article-member-avatar-item:nth-child(n+4) {
+    display: none;
+  }
+}
+
+@container home-page (max-width: 768px) {
+  .home-page {
+    --main-width: 70%;
+    --avatars-width: 10%;
+  }
+  .article-member-avatar-item:nth-child(n+2) {
+    display: none;
+  }
 }
 
 </style>
