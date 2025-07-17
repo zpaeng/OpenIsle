@@ -1,6 +1,6 @@
 <template>
   <div class="home-page" @scroll="handleScroll">
-    <div class="search-container">
+    <div v-if="!isMobile" class="search-container">
       <div class="search-title">一切可能，从此刻启航</div>
       <div class="search-subtitle">愿你在此遇见灵感与共鸣。若有疑惑，欢迎发问，亦可在知识的海洋中搜寻答案。</div>
       <SearchDropdown />
@@ -113,6 +113,7 @@ import ArticleTags from '../components/ArticleTags.vue'
 import ArticleCategory from '../components/ArticleCategory.vue'
 import SearchDropdown from '../components/SearchDropdown.vue'
 import { hatch } from 'ldrs'
+import { isMobile } from '../utils/screen'
 hatch.register()
 
 
@@ -317,7 +318,7 @@ export default {
 
     const sanitizeDescription = (text) => stripMarkdown(text)
 
-    return { topics, selectedTopic, articles, sanitizeDescription, isLoadingPosts, handleScroll, selectedCategory, selectedTags, tagOptions, categoryOptions }
+    return { topics, selectedTopic, articles, sanitizeDescription, isLoadingPosts, handleScroll, selectedCategory, selectedTags, tagOptions, categoryOptions, isMobile }
   }
 }
 </script>
@@ -528,11 +529,7 @@ export default {
   opacity: 0.7;
 }
 
-@media (max-width: var(--page-max-width)) {
-
+@container home-page (min-width: 900px) {
 }
 
-@media (max-width: var(--page-max-width-mobile)) {
-
-}
 </style>
