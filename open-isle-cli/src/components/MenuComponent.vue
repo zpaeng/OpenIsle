@@ -2,26 +2,52 @@
   <transition name="slide">
     <nav v-if="visible" class="menu">
       <div class="menu-item-container">
-        <router-link class="menu-item" exact-active-class="selected" to="/">
+        <router-link
+          class="menu-item"
+          exact-active-class="selected"
+          to="/"
+          @click="handleItemClick"
+        >
           <i class="menu-item-icon fas fa-hashtag"></i>
           <span class="menu-item-text">话题</span>
         </router-link>
-        <router-link class="menu-item" exact-active-class="selected" to="/message">
+        <router-link
+          class="menu-item"
+          exact-active-class="selected"
+          to="/message"
+          @click="handleItemClick"
+        >
           <i class="menu-item-icon fas fa-envelope"></i>
           <span class="menu-item-text">我的消息</span>
           <span v-if="unreadCount > 0" class="unread-container">
             <span class="unread"> {{ showUnreadCount }} </span>
           </span>
         </router-link>
-        <router-link class="menu-item" exact-active-class="selected" to="/about">
+        <router-link
+          class="menu-item"
+          exact-active-class="selected"
+          to="/about"
+          @click="handleItemClick"
+        >
           <i class="menu-item-icon fas fa-info-circle"></i>
           <span class="menu-item-text">关于</span>
         </router-link>
-        <router-link v-if="shouldShowStats" class="menu-item" exact-active-class="selected" to="/about/stats">
+        <router-link
+          v-if="shouldShowStats"
+          class="menu-item"
+          exact-active-class="selected"
+          to="/about/stats"
+          @click="handleItemClick"
+        >
           <i class="menu-item-icon fas fa-chart-line"></i>
           <span class="menu-item-text">站点统计</span>
         </router-link>
-        <router-link class="menu-item" exact-active-class="selected" to="/new-post">
+        <router-link
+          class="menu-item"
+          exact-active-class="selected"
+          to="/new-post"
+          @click="handleItemClick"
+        >
           <i class="menu-item-icon fas fa-edit"></i>
           <span class="menu-item-text">发帖</span>
         </router-link>
@@ -162,6 +188,9 @@ export default {
   },
   methods: {
     cycleTheme,
+    handleItemClick() {
+      if (window.innerWidth <= 768) this.$emit('item-click')
+    },
     isImageIcon(icon) {
       if (!icon) return false
       return /^https?:\/\//.test(icon) || icon.startsWith('/')
@@ -173,6 +202,7 @@ export default {
         .then(() => {
           window.location.reload()
         })
+      this.handleItemClick()
     },
     gotoTag(t) {
       const value = encodeURIComponent(t.id ?? t.name)
@@ -181,6 +211,7 @@ export default {
         .then(() => {
           window.location.reload()
         })
+      this.handleItemClick()
     }
   }
 }
