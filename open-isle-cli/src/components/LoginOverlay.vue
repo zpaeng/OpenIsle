@@ -60,6 +60,9 @@ export default {
   align-items: center;
   border-radius: 10px;
   padding: 24px 32px;
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 20px;
 }
 
 .login-overlay-icon {
