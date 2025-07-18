@@ -830,6 +830,10 @@ export default {
     font-size: 12px;
   }
 
+  .info-content-text {
+    line-height: 1.3;
+  }
+
   .reactions-viewer-item {
     font-size: 14px;
   }
@@ -852,7 +856,7 @@ export default {
   }
 
   .article-footer-container {
-    margin-top: 10px;
+    margin-top: 0;
   }
 
   .loading-container {

@@ -183,6 +183,8 @@ body {
 
   .info-content-text p {
     font-size: 14px;
+    margin-top: 3px;
+    margin-bottom: 3px;
   }
 
   .info-content-text li {
