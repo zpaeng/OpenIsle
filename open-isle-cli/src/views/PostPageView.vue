@@ -63,7 +63,9 @@
         </div>
       </div>
 
-      <CommentEditor @submit="postComment" :loading="isWaitingPostingComment" :disabled="!loggedIn"
+      <CommentEditor v-if="!isMobile" @submit="postComment" :loading="isWaitingPostingComment" :disabled="!loggedIn"
+        :show-login-overlay="!loggedIn" />
+      <SimpleCommentEditor v-else @submit="postComment" :loading="isWaitingPostingComment" :disabled="!loggedIn"
         :show-login-overlay="!loggedIn" />
 
       <div class="comments-container">
@@ -108,6 +110,7 @@ import VueEasyLightbox from 'vue-easy-lightbox'
 import { useRoute } from 'vue-router'
 import CommentItem from '../components/CommentItem.vue'
 import CommentEditor from '../components/CommentEditor.vue'
+import SimpleCommentEditor from '../components/SimpleCommentEditor.vue'
 import BaseTimeline from '../components/BaseTimeline.vue'
 import ArticleTags from '../components/ArticleTags.vue'
 import ArticleCategory from '../components/ArticleCategory.vue'
@@ -124,7 +127,7 @@ hatch.register()
 
 export default {
   name: 'PostPageView',
-  components: { CommentItem, CommentEditor, BaseTimeline, ArticleTags, ArticleCategory, ReactionsGroup, DropdownMenu, VueEasyLightbox },
+  components: { CommentItem, CommentEditor, SimpleCommentEditor, BaseTimeline, ArticleTags, ArticleCategory, ReactionsGroup, DropdownMenu, VueEasyLightbox },
   setup() {
     const route = useRoute()
     const postId = route.params.id
