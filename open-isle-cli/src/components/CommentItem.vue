@@ -33,7 +33,7 @@
         </ReactionsGroup>
       </div>
       <div class="comment-editor-wrapper">
-        <CommentEditor v-if="showEditor" @submit="submitReply" :loading="isWaitingForReply" :disabled="!isLoggedIn" :show-login-overlay="!isLoggedIn" />
+        <CommentEditor v-if="showEditor" @submit="submitReply" :loading="isWaitingForReply" :disabled="!loggedIn" :show-login-overlay="!loggedIn" />
       </div>
       <div v-if="comment.reply && comment.reply.length" class="reply-toggle" @click="toggleReplies">
         <i v-if="showReplies" class="fas fa-chevron-up reply-toggle-icon"></i>
@@ -110,6 +110,7 @@ const CommentItem = {
     const lightboxVisible = ref(false)
     const lightboxIndex = ref(0)
     const lightboxImgs = ref([])
+    const loggedIn = computed(() => authState.loggedIn)
     const toggleReplies = () => {
       showReplies.value = !showReplies.value
     }
@@ -205,7 +206,7 @@ const CommentItem = {
         lightboxVisible.value = true
       }
     }
-    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply, commentMenuItems, deleteComment, lightboxVisible, lightboxIndex, lightboxImgs, handleImageClick }
+    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply, commentMenuItems, deleteComment, lightboxVisible, lightboxIndex, lightboxImgs, handleImageClick, loggedIn }
   }
 }
 

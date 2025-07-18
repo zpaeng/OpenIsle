@@ -96,15 +96,11 @@ body {
   background-color: #f6f8fa;
   padding: 8px 12px;
   border-radius: 4px;
-  line-height: 1.0;
-  overflow-x: auto;
-  max-width: 100%;
 }
 
 .info-content-text code {
   font-family: 'Courier New', monospace;
   font-size: 13px;
-  /* background-color: rgba(27, 31, 35, 0.05); */
   border-radius: 4px;
 }
 
@@ -178,6 +174,7 @@ body {
   .info-content-text {
     font-size: 14px;
   }
+
   .info-content-text h1 {
     font-size: 20px;
   }
