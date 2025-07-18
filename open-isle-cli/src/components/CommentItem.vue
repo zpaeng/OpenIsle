@@ -33,7 +33,8 @@
         </ReactionsGroup>
       </div>
       <div class="comment-editor-wrapper">
-        <CommentEditor v-if="showEditor" @submit="submitReply" :loading="isWaitingForReply" :disabled="!loggedIn" :show-login-overlay="!loggedIn" />
+        <CommentEditor v-if="showEditor && !isMobile" @submit="submitReply" :loading="isWaitingForReply" :disabled="!loggedIn" :show-login-overlay="!loggedIn" />
+        <SimpleCommentEditor v-if="showEditor && isMobile" @submit="submitReply" :loading="isWaitingForReply" :disabled="!loggedIn" :show-login-overlay="!loggedIn" />
       </div>
       <div v-if="comment.reply && comment.reply.length" class="reply-toggle" @click="toggleReplies">
         <i v-if="showReplies" class="fas fa-chevron-up reply-toggle-icon"></i>
@@ -69,6 +70,7 @@ import { ref, watch, computed } from 'vue'
 import VueEasyLightbox from 'vue-easy-lightbox'
 import { useRouter } from 'vue-router'
 import CommentEditor from './CommentEditor.vue'
+import SimpleCommentEditor from './SimpleCommentEditor.vue'
 import { renderMarkdown } from '../utils/markdown'
 import TimeManager from '../utils/time'
 import BaseTimeline from './BaseTimeline.vue'
@@ -77,6 +79,7 @@ import { getToken, authState } from '../utils/auth'
 import ReactionsGroup from './ReactionsGroup.vue'
 import DropdownMenu from './DropdownMenu.vue'
 import LoginOverlay from './LoginOverlay.vue'
+import { isMobile } from '../utils/screen'
 
 const CommentItem = {
   name: 'CommentItem',
@@ -205,11 +208,11 @@ const CommentItem = {
         lightboxVisible.value = true
       }
     }
-    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply, commentMenuItems, deleteComment, lightboxVisible, lightboxIndex, lightboxImgs, handleImageClick, loggedIn }
+    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply, commentMenuItems, deleteComment, lightboxVisible, lightboxIndex, lightboxImgs, handleImageClick, loggedIn, isMobile }
   }
 }
 
-CommentItem.components = { CommentItem, CommentEditor, BaseTimeline, ReactionsGroup, DropdownMenu, VueEasyLightbox, LoginOverlay }
+CommentItem.components = { CommentItem, CommentEditor, SimpleCommentEditor, BaseTimeline, ReactionsGroup, DropdownMenu, VueEasyLightbox, LoginOverlay }
 
 export default CommentItem
 </script>
