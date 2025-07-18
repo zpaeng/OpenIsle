@@ -27,7 +27,7 @@ export async function twitterAuthorize(state = '') {
   if (state === '') {
     state = Math.random().toString(36).substring(2, 15)
   }
-  const redirectUri = `${window.location.origin}/twitter-callback`
+  const redirectUri = `https://www.open-isle.com/twitter-callback`
   const codeVerifier = generateCodeVerifier()
   sessionStorage.setItem('twitter_code_verifier', codeVerifier)
   const codeChallenge = await generateCodeChallenge(codeVerifier)

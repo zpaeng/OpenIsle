@@ -6,7 +6,7 @@ export function discordAuthorize(state = '') {
     toast.error('Discord 登录不可用')
     return
   }
-  const redirectUri = `${window.location.origin}/discord-callback`
+  const redirectUri = `https://www.open-isle.com/discord-callback`
   const url = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=identify%20email&state=${state}`
   window.location.href = url
 }
