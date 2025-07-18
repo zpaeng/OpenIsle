@@ -384,12 +384,16 @@ export default {
 }
 
 .topic-container {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--background-color);
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 20px 0;
+  padding: 10px 0;
 }
 
 .topic-item-container {

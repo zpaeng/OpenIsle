@@ -358,8 +358,12 @@ export default {
 @media (max-width: 768px) {
   .menu {
     position: fixed;
-    width: calc(100% - 20px);
     z-index: 1000;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    left: 10px;
+    border-radius: 20px;
+    border-right: none;
+    height: 400px;
   }
 
   .slide-enter-active,
