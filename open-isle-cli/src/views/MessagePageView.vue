@@ -659,4 +659,10 @@ export default {
   color: var(--primary-color);
   border-bottom: 2px solid var(--primary-color);
 }
+
+@media (max-width: 768px) {
+  .has_read_button {
+    display: none;
+  }
+}
 </style>

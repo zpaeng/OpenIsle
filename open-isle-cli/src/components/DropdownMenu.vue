@@ -75,7 +75,7 @@ export default {
   border: 1px solid var(--normal-border-color);
   border-radius: 4px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  z-index: 10;
+  z-index: 1000;
   border-radius: 8px;
   min-width: 100px;
 }
