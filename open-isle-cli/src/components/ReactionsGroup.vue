@@ -116,7 +116,7 @@ export default {
     }
     const scheduleHide = () => {
       clearTimeout(hideTimer)
-      hideTimer = setTimeout(() => { panelVisible.value = false }, 0)
+      hideTimer = setTimeout(() => { panelVisible.value = false }, 500)
     }
     const cancelHide = () => {
       clearTimeout(hideTimer)
