@@ -96,6 +96,7 @@ body {
   background-color: #f6f8fa;
   padding: 8px 12px;
   border-radius: 4px;
+  line-height: 0.5;
 }
 
 .info-content-text code {
