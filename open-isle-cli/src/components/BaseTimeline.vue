@@ -88,6 +88,7 @@ export default {
 
 .timeline-content {
   flex: 1;
+  width: calc(100% - 32px);
 }
 
 @media (max-width: 768px) {

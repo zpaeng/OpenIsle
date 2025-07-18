@@ -94,7 +94,7 @@
                       下对
                       <router-link :to="`/posts/${item.comment.post.id}#comment-${item.comment.parentComment.id}`"
                         class="timeline-link">
-                        {{ item.comment.parentComment.content }}
+                        {{ stripMarkdownLength(item.comment.parentComment.content, 200) }}
                       </router-link>
                       回复了
                     </template>
@@ -103,7 +103,7 @@
                     </template>
                     <router-link :to="`/posts/${item.comment.post.id}#comment-${item.comment.id}`"
                       class="timeline-link">
-                      {{ item.comment.content }}
+                      {{ stripMarkdownLength(item.comment.content, 200) }}
                     </router-link>
                     <div class="timeline-date">
                       {{ formatDate(item.comment.createdAt) }}
@@ -178,7 +178,7 @@
                 </router-link>
                 下评论了
                 <router-link :to="`/posts/${item.comment.post.id}#comment-${item.comment.id}`" class="timeline-link">
-                  {{ item.comment.content }}
+                  {{ stripMarkdownLength(item.comment.content, 200) }}
                 </router-link>
                 <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
               </template>
@@ -240,7 +240,7 @@ import { getToken, authState } from '../utils/auth'
 import BaseTimeline from '../components/BaseTimeline.vue'
 import UserList from '../components/UserList.vue'
 import BasePlaceholder from '../components/BasePlaceholder.vue'
-import { stripMarkdown } from '../utils/markdown'
+import { stripMarkdown, stripMarkdownLength } from '../utils/markdown'
 import TimeManager from '../utils/time'
 import { hatch } from 'ldrs'
 hatch.register()
@@ -440,6 +440,7 @@ export default {
       followTab,
       formatDate,
       stripMarkdown,
+      stripMarkdownLength,
       loadTimeline,
       loadFollow,
       loadSummary,
@@ -464,6 +465,7 @@ export default {
   background-color: var(--background-color);
   height: calc(100vh - var(--header-height));
   overflow-y: auto;
+  overflow-x: hidden; 
 }
 
 .profile-page-header {
@@ -535,6 +537,8 @@ export default {
   gap: 20px;
   border-top: 1px solid var(--normal-border-color);
   border-bottom: 1px solid var(--normal-border-color);
+  scrollbar-width: none; 
+  overflow-x: auto;
 }
 
 .profile-info-item {
@@ -543,6 +547,7 @@ export default {
   gap: 5px;
   align-items: center;
   padding: 10px 0;
+  white-space: nowrap; 
 }
 
 .profile-info-item-label {
@@ -559,10 +564,13 @@ export default {
   flex-direction: row;
   padding: 0 20px;
   border-bottom: 1px solid var(--normal-border-color);
-}
+  scrollbar-width: none; 
+  overflow-x: auto;
+ }
 
 .profile-tabs-item {
   display: flex;
+  flex: 0 0 auto;
   flex-direction: row;
   gap: 10px;
   align-items: center;
@@ -570,6 +578,7 @@ export default {
   padding: 10px 0;
   width: 200px;
   cursor: pointer;
+  white-space: nowrap; 
 }
 
 .profile-tabs-item.selected {
@@ -586,6 +595,7 @@ export default {
 
 .summary-title {
   font-size: 20px;
+  margin-bottom: 10px;
   font-weight: bold;
 }
 
@@ -596,7 +606,9 @@ export default {
 .total-summary-content {
   display: flex;
   flex-direction: row;
-  gap: 20px;
+  flex-wrap: wrap;
+  row-gap: 0px;
+  column-gap: 20px;
 }
 
 .total-summary-item {
@@ -604,7 +616,6 @@ export default {
   flex-direction: row;
   gap: 10px;
   align-items: center;
-  padding: 10px 0;
 }
 
 .total-summary-item-label {
@@ -696,5 +707,34 @@ export default {
 
 .follow-list {
   padding-left: 20px;
+}
+
+@media (max-width: 768px) {
+  .profile-page {
+    width: 100vw;
+  }
+
+  .profile-page-header-avatar-img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .profile-tabs-item {
+    width: 100px;
+  }
+
+  .summary-divider {
+    flex-direction: column;
+  }
+
+  .hot-reply,
+  .hot-topic,
+  .hot-tag {
+    width: 100%;
+  }
+
+  .profile-timeline {
+    width: calc(100vw - 40px);
+  }
 }
 </style>

@@ -16,3 +16,12 @@ export function stripMarkdown(text) {
   el.innerHTML = html
   return el.textContent || el.innerText || ''
 }
+
+export function stripMarkdownLength(text, length) {
+  const plain = stripMarkdown(text)
+  if (!length || plain.length <= length) {
+    return plain
+  }
+  // 截断并加省略号
+  return plain.slice(0, length) + '...'
+}
