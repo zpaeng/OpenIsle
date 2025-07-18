@@ -133,4 +133,10 @@ export default {
 .signup-page-button-primary.disabled:hover {
   cursor: not-allowed;
 }
+
+@media (max-width: 768px) {
+  .reason-content {
+    width: calc(100vw - 40px);
+  }
+}
 </style>
