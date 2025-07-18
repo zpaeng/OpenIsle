@@ -42,6 +42,8 @@ export default {
 }
 
 .timeline-icon {
+  position: sticky;
+  top: 0;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -87,4 +89,17 @@ export default {
 .timeline-content {
   flex: 1;
 }
+
+@media (max-width: 768px) {
+  .timeline-item {
+    margin-bottom: 10px;
+  }
+
+  .timeline-icon {
+    margin-right: 2px;
+    width: 30px;
+    height: 30px;
+  }
+}
+
 </style>

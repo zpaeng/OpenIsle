@@ -116,7 +116,7 @@ export default {
     }
     const scheduleHide = () => {
       clearTimeout(hideTimer)
-      hideTimer = setTimeout(() => { panelVisible.value = false }, 2000)
+      hideTimer = setTimeout(() => { panelVisible.value = false }, 0)
     }
     const cancelHide = () => {
       clearTimeout(hideTimer)
@@ -275,5 +275,12 @@ export default {
 
 .reaction-option.selected {
   background-color: rgb(236, 236, 236);
+}
+
+@media (max-width: 768px) {
+  .make-reaction-item {
+    font-size: 16px;
+    padding: 3px 5px;
+  }
 }
 </style>

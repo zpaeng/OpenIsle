@@ -227,6 +227,7 @@ export default {
   flex-direction: column;
   padding: 10px;
   overflow-y: auto;
+  scrollbar-width: none;
 }
 
 .menu-item-container {

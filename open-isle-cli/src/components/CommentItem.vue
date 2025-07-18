@@ -8,7 +8,7 @@
       </div>
     </div>   -->
     <div class="info-content">
-      <div class="info-content-header">
+      <div class="common-info-content-header">
         <div class="info-content-header-left">
           <div class="user-name">{{ comment.userName }}</div>
           <div class="post-time">{{ comment.time }}</div>
@@ -38,7 +38,6 @@
       <div v-if="comment.reply && comment.reply.length" class="reply-toggle" @click="toggleReplies">
         <i v-if="showReplies" class="fas fa-chevron-up reply-toggle-icon"></i>
         <i v-else class="fas fa-chevron-down reply-toggle-icon"></i>
-
         {{ comment.reply.length }}条回复
       </div>
       <div v-if="showReplies" class="reply-list">
@@ -239,6 +238,14 @@ export default CommentItem
 .reply-toggle-icon {
   margin-right: 5px;
 }
+
+.common-info-content-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
 
 @keyframes highlight {
   from {

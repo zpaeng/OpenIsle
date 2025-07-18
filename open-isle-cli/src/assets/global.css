@@ -93,16 +93,17 @@ body {
 }
 
 .info-content-text pre {
-  background-color: #f6f8fa;
+  background-color: var(--normal-background-color);
   padding: 8px 12px;
   border-radius: 4px;
-  line-height: 0.5;
+  line-height: 0.8;
 }
 
 .info-content-text code {
-  font-family: 'Courier New', monospace;
+  font-family: monospace;
   font-size: 13px;
   border-radius: 4px;
+  white-space: pre-wrap;
 }
 
 .info-content-text a {
@@ -172,10 +173,6 @@ body {
 }
 
 @media (max-width: 768px) {
-  .info-content-text {
-    font-size: 14px;
-  }
-
   .info-content-text h1 {
     font-size: 20px;
   }
@@ -185,10 +182,10 @@ body {
   }
 
   .info-content-text p {
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .info-content-text li {
-    font-size: 12px;
+    font-size: 14px;
   }
 }

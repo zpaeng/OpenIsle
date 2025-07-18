@@ -95,7 +95,6 @@ export default {
           'redo',
           '|',
           'link',
-          'image'
         ],
         toolbarConfig: { pin: true },
         input(value) {

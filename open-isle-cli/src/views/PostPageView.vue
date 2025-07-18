@@ -40,10 +40,14 @@
           <div class="user-avatar-item">
             <img class="user-avatar-item-img" :src="author.avatar" alt="avatar">
           </div>
+          <div v-if="isMobile" class="info-content-header">
+            <div class="user-name">{{ author.username }}</div>
+            <div class="post-time">{{ postTime }}</div>
+          </div>
         </div>
 
         <div class="info-content">
-          <div class="info-content-header">
+          <div v-if="!isMobile" class="info-content-header">
             <div class="user-name">{{ author.username }}</div>
             <div class="post-time">{{ postTime }}</div>
           </div>
@@ -63,9 +67,9 @@
         :show-login-overlay="!loggedIn" />
 
       <div class="comments-container">
-        <BaseTimeline :items="comments">
+        <BaseTimeline :items="comments"> 
           <template #item="{ item }">
-            <CommentItem :key="item.id" :comment="item" :level="level + 1" :default-show-replies="item.openReplies"
+            <CommentItem :key="item.id" :comment="item" :level="0" :default-show-replies="item.openReplies"
               @deleted="onCommentDeleted" />
           </template>
         </BaseTimeline>
@@ -115,6 +119,7 @@ import { getToken, authState } from '../utils/auth'
 import TimeManager from '../utils/time'
 import { hatch } from 'ldrs'
 import { useRouter } from 'vue-router'
+import { isMobile } from '../utils/screen'
 hatch.register()
 
 export default {
@@ -140,7 +145,7 @@ export default {
     const mainContainer = ref(null)
     const currentIndex = ref(1)
     const subscribed = ref(false)
-
+      
     const lightboxVisible = ref(false)
     const lightboxIndex = ref(0)
     const lightboxImgs = ref([])
@@ -506,7 +511,8 @@ export default {
       lightboxVisible,
       lightboxIndex,
       lightboxImgs,
-      handleImageClick
+      handleImageClick,
+      isMobile
     }
   }
 }
@@ -549,6 +555,11 @@ export default {
 .scroller-time {
   font-size: 14px;
   opacity: 0.5;
+}
+
+.user-avatar-container {
+  display: flex;
+  flex-direction: row;
 }
 
 .scroller-middle {
@@ -740,7 +751,6 @@ export default {
 .info-content-header {
   display: flex;
   flex-direction: row;
-  gap: 10px;
   align-items: center;
   justify-content: space-between;
 }
@@ -768,15 +778,6 @@ export default {
   flex-direction: row;
   gap: 10px;
   margin-top: 60px;
-}
-
-.reactions-container {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  align-items: center;
-  width: 100%;
-  justify-content: space-between;
 }
 
 .reactions-viewer {
@@ -835,6 +836,27 @@ export default {
 
   .post-page-scroller-container {
     display: none;
+  }
+
+  .info-content {
+    gap: 3px;
+  }
+
+  .info-content-container {
+    flex-direction: column;
+  }
+
+  .info-content-header {
+    width: calc(100% - 50px - 10px);
+    margin-left: 10px;
+  }
+
+  .article-footer-container {
+    margin-top: 10px;
+  }
+
+  .loading-container {
+    width: 100%;
   }
 }
 </style>
