@@ -80,6 +80,11 @@ body {
   padding-left: 1.5em;
 }
 
+.info-content-text {
+  word-break: break-word;
+  max-width: 100%;
+}
+
 .info-content-text blockquote {
   margin: 1em 0;
   padding-left: 1em;
@@ -92,6 +97,8 @@ body {
   padding: 8px 12px;
   border-radius: 4px;
   line-height: 1.0;
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .info-content-text code {
@@ -168,6 +175,9 @@ body {
 }
 
 @media (max-width: 768px) {
+  .info-content-text {
+    font-size: 14px;
+  }
   .info-content-text h1 {
     font-size: 20px;
   }

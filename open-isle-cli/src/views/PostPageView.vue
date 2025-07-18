@@ -818,6 +818,22 @@ export default {
     padding: 10px;
   }
 
+  .article-title {
+    font-size: 22px;
+  }
+
+  .user-name {
+    font-size: 14px;
+  }
+
+  .post-time {
+    font-size: 12px;
+  }
+
+  .reactions-viewer-item {
+    font-size: 14px;
+  }
+
   .post-page-scroller-container {
     display: none;
   }
