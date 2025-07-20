@@ -173,20 +173,24 @@ body {
 }
 
 @media (max-width: 768px) {
+  .about-content h1,
   .info-content-text h1 {
     font-size: 20px;
   }
 
+  .about-content h2,
   .info-content-text h2 {
     font-size: 18px;
   }
 
+  .about-content p,
   .info-content-text p {
     font-size: 14px;
     margin-top: 3px;
     margin-bottom: 3px;
   }
 
+  .about-content li,
   .info-content-text li {
     font-size: 14px;
   }
