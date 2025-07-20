@@ -1,12 +1,13 @@
 import { API_BASE_URL, GITHUB_CLIENT_ID, toast } from '../main'
 import { setToken, loadCurrentUser } from './auth'
+import { WEBSITE_BASE_URL } from '../constants'
 
 export function githubAuthorize(state = '') {
   if (!GITHUB_CLIENT_ID) {
     toast.error('GitHub 登录不可用')
     return
   }
-  const redirectUri = `https://www.open-isle.com/github-callback`
+  const redirectUri = `${WEBSITE_BASE_URL}/github-callback`
   const url = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user:email&state=${state}`
   window.location.href = url
 }
