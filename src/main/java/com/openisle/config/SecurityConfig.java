@@ -25,6 +25,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.beans.factory.annotation.Value;
 import java.util.List;
 
 import jakarta.servlet.FilterChain;
@@ -40,6 +41,8 @@ public class SecurityConfig {
     private final UserRepository userRepository;
     private final AccessDeniedHandler customAccessDeniedHandler;
     private final UserVisitService userVisitService;
+    @Value("${app.website-url}")
+    private String websiteUrl;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -70,14 +73,14 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
         cfg.setAllowedOrigins(List.of(
-                "http://127.0.0.1:8080",        
-                "http://127.0.0.1",           
-                "http://localhost:8080",          
-                "http://localhost",           
-                "http://30.211.97.200:8080",          
-                "http://30.211.97.200",     
-                "https://www.open-isle.com",   
-                "https://open-isle.com"
+                "http://127.0.0.1:8080",
+                "http://127.0.0.1",
+                "http://localhost:8080",
+                "http://localhost",
+                "http://30.211.97.200:8080",
+                "http://30.211.97.200",
+                websiteUrl,
+                websiteUrl.replace("://www.", "://")
         ));
         cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
         cfg.setAllowedHeaders(List.of("*"));

@@ -1,4 +1,5 @@
 import { API_BASE_URL, TWITTER_CLIENT_ID, toast } from '../main'
+import { WEBSITE_BASE_URL } from '../constants'
 import { setToken, loadCurrentUser } from './auth'
 
 function generateCodeVerifier() {
@@ -27,7 +28,7 @@ export async function twitterAuthorize(state = '') {
   if (state === '') {
     state = Math.random().toString(36).substring(2, 15)
   }
-  const redirectUri = `https://www.open-isle.com/twitter-callback`
+  const redirectUri = `${WEBSITE_BASE_URL}/twitter-callback`
   const codeVerifier = generateCodeVerifier()
   sessionStorage.setItem('twitter_code_verifier', codeVerifier)
   const codeChallenge = await generateCodeChallenge(codeVerifier)
