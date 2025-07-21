@@ -112,13 +112,14 @@ body {
   padding: 2px 6px;
   border: none;
   border-radius: 4px;
-  background-color: var(--primary-color);
-  color: #fff;
+  background-color: white;
+  opacity: 0.8;
+  color: black;
   cursor: pointer;
 }
 
 .copy-code-btn:hover {
-  background-color: var(--primary-color-hover);
+  opacity: 1;
 }
 
 .info-content-text code {
@@ -126,6 +127,8 @@ body {
   font-size: 13px;
   border-radius: 4px;
   white-space: pre-wrap;
+  background-color: var(--normal-background-color);
+  color: var(--text-color);
 }
 
 .info-content-text a {

@@ -14,7 +14,7 @@ const md = new MarkdownIt({
     } else {
       code = hljs.highlightAuto(str).value
     }
-    return `<pre class="code-block"><button class="copy-code-btn">复制</button><code class="hljs language-${lang || ''}">${code}</code></pre>`
+    return `<pre class="code-block"><button class="copy-code-btn">Copy</button><code class="hljs language-${lang || ''}">${code}</code></pre>`
   }
 })
 

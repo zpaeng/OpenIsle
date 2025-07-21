@@ -359,6 +359,7 @@ export default {
   align-items: center;
   flex-wrap: wrap;
   margin-top: 20px;
+  padding-bottom: 50px;
 }
 
 @media (max-width: 768px) {
