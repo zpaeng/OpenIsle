@@ -30,7 +30,17 @@ initTheme()
 
 const app = createApp(App)
 app.use(router)
-app.use(Toast, { position: POSITION.TOP_RIGHT })
+app.use(
+  Toast, 
+  { 
+    position: POSITION.TOP_RIGHT,
+    containerClassName: "open-isle-toast-style-v1",
+    transition: "Vue-Toastification__fade",
+    // closeButton: false,
+    timeout: 2000,
+  }, 
+)
+
 app.mount('#app')
 
 checkToken().then(valid => {
