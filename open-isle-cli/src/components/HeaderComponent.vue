@@ -13,7 +13,7 @@
       </div>
 
       <div v-if="isLogin" class="header-content-right">
-        <div v-if="isMobile" class="search-icon" @click="showSearch = true">
+        <div v-if="isMobile" class="search-icon" @click="search">
           <i class="fas fa-search"></i>
         </div>
         <DropdownMenu ref="userMenu" :items="headerMenuItems">
@@ -27,20 +27,21 @@
       </div>
 
       <div v-else class="header-content-right">
-        <div v-if="isMobile" class="search-icon" @click="showSearch = true">
+        <div v-if="isMobile" class="search-icon" @click="search">
           <i class="fas fa-search"></i>
         </div>
         <div class="header-content-item-main" @click="goToLogin">登录</div>
         <div class="header-content-item-secondary" @click="goToSignup">注册</div>
       </div>
+      
+      <SearchDropdown ref="searchDropdown" v-if="isMobile && showSearch" @close="closeSearch" />
     </div>
   </header>
-  <SearchDropdown v-if="isMobile && showSearch" @close="showSearch = false" />
 </template>
 
 <script>
 import { authState, clearToken, loadCurrentUser } from '../utils/auth'
-import { watch } from 'vue'
+import { watch, nextTick } from 'vue'
 import DropdownMenu from './DropdownMenu.vue'
 import SearchDropdown from './SearchDropdown.vue'
 import { isMobile } from '../utils/screen'
@@ -102,6 +103,17 @@ export default {
     goToHome() {
       this.$router.push('/').then(() => {
         window.location.reload()
+      })
+    },
+    search() {
+      this.showSearch = true
+      nextTick(() => {
+        this.$refs.searchDropdown.toggle()
+      })
+    },
+    closeSearch() {
+      nextTick(() => {
+        this.showSearch = false
       })
     },
     goToLogin() {

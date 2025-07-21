@@ -2,13 +2,10 @@
   <div class="search-dropdown">
     <Dropdown ref="dropdown" v-model="selected" :fetch-options="fetchResults" remote menu-class="search-menu"
       option-class="search-option" :show-search="isMobile" @update:search="keyword = $event" @close="onClose">
-      <template #display="{ toggle, setSearch }">
-        <div v-if="isMobile" class="search-mobile-trigger" @click="toggle">
-          <i class="fas fa-search"></i>
-        </div>
-        <div v-else class="search-input" @click="toggle">
+      <template #display="{ setSearch }">
+        <div class="search-input">
           <i class="search-input-icon fas fa-search"></i>
-          <input class="text-input" v-model="keyword" placeholder="Search" @focus="toggle" @input="setSearch(keyword)" />
+          <input class="text-input" v-model="keyword" placeholder="Search" @input="setSearch(keyword)" />
         </div>
       </template>
       <template #option="{ option }">
@@ -26,7 +23,7 @@
 </template>
 
 <script>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 import { isMobile } from '../utils/screen'
 import { useRouter } from 'vue-router'
 import Dropdown from './Dropdown.vue'
@@ -43,6 +40,10 @@ export default {
     const selected = ref(null)
     const results = ref([])
     const dropdown = ref(null)
+
+    const toggle = () => {
+      dropdown.value.toggle()
+    }
 
     const onClose = () => emit('close')
 
@@ -76,12 +77,6 @@ export default {
       comment: 'fas fa-comment'
     }
 
-    onMounted(() => {
-      if (isMobile.value && dropdown.value) {
-        dropdown.value.toggle()
-      }
-    })
-
     watch(selected, val => {
       if (!val) return
       const opt = results.value.find(r => r.id === val)
@@ -99,7 +94,7 @@ export default {
       keyword.value = ''
     })
 
-    return { keyword, selected, fetchResults, highlight, iconMap, isMobile, dropdown, onClose }
+    return { keyword, selected, fetchResults, highlight, iconMap, isMobile, dropdown, onClose, toggle }
   }
 }
 </script>

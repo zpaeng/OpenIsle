@@ -148,6 +148,7 @@ export default {
     })
 
     const clickOutside = e => {
+      if (isMobile) return
       if (wrapper.value && !wrapper.value.contains(e.target)) {
         close()
       }
@@ -269,7 +270,7 @@ export default {
   right: 0;
   background: var(--background-color);
   border: 1px solid var(--normal-border-color);
-  z-index: 10;
+  z-index: 10000;
   max-height: 200px;
   min-width: 350px;
   overflow-y: auto;
