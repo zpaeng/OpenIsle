@@ -274,6 +274,7 @@ export default {
   font-size: 42px;
   width: 100%;
   font-weight: bold;
+  color: var(--text-color);
 }
 
 .post-draft {
