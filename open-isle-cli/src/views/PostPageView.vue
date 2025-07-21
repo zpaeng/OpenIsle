@@ -625,6 +625,7 @@ export default {
   flex-direction: row;
   width: 100%;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .article-title-container-left {
