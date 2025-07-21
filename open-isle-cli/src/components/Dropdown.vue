@@ -32,7 +32,7 @@
         <i class="fas fa-caret-down dropdown-caret"></i>
       </slot>
     </div>
-    <div v-if="open && (loading || filteredOptions.length > 0 || showSearch)" :class="['dropdown-menu', menuClass]">
+    <div v-if="open && !isMobile && (loading || filteredOptions.length > 0 || showSearch)" :class="['dropdown-menu', menuClass]">
       <div v-if="showSearch" class="dropdown-search">
         <i class="fas fa-search search-icon"></i>
         <input type="text" v-model="search" placeholder="搜索" />
@@ -53,12 +53,40 @@
         </div>
       </template>
     </div>
+    <div v-if="open && isMobile" class="dropdown-mobile-page">
+      <div class="dropdown-mobile-header">
+        <i class="fas fa-arrow-left" @click="close"></i>
+        <span class="mobile-title">{{ placeholder }}</span>
+      </div>
+      <div class="dropdown-mobile-menu">
+        <div v-if="showSearch" class="dropdown-search">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" v-model="search" placeholder="搜索" />
+        </div>
+        <div v-if="loading" class="dropdown-loading">
+          <l-hatch size="20" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+        </div>
+        <template v-else>
+          <div v-for="o in filteredOptions" :key="o.id" @click="select(o.id)"
+            :class="['dropdown-option', optionClass, { 'selected': isSelected(o.id) }]">
+            <slot name="option" :option="o" :isSelected="isSelected(o.id)">
+              <template v-if="o.icon">
+                <img v-if="isImageIcon(o.icon)" :src="o.icon" class="option-icon" />
+                <i v-else :class="['option-icon', o.icon]"></i>
+              </template>
+              <span>{{ o.name }}</span>
+            </slot>
+          </div>
+        </template>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { hatch } from 'ldrs'
+import { isMobile } from '../utils/screen'
 hatch.register()
 
 export default {
@@ -74,8 +102,8 @@ export default {
     showSearch: { type: Boolean, default: true },
     initialOptions: { type: Array, default: () => [] }
   },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
+  emits: ['update:modelValue', 'update:search', 'close'],
+  setup(props, { emit, expose }) {
     const open = ref(false)
     const search = ref('')
     const setSearch = (val) => {
@@ -88,10 +116,12 @@ export default {
 
     const toggle = () => {
       open.value = !open.value
+      if (!open.value) emit('close')
     }
 
     const close = () => {
       open.value = false
+      emit('close')
     }
 
     const select = id => {
@@ -118,6 +148,7 @@ export default {
     })
 
     const clickOutside = e => {
+      if (isMobile) return
       if (wrapper.value && !wrapper.value.contains(e.target)) {
         close()
       }
@@ -157,6 +188,7 @@ export default {
     })
 
     watch(search, async val => {
+      emit('update:search', val)
       if (props.remote && open.value) {
         await loadOptions(val)
       }
@@ -190,9 +222,12 @@ export default {
       return /^https?:\/\//.test(icon) || icon.startsWith('/')
     }
 
+    expose({ toggle, close })
+
     return {
       open,
       toggle,
+      close,
       select,
       search,
       filteredOptions,
@@ -201,7 +236,8 @@ export default {
       isSelected,
       loading,
       isImageIcon,
-      setSearch
+      setSearch,
+      isMobile
     }
   }
 }
@@ -234,7 +270,7 @@ export default {
   right: 0;
   background: var(--background-color);
   border: 1px solid var(--normal-border-color);
-  z-index: 10;
+  z-index: 10000;
   max-height: 200px;
   min-width: 350px;
   overflow-y: auto;
@@ -291,5 +327,30 @@ export default {
   display: flex;
   justify-content: center;
   padding: 10px 0;
+}
+
+.dropdown-mobile-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--menu-background-color);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-mobile-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-bottom: 1px solid var(--normal-border-color);
+}
+
+.dropdown-mobile-menu {
+  flex: 1;
+  overflow-y: auto;
 }
 </style>

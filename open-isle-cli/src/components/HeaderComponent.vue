@@ -13,6 +13,9 @@
       </div>
 
       <div v-if="isLogin" class="header-content-right">
+        <div v-if="isMobile" class="search-icon" @click="search">
+          <i class="fas fa-search"></i>
+        </div>
         <DropdownMenu ref="userMenu" :items="headerMenuItems">
           <template #trigger>
             <div class="avatar-container">
@@ -24,21 +27,28 @@
       </div>
 
       <div v-else class="header-content-right">
+        <div v-if="isMobile" class="search-icon" @click="search">
+          <i class="fas fa-search"></i>
+        </div>
         <div class="header-content-item-main" @click="goToLogin">登录</div>
         <div class="header-content-item-secondary" @click="goToSignup">注册</div>
       </div>
+      
+      <SearchDropdown ref="searchDropdown" v-if="isMobile && showSearch" @close="closeSearch" />
     </div>
   </header>
 </template>
 
 <script>
 import { authState, clearToken, loadCurrentUser } from '../utils/auth'
-import { watch } from 'vue'
+import { watch, nextTick } from 'vue'
 import DropdownMenu from './DropdownMenu.vue'
+import SearchDropdown from './SearchDropdown.vue'
+import { isMobile } from '../utils/screen'
 
 export default {
   name: 'HeaderComponent',
-  components: { DropdownMenu },
+  components: { DropdownMenu, SearchDropdown },
   props: {
     showMenuBtn: {
       type: Boolean,
@@ -47,12 +57,16 @@ export default {
   },
   data() {
     return {
-      avatar: ''
+      avatar: '',
+      showSearch: false
     }
   },
   computed: {
     isLogin() {
       return authState.loggedIn
+    },
+    isMobile() {
+      return isMobile.value
     },
     headerMenuItems() {
       return [
@@ -80,6 +94,7 @@ export default {
 
     watch(() => this.$route.fullPath, () => {
       if (this.$refs.userMenu) this.$refs.userMenu.close()
+      this.showSearch = false
     })
   },
 
@@ -88,6 +103,17 @@ export default {
     goToHome() {
       this.$router.push('/').then(() => {
         window.location.reload()
+      })
+    },
+    search() {
+      this.showSearch = true
+      nextTick(() => {
+        this.$refs.searchDropdown.toggle()
+      })
+    },
+    closeSearch() {
+      nextTick(() => {
+        this.showSearch = false
       })
     },
     goToLogin() {
@@ -225,6 +251,11 @@ export default {
 
 .dropdown-item:hover {
   background-color: var(--menu-selected-background-color);
+}
+
+.search-icon {
+  font-size: 18px;
+  cursor: pointer;
 }
 
 @media (max-width: 1200px) {

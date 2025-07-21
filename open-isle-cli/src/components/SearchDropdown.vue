@@ -1,11 +1,11 @@
 <template>
   <div class="search-dropdown">
-    <Dropdown v-model="selected" :fetch-options="fetchResults" remote menu-class="search-menu"
-      option-class="search-option" :show-search="false">
-      <template #display="{ toggle, setSearch }">
-        <div class="search-input" @click="toggle">
+    <Dropdown ref="dropdown" v-model="selected" :fetch-options="fetchResults" remote menu-class="search-menu"
+      option-class="search-option" :show-search="isMobile" @update:search="keyword = $event" @close="onClose">
+      <template #display="{ setSearch }">
+        <div class="search-input">
           <i class="search-input-icon fas fa-search"></i>
-          <input class="text-input" v-model="keyword" placeholder="Search" @focus="toggle" @input="setSearch(keyword)" />
+          <input class="text-input" v-model="keyword" placeholder="Search" @input="setSearch(keyword)" />
         </div>
       </template>
       <template #option="{ option }">
@@ -24,6 +24,7 @@
 
 <script>
 import { ref, watch } from 'vue'
+import { isMobile } from '../utils/screen'
 import { useRouter } from 'vue-router'
 import Dropdown from './Dropdown.vue'
 import { API_BASE_URL } from '../main'
@@ -32,11 +33,19 @@ import { stripMarkdown } from '../utils/markdown'
 export default {
   name: 'SearchDropdown',
   components: { Dropdown },
-  setup() {
+  emits: ['close'],
+  setup(props, { emit }) {
     const router = useRouter()
     const keyword = ref('')
     const selected = ref(null)
     const results = ref([])
+    const dropdown = ref(null)
+
+    const toggle = () => {
+      dropdown.value.toggle()
+    }
+
+    const onClose = () => emit('close')
 
     const fetchResults = async (kw) => {
       if (!kw) return []
@@ -85,7 +94,7 @@ export default {
       keyword.value = ''
     })
 
-    return { keyword, selected, fetchResults, highlight, iconMap }
+    return { keyword, selected, fetchResults, highlight, iconMap, isMobile, dropdown, onClose, toggle }
   }
 }
 </script>
@@ -94,6 +103,11 @@ export default {
 .search-dropdown {
   margin-top: 20px;
   width: 500px;
+}
+
+.search-mobile-trigger {
+  padding: 10px;
+  font-size: 18px;
 }
 
 .search-input {
@@ -116,6 +130,12 @@ export default {
 .search-menu {
   width: 100%;
   max-width: 600px;
+}
+
+@media (max-width: 768px) {
+  .search-dropdown {
+    width: 100%;
+  }
 }
 
 .search-option-item {
