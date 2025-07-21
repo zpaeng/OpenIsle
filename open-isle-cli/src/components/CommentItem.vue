@@ -21,7 +21,7 @@
           </DropdownMenu>
         </div>
       </div>
-      <div class="info-content-text" v-html="renderMarkdown(comment.text)" @click="handleImageClick"></div>
+      <div class="info-content-text" v-html="renderMarkdown(comment.text)" @click="handleContentClick"></div>
       <div class="article-footer-container">
         <ReactionsGroup v-model="comment.reactions" content-type="comment" :content-id="comment.id">
           <div class="make-reaction-item comment-reaction" @click="toggleEditor">
@@ -69,7 +69,7 @@ import { ref, watch, computed } from 'vue'
 import VueEasyLightbox from 'vue-easy-lightbox'
 import { useRouter } from 'vue-router'
 import CommentEditor from './CommentEditor.vue'
-import { renderMarkdown } from '../utils/markdown'
+import { renderMarkdown, handleMarkdownClick } from '../utils/markdown'
 import TimeManager from '../utils/time'
 import BaseTimeline from './BaseTimeline.vue'
 import { API_BASE_URL, toast } from '../main'
@@ -196,7 +196,8 @@ const CommentItem = {
         toast.success('已复制')
       })
     }
-    const handleImageClick = e => {
+    const handleContentClick = e => {
+      handleMarkdownClick(e)
       if (e.target.tagName === 'IMG') {
         const container = e.target.parentNode
         const imgs = [...container.querySelectorAll('img')].map(i => i.src)
@@ -205,7 +206,7 @@ const CommentItem = {
         lightboxVisible.value = true
       }
     }
-    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply, commentMenuItems, deleteComment, lightboxVisible, lightboxIndex, lightboxImgs, handleImageClick, loggedIn }
+    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply, commentMenuItems, deleteComment, lightboxVisible, lightboxIndex, lightboxImgs, handleContentClick, loggedIn }
   }
 }
 
