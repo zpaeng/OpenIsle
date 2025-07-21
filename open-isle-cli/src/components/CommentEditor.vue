@@ -23,6 +23,7 @@ import Vditor from 'vditor'
 import { themeState } from '../utils/theme'
 import 'vditor/dist/index.css'
 import LoginOverlay from './LoginOverlay.vue'
+import { isMobile } from '../utils/screen'
 
 export default {
   name: 'CommentEditor',
@@ -72,7 +73,7 @@ export default {
     onMounted(() => {
       vditorInstance.value = new Vditor(props.editorId, {
         placeholder: '说点什么...',
-        height: 200,
+        height: isMobile.value ? 'auto' : 200,
         theme: getEditorTheme(),
         preview: {
           actions: [],
@@ -174,5 +175,11 @@ export default {
 
 .comment-submit:hover {
   background-color: var(--primary-color-hover);
+}
+
+@media (max-width: 768px) {
+  .comment-editor-container {
+    margin-bottom: 10px;
+  }
 }
 </style>

@@ -266,7 +266,6 @@ export default {
 }
 
 .post-title-input {
-  font-size: 18px;
   border: none;
   outline: none;
   padding-top: 20px;
@@ -341,18 +340,42 @@ export default {
 .post-options-left {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .post-options-right {
+  margin-top: 10px;
   display: flex;
   align-items: center;
   gap: 30px;
+  row-gap: 10px;
+  flex-wrap: wrap;
 }
 
 .post-options {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .new-post-page {
+    width: calc(100vw - 20px);
+    padding-right: 10px;
+    padding-left: 10px;
+    overflow-x: hidden;
+  }
+
+  .post-title-input {
+    font-size: 24px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .post-options {
+    margin-top: 10px;
+  }
 }
 </style>

@@ -72,6 +72,10 @@ body {
   box-shadow: none !important;
 } */
 
+/* .vditor-toolbar {
+  position: relative !important;
+} */
+
 /*************************
  * Markdown 渲染样式
  *************************/
@@ -173,6 +177,10 @@ body {
 }
 
 @media (max-width: 768px) {
+  .vditor-toolbar {
+    display: none;
+  }
+
   .about-content h1,
   .info-content-text h1 {
     font-size: 20px;

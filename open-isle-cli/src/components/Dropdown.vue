@@ -93,7 +93,7 @@ export default {
   name: 'BaseDropdown',
   props: {
     modelValue: { type: [Array, String, Number], default: () => [] },
-    placeholder: { type: String, default: '请选择' },
+    placeholder: { type: String, default: '返回' },
     multiple: { type: Boolean, default: false },
     fetchOptions: { type: Function, required: true },
     remote: { type: Boolean, default: false },
