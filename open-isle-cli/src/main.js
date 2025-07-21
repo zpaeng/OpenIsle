@@ -7,6 +7,7 @@ import 'vue-toastification/dist/index.css'
 // Use Sugar theme from vue-toast-notification for better toast styling.
 // If you prefer Bootstrap style, replace with theme-bootstrap.css instead.
 import 'vue-toast-notification/dist/theme-sugar.css'
+import './assets/toast.css'
 import { useToast } from 'vue-toastification'
 import { checkToken, clearToken } from './utils/auth'
 import { initTheme } from './utils/theme'

@@ -1,0 +1,33 @@
+/* Custom styles for vue-toastification */
+.Vue-Toastification__toast--info {
+  background-color: #d0e9ff;
+  color: #1b6ec2;
+}
+.Vue-Toastification__toast--success {
+  background-color: #dff6dd;
+  color: #2b7a2b;
+}
+.Vue-Toastification__toast--error {
+  background-color: #ffe4e4;
+  color: #b73737;
+}
+
+@media (max-width: 600px) {
+  .Vue-Toastification__container {
+    width: auto;
+    max-width: 90vw;
+    right: 0.5em;
+    left: auto;
+  }
+  .Vue-Toastification__toast {
+    padding: 12px 14px;
+  }
+  .Vue-Toastification__toast-body {
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .Vue-Toastification__close-button {
+    font-size: 20px;
+    line-height: 20px;
+  }
+}
