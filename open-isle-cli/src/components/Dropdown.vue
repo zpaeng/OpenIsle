@@ -58,10 +58,7 @@
 
 <script>
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
-import { useRouter } from 'vue-router'
 import { hatch } from 'ldrs'
-import { isMobile } from '../utils/screen'
-import { registerDropdownStore, removeDropdownStore } from '../utils/mobileDropdown'
 hatch.register()
 
 export default {
@@ -79,10 +76,7 @@ export default {
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
-    const router = useRouter()
-    const storeId = Math.random().toString(36).substring(2)
     const open = ref(false)
-    const model = ref(props.modelValue)
     const search = ref('')
     const setSearch = (val) => {
       search.value = val
@@ -93,18 +87,7 @@ export default {
     const wrapper = ref(null)
 
     const toggle = () => {
-      if (isMobile.value) {
-        registerDropdownStore(storeId, {
-          value: model,
-          multiple: props.multiple,
-          fetchOptions: props.fetchOptions,
-          remote: props.remote,
-          showSearch: props.showSearch
-        })
-        router.push(`/mobile-dropdown/${storeId}`)
-      } else {
-        open.value = !open.value
-      }
+      open.value = !open.value
     }
 
     const close = () => {
@@ -113,16 +96,16 @@ export default {
 
     const select = id => {
       if (props.multiple) {
-        const arr = Array.isArray(model.value) ? [...model.value] : []
+        const arr = Array.isArray(props.modelValue) ? [...props.modelValue] : []
         const idx = arr.indexOf(id)
         if (idx > -1) {
           arr.splice(idx, 1)
         } else {
           arr.push(id)
         }
-        model.value = arr
+        emit('update:modelValue', arr)
       } else {
-        model.value = id
+        emit('update:modelValue', id)
         close()
       }
       search.value = ''
@@ -162,18 +145,6 @@ export default {
         }
       }
     )
-    watch(
-      () => props.modelValue,
-      val => {
-        model.value = val
-      }
-    )
-    watch(
-      () => model.value,
-      val => {
-        emit('update:modelValue', val)
-      }
-    )
 
     watch(open, async val => {
       if (val) {
@@ -192,26 +163,21 @@ export default {
     })
 
     onMounted(() => {
-      if (!isMobile.value) {
-        document.addEventListener('click', clickOutside)
-      }
+      document.addEventListener('click', clickOutside)
       if (!props.remote) {
         loadOptions()
       }
     })
 
     onBeforeUnmount(() => {
-      if (!isMobile.value) {
-        document.removeEventListener('click', clickOutside)
-      }
-      removeDropdownStore(storeId)
+      document.removeEventListener('click', clickOutside)
     })
 
     const selectedLabels = computed(() => {
       if (props.multiple) {
-        return options.value.filter(o => (model.value || []).includes(o.id))
+        return options.value.filter(o => (props.modelValue || []).includes(o.id))
       }
-      const match = options.value.find(o => o.id === model.value)
+      const match = options.value.find(o => o.id === props.modelValue)
       return match ? [match] : []
     })
 

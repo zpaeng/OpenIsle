@@ -13,9 +13,6 @@
       </div>
 
       <div v-if="isLogin" class="header-content-right">
-        <button v-if="isMobile" class="mobile-search-btn" @click="openMobileSearch">
-          <i class="fas fa-search"></i>
-        </button>
         <DropdownMenu ref="userMenu" :items="headerMenuItems">
           <template #trigger>
             <div class="avatar-container">
@@ -27,9 +24,6 @@
       </div>
 
       <div v-else class="header-content-right">
-        <button v-if="isMobile" class="mobile-search-btn" @click="openMobileSearch">
-          <i class="fas fa-search"></i>
-        </button>
         <div class="header-content-item-main" @click="goToLogin">登录</div>
         <div class="header-content-item-secondary" @click="goToSignup">注册</div>
       </div>
@@ -39,11 +33,8 @@
 
 <script>
 import { authState, clearToken, loadCurrentUser } from '../utils/auth'
-import { watch, ref } from 'vue'
+import { watch } from 'vue'
 import DropdownMenu from './DropdownMenu.vue'
-import { isMobile } from '../utils/screen'
-import { registerDropdownStore } from '../utils/mobileDropdown'
-import { API_BASE_URL } from '../main'
 
 export default {
   name: 'HeaderComponent',
@@ -62,9 +53,6 @@ export default {
   computed: {
     isLogin() {
       return authState.loggedIn
-    },
-    isMobile() {
-      return isMobile.value
     },
     headerMenuItems() {
       return [
@@ -132,23 +120,6 @@ export default {
     goToLogout() {
       clearToken()
       this.$router.push('/login')
-    },
-    async openMobileSearch() {
-      const id = Math.random().toString(36).substring(2)
-      registerDropdownStore(id, {
-        value: ref(null),
-        multiple: false,
-        remote: true,
-        showSearch: true,
-        async fetchOptions(kw) {
-          if (!kw) return []
-          const res = await fetch(`${API_BASE_URL}/api/search/global?keyword=${encodeURIComponent(kw)}`)
-          if (!res.ok) return []
-          const data = await res.json()
-          return data.map(r => ({ id: r.id, name: r.text }))
-        }
-      })
-      this.$router.push(`/mobile-dropdown/${id}`)
     }
   }
 }
@@ -227,20 +198,6 @@ export default {
   color: var(--primary-color);
   text-decoration: underline;
   cursor: pointer;
-}
-
-.mobile-search-btn {
-  background: none;
-  border: none;
-  color: inherit;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-@media (min-width: 769px) {
-  .mobile-search-btn {
-    display: none;
-  }
 }
 
 .avatar-container {

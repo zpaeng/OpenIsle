@@ -14,7 +14,6 @@ import NotFoundPageView from '../views/NotFoundPageView.vue'
 import GithubCallbackPageView from '../views/GithubCallbackPageView.vue'
 import DiscordCallbackPageView from '../views/DiscordCallbackPageView.vue'
 import TwitterCallbackPageView from '../views/TwitterCallbackPageView.vue'
-import MobileDropdownPageView from '../views/MobileDropdownPageView.vue'
 
 const routes = [
   {
@@ -86,11 +85,6 @@ const routes = [
     path: '/twitter-callback',
     name: 'twitter-callback',
     component: TwitterCallbackPageView
-  },
-  {
-    path: '/mobile-dropdown/:id',
-    name: 'mobile-dropdown',
-    component: MobileDropdownPageView
   },
   {
     path: '/404',
