@@ -51,7 +51,7 @@
             <div class="user-name">{{ author.username }}</div>
             <div class="post-time">{{ postTime }}</div>
           </div>
-          <div class="info-content-text" v-html="renderMarkdown(postContent)" @click="handleImageClick"></div>
+          <div class="info-content-text" v-html="renderMarkdown(postContent)" @click="handleContentClick"></div>
 
           <div class="article-footer-container">
             <ReactionsGroup v-model="postReactions" content-type="post" :content-id="postId">
@@ -113,7 +113,7 @@ import ArticleTags from '../components/ArticleTags.vue'
 import ArticleCategory from '../components/ArticleCategory.vue'
 import ReactionsGroup from '../components/ReactionsGroup.vue'
 import DropdownMenu from '../components/DropdownMenu.vue'
-import { renderMarkdown } from '../utils/markdown'
+import { renderMarkdown, handleMarkdownClick } from '../utils/markdown'
 import { API_BASE_URL, toast } from '../main'
 import { getToken, authState } from '../utils/auth'
 import TimeManager from '../utils/time'
@@ -237,7 +237,8 @@ export default {
       return false
     }
 
-    const handleImageClick = e => {
+    const handleContentClick = e => {
+      handleMarkdownClick(e)
       if (e.target.tagName === 'IMG') {
         const container = e.target.parentNode
         const imgs = [...container.querySelectorAll('img')].map(i => i.src)
@@ -511,7 +512,7 @@ export default {
       lightboxVisible,
       lightboxIndex,
       lightboxImgs,
-      handleImageClick,
+      handleContentClick,
       isMobile
     }
   }

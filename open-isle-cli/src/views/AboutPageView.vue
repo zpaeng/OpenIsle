@@ -10,7 +10,7 @@
         <div class="about-tabs-item-label">{{ tab.label }}</div>
       </div>
     </div>
-    <div class="about-content" v-html="renderMarkdown(content)"></div>
+    <div class="about-content" v-html="renderMarkdown(content)" @click="handleContentClick"></div>
     <div class="about-loading" v-if="isFetching">
       <l-hatch-spinner size="100" stroke="10" speed="1" color="var(--primary-color)" />
     </div>
@@ -19,7 +19,7 @@
 
 <script>
 import { ref, onMounted } from 'vue'
-import { renderMarkdown } from '../utils/markdown'
+import { renderMarkdown, handleMarkdownClick } from '../utils/markdown'
 import { hatch } from 'ldrs'
 hatch.register()
 
@@ -61,7 +61,11 @@ export default {
       loadContent(tabs[0].file)
     })
 
-    return { tabs, selectedTab, content, renderMarkdown, selectTab, isFetching }
+    const handleContentClick = e => {
+      handleMarkdownClick(e)
+    }
+
+    return { tabs, selectedTab, content, renderMarkdown, selectTab, isFetching, handleContentClick }
   }
 }
 </script>
