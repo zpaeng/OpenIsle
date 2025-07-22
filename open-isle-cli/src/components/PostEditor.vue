@@ -97,6 +97,7 @@ export default {
         preview: {
           theme: { current: getPreviewTheme() },
         },
+        cdn: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/vditor',        
         toolbar: [
           'emoji',
           'bold',
