@@ -348,6 +348,39 @@ public class PostService {
     }
 
     @org.springframework.transaction.annotation.Transactional
+    public Post updatePost(Long id,
+                           String username,
+                           Long categoryId,
+                           String title,
+                           String content,
+                           java.util.List<Long> tagIds) {
+        if (tagIds == null || tagIds.isEmpty()) {
+            throw new IllegalArgumentException("At least one tag required");
+        }
+        if (tagIds.size() > 2) {
+            throw new IllegalArgumentException("At most two tags allowed");
+        }
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
+        if (!user.getId().equals(post.getAuthor().getId()) && user.getRole() != Role.ADMIN) {
+            throw new IllegalArgumentException("Unauthorized");
+        }
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+        java.util.List<com.openisle.model.Tag> tags = tagRepository.findAllById(tagIds);
+        if (tags.isEmpty()) {
+            throw new IllegalArgumentException("Tag not found");
+        }
+        post.setTitle(title);
+        post.setContent(content);
+        post.setCategory(category);
+        post.setTags(new java.util.HashSet<>(tags));
+        return postRepository.save(post);
+    }
+
+    @org.springframework.transaction.annotation.Transactional
     public void deletePost(Long id, String username) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));

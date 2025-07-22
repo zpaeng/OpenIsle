@@ -8,6 +8,7 @@ import LoginPageView from '../views/LoginPageView.vue'
 import SignupPageView from '../views/SignupPageView.vue'
 import SignupReasonPageView from '../views/SignupReasonPageView.vue'
 import NewPostPageView from '../views/NewPostPageView.vue'
+import EditPostPageView from '../views/EditPostPageView.vue'
 import SettingsPageView from '../views/SettingsPageView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import NotFoundPageView from '../views/NotFoundPageView.vue'
@@ -40,6 +41,11 @@ const routes = [
     path: '/new-post',
     name: 'new-post',
     component: NewPostPageView
+  },
+  {
+    path: '/posts/:id/edit',
+    name: 'edit-post',
+    component: EditPostPageView
   },
   {
     path: '/posts/:id',
