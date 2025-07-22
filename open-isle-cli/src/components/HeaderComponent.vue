@@ -226,7 +226,7 @@ export default {
 .menu-unread-dot {
   position: absolute;
   top: 0;
-  right: 0;
+  right: 10px;
   width: 8px;
   height: 8px;
   border-radius: 50%;
