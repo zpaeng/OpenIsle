@@ -2,9 +2,12 @@
   <header class="header">
     <div class="header-content">
       <div class="header-content-left">
-        <button v-if="showMenuBtn" class="menu-btn" @click="$emit('toggle-menu')">
-          <i class="fas fa-bars"></i>
-        </button>
+        <div v-if="showMenuBtn" class="menu-btn-wrapper">
+          <button class="menu-btn" @click="$emit('toggle-menu')">
+            <i class="fas fa-bars"></i>
+          </button>
+          <span v-if="isMobile && unreadCount > 0" class="menu-unread-dot"></span>
+        </div>
         <div class="logo-container" @click="goToHome">
           <img alt="OpenIsle" src="https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/image.png"
             width="60" height="60">
@@ -42,6 +45,7 @@
 <script>
 import { authState, clearToken, loadCurrentUser } from '../utils/auth'
 import { watch, nextTick } from 'vue'
+import { fetchUnreadCount } from '../utils/notification'
 import DropdownMenu from './DropdownMenu.vue'
 import SearchDropdown from './SearchDropdown.vue'
 import { isMobile } from '../utils/screen'
@@ -58,7 +62,8 @@ export default {
   data() {
     return {
       avatar: '',
-      showSearch: false
+      showSearch: false,
+      unreadCount: 0
     }
   },
   computed: {
@@ -85,11 +90,20 @@ export default {
         }
       }
     }
+    const updateUnread = async () => {
+      if (authState.loggedIn) {
+        this.unreadCount = await fetchUnreadCount()
+      } else {
+        this.unreadCount = 0
+      }
+    }
 
     await updateAvatar()
+    await updateUnread()
 
     watch(() => authState.loggedIn, async () => {
       await updateAvatar()
+      await updateUnread()
     })
 
     watch(() => this.$route.fullPath, () => {
@@ -202,6 +216,21 @@ export default {
   cursor: pointer;
   opacity: 0.4;
   margin-right: 10px;
+}
+
+.menu-btn-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.menu-unread-dot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ff4d4f;
 }
 
 .menu-btn:hover {
