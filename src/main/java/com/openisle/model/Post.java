@@ -59,4 +59,7 @@ public class Post {
     @Column(nullable = false)
     private PostStatus status = PostStatus.PUBLISHED;
 
+    @Column
+    private LocalDateTime pinnedAt;
+
 }

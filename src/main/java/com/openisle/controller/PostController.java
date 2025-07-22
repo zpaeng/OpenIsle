@@ -143,6 +143,7 @@ public class PostController {
         dto.setTags(post.getTags().stream().map(this::toTagDto).collect(Collectors.toList()));
         dto.setViews(post.getViews());
         dto.setStatus(post.getStatus());
+        dto.setPinnedAt(post.getPinnedAt());
 
         List<ReactionDto> reactions = reactionService.getReactionsForPost(post.getId())
                 .stream()
@@ -259,6 +260,7 @@ public class PostController {
         private java.util.List<TagDto> tags;
         private long views;
         private com.openisle.model.PostStatus status;
+        private LocalDateTime pinnedAt;
         private List<CommentDto> comments;
         private List<ReactionDto> reactions;
         private java.util.List<AuthorDto> participants;

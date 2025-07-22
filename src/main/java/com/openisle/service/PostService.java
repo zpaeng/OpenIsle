@@ -173,22 +173,14 @@ public class PostService {
                                        java.util.List<Long> tagIds,
                                        Integer page,
                                        Integer pageSize) {
-        Pageable pageable = null;
-        if (page != null && pageSize != null) {
-            pageable = PageRequest.of(page, pageSize, Sort.Direction.DESC, "createdAt");
-        }
-
         boolean hasCategories = categoryIds != null && !categoryIds.isEmpty();
         boolean hasTags = tagIds != null && !tagIds.isEmpty();
 
-        if (!hasCategories && !hasTags) {
-            if (pageable != null) {
-                return postRepository.findByStatusOrderByViewsDesc(PostStatus.PUBLISHED, pageable);
-            }
-            return postRepository.findByStatusOrderByViewsDesc(PostStatus.PUBLISHED);
-        }
+        java.util.List<Post> posts;
 
-        if (hasCategories) {
+        if (!hasCategories && !hasTags) {
+            posts = postRepository.findByStatusOrderByViewsDesc(PostStatus.PUBLISHED);
+        } else if (hasCategories) {
             java.util.List<Category> categories = categoryRepository.findAllById(categoryIds);
             if (categories.isEmpty()) {
                 return java.util.List.of();
@@ -198,49 +190,33 @@ public class PostService {
                 if (tags.isEmpty()) {
                     return java.util.List.of();
                 }
-                if (pageable != null) {
-                    return postRepository.findByCategoriesAndAllTagsOrderByViewsDesc(
-                            categories, tags, PostStatus.PUBLISHED, tags.size(), pageable);
-                }
-                return postRepository.findByCategoriesAndAllTagsOrderByViewsDesc(
+                posts = postRepository.findByCategoriesAndAllTagsOrderByViewsDesc(
                         categories, tags, PostStatus.PUBLISHED, tags.size());
+            } else {
+                posts = postRepository.findByCategoryInAndStatusOrderByViewsDesc(categories, PostStatus.PUBLISHED);
             }
-            if (pageable != null) {
-                return postRepository.findByCategoryInAndStatusOrderByViewsDesc(categories, PostStatus.PUBLISHED, pageable);
+        } else {
+            java.util.List<com.openisle.model.Tag> tags = tagRepository.findAllById(tagIds);
+            if (tags.isEmpty()) {
+                return java.util.List.of();
             }
-            return postRepository.findByCategoryInAndStatusOrderByViewsDesc(categories, PostStatus.PUBLISHED);
+            posts = postRepository.findByAllTagsOrderByViewsDesc(tags, PostStatus.PUBLISHED, tags.size());
         }
 
-        java.util.List<com.openisle.model.Tag> tags = tagRepository.findAllById(tagIds);
-        if (tags.isEmpty()) {
-            return java.util.List.of();
-        }
-        if (pageable != null) {
-            return postRepository.findByAllTagsOrderByViewsDesc(tags, PostStatus.PUBLISHED, tags.size(), pageable);
-        }
-        return postRepository.findByAllTagsOrderByViewsDesc(tags, PostStatus.PUBLISHED, tags.size());
+        return paginate(sortByPinnedAndViews(posts), page, pageSize);
     }
 
     public List<Post> listPostsByCategories(java.util.List<Long> categoryIds,
                                             Integer page,
                                             Integer pageSize) {
-        Pageable pageable = null;
-        if (page != null && pageSize != null) {
-            pageable = PageRequest.of(page, pageSize, Sort.Direction.DESC, "createdAt");
-        }
-
         if (categoryIds == null || categoryIds.isEmpty()) {
-            if (pageable != null) {
-                return postRepository.findByStatusOrderByCreatedAtDesc(PostStatus.PUBLISHED, pageable);
-            }
-            return postRepository.findByStatusOrderByCreatedAtDesc(PostStatus.PUBLISHED);
+            java.util.List<Post> posts = postRepository.findByStatusOrderByCreatedAtDesc(PostStatus.PUBLISHED);
+            return paginate(sortByPinnedAndCreated(posts), page, pageSize);
         }
 
         java.util.List<Category> categories = categoryRepository.findAllById(categoryIds);
-        if (pageable != null) {
-            return postRepository.findByCategoryInAndStatusOrderByCreatedAtDesc(categories, PostStatus.PUBLISHED, pageable);
-        }
-        return postRepository.findByCategoryInAndStatusOrderByCreatedAtDesc(categories, PostStatus.PUBLISHED);
+        java.util.List<Post> posts = postRepository.findByCategoryInAndStatusOrderByCreatedAtDesc(categories, PostStatus.PUBLISHED);
+        return paginate(sortByPinnedAndCreated(posts), page, pageSize);
     }
 
     public List<Post> getRecentPostsByUser(String username, int limit) {
@@ -266,20 +242,13 @@ public class PostService {
             return java.util.List.of();
         }
 
-        Pageable pageable = null;
-        if (page != null && pageSize != null) {
-            pageable = PageRequest.of(page, pageSize, Sort.Direction.DESC, "createdAt");
-        }
-
         java.util.List<com.openisle.model.Tag> tags = tagRepository.findAllById(tagIds);
         if (tags.isEmpty()) {
             return java.util.List.of();
         }
 
-        if (pageable != null) {
-            return postRepository.findByAllTagsOrderByCreatedAtDesc(tags, PostStatus.PUBLISHED, tags.size(), pageable);
-        }
-        return postRepository.findByAllTagsOrderByCreatedAtDesc(tags, PostStatus.PUBLISHED, tags.size());
+        java.util.List<Post> posts = postRepository.findByAllTagsOrderByCreatedAtDesc(tags, PostStatus.PUBLISHED, tags.size());
+        return paginate(sortByPinnedAndCreated(posts), page, pageSize);
     }
 
     public List<Post> listPostsByCategoriesAndTags(java.util.List<Long> categoryIds,
@@ -290,21 +259,14 @@ public class PostService {
             return java.util.List.of();
         }
 
-        Pageable pageable = null;
-        if (page != null && pageSize != null) {
-            pageable = PageRequest.of(page, pageSize);
-        }
-
         java.util.List<Category> categories = categoryRepository.findAllById(categoryIds);
         java.util.List<com.openisle.model.Tag> tags = tagRepository.findAllById(tagIds);
         if (categories.isEmpty() || tags.isEmpty()) {
             return java.util.List.of();
         }
 
-        if (pageable != null) {
-            return postRepository.findByCategoriesAndAllTagsOrderByCreatedAtDesc(categories, tags, PostStatus.PUBLISHED, tags.size(), pageable);
-        }
-        return postRepository.findByCategoriesAndAllTagsOrderByCreatedAtDesc(categories, tags, PostStatus.PUBLISHED, tags.size());
+        java.util.List<Post> posts = postRepository.findByCategoriesAndAllTagsOrderByCreatedAtDesc(categories, tags, PostStatus.PUBLISHED, tags.size());
+        return paginate(sortByPinnedAndCreated(posts), page, pageSize);
     }
 
     public List<Post> listPendingPosts() {
@@ -345,6 +307,20 @@ public class PostService {
         post = postRepository.save(post);
         notificationService.createNotification(post.getAuthor(), NotificationType.POST_REVIEWED, post, null, false, null, null, null);
         return post;
+    }
+
+    public Post pinPost(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
+        post.setPinnedAt(java.time.LocalDateTime.now());
+        return postRepository.save(post);
+    }
+
+    public Post unpinPost(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
+        post.setPinnedAt(null);
+        return postRepository.save(post);
     }
 
     @org.springframework.transaction.annotation.Transactional
@@ -409,5 +385,33 @@ public class PostService {
 
     public long countPostsByTag(Long tagId) {
         return postRepository.countDistinctByTags_Id(tagId);
+    }
+
+    private java.util.List<Post> sortByPinnedAndCreated(java.util.List<Post> posts) {
+        return posts.stream()
+                .sorted(java.util.Comparator
+                        .comparing(Post::getPinnedAt, java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder()))
+                        .thenComparing(Post::getCreatedAt, java.util.Comparator.reverseOrder()))
+                .toList();
+    }
+
+    private java.util.List<Post> sortByPinnedAndViews(java.util.List<Post> posts) {
+        return posts.stream()
+                .sorted(java.util.Comparator
+                        .comparing(Post::getPinnedAt, java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder()))
+                        .thenComparing(Post::getViews, java.util.Comparator.reverseOrder()))
+                .toList();
+    }
+
+    private java.util.List<Post> paginate(java.util.List<Post> posts, Integer page, Integer pageSize) {
+        if (page == null || pageSize == null) {
+            return posts;
+        }
+        int from = page * pageSize;
+        if (from >= posts.size()) {
+            return java.util.List.of();
+        }
+        int to = Math.min(from + pageSize, posts.size());
+        return posts.subList(from, to);
     }
 }

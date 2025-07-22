@@ -36,6 +36,16 @@ public class AdminPostController {
         return toDto(postService.rejectPost(id));
     }
 
+    @PostMapping("/{id}/pin")
+    public PostDto pin(@PathVariable Long id) {
+        return toDto(postService.pinPost(id));
+    }
+
+    @PostMapping("/{id}/unpin")
+    public PostDto unpin(@PathVariable Long id) {
+        return toDto(postService.unpinPost(id));
+    }
+
     private PostDto toDto(Post post) {
         PostDto dto = new PostDto();
         dto.setId(post.getId());
@@ -46,6 +56,7 @@ public class AdminPostController {
         dto.setCategory(toCategoryDto(post.getCategory()));
         dto.setViews(post.getViews());
         dto.setStatus(post.getStatus());
+        dto.setPinnedAt(post.getPinnedAt());
         return dto;
     }
 
@@ -69,6 +80,7 @@ public class AdminPostController {
         private CategoryDto category;
         private long views;
         private com.openisle.model.PostStatus status;
+        private LocalDateTime pinnedAt;
     }
 
     @Data

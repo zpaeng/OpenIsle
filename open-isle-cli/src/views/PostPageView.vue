@@ -138,6 +138,7 @@ export default {
     const postReactions = ref([])
     const comments = ref([])
     const status = ref('PUBLISHED')
+    const pinnedAt = ref(null)
     const isWaitingFetchingPost = ref(false);
     const isWaitingPostingComment = ref(false);
     const postTime = ref('')
@@ -157,6 +158,13 @@ export default {
       if (isAuthor.value || isAdmin.value) {
         items.push({ text: '编辑文章', onClick: () => editPost() })
         items.push({ text: '删除文章', color: 'red', onClick: () => deletePost() })
+      }
+      if (isAdmin.value) {
+        if (pinnedAt.value) {
+          items.push({ text: '取消置顶', onClick: () => unpinPost() })
+        } else {
+          items.push({ text: '置顶', onClick: () => pinPost() })
+        }
       }
       if (isAdmin.value && status.value === 'PENDING') {
         items.push({ text: '通过审核', onClick: () => approvePost() })
@@ -277,6 +285,7 @@ export default {
         comments.value = (data.comments || []).map(mapComment)
         subscribed.value = !!data.subscribed
         status.value = data.status
+        pinnedAt.value = data.pinnedAt
         postTime.value = TimeManager.format(data.createdAt)
         await nextTick()
         gatherPostItems()
@@ -395,6 +404,36 @@ export default {
       }
     }
 
+    const pinPost = async () => {
+      const token = getToken()
+      if (!token) return
+      const res = await fetch(`${API_BASE_URL}/api/admin/posts/${postId}/pin`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.ok) {
+        pinnedAt.value = new Date().toISOString()
+        toast.success('已置顶')
+      } else {
+        toast.error('操作失败')
+      }
+    }
+
+    const unpinPost = async () => {
+      const token = getToken()
+      if (!token) return
+      const res = await fetch(`${API_BASE_URL}/api/admin/posts/${postId}/unpin`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.ok) {
+        pinnedAt.value = null
+        toast.success('已取消置顶')
+      } else {
+        toast.error('操作失败')
+      }
+    }
+    
     const editPost = () => {
       router.push(`/posts/${postId}/edit`)
     }
@@ -514,12 +553,15 @@ export default {
       editPost,
       onCommentDeleted,
       deletePost,
+      pinPost,
+      unpinPost,
       rejectPost,
       lightboxVisible,
       lightboxIndex,
       lightboxImgs,
       handleContentClick,
-      isMobile
+      isMobile,
+      pinnedAt
     }
   }
 }
