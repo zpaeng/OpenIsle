@@ -50,6 +50,14 @@ public class PostController {
         return ResponseEntity.ok(toDto(post));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<PostDto> updatePost(@PathVariable Long id, @RequestBody PostRequest req,
+                                              Authentication auth) {
+        Post post = postService.updatePost(id, auth.getName(), req.getCategoryId(),
+                req.getTitle(), req.getContent(), req.getTagIds());
+        return ResponseEntity.ok(toDto(post));
+    }
+
     @DeleteMapping("/{id}")
     public void deletePost(@PathVariable Long id, Authentication auth) {
         postService.deletePost(id, auth.getName());

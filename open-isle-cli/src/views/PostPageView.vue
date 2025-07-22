@@ -156,6 +156,7 @@ export default {
     const articleMenuItems = computed(() => {
       const items = []
       if (isAuthor.value || isAdmin.value) {
+        items.push({ text: '编辑文章', onClick: () => editPost() })
         items.push({ text: '删除文章', color: 'red', onClick: () => deletePost() })
       }
       if (isAdmin.value) {
@@ -432,6 +433,10 @@ export default {
         toast.error('操作失败')
       }
     }
+    
+    const editPost = () => {
+      router.push(`/posts/${postId}/edit`)
+    }
 
     const deletePost = async () => {
       const token = getToken()
@@ -545,6 +550,7 @@ export default {
       status,
       isAdmin,
       approvePost,
+      editPost,
       onCommentDeleted,
       deletePost,
       pinPost,
