@@ -58,6 +58,7 @@
         <div class="article-item" v-for="article in articles" :key="article.id">
           <div class="article-main-container">
             <router-link class="article-item-title main-item" :to="`/posts/${article.id}`">
+              <i v-if="article.pinned" class="fas fa-thumbtack pinned-icon"></i>
               {{ article.title }}
             </router-link>
             <div class="article-item-description main-item">{{ sanitizeDescription(article.description) }}</div>
@@ -236,7 +237,8 @@ export default {
             members: (p.participants || []).map(m => ({ id: m.id, avatar: m.avatar })),
             comments: (p.comments || []).length,
             views: p.views,
-            time: TimeManager.format(p.createdAt)
+            time: TimeManager.format(p.createdAt),
+            pinned: !!p.pinnedAt
           }))
         )
         if (data.length < pageSize) {
@@ -272,7 +274,8 @@ export default {
             members: (p.participants || []).map(m => ({ id: m.id, avatar: m.avatar })),
             comments: (p.comments || []).length,
             views: p.views,
-            time: TimeManager.format(p.createdAt)
+            time: TimeManager.format(p.createdAt),
+            pinned: !!p.pinnedAt
           }))
         )
         if (data.length < pageSize) {
@@ -500,6 +503,11 @@ export default {
 .article-item-title:hover {
   color: var(--primary-color);
   text-decoration: underline;
+}
+
+.pinned-icon {
+  margin-right: 4px;
+  color: var(--primary-color);
 }
 
 .article-item-description {
