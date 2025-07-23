@@ -10,6 +10,8 @@ import com.qcloud.cos.region.Region;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.util.UUID;
@@ -26,6 +28,7 @@ public class CosImageUploader extends ImageUploader {
     private final COSClient cosClient;
     private final String bucketName;
     private final String baseUrl;
+    private static final Logger logger = LoggerFactory.getLogger(CosImageUploader.class);
     private final ExecutorService executor = Executors.newFixedThreadPool(2,
             new CustomizableThreadFactory("cos-upload-"));
 
@@ -41,6 +44,7 @@ public class CosImageUploader extends ImageUploader {
         this.cosClient = new COSClient(cred, config);
         this.bucketName = bucketName;
         this.baseUrl = baseUrl;
+        logger.debug("COS client initialized for region {} with bucket {}", region, bucketName);
     }
 
     // for tests
@@ -48,17 +52,20 @@ public class CosImageUploader extends ImageUploader {
         this.cosClient = cosClient;
         this.bucketName = bucketName;
         this.baseUrl = baseUrl;
+        logger.debug("COS client provided directly with bucket {}", bucketName);
     }
 
     @Override
     public CompletableFuture<String> upload(byte[] data, String filename) {
         return CompletableFuture.supplyAsync(() -> {
+            logger.debug("Uploading {} bytes as {}", data.length, filename);
             String ext = "";
             int dot = filename.lastIndexOf('.');
             if (dot != -1) {
                 ext = filename.substring(dot);
             }
             String randomName = UUID.randomUUID().toString().replace("-", "") + ext;
+            logger.debug("Generated object key {}", randomName);
 
             ObjectMetadata meta = new ObjectMetadata();
             meta.setContentLength(data.length);
@@ -67,8 +74,11 @@ public class CosImageUploader extends ImageUploader {
                     randomName,
                     new ByteArrayInputStream(data),
                     meta);
+            logger.debug("Sending PutObject request to bucket {}", bucketName);
             cosClient.putObject(req);
-            return baseUrl + "/" + randomName;
+            String url = baseUrl + "/" + randomName;
+            logger.debug("Upload successful, accessible at {}", url);
+            return url;
         }, executor);
     }
 }
