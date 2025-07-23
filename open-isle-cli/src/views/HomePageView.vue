@@ -162,7 +162,7 @@ export default {
 
     const articles = ref([])
     const page = ref(0)
-    const pageSize = 5
+    const pageSize = 10
     const allLoaded = ref(false)
 
     const loadOptions = async () => {
