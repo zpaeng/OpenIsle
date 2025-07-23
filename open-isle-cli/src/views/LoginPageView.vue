@@ -53,7 +53,7 @@
 <script>
 import { API_BASE_URL, toast } from '../main'
 import { setToken, loadCurrentUser } from '../utils/auth'
-import { googleSignIn } from '../utils/google'
+import { loginWithGoogle } from '../utils/google'
 import { githubAuthorize } from '../utils/github'
 import { discordAuthorize } from '../utils/discord'
 import { twitterAuthorize } from '../utils/twitter'
@@ -61,6 +61,9 @@ import BaseInput from '../components/BaseInput.vue'
 export default {
   name: 'LoginPageView',
   components: { BaseInput },
+  setup() {
+    return { loginWithGoogle }
+  }, 
   data() {
     return {
       username: '',
@@ -99,16 +102,7 @@ export default {
         toast.error('登录失败')
       }
     },
-    loginWithGoogle() {
-      googleSignIn(
-        () => {
-          this.$router.push('/')
-        },
-        (token) => {
-          this.$router.push('/signup-reason?token=' + token)
-        }
-      )
-    },
+
     loginWithGithub() {
       githubAuthorize()
     },
@@ -117,7 +111,7 @@ export default {
     },
     loginWithTwitter() {
       twitterAuthorize()
-    }
+    },
   }
 }
 </script>
