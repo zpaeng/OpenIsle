@@ -132,6 +132,31 @@ public class PostController {
                 .stream().map(this::toDto).collect(Collectors.toList());
     }
 
+    @GetMapping("/latest-reply")
+    public List<PostDto> latestReplyPosts(@RequestParam(value = "categoryId", required = false) Long categoryId,
+                                          @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds,
+                                          @RequestParam(value = "tagId", required = false) Long tagId,
+                                          @RequestParam(value = "tagIds", required = false) List<Long> tagIds,
+                                          @RequestParam(value = "page", required = false) Integer page,
+                                          @RequestParam(value = "pageSize", required = false) Integer pageSize,
+                                          Authentication auth) {
+        List<Long> ids = categoryIds;
+        if (categoryId != null) {
+            ids = java.util.List.of(categoryId);
+        }
+        List<Long> tids = tagIds;
+        if (tagId != null) {
+            tids = java.util.List.of(tagId);
+        }
+
+        if (auth != null) {
+            userVisitService.recordVisit(auth.getName());
+        }
+
+        return postService.listPostsByLatestReply(ids, tids, page, pageSize)
+                .stream().map(this::toDto).collect(Collectors.toList());
+    }
+
     private PostDto toDto(Post post) {
         PostDto dto = new PostDto();
         dto.setId(post.getId());
@@ -159,6 +184,9 @@ public class PostController {
 
         java.util.List<com.openisle.model.User> participants = commentService.getParticipants(post.getId(), 5);
         dto.setParticipants(participants.stream().map(this::toAuthorDto).collect(Collectors.toList()));
+
+        java.time.LocalDateTime last = commentService.getLastCommentTime(post.getId());
+        dto.setLastReplyAt(last != null ? last : post.getCreatedAt());
 
         return dto;
     }
@@ -261,6 +289,7 @@ public class PostController {
         private long views;
         private com.openisle.model.PostStatus status;
         private LocalDateTime pinnedAt;
+        private LocalDateTime lastReplyAt;
         private List<CommentDto> comments;
         private List<ReactionDto> reactions;
         private java.util.List<AuthorDto> participants;

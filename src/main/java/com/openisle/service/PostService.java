@@ -206,6 +206,47 @@ public class PostService {
         return paginate(sortByPinnedAndViews(posts), page, pageSize);
     }
 
+    public List<Post> listPostsByLatestReply(Integer page, Integer pageSize) {
+        return listPostsByLatestReply(null, null, page, pageSize);
+    }
+
+    public List<Post> listPostsByLatestReply(java.util.List<Long> categoryIds,
+                                             java.util.List<Long> tagIds,
+                                             Integer page,
+                                             Integer pageSize) {
+        boolean hasCategories = categoryIds != null && !categoryIds.isEmpty();
+        boolean hasTags = tagIds != null && !tagIds.isEmpty();
+
+        java.util.List<Post> posts;
+
+        if (!hasCategories && !hasTags) {
+            posts = postRepository.findByStatusOrderByCreatedAtDesc(PostStatus.PUBLISHED);
+        } else if (hasCategories) {
+            java.util.List<Category> categories = categoryRepository.findAllById(categoryIds);
+            if (categories.isEmpty()) {
+                return java.util.List.of();
+            }
+            if (hasTags) {
+                java.util.List<com.openisle.model.Tag> tags = tagRepository.findAllById(tagIds);
+                if (tags.isEmpty()) {
+                    return java.util.List.of();
+                }
+                posts = postRepository.findByCategoriesAndAllTagsOrderByCreatedAtDesc(
+                        categories, tags, PostStatus.PUBLISHED, tags.size());
+            } else {
+                posts = postRepository.findByCategoryInAndStatusOrderByCreatedAtDesc(categories, PostStatus.PUBLISHED);
+            }
+        } else {
+            java.util.List<com.openisle.model.Tag> tags = tagRepository.findAllById(tagIds);
+            if (tags.isEmpty()) {
+                return java.util.List.of();
+            }
+            posts = postRepository.findByAllTagsOrderByCreatedAtDesc(tags, PostStatus.PUBLISHED, tags.size());
+        }
+
+        return paginate(sortByPinnedAndLastReply(posts), page, pageSize);
+    }
+
     public List<Post> listPostsByCategories(java.util.List<Long> categoryIds,
                                             Integer page,
                                             Integer pageSize) {
@@ -400,6 +441,17 @@ public class PostService {
                 .sorted(java.util.Comparator
                         .comparing(Post::getPinnedAt, java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder()))
                         .thenComparing(Post::getViews, java.util.Comparator.reverseOrder()))
+                .toList();
+    }
+
+    private java.util.List<Post> sortByPinnedAndLastReply(java.util.List<Post> posts) {
+        return posts.stream()
+                .sorted(java.util.Comparator
+                        .comparing(Post::getPinnedAt, java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder()))
+                        .thenComparing(p -> {
+                            java.time.LocalDateTime t = commentRepository.findLastCommentTime(p);
+                            return t != null ? t : p.getCreatedAt();
+                        }, java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder())))
                 .toList();
     }
 

@@ -151,8 +151,14 @@ export default {
     const tagOptions = ref([])
     const categoryOptions = ref([])
     const isLoadingPosts = ref(false)
-    const topics = ref(['最新', '排行榜' /*, '热门', '类别'*/])
-    const selectedTopic = ref(route.query.view === 'ranking' ? '排行榜' : '最新')
+    const topics = ref(['最新', '最新回复', '排行榜' /*, '热门', '类别'*/])
+    const selectedTopic = ref(
+      route.query.view === 'ranking'
+        ? '排行榜'
+        : route.query.view === 'latest-reply'
+          ? '最新回复'
+          : '最新'
+    )
 
     const articles = ref([])
     const page = ref(0)
@@ -198,6 +204,19 @@ export default {
 
     const buildRankUrl = () => {
       let url = `${API_BASE_URL}/api/posts/ranking?page=${page.value}&pageSize=${pageSize}`
+      if (selectedCategory.value) {
+        url += `&categoryId=${selectedCategory.value}`
+      }
+      if (selectedTags.value.length) {
+        selectedTags.value.forEach(t => {
+          url += `&tagIds=${t}`
+        })
+      }
+      return url
+    }
+
+    const buildReplyUrl = () => {
+      let url = `${API_BASE_URL}/api/posts/latest-reply?page=${page.value}&pageSize=${pageSize}`
       if (selectedCategory.value) {
         url += `&categoryId=${selectedCategory.value}`
       }
@@ -288,11 +307,50 @@ export default {
       }
     }
 
+    const fetchLatestReply = async (reset = false) => {
+      if (reset) {
+        page.value = 0
+        allLoaded.value = false
+        articles.value = []
+      }
+      if (isLoadingPosts.value || allLoaded.value) return
+      try {
+        isLoadingPosts.value = true
+        const res = await fetch(buildReplyUrl())
+        isLoadingPosts.value = false
+        if (!res.ok) return
+        const data = await res.json()
+        articles.value.push(
+          ...data.map(p => ({
+            id: p.id,
+            title: p.title,
+            description: p.content,
+            category: p.category,
+            tags: p.tags || [],
+            members: (p.participants || []).map(m => ({ id: m.id, avatar: m.avatar })),
+            comments: (p.comments || []).length,
+            views: p.views,
+            time: TimeManager.format(p.lastReplyAt || p.createdAt),
+            pinned: !!p.pinnedAt
+          }))
+        )
+        if (data.length < pageSize) {
+          allLoaded.value = true
+        } else {
+          page.value += 1
+        }
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
     const handleScroll = (e) => {
       const el = e.target
       if (el.scrollHeight - el.scrollTop <= el.clientHeight + 50) {
         if (selectedTopic.value === '排行榜') {
           fetchRanking()
+        } else if (selectedTopic.value === '最新回复') {
+          fetchLatestReply()
         } else {
           fetchPosts()
         }
@@ -303,6 +361,8 @@ export default {
       await loadOptions()
       if (selectedTopic.value === '排行榜') {
         fetchRanking()
+      } else if (selectedTopic.value === '最新回复') {
+        fetchLatestReply()
       } else {
         fetchPosts()
       }
@@ -313,12 +373,16 @@ export default {
         fetchPosts(true)
       } else if (selectedTopic.value === '排行榜') {
         fetchRanking(true)
+      } else if (selectedTopic.value === '最新回复') {
+        fetchLatestReply(true)
       }
     })
 
     watch(selectedTopic, () => {
       if (selectedTopic.value === '排行榜') {
         fetchRanking(true)
+      } else if (selectedTopic.value === '最新回复') {
+        fetchLatestReply(true)
       } else {
         fetchPosts(true)
       }
