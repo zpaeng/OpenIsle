@@ -19,13 +19,14 @@
 
 <script>
 import { ref, onMounted, computed, watch } from 'vue'
-import Vditor from 'vditor'
 import { themeState } from '../utils/theme'
-import 'vditor/dist/index.css'
+import {
+  createVditor,
+  getEditorTheme as getEditorThemeUtil,
+  getPreviewTheme as getPreviewThemeUtil
+} from '../utils/vditor'
 import LoginOverlay from './LoginOverlay.vue'
 import { isMobile } from '../utils/screen'
-import { API_BASE_URL } from '../main'
-import { getToken } from '../utils/auth'
 
 export default {
   name: 'CommentEditor',
@@ -52,10 +53,8 @@ export default {
   setup(props, { emit }) {
     const vditorInstance = ref(null)
     const text = ref('')
-    const getEditorTheme = () =>
-      document.documentElement.dataset.theme === 'dark' ? 'dark' : 'classic'
-    const getPreviewTheme = () =>
-      document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'
+    const getEditorTheme = getEditorThemeUtil
+    const getPreviewTheme = getPreviewThemeUtil
     const applyTheme = () => {
       if (vditorInstance.value) {
         vditorInstance.value.setTheme(getEditorTheme(), getPreviewTheme())
@@ -73,61 +72,13 @@ export default {
     }
 
     onMounted(() => {
-      vditorInstance.value = new Vditor(props.editorId, {
+      vditorInstance.value = createVditor(props.editorId, {
         placeholder: '说点什么...',
         height: isMobile.value ? 'auto' : 200,
-        theme: getEditorTheme(),
         preview: {
           actions: [],
-          markdown: { toc: false },
-          theme: { current: getPreviewTheme() }
+          markdown: { toc: false }
         },
-        cdn: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/vditor',
-        toolbar: [
-          'emoji',
-          'bold',
-          'italic',
-          'strike',
-          '|',
-          'list',
-          'line',
-          'quote',
-          'code',
-          'inline-code',
-          '|',
-          'undo',
-          'redo',
-          '|',
-          'link',
-          'upload'
-        ],
-        upload: {
-          fieldName: 'file',
-          url: `${API_BASE_URL}/api/upload`,
-          accept: 'image/*,video/*',
-          multiple: false,
-          headers: { Authorization: `Bearer ${getToken()}` },
-          format(files, responseText) {
-            const res = JSON.parse(responseText)
-            if (res.code === 0) {
-              return JSON.stringify({
-                code: 0,
-                msg: '',
-                data: {
-                  errFiles: [],
-                  succMap: { [files[0].name]: res.data.url }
-                }
-              })
-            } else {
-              return JSON.stringify({
-                code: 1,
-                msg: '上传失败',
-                data: { errFiles: files.map(f => f.name), succMap: {} }
-              })
-            }
-          }
-        },
-        toolbarConfig: { pin: true },
         input(value) {
           text.value = value
         },
