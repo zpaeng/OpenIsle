@@ -123,6 +123,12 @@ public class CommentService {
         return commentRepository.findAllById(ids);
     }
 
+    public java.time.LocalDateTime getLastCommentTime(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
+        return commentRepository.findLastCommentTime(post);
+    }
+
     @org.springframework.transaction.annotation.Transactional
     public void deleteComment(String username, Long id) {
         User user = userRepository.findByUsername(username)
