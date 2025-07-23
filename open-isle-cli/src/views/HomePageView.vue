@@ -26,7 +26,7 @@
     </div>
 
     <div class="article-container">
-      <template v-if="selectedTopic === '最新' || selectedTopic === '排行榜'">
+      <template v-if="selectedTopic === '最新' || selectedTopic === '排行榜' || selectedTopic === '最新回复'">
         <div class="header-container">
           <div class="header-item main-item">
             <div class="header-item-text">话题</div>
@@ -344,48 +344,34 @@ export default {
       }
     }
 
+    const fetchContent = (reset = false) => {
+      if (selectedTopic.value === '排行榜') {
+          fetchRanking(reset)
+        } else if (selectedTopic.value === '最新回复') {
+          fetchLatestReply(reset)
+        } else {
+          fetchPosts(reset)
+        }
+    }
+
     const handleScroll = (e) => {
       const el = e.target
       if (el.scrollHeight - el.scrollTop <= el.clientHeight + 50) {
-        if (selectedTopic.value === '排行榜') {
-          fetchRanking()
-        } else if (selectedTopic.value === '最新回复') {
-          fetchLatestReply()
-        } else {
-          fetchPosts()
-        }
+        fetchContent()
       }
     }
 
     onMounted(async () => {
       await loadOptions()
-      if (selectedTopic.value === '排行榜') {
-        fetchRanking()
-      } else if (selectedTopic.value === '最新回复') {
-        fetchLatestReply()
-      } else {
-        fetchPosts()
-      }
+      fetchContent()
     })
 
     watch([selectedCategory, selectedTags], () => {
-      if (selectedTopic.value === '最新') {
-        fetchPosts(true)
-      } else if (selectedTopic.value === '排行榜') {
-        fetchRanking(true)
-      } else if (selectedTopic.value === '最新回复') {
-        fetchLatestReply(true)
-      }
+      fetchContent(true)
     })
 
     watch(selectedTopic, () => {
-      if (selectedTopic.value === '排行榜') {
-        fetchRanking(true)
-      } else if (selectedTopic.value === '最新回复') {
-        fetchLatestReply(true)
-      } else {
-        fetchPosts(true)
-      }
+      fetchContent(true)
     })
 
     const sanitizeDescription = (text) => stripMarkdown(text)
