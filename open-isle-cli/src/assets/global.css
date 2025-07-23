@@ -17,6 +17,7 @@
   --login-background-color: rgb(241, 241, 241);
   --login-background-color-hover: #e0e0e0;
   --text-color: black;
+  --blockquote-text-color: #6a737d;
   --menu-width: 200px;
   --page-max-width: 1200px;
   --page-max-width-mobile: 900px;
@@ -39,6 +40,7 @@
   --login-background-color: #575757;
   --login-background-color-hover: #717171;
   --text-color: #eee;
+  --blockquote-text-color: #999;
   --article-info-background-color: #747373;
 }
 
@@ -93,7 +95,7 @@ body {
   margin: 1em 0;
   padding-left: 1em;
   border-left: 4px solid #d0d7de;
-  color: #6a737d;
+  color: var(--blockquote-text-color);
 }
 
 .info-content-text pre {
