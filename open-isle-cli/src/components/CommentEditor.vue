@@ -24,6 +24,8 @@ import { themeState } from '../utils/theme'
 import 'vditor/dist/index.css'
 import LoginOverlay from './LoginOverlay.vue'
 import { isMobile } from '../utils/screen'
+import { API_BASE_URL } from '../main'
+import { getToken } from '../utils/auth'
 
 export default {
   name: 'CommentEditor',
@@ -97,10 +99,43 @@ export default {
           'redo',
           '|',
           'link',
+          'upload'
         ],
+        upload: {
+          fieldName: 'file',
+          url: `${API_BASE_URL}/api/upload`,
+          accept: 'image/*,video/*',
+          multiple: false,
+          headers: { Authorization: `Bearer ${getToken()}` },
+          format(files, responseText) {
+            const res = JSON.parse(responseText)
+            if (res.code === 0) {
+              return JSON.stringify({
+                code: 0,
+                msg: '',
+                data: {
+                  errFiles: [],
+                  succMap: { [files[0].name]: res.data.url }
+                }
+              })
+            } else {
+              return JSON.stringify({
+                code: 1,
+                msg: '上传失败',
+                data: { errFiles: files.map(f => f.name), succMap: {} }
+              })
+            }
+          }
+        },
         toolbarConfig: { pin: true },
         input(value) {
           text.value = value
+        },
+        after() {
+          if (props.loading || props.disabled) {
+            vditorInstance.value.disabled()
+          }
+          applyTheme()
         }
       })
       // applyTheme()
