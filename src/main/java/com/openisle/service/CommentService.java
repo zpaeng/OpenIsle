@@ -31,6 +31,7 @@ public class CommentService {
     private final ReactionRepository reactionRepository;
     private final CommentSubscriptionRepository commentSubscriptionRepository;
     private final NotificationRepository notificationRepository;
+    private final ImageUploader imageUploader;
 
     public Comment addComment(String username, Long postId, String content) {
         User author = userRepository.findByUsername(username)
@@ -42,6 +43,7 @@ public class CommentService {
         comment.setPost(post);
         comment.setContent(content);
         comment = commentRepository.save(comment);
+        imageUploader.addReferences(imageUploader.extractUrls(content));
         if (!author.getId().equals(post.getAuthor().getId())) {
             notificationService.createNotification(post.getAuthor(), NotificationType.COMMENT_REPLY, post, comment, null, null, null, null);
         }
@@ -69,6 +71,7 @@ public class CommentService {
         comment.setParent(parent);
         comment.setContent(content);
         comment = commentRepository.save(comment);
+        imageUploader.addReferences(imageUploader.extractUrls(content));
         if (!author.getId().equals(parent.getAuthor().getId())) {
             notificationService.createNotification(parent.getAuthor(), NotificationType.COMMENT_REPLY, parent.getPost(), comment, null, null, null, null);
         }
@@ -150,6 +153,7 @@ public class CommentService {
         reactionRepository.findByComment(comment).forEach(reactionRepository::delete);
         commentSubscriptionRepository.findByComment(comment).forEach(commentSubscriptionRepository::delete);
         notificationRepository.deleteAll(notificationRepository.findByComment(comment));
+        imageUploader.removeReferences(imageUploader.extractUrls(comment.getContent()));
         commentRepository.delete(comment);
     }
 }

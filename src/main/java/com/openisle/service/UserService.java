@@ -21,6 +21,7 @@ public class UserService {
     private final PasswordValidator passwordValidator;
     private final UsernameValidator usernameValidator;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final ImageUploader imageUploader;
 
     public User register(String username, String email, String password, String reason, com.openisle.model.RegisterMode mode) {
         usernameValidator.validate(username);
@@ -120,8 +121,16 @@ public class UserService {
     public User updateAvatar(String username, String avatarUrl) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
+        String old = user.getAvatar();
         user.setAvatar(avatarUrl);
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+        if (old != null && !old.equals(avatarUrl)) {
+            imageUploader.removeReferences(java.util.Set.of(old));
+        }
+        if (avatarUrl != null) {
+            imageUploader.addReferences(java.util.Set.of(avatarUrl));
+        }
+        return saved;
     }
 
     public User updateReason(String username, String reason) {
