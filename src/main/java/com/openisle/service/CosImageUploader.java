@@ -28,6 +28,7 @@ public class CosImageUploader extends ImageUploader {
     private final COSClient cosClient;
     private final String bucketName;
     private final String baseUrl;
+    private static final String UPLOAD_DIR = "dynamic_assert/";
     private static final Logger logger = LoggerFactory.getLogger(CosImageUploader.class);
     private final ExecutorService executor = Executors.newFixedThreadPool(2,
             new CustomizableThreadFactory("cos-upload-"));
@@ -71,18 +72,19 @@ public class CosImageUploader extends ImageUploader {
                 ext = filename.substring(dot);
             }
             String randomName = UUID.randomUUID().toString().replace("-", "") + ext;
-            logger.debug("Generated object key {}", randomName);
+            String objectKey = UPLOAD_DIR + randomName;
+            logger.debug("Generated object key {}", objectKey);
 
             ObjectMetadata meta = new ObjectMetadata();
             meta.setContentLength(data.length);
             PutObjectRequest req = new PutObjectRequest(
                     bucketName,
-                    randomName,
+                    objectKey,
                     new ByteArrayInputStream(data),
                     meta);
             logger.debug("Sending PutObject request to bucket {}", bucketName);
             cosClient.putObject(req);
-            String url = baseUrl + "/" + randomName;
+            String url = baseUrl + "/" + objectKey;
             logger.debug("Upload successful, accessible at {}", url);
             return url;
         }, executor);

@@ -18,6 +18,6 @@ class CosImageUploaderTest {
         String url = uploader.upload("data".getBytes(), "img.png").join();
 
         verify(client).putObject(any(PutObjectRequest.class));
-        assertTrue(url.matches("http://cos.example.com/[a-f0-9]{32}\\.png"));
+        assertTrue(url.matches("http://cos.example.com/dynamic_assert/[a-f0-9]{32}\\.png"));
     }
 }
