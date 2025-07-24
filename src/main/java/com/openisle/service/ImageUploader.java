@@ -31,10 +31,7 @@ public abstract class ImageUploader {
      * Upload an image asynchronously and return a future of its accessible URL.
      */
     public CompletableFuture<String> upload(byte[] data, String filename) {
-        return doUpload(data, filename).thenApply(url -> {
-            addReference(url);
-            return url;
-        });
+        return doUpload(data, filename).thenApply(url -> url);
     }
 
     protected abstract CompletableFuture<String> doUpload(byte[] data, String filename);
