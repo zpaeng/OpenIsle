@@ -8,6 +8,7 @@ import com.openisle.repository.CategoryRepository;
 import com.openisle.repository.DraftRepository;
 import com.openisle.repository.TagRepository;
 import com.openisle.repository.UserRepository;
+import com.openisle.service.ImageUploader;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,12 +25,15 @@ public class DraftService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
+    private final ImageUploader imageUploader;
 
     @Transactional
     public Draft saveDraft(String username, Long categoryId, String title, String content, List<Long> tagIds) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Draft draft = draftRepository.findByAuthor(user).orElse(new Draft());
+        String oldContent = draft.getContent();
+        boolean existing = draft.getId() != null;
         draft.setAuthor(user);
         draft.setTitle(title);
         draft.setContent(content);
@@ -45,7 +49,13 @@ public class DraftService {
             tags.addAll(tagRepository.findAllById(tagIds));
         }
         draft.setTags(tags);
-        return draftRepository.save(draft);
+        Draft saved = draftRepository.save(draft);
+        if (existing) {
+            imageUploader.adjustReferences(oldContent == null ? "" : oldContent, content);
+        } else {
+            imageUploader.addReferences(imageUploader.extractUrls(content));
+        }
+        return saved;
     }
 
     @Transactional(readOnly = true)
@@ -56,7 +66,11 @@ public class DraftService {
 
     @Transactional
     public void deleteDraft(String username) {
-        userRepository.findByUsername(username)
-                .ifPresent(draftRepository::deleteByAuthor);
+        userRepository.findByUsername(username).ifPresent(user ->
+                draftRepository.findByAuthor(user).ifPresent(draft -> {
+                    imageUploader.removeReferences(imageUploader.extractUrls(draft.getContent()));
+                    draftRepository.delete(draft);
+                })
+        );
     }
 }
