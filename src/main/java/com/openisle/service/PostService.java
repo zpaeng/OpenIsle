@@ -41,6 +41,7 @@ public class PostService {
     private final PostSubscriptionRepository postSubscriptionRepository;
     private final NotificationRepository notificationRepository;
     private final PostReadService postReadService;
+    private final ImageUploader imageUploader;
 
     @org.springframework.beans.factory.annotation.Autowired
     public PostService(PostRepository postRepository,
@@ -55,6 +56,7 @@ public class PostService {
                        PostSubscriptionRepository postSubscriptionRepository,
                        NotificationRepository notificationRepository,
                        PostReadService postReadService,
+                       ImageUploader imageUploader,
                        @Value("${app.post.publish-mode:DIRECT}") PublishMode publishMode) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
@@ -68,6 +70,7 @@ public class PostService {
         this.postSubscriptionRepository = postSubscriptionRepository;
         this.notificationRepository = notificationRepository;
         this.postReadService = postReadService;
+        this.imageUploader = imageUploader;
         this.publishMode = publishMode;
     }
 
@@ -106,6 +109,7 @@ public class PostService {
         post.setTags(new java.util.HashSet<>(tags));
         post.setStatus(publishMode == PublishMode.REVIEW ? PostStatus.PENDING : PostStatus.PUBLISHED);
         post = postRepository.save(post);
+        imageUploader.addReferences(imageUploader.extractUrls(content));
         if (post.getStatus() == PostStatus.PENDING) {
             java.util.List<User> admins = userRepository.findByRole(com.openisle.model.Role.ADMIN);
             for (User admin : admins) {
@@ -391,10 +395,13 @@ public class PostService {
             throw new IllegalArgumentException("Tag not found");
         }
         post.setTitle(title);
+        String oldContent = post.getContent();
         post.setContent(content);
         post.setCategory(category);
         post.setTags(new java.util.HashSet<>(tags));
-        return postRepository.save(post);
+        Post updated = postRepository.save(post);
+        imageUploader.adjustReferences(oldContent, content);
+        return updated;
     }
 
     @org.springframework.transaction.annotation.Transactional
@@ -413,6 +420,7 @@ public class PostService {
         postSubscriptionRepository.findByPost(post).forEach(postSubscriptionRepository::delete);
         notificationRepository.deleteAll(notificationRepository.findByPost(post));
         postReadService.deleteByPost(post);
+        imageUploader.removeReferences(imageUploader.extractUrls(post.getContent()));
         postRepository.delete(post);
     }
 

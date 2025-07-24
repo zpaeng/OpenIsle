@@ -34,11 +34,13 @@ public class CosImageUploader extends ImageUploader {
 
     @org.springframework.beans.factory.annotation.Autowired
     public CosImageUploader(
+            com.openisle.repository.ImageRepository imageRepository,
             @Value("${cos.secret-id:}") String secretId,
             @Value("${cos.secret-key:}") String secretKey,
             @Value("${cos.region:ap-guangzhou}") String region,
             @Value("${cos.bucket-name:}") String bucketName,
             @Value("${cos.base-url:https://example.com}") String baseUrl) {
+        super(imageRepository, baseUrl);
         COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
         ClientConfig config = new ClientConfig(new Region(region));
         this.cosClient = new COSClient(cred, config);
@@ -48,7 +50,11 @@ public class CosImageUploader extends ImageUploader {
     }
 
     // for tests
-    CosImageUploader(COSClient cosClient, String bucketName, String baseUrl) {
+    CosImageUploader(COSClient cosClient,
+                     com.openisle.repository.ImageRepository imageRepository,
+                     String bucketName,
+                     String baseUrl) {
+        super(imageRepository, baseUrl);
         this.cosClient = cosClient;
         this.bucketName = bucketName;
         this.baseUrl = baseUrl;
@@ -56,7 +62,7 @@ public class CosImageUploader extends ImageUploader {
     }
 
     @Override
-    public CompletableFuture<String> upload(byte[] data, String filename) {
+    protected CompletableFuture<String> doUpload(byte[] data, String filename) {
         return CompletableFuture.supplyAsync(() -> {
             logger.debug("Uploading {} bytes as {}", data.length, filename);
             String ext = "";
@@ -80,5 +86,14 @@ public class CosImageUploader extends ImageUploader {
             logger.debug("Upload successful, accessible at {}", url);
             return url;
         }, executor);
+    }
+
+    @Override
+    protected void deleteFromStore(String key) {
+        try {
+            cosClient.deleteObject(bucketName, key);
+        } catch (Exception e) {
+            logger.warn("Failed to delete image {} from COS", key, e);
+        }
     }
 }

@@ -24,11 +24,12 @@ class PostServiceTest {
         PostSubscriptionRepository subRepo = mock(PostSubscriptionRepository.class);
         NotificationRepository notificationRepo = mock(NotificationRepository.class);
         PostReadService postReadService = mock(PostReadService.class);
+        ImageUploader imageUploader = mock(ImageUploader.class);
 
         PostService service = new PostService(postRepo, userRepo, catRepo, tagRepo,
                 notifService, subService, commentService, commentRepo,
                 reactionRepo, subRepo, notificationRepo, postReadService,
-                PublishMode.DIRECT);
+                imageUploader, PublishMode.DIRECT);
 
         Post post = new Post();
         post.setId(1L);
