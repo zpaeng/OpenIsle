@@ -365,12 +365,6 @@ export default {
     onMounted(async () => {
       await loadOptions()
       fetchContent()
-      if (!isLogin()) {
-        //
-      }
-      setTimeout(() => {
-          loginWithGoogle()
-        }, 3000)
     })
 
     watch([selectedCategory, selectedTags], () => {
