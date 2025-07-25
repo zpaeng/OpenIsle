@@ -111,7 +111,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { stripMarkdown } from '../utils/markdown'
 import { API_BASE_URL } from '../main'
-import { getToken, isLogin } from '../utils/auth'
+import { getToken } from '../utils/auth'
 import TimeManager from '../utils/time'
 import CategorySelect from '../components/CategorySelect.vue'
 import TagSelect from '../components/TagSelect.vue'
@@ -120,7 +120,6 @@ import ArticleCategory from '../components/ArticleCategory.vue'
 import SearchDropdown from '../components/SearchDropdown.vue'
 import { hatch } from 'ldrs'
 import { isMobile } from '../utils/screen'
-import { loginWithGoogle } from '../utils/google'
 hatch.register()
 
 
