@@ -51,10 +51,15 @@ export async function googleSignIn(redirect_success, redirect_not_approved) {
   }
 }
 
+import router from '../router'
+
 export function loginWithGoogle() {
-  googleSignIn(() => {
-      this.$router.push('/')
-    }, (token) => {
-      this.$router.push('/signup-reason?token=' + token)
-    })
+  googleSignIn(
+    () => {
+      router.push('/')
+    },
+    token => {
+      router.push('/signup-reason?token=' + token)
+    }
+  )
 }
