@@ -14,7 +14,6 @@ export function getPreviewTheme() {
 export function createVditor(editorId, options = {}) {
   const {
     placeholder = '',
-    height,
     preview = {},
     input,
     after
@@ -22,7 +21,7 @@ export function createVditor(editorId, options = {}) {
 
   return new Vditor(editorId, {
     placeholder,
-    height,
+    height: 'auto',
     theme: getEditorTheme(),
     preview: Object.assign({ theme: { current: getPreviewTheme() } }, preview),
     cdn: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/vditor',

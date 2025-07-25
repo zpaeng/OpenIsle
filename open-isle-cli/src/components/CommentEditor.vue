@@ -26,7 +26,6 @@ import {
   getPreviewTheme as getPreviewThemeUtil
 } from '../utils/vditor'
 import LoginOverlay from './LoginOverlay.vue'
-import { isMobile } from '../utils/screen'
 
 export default {
   name: 'CommentEditor',
@@ -74,7 +73,6 @@ export default {
     onMounted(() => {
       vditorInstance.value = createVditor(props.editorId, {
         placeholder: '说点什么...',
-        height: isMobile.value ? 'auto' : 200,
         preview: {
           actions: [],
           markdown: { toc: false }

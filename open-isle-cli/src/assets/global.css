@@ -57,7 +57,9 @@ body {
 /*************************
  * Vditor 自定义皮肤覆写
  *************************/
- 
+.vditor {
+  min-height: 200px;
+} 
 /* .vditor {
   --textarea-background-color: transparent;
   border: none !important;
@@ -200,6 +202,10 @@ body {
 }
 
 @media (max-width: 768px) {
+  .vditor {
+    min-height: 100px;
+  } 
+
   .vditor-toolbar {
     display: none;
   }
