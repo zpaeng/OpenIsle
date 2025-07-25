@@ -251,7 +251,7 @@ export default {
   bottom: 40px;
   left: -20px;
   background-color: var(--background-color);
-  border: 1px solid #ccc;
+  border: 1px solid var(--normal-border-color);
   border-radius: 5px;
   padding: 5px;
   max-width: 240px;
@@ -274,7 +274,7 @@ export default {
 }
 
 .reaction-option.selected {
-  background-color: rgb(236, 236, 236);
+  background-color: var(--menu-selected-background-color);
 }
 
 @media (max-width: 768px) {
