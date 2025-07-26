@@ -4,7 +4,7 @@ import { setToken, loadCurrentUser } from './auth'
 export async function googleGetIdToken() {
   return new Promise((resolve, reject) => {
     if (!window.google || !GOOGLE_CLIENT_ID) {
-      toast.error('Google 登录不可用')
+      toast.error('Google 登录不可用, 请检查网络设置与VPN')
       reject()
       return
     }
