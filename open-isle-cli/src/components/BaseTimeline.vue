@@ -38,7 +38,7 @@ export default {
   flex-direction: row;
   align-items: flex-start;
   position: relative;
-  margin-bottom: 20px;
+  margin-top: 10px;
 }
 
 .timeline-icon {
@@ -92,9 +92,6 @@ export default {
 }
 
 @media (max-width: 768px) {
-  .timeline-item {
-    margin-bottom: 10px;
-  }
 
   .timeline-icon {
     margin-right: 2px;

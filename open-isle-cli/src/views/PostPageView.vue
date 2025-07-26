@@ -794,7 +794,7 @@ export default {
 .info-content {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 3px;
   width: 100%;
 }
 
@@ -819,7 +819,6 @@ export default {
 .info-content-text {
   font-size: 16px;
   line-height: 1.8;
-  opacity: 0.7;
   width: 100%;
 }
 
@@ -827,7 +826,7 @@ export default {
   display: flex;
   flex-direction: row;
   gap: 10px;
-  margin-top: 60px;
+  margin-top: 0px;
 }
 
 .reactions-viewer {
@@ -890,10 +889,6 @@ export default {
 
   .post-page-scroller-container {
     display: none;
-  }
-
-  .info-content {
-    gap: 3px;
   }
 
   .info-content-container {
