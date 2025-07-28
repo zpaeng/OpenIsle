@@ -31,6 +31,13 @@
               </div>
               <div class="profile-level-target">🎉目标 Lv.{{ levelInfo.currentLevel + 1 }}</div>
             </div>
+            <div class="profile-level-target">
+              目标 Lv.{{ levelInfo.currentLevel + 1 }}
+              <i
+                class="fas fa-info-circle profile-exp-info"
+                title="经验值可通过发帖、评论等操作获得，达到目标后即可提升等级，解锁更多功能。"
+              ></i>
+            </div>
           </div>
         </div>
       </div>
@@ -591,6 +598,12 @@ export default {
 .profile-level-target {
   font-size: 12px;
   opacity: 0.8;
+}
+
+.profile-exp-info {
+  margin-left: 4px;
+  opacity: 0.5;
+  cursor: pointer;
 }
 
 .profile-info {
