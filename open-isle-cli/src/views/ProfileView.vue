@@ -20,6 +20,16 @@
             <i class="fas fa-user-minus"></i>
             取消关注
           </div>
+          <div class="profile-level-container">
+            <div class="profile-level-current">Lv.{{ levelInfo.currentLevel }}</div>
+            <div class="profile-level-bar">
+              <div class="profile-level-bar-inner" :style="{ width: `${levelInfo.percent}%` }" />
+            </div>
+            <div class="profile-level-exp">
+              {{ levelInfo.exp }} / {{ levelInfo.nextExp }}
+            </div>
+            <div class="profile-level-target">目标 Lv.{{ levelInfo.currentLevel + 1 }}</div>
+          </div>
         </div>
       </div>
 
@@ -242,6 +252,7 @@ import UserList from '../components/UserList.vue'
 import BasePlaceholder from '../components/BasePlaceholder.vue'
 import { stripMarkdown, stripMarkdownLength } from '../utils/markdown'
 import TimeManager from '../utils/time'
+import { prevLevelExp } from '../utils/level'
 import { hatch } from 'ldrs'
 hatch.register()
 
@@ -264,7 +275,18 @@ export default {
     const isLoading = ref(true)
     const tabLoading = ref(false)
     const selectedTab = ref('summary')
-    const followTab = ref('followers')
+   const followTab = ref('followers')
+
+    const levelInfo = computed(() => {
+      const exp = user.value.experience || 0
+      const currentLevel = user.value.currentLevel || 0
+      const nextExp = user.value.nextLevelExp || 0
+      const prevExp = prevLevelExp(currentLevel)
+      const total = nextExp - prevExp
+      const ratio = total > 0 ? (exp - prevExp) / total : 1
+      const percent = Math.max(0, Math.min(1, ratio)) * 100
+      return { exp, currentLevel, nextExp, percent }
+    })
 
     const isMine = computed(() => authState.username === username)
 
@@ -447,7 +469,8 @@ export default {
       subscribeUser,
       unsubscribeUser,
       gotoTag,
-      hotTags
+      hotTags,
+      levelInfo
     }
   }
 }
@@ -528,6 +551,37 @@ export default {
   margin-top: 15px;
   width: fit-content;
   cursor: pointer;
+}
+
+.profile-level-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.profile-level-current {
+  font-weight: bold;
+}
+
+.profile-level-bar {
+  width: 200px;
+  height: 8px;
+  background-color: var(--normal-background-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.profile-level-bar-inner {
+  height: 100%;
+  background-color: var(--primary-color);
+}
+
+.profile-level-exp,
+.profile-level-target {
+  font-size: 12px;
+  opacity: 0.8;
 }
 
 .profile-info {
