@@ -26,10 +26,10 @@
     <div v-if="dialogVisible" class="redeem-dialog">
       <div class="redeem-dialog-overlay" @click="closeDialog"></div>
       <div class="redeem-dialog-content">
-        <BaseInput v-model="contact" placeholder="联系方式" />
+        <BaseInput textarea="" rows="5" v-model="contact" placeholder="联系方式 (手机号/Email/微信/instagram/telegram等, 务必注明来源)" />
         <div class="redeem-actions">
-          <button class="redeem-submit-button" @click="submitRedeem" :disabled="loading">提交</button>
-          <button class="redeem-cancel-button" @click="closeDialog">取消</button>
+          <div class="redeem-submit-button" @click="submitRedeem" :disabled="loading">提交</div>
+          <div class="redeem-cancel-button" @click="closeDialog">取消</div>
         </div>
       </div>
     </div>
@@ -194,14 +194,16 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  min-width: 250px;
+  min-width: 400px;
 }
 
 .redeem-actions {
+  margin-top: 10px;
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 20px;
+  align-items: center;
 }
 
 .redeem-submit-button {
