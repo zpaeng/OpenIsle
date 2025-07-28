@@ -25,7 +25,7 @@
         </div>
 
         <div class="login-page-button-secondary">没有账号？ <a class="login-page-button-secondary-link" href="/signup">注册</a> |
-          <a class="login-page-button-secondary-link" href="/forgot-password">找回密码</a>
+          <a class="login-page-button-secondary-link" :href="`/forgot-password?email=${username}`">找回密码</a>
         </div>
       </div>
     </div>

@@ -62,12 +62,11 @@ export default {
           body: JSON.stringify({ email: this.email })
         })
         this.isSending = false
-        const data = await res.json()
         if (res.ok) {
           toast.success('验证码已发送')
           this.step = 1
         } else {
-          toast.error(data.error || '发送失败')
+          toast.error('请填写已注册邮箱')
         }
       } catch (e) {
         this.isSending = false

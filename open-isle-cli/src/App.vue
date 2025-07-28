@@ -29,7 +29,7 @@ export default {
   },
   computed: {
     hideMenu() {
-      return ['/login', '/signup', '/404', '/signup-reason', '/github-callback', '/twitter-callback', '/discord-callback'].includes(this.$route.path)
+      return ['/login', '/signup', '/404', '/signup-reason', '/github-callback', '/twitter-callback', '/discord-callback', '/forgot-password'].includes(this.$route.path)
     }
   }
 }
