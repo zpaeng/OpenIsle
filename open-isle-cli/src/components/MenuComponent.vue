@@ -33,6 +33,15 @@
           <span class="menu-item-text">关于</span>
         </router-link>
         <router-link
+          class="menu-item"
+          exact-active-class="selected"
+          to="/activities"
+          @click="handleItemClick"
+        >
+          <i class="menu-item-icon fas fa-gift"></i>
+          <span class="menu-item-text">活动</span>
+        </router-link>
+        <router-link
           v-if="shouldShowStats"
           class="menu-item"
           exact-active-class="selected"

@@ -29,5 +29,7 @@ public enum NotificationType {
     /** A user you subscribe to created a post or comment */
     USER_ACTIVITY,
     /** A user requested registration approval */
-    REGISTER_REQUEST
+    REGISTER_REQUEST,
+    /** A user redeemed an activity reward */
+    ACTIVITY_REDEEM
 }
