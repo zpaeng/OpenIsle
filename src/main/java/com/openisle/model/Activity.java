@@ -26,6 +26,8 @@ public class Activity {
 
     private String icon;
 
+    private String content;
+
     @Column(name = "start_time", nullable = false)
     @CreationTimestamp
     private LocalDateTime startTime;

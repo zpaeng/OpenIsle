@@ -14,7 +14,7 @@
   --menu-text-color: black;
   --scroller-background-color: rgba(130, 175, 180, 0.5);
   --normal-background-color: rgb(241, 241, 241);
-  --login-background-color: rgb(241, 241, 241);
+  --login-background-color: rgb(248, 248, 248);
   --login-background-color-hover: #e0e0e0;
   --text-color: black;
   --blockquote-text-color: #6a737d;
@@ -22,6 +22,7 @@
   --page-max-width: 1200px;
   --page-max-width-mobile: 900px;
   --article-info-background-color: #f0f0f0;
+  --activity-card-background-color: #f0f0f0;
 }
 
 [data-theme='dark'] {
@@ -42,6 +43,7 @@
   --text-color: #eee;
   --blockquote-text-color: #999;
   --article-info-background-color: #747373;
+  --activity-card-background-color: #585858;
 }
 
 body {
