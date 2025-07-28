@@ -9,4 +9,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     java.util.List<User> findByUsernameContainingIgnoreCase(String keyword);
     java.util.List<User> findByRole(com.openisle.model.Role role);
+    long countByExperienceGreaterThanEqual(int experience);
 }

@@ -3,6 +3,7 @@ import HomePageView from '../views/HomePageView.vue'
 import MessagePageView from '../views/MessagePageView.vue'
 import AboutPageView from '../views/AboutPageView.vue'
 import SiteStatsPageView from '../views/SiteStatsPageView.vue'
+import ActivityListPageView from '../views/ActivityListPageView.vue'
 import PostPageView from '../views/PostPageView.vue'
 import LoginPageView from '../views/LoginPageView.vue'
 import SignupPageView from '../views/SignupPageView.vue'
@@ -37,6 +38,11 @@ const routes = [
     path: '/about/stats',
     name: 'site-stats',
     component: SiteStatsPageView
+  },
+  {
+    path: '/activities',
+    name: 'activities',
+    component: ActivityListPageView
   },
   {
     path: '/new-post',
