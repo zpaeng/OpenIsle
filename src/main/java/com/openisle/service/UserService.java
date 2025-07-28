@@ -155,4 +155,32 @@ public class UserService {
         }
         return userRepository.save(user);
     }
+
+    public String generatePasswordResetCode(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
+        String code = genCode();
+        user.setPasswordResetCode(code);
+        userRepository.save(user);
+        return code;
+    }
+
+    public boolean verifyPasswordResetCode(String email, String code) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isPresent() && code.equals(userOpt.get().getPasswordResetCode())) {
+            User user = userOpt.get();
+            user.setPasswordResetCode(null);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
+
+    public User updatePassword(String username, String newPassword) {
+        passwordValidator.validate(newPassword);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
+        user.setPassword(passwordEncoder.encode(newPassword));
+        return userRepository.save(user);
+    }
 }

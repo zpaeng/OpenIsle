@@ -37,6 +37,8 @@ public class User {
 
     private String verificationCode;
 
+    private String passwordResetCode;
+
     private String avatar;
 
     @Column(length = 1000)

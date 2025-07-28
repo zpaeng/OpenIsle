@@ -15,6 +15,7 @@ import NotFoundPageView from '../views/NotFoundPageView.vue'
 import GithubCallbackPageView from '../views/GithubCallbackPageView.vue'
 import DiscordCallbackPageView from '../views/DiscordCallbackPageView.vue'
 import TwitterCallbackPageView from '../views/TwitterCallbackPageView.vue'
+import ForgotPasswordPageView from '../views/ForgotPasswordPageView.vue'
 
 const routes = [
   {
@@ -56,6 +57,11 @@ const routes = [
     path: '/login',
     name: 'login',
     component: LoginPageView
+  },
+  {
+    path: '/forgot-password',
+    name: 'forgot-password',
+    component: ForgotPasswordPageView
   },
   {
     path: '/signup',
