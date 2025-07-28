@@ -1,26 +1,37 @@
 package com.openisle.service;
 
 import com.openisle.model.User;
-import com.openisle.repository.CommentRepository;
-import com.openisle.repository.PostRepository;
-import com.openisle.repository.ReactionRepository;
 import com.openisle.repository.UserRepository;
+import com.openisle.repository.ExperienceLogRepository;
+import com.openisle.model.ExperienceLog;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class LevelService {
     private final UserRepository userRepository;
-    private final PostRepository postRepository;
-    private final CommentRepository commentRepository;
-    private final ReactionRepository reactionRepository;
+    // repositories for experience-related entities
+    private final ExperienceLogRepository experienceLogRepository;
     private final UserVisitService userVisitService;
 
     private static final int[] LEVEL_EXP = {100,200,300,600,1200,10000};
+
+    private ExperienceLog getTodayLog(User user) {
+        LocalDate today = LocalDate.now();
+        return experienceLogRepository.findByUserAndLogDate(user, today)
+                .orElseGet(() -> {
+                    ExperienceLog log = new ExperienceLog();
+                    log.setUser(user);
+                    log.setLogDate(today);
+                    log.setPostCount(0);
+                    log.setCommentCount(0);
+                    log.setReactionCount(0);
+                    return experienceLogRepository.save(log);
+                });
+    }
 
     private int addExperience(User user, int amount) {
         user.setExperience(user.getExperience() + amount);
@@ -30,25 +41,28 @@ public class LevelService {
 
     public int awardForPost(String username) {
         User user = userRepository.findByUsername(username).orElseThrow();
-        LocalDateTime start = LocalDate.now().atStartOfDay();
-        long count = postRepository.countByAuthorAfter(username, start);
-        if (count > 1) return 0;
+        ExperienceLog log = getTodayLog(user);
+        if (log.getPostCount() > 1) return 0;
+        log.setPostCount(log.getPostCount() + 1);
+        experienceLogRepository.save(log);
         return addExperience(user,30);
     }
 
     public int awardForComment(String username) {
         User user = userRepository.findByUsername(username).orElseThrow();
-        LocalDateTime start = LocalDate.now().atStartOfDay();
-        long count = commentRepository.countByAuthorAfter(username, start);
-        if (count > 3) return 0;
+        ExperienceLog log = getTodayLog(user);
+        if (log.getCommentCount() > 3) return 0;
+        log.setCommentCount(log.getCommentCount() + 1);
+        experienceLogRepository.save(log);
         return addExperience(user,10);
     }
 
     public int awardForReaction(String username) {
         User user = userRepository.findByUsername(username).orElseThrow();
-        LocalDateTime start = LocalDate.now().atStartOfDay();
-        long count = reactionRepository.countByUserAfter(username, start);
-        if (count > 3) return 0;
+        ExperienceLog log = getTodayLog(user);
+        if (log.getReactionCount() > 3) return 0;
+        log.setReactionCount(log.getReactionCount() + 1);
+        experienceLogRepository.save(log);
         return addExperience(user,5);
     }
 
