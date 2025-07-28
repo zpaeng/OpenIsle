@@ -13,6 +13,7 @@ import com.openisle.service.RegisterModeService;
 import com.openisle.service.NotificationService;
 import com.openisle.model.RegisterMode;
 import com.openisle.repository.UserRepository;
+import com.openisle.exception.FieldException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,7 @@ public class AuthController {
     private final RegisterModeService registerModeService;
     private final NotificationService notificationService;
     private final UserRepository userRepository;
+
 
     @Value("${app.captcha.enabled:false}")
     private boolean captchaEnabled;
@@ -270,6 +272,41 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("valid", true));
     }
 
+    @PostMapping("/forgot/send")
+    public ResponseEntity<?> sendReset(@RequestBody ForgotPasswordRequest req) {
+        Optional<User> userOpt = userService.findByEmail(req.getEmail());
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "User not found"));
+        }
+        String code = userService.generatePasswordResetCode(req.getEmail());
+        emailService.sendEmail(req.getEmail(), "Password Reset Code", "Your verification code is " + code);
+        return ResponseEntity.ok(Map.of("message", "Verification code sent"));
+    }
+
+    @PostMapping("/forgot/verify")
+    public ResponseEntity<?> verifyReset(@RequestBody VerifyForgotRequest req) {
+        boolean ok = userService.verifyPasswordResetCode(req.getEmail(), req.getCode());
+        if (ok) {
+            String username = userService.findByEmail(req.getEmail()).get().getUsername();
+            return ResponseEntity.ok(Map.of("token", jwtService.generateResetToken(username)));
+        }
+        return ResponseEntity.badRequest().body(Map.of("error", "Invalid verification code"));
+    }
+
+    @PostMapping("/forgot/reset")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest req) {
+        String username = jwtService.validateAndGetSubjectForReset(req.getToken());
+        try {
+            userService.updatePassword(username, req.getPassword());
+            return ResponseEntity.ok(Map.of("message", "Password updated"));
+        } catch (FieldException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "field", e.getField(),
+                    "error", e.getMessage()
+            ));
+        }
+    }
+
     @Data
     private static class RegisterRequest {
         private String username;
@@ -319,5 +356,22 @@ public class AuthController {
     private static class MakeReasonRequest {
         private String token;
         private String reason;
+    }
+
+    @Data
+    private static class ForgotPasswordRequest {
+        private String email;
+    }
+
+    @Data
+    private static class VerifyForgotRequest {
+        private String email;
+        private String code;
+    }
+
+    @Data
+    private static class ResetPasswordRequest {
+        private String token;
+        private String password;
     }
 }
