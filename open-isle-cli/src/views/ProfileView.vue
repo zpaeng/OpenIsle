@@ -20,24 +20,17 @@
             <i class="fas fa-user-minus"></i>
             取消关注
           </div>
-          <div class="profile-level-container">
-            <div class="profile-level-current">Lv.{{ levelInfo.currentLevel }}</div>
-            <div class="profile-level-bar">
-              <div class="profile-level-bar-inner" :style="{ width: `${levelInfo.percent}%` }" />
-            </div>
-            <div class="profile-level-info">
-              <div class="profile-level-exp">
-                {{ levelInfo.exp }} / {{ levelInfo.nextExp }}
-              </div>
-              <div class="profile-level-target">🎉目标 Lv.{{ levelInfo.currentLevel + 1 }}</div>
-            </div>
-            <div class="profile-level-target">
-              目标 Lv.{{ levelInfo.currentLevel + 1 }}
-              <i
-                class="fas fa-info-circle profile-exp-info"
-                title="经验值可通过发帖、评论等操作获得，达到目标后即可提升等级，解锁更多功能。"
-              ></i>
-            </div>
+          <LevelProgress
+            :exp="levelInfo.exp"
+            :current-level="levelInfo.currentLevel"
+            :next-exp="levelInfo.nextExp"
+          />
+          <div class="profile-level-target">
+            目标 Lv.{{ levelInfo.currentLevel + 1 }}
+            <i
+              class="fas fa-info-circle profile-exp-info"
+              title="经验值可通过发帖、评论等操作获得，达到目标后即可提升等级，解锁更多功能。"
+            ></i>
           </div>
         </div>
       </div>
@@ -259,6 +252,7 @@ import { getToken, authState } from '../utils/auth'
 import BaseTimeline from '../components/BaseTimeline.vue'
 import UserList from '../components/UserList.vue'
 import BasePlaceholder from '../components/BasePlaceholder.vue'
+import LevelProgress from '../components/LevelProgress.vue'
 import { stripMarkdown, stripMarkdownLength } from '../utils/markdown'
 import TimeManager from '../utils/time'
 import { prevLevelExp } from '../utils/level'
@@ -267,7 +261,7 @@ hatch.register()
 
 export default {
   name: 'ProfileView',
-  components: { BaseTimeline, UserList, BasePlaceholder },
+  components: { BaseTimeline, UserList, BasePlaceholder, LevelProgress },
   setup() {
     const route = useRoute()
     const router = useRouter()
