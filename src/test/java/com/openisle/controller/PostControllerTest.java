@@ -9,6 +9,7 @@ import com.openisle.service.CommentService;
 import com.openisle.service.ReactionService;
 import com.openisle.service.CaptchaService;
 import com.openisle.service.DraftService;
+import com.openisle.service.LevelService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,8 @@ class PostControllerTest {
     private CaptchaService captchaService;
     @MockBean
     private DraftService draftService;
+    @MockBean
+    private LevelService levelService;
 
     @Test
     void createAndGetPost() throws Exception {

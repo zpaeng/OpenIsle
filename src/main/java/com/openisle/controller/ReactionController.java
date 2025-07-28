@@ -3,6 +3,7 @@ package com.openisle.controller;
 import com.openisle.model.Reaction;
 import com.openisle.model.ReactionType;
 import com.openisle.service.ReactionService;
+import com.openisle.service.LevelService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ReactionController {
     private final ReactionService reactionService;
+    private final LevelService levelService;
 
     /**
      * Get all available reaction types.
@@ -31,7 +33,9 @@ public class ReactionController {
         if (reaction == null) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(toDto(reaction));
+        ReactionDto dto = toDto(reaction);
+        dto.setReward(levelService.awardForReaction(auth.getName()));
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping("/comments/{commentId}/reactions")
@@ -42,7 +46,9 @@ public class ReactionController {
         if (reaction == null) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(toDto(reaction));
+        ReactionDto dto = toDto(reaction);
+        dto.setReward(levelService.awardForReaction(auth.getName()));
+        return ResponseEntity.ok(dto);
     }
 
     private ReactionDto toDto(Reaction reaction) {
@@ -56,6 +62,7 @@ public class ReactionController {
         if (reaction.getComment() != null) {
             dto.setCommentId(reaction.getComment().getId());
         }
+        dto.setReward(0);
         return dto;
     }
 
@@ -71,5 +78,6 @@ public class ReactionController {
         private String user;
         private Long postId;
         private Long commentId;
+        private int reward;
     }
 }

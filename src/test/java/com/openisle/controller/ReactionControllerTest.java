@@ -6,6 +6,7 @@ import com.openisle.model.Reaction;
 import com.openisle.model.ReactionType;
 import com.openisle.model.User;
 import com.openisle.service.ReactionService;
+import com.openisle.service.LevelService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ class ReactionControllerTest {
 
     @MockBean
     private ReactionService reactionService;
+    @MockBean
+    private LevelService levelService;
 
     @Test
     void reactToPost() throws Exception {

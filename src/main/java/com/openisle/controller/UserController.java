@@ -27,6 +27,7 @@ public class UserController {
     private final SubscriptionService subscriptionService;
     private final PostReadService postReadService;
     private final UserVisitService userVisitService;
+    private final LevelService levelService;
 
     @Value("${app.upload.check-type:true}")
     private boolean checkImageType;
@@ -76,6 +77,12 @@ public class UserController {
                                                  Authentication auth) {
         User user = userService.updateProfile(auth.getName(), dto.getUsername(), dto.getIntroduction());
         return ResponseEntity.ok(toDto(user, auth));
+    }
+
+    @PostMapping("/me/signin")
+    public Map<String, Integer> signIn(Authentication auth) {
+        int reward = levelService.awardForSignin(auth.getName());
+        return Map.of("reward", reward);
     }
 
     @GetMapping("/{identifier}")
@@ -223,6 +230,9 @@ public class UserController {
         dto.setReadPosts(postReadService.countReads(user.getUsername()));
         dto.setLikesSent(reactionService.countLikesSent(user.getUsername()));
         dto.setLikesReceived(reactionService.countLikesReceived(user.getUsername()));
+        dto.setExperience(user.getExperience());
+        dto.setCurrentLevel(levelService.getLevel(user.getExperience()));
+        dto.setNextLevelExp(levelService.nextLevelExp(user.getExperience()));
         if (viewer != null) {
             dto.setSubscribed(subscriptionService.isSubscribed(viewer.getName(), user.getUsername()));
         } else {
@@ -288,6 +298,9 @@ public class UserController {
         private long likesSent;
         private long likesReceived;
         private boolean subscribed;
+        private int experience;
+        private int currentLevel;
+        private int nextLevelExp;
     }
 
     @Data

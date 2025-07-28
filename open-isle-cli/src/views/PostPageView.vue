@@ -354,7 +354,11 @@ export default {
           comments.value.push(mapComment(data))
           await nextTick()
           gatherPostItems()
-          toast.success('评论成功')
+          if (data.reward && data.reward > 0) {
+            toast.success(`评论成功，获得 ${data.reward} 经验值`)
+          } else {
+            toast.success('评论成功')
+          }
         } else {
           toast.error('评论失败')
         }

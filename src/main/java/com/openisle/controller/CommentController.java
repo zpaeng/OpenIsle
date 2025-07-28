@@ -3,6 +3,7 @@ package com.openisle.controller;
 import com.openisle.model.Comment;
 import com.openisle.service.CommentService;
 import com.openisle.service.CaptchaService;
+import com.openisle.service.LevelService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
+    private final LevelService levelService;
     private final CaptchaService captchaService;
 
     @Value("${app.captcha.enabled:false}")
@@ -35,7 +37,9 @@ public class CommentController {
             return ResponseEntity.badRequest().build();
         }
         Comment comment = commentService.addComment(auth.getName(), postId, req.getContent());
-        return ResponseEntity.ok(toDto(comment));
+        CommentDto dto = toDto(comment);
+        dto.setReward(levelService.awardForComment(auth.getName()));
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping("/comments/{commentId}/replies")
@@ -46,7 +50,9 @@ public class CommentController {
             return ResponseEntity.badRequest().build();
         }
         Comment comment = commentService.addReply(auth.getName(), commentId, req.getContent());
-        return ResponseEntity.ok(toDto(comment));
+        CommentDto dto = toDto(comment);
+        dto.setReward(levelService.awardForComment(auth.getName()));
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/posts/{postId}/comments")
@@ -76,6 +82,7 @@ public class CommentController {
         dto.setContent(comment.getContent());
         dto.setCreatedAt(comment.getCreatedAt());
         dto.setAuthor(toAuthorDto(comment.getAuthor()));
+        dto.setReward(0);
         return dto;
     }
 
@@ -100,6 +107,7 @@ public class CommentController {
         private LocalDateTime createdAt;
         private AuthorDto author;
         private List<CommentDto> replies;
+        private int reward;
     }
 
     @Data

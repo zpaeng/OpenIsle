@@ -17,15 +17,16 @@ public class UserVisitService {
     private final UserVisitRepository userVisitRepository;
     private final UserRepository userRepository;
 
-    public void recordVisit(String username) {
+    public boolean recordVisit(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         LocalDate today = LocalDate.now();
-        userVisitRepository.findByUserAndVisitDate(user, today).orElseGet(() -> {
+        return userVisitRepository.findByUserAndVisitDate(user, today).map(v -> false).orElseGet(() -> {
             UserVisit visit = new UserVisit();
             visit.setUser(user);
             visit.setVisitDate(today);
-            return userVisitRepository.save(visit);
+            userVisitRepository.save(visit);
+            return true;
         });
     }
 

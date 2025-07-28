@@ -144,6 +144,9 @@ export default {
           } else {
             const data = await res.json()
             reactions.value.push(data)
+            if (data.reward && data.reward > 0) {
+              toast.success(`获得 ${data.reward} 经验值`)
+            }
           }
           emit('update:modelValue', reactions.value)
         } else {
