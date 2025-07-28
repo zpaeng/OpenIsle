@@ -32,7 +32,7 @@ public class LevelService {
         User user = userRepository.findByUsername(username).orElseThrow();
         LocalDateTime start = LocalDate.now().atStartOfDay();
         long count = postRepository.countByAuthorAfter(username, start);
-        if (count >= 1) return 0;
+        if (count > 1) return 0;
         return addExperience(user,30);
     }
 
@@ -40,7 +40,7 @@ public class LevelService {
         User user = userRepository.findByUsername(username).orElseThrow();
         LocalDateTime start = LocalDate.now().atStartOfDay();
         long count = commentRepository.countByAuthorAfter(username, start);
-        if (count >= 3) return 0;
+        if (count > 3) return 0;
         return addExperience(user,10);
     }
 
@@ -48,7 +48,7 @@ public class LevelService {
         User user = userRepository.findByUsername(username).orElseThrow();
         LocalDateTime start = LocalDate.now().atStartOfDay();
         long count = reactionRepository.countByUserAfter(username, start);
-        if (count >= 3) return 0;
+        if (count > 3) return 0;
         return addExperience(user,5);
     }
 

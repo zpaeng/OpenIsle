@@ -21,11 +21,11 @@
           </div>
           <div v-if="loggedIn && !isAuthor && !subscribed" class="article-subscribe-button" @click="subscribePost">
             <i class="fas fa-user-plus"></i>
-            订阅文章
+            <div class="article-subscribe-button-text">订阅文章</div>
           </div>
           <div v-if="loggedIn && !isAuthor && subscribed" class="article-unsubscribe-button" @click="unsubscribePost">
             <i class="fas fa-user-minus"></i>
-            取消订阅
+            <div class="article-unsubscribe-button-text">取消订阅</div>
           </div>
           <DropdownMenu v-if="articleMenuItems.length > 0" :items="articleMenuItems">
             <template #trigger>
@@ -699,6 +699,15 @@ export default {
   border-radius: 8px;
   font-size: 14px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.article-subscribe-button-text,
+.article-unsubscribe-button-text {
+  white-space: nowrap;
 }
 
 .article-subscribe-button:hover {
@@ -713,6 +722,11 @@ export default {
   border-radius: 8px;
   font-size: 14px;
   cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
 }
 
 .article-pending-button {
