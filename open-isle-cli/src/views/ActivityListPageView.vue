@@ -126,4 +126,20 @@ export default {
   color: inherit;
 }
 
+@media screen and (max-width: 768px) {
+  .activity-card-left-avatar-img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .activity-list-page-card-title {
+    font-size: 16px;
+  }
+
+  .activity-list-page-card-content {
+    font-size: 12px;
+    opacity: 0.7;
+  }
+}
+
 </style>

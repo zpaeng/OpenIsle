@@ -127,7 +127,7 @@ export default {
   margin-top: 20px;
   background-color: var(--primary-color);
   color: #fff;
-  padding: 10px 20px;
+  padding: 8px 16px;
   border-radius: 10px;
   width: fit-content;
   cursor: pointer;
@@ -231,4 +231,19 @@ export default {
 .redeem-cancel-button:hover {
   text-decoration: underline;
 }
+
+
+@media screen and (max-width: 768px) {
+  .milk-tea-status-container { 
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .redeem-dialog-content {
+    min-width: 300px;
+  }
+}
+
 </style>
+
