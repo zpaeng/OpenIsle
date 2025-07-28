@@ -96,4 +96,23 @@ class NotificationServiceTest {
         verify(nRepo).deleteByTypeAndFromUser(NotificationType.REGISTER_REQUEST, applicant);
         verify(nRepo).save(any(Notification.class));
     }
+
+    @Test
+    void createActivityRedeemNotificationsDeletesOldOnes() {
+        NotificationRepository nRepo = mock(NotificationRepository.class);
+        UserRepository uRepo = mock(UserRepository.class);
+        NotificationService service = new NotificationService(nRepo, uRepo);
+
+        User admin = new User();
+        admin.setId(10L);
+        User user = new User();
+        user.setId(20L);
+
+        when(uRepo.findByRole(Role.ADMIN)).thenReturn(List.of(admin));
+
+        service.createActivityRedeemNotifications(user, "contact");
+
+        verify(nRepo).deleteByTypeAndFromUser(NotificationType.ACTIVITY_REDEEM, user);
+        verify(nRepo).save(any(Notification.class));
+    }
 }

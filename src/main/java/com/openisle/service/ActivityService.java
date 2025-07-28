@@ -39,10 +39,7 @@ public class ActivityService {
 
     public void redeem(Activity activity, User user, String contact) {
         String content = user.getUsername() + " contact: " + contact;
-        for (User admin : userRepository.findByRole(Role.ADMIN)) {
-            notificationService.createNotification(admin, NotificationType.ACTIVITY_REDEEM,
-                    null, null, null, user, null, content);
-        }
+        notificationService.createActivityRedeemNotifications(user, content);
         activity.getParticipants().add(user);
         activityRepository.save(activity);
     }

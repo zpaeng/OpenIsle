@@ -26,10 +26,10 @@
     <div v-if="dialogVisible" class="redeem-dialog">
       <div class="redeem-dialog-overlay" @click="closeDialog"></div>
       <div class="redeem-dialog-content">
-        <input v-model="contact" class="redeem-input" placeholder="联系方式" />
+        <BaseInput v-model="contact" placeholder="联系方式" />
         <div class="redeem-actions">
-          <button @click="submitRedeem" :disabled="loading">提交</button>
-          <button @click="closeDialog">取消</button>
+          <button class="redeem-submit-button" @click="submitRedeem" :disabled="loading">提交</button>
+          <button class="redeem-cancel-button" @click="closeDialog">取消</button>
         </div>
       </div>
     </div>
@@ -39,12 +39,13 @@
 <script>
 import ProgressBar from '../components/ProgressBar.vue'
 import LevelProgress from '../components/LevelProgress.vue'
+import BaseInput from './BaseInput.vue'
 import { API_BASE_URL, toast } from '../main'
 import { getToken, fetchCurrentUser } from '../utils/auth'
 
 export default {
   name: 'MilkTeaActivityComponent',
-  components: { ProgressBar, LevelProgress },
+  components: { ProgressBar, LevelProgress, BaseInput },
   data () {
     return {
       info: { level1Count: 0, ended: false },
@@ -189,6 +190,7 @@ export default {
   background-color: var(--background-color);
   padding: 20px;
   border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -202,9 +204,29 @@ export default {
   gap: 10px;
 }
 
-.redeem-input {
-  padding: 6px;
-  border: 1px solid var(--normal-border-color);
-  border-radius: 4px;
+.redeem-submit-button {
+  background-color: var(--primary-color);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.redeem-submit-button:disabled {
+  background-color: var(--primary-color-disabled);
+  cursor: not-allowed;
+}
+.redeem-submit-button:hover {
+  background-color: var(--primary-color-hover);
+}
+.redeem-submit-button:disabled:hover {
+  background-color: var(--primary-color-disabled);
+}
+.redeem-cancel-button {
+  color: var(--primary-color);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.redeem-cancel-button:hover {
+  text-decoration: underline;
 }
 </style>
