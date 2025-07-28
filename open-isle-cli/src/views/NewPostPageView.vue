@@ -232,7 +232,11 @@ export default {
         })
         const data = await res.json()
         if (res.ok) {
-          toast.success('发布成功')
+          if (data.reward && data.reward > 0) {
+            toast.success(`发布成功，获得 ${data.reward} 经验值`)
+          } else {
+            toast.success('发布成功')
+          }
           if (data.id) {
             window.location.href = `/posts/${data.id}`
           }

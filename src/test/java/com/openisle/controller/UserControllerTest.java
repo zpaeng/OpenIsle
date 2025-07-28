@@ -38,6 +38,8 @@ class UserControllerTest {
     private PostService postService;
     @MockBean
     private CommentService commentService;
+    @MockBean
+    private LevelService levelService;
 
     @Test
     void getCurrentUser() throws Exception {

@@ -10,6 +10,7 @@ import com.openisle.service.CaptchaService;
 import com.openisle.service.DraftService;
 import com.openisle.service.SubscriptionService;
 import com.openisle.service.UserVisitService;
+import com.openisle.service.LevelService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ public class PostController {
     private final CommentService commentService;
     private final ReactionService reactionService;
     private final SubscriptionService subscriptionService;
+    private final LevelService levelService;
     private final CaptchaService captchaService;
     private final DraftService draftService;
     private final UserVisitService userVisitService;
@@ -47,7 +49,9 @@ public class PostController {
         Post post = postService.createPost(auth.getName(), req.getCategoryId(),
                 req.getTitle(), req.getContent(), req.getTagIds());
         draftService.deleteDraft(auth.getName());
-        return ResponseEntity.ok(toDto(post));
+        PostDto dto = toDto(post);
+        dto.setReward(levelService.awardForPost(auth.getName()));
+        return ResponseEntity.ok(dto);
     }
 
     @PutMapping("/{id}")
@@ -187,6 +191,7 @@ public class PostController {
 
         java.time.LocalDateTime last = commentService.getLastCommentTime(post.getId());
         dto.setLastReplyAt(last != null ? last : post.getCreatedAt());
+        dto.setReward(0);
 
         return dto;
     }
@@ -223,6 +228,7 @@ public class PostController {
         dto.setContent(comment.getContent());
         dto.setCreatedAt(comment.getCreatedAt());
         dto.setAuthor(toAuthorDto(comment.getAuthor()));
+        dto.setReward(0);
         return dto;
     }
 
@@ -237,6 +243,7 @@ public class PostController {
         if (reaction.getComment() != null) {
             dto.setCommentId(reaction.getComment().getId());
         }
+        dto.setReward(0);
         return dto;
     }
 
@@ -294,6 +301,7 @@ public class PostController {
         private List<ReactionDto> reactions;
         private java.util.List<AuthorDto> participants;
         private boolean subscribed;
+        private int reward;
     }
 
     @Data
@@ -329,6 +337,7 @@ public class PostController {
         private AuthorDto author;
         private List<CommentDto> replies;
         private List<ReactionDto> reactions;
+        private int reward;
     }
 
     @Data
@@ -338,5 +347,6 @@ public class PostController {
         private String user;
         private Long postId;
         private Long commentId;
+        private int reward;
     }
 }

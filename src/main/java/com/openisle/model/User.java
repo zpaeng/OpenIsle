@@ -39,6 +39,9 @@ public class User {
 
     private String avatar;
 
+    @Column(nullable = false)
+    private int experience = 0;
+
     @Column(length = 1000)
     private String introduction;
 
