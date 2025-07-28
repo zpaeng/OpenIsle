@@ -25,8 +25,11 @@
             <div class="profile-level-bar">
               <div class="profile-level-bar-inner" :style="{ width: `${levelInfo.percent}%` }" />
             </div>
-            <div class="profile-level-exp">
-              {{ levelInfo.exp }} / {{ levelInfo.nextExp }}
+            <div class="profile-level-info">
+              <div class="profile-level-exp">
+                {{ levelInfo.exp }} / {{ levelInfo.nextExp }}
+              </div>
+              <div class="profile-level-target">🎉目标 Lv.{{ levelInfo.currentLevel + 1 }}</div>
             </div>
             <div class="profile-level-target">
               目标 Lv.{{ levelInfo.currentLevel + 1 }}
@@ -582,6 +585,13 @@ export default {
 .profile-level-bar-inner {
   height: 100%;
   background-color: var(--primary-color);
+}
+
+.profile-level-info {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
 }
 
 .profile-level-exp,
