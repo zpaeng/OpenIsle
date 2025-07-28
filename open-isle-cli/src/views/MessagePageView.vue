@@ -62,6 +62,11 @@
                   </span>
                 </NotificationContainer>
               </template>
+              <template v-else-if="item.type === 'ACTIVITY_REDEEM' && !item.parentComment">
+                <NotificationContainer :item="item" :markRead="markRead">
+                  <span class="notif-user">{{ item.fromUser.username }} </span> 申请进行奶茶兑换，联系方式是：{{ item.content }}
+                </NotificationContainer>
+              </template>
               <template v-else-if="item.type === 'REACTION' && item.post && !item.comment">
                 <NotificationContainer :item="item" :markRead="markRead">
                   <span class="notif-user">{{ item.fromUser.username }} </span> 对我的文章
@@ -287,7 +292,8 @@ export default {
       USER_UNFOLLOWED: 'fas fa-user-minus',
       POST_SUBSCRIBED: 'fas fa-bookmark',
       POST_UNSUBSCRIBED: 'fas fa-bookmark',
-      REGISTER_REQUEST: 'fas fa-user-clock'
+      REGISTER_REQUEST: 'fas fa-user-clock',
+      ACTIVITY_REDEEM: 'fas fa-coffee'
     }
 
     const reactionEmojiMap = {

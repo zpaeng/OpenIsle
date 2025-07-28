@@ -1,6 +1,6 @@
 <template>
   <div class="level-progress">
-    <div class="level-progress-current">Lv.{{ currentLevel }}</div>
+    <div class="level-progress-current">当前Lv.{{ currentLevel }}</div>
     <ProgressBar :value="value" :max="max" />
     <div class="level-progress-info">
       <div class="level-progress-exp">{{ exp }} / {{ nextExp }}</div>

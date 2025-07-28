@@ -1,8 +1,7 @@
 <template>
   <div class="activity-list-page">
     <div class="activity-list-page-card" v-for="a in activities" :key="a.id">
-      <router-link v-if="a.type === 'MILK_TEA'" class="activity-link" to="/activities/milk-tea">
-        <div class="activity-list-page-card-normal">
+      <div class="activity-list-page-card-normal">
         <div v-if="a.icon" class="activity-card-normal-left">
           <img :src="a.icon" alt="avatar" class="activity-card-left-avatar-img" />
         </div>
@@ -21,26 +20,7 @@
           </div>
         </div>
       </div>
-      </router-link>
-      <div v-else class="activity-list-page-card-normal">
-        <div v-if="a.icon" class="activity-card-normal-left">
-          <img :src="a.icon" alt="avatar" class="activity-card-left-avatar-img" />
-        </div>
-        <div class="activity-card-normal-right">
-          <div class="activity-card-normal-right-header">
-            <div class="activity-list-page-card-title">{{ a.title }}</div>
-            <div v-if="a.ended" class="activity-list-page-card-state-end">已结束</div>
-            <div v-else class="activity-list-page-card-state-ongoing">进行中</div>
-          </div>
-          <div class="activity-list-page-card-content">{{ a.content }}</div>
-          <div class="activity-list-page-card-footer">
-            <div class="activity-list-page-card-footer-start-time">
-              <i class="fas fa-clock"></i>
-              <span>开始于 {{ TimeManager.format(a.startTime) }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <MilkTeaActivityComponent v-if="a.type === 'MILK_TEA'" />
     </div>
   </div>
 </template>
@@ -48,9 +28,11 @@
 <script>
 import { API_BASE_URL } from '../main'
 import TimeManager from '../utils/time'
+import MilkTeaActivityComponent from '../components/MilkTeaActivityComponent.vue'
 
 export default {
   name: 'ActivityListPageView',
+  components: { MilkTeaActivityComponent },
   data() {
     return { activities: [], TimeManager }
   },
@@ -68,6 +50,7 @@ export default {
   background-color: var(--background-color);
   padding: 20px;
   height: calc(100vh - var(--header-height) - 40px);
+  overflow-y: auto;
 }
 
 .activity-list-page-card {

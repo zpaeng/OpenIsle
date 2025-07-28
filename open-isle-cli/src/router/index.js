@@ -4,7 +4,6 @@ import MessagePageView from '../views/MessagePageView.vue'
 import AboutPageView from '../views/AboutPageView.vue'
 import SiteStatsPageView from '../views/SiteStatsPageView.vue'
 import ActivityListPageView from '../views/ActivityListPageView.vue'
-import MilkTeaActivityPageView from '../views/MilkTeaActivityPageView.vue'
 import PostPageView from '../views/PostPageView.vue'
 import LoginPageView from '../views/LoginPageView.vue'
 import SignupPageView from '../views/SignupPageView.vue'
@@ -44,11 +43,6 @@ const routes = [
     path: '/activities',
     name: 'activities',
     component: ActivityListPageView
-  },
-  {
-    path: '/activities/milk-tea',
-    name: 'activity-milk-tea',
-    component: MilkTeaActivityPageView
   },
   {
     path: '/new-post',

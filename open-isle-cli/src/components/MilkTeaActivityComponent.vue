@@ -1,17 +1,28 @@
 <template>
-  <div class="milk-tea-page">
+  <div class="milk-tea-activity">
+    <div class="milk-tea-description">
+      <div class="milk-tea-description-title">
+        <i class="fas fa-info-circle"></i>
+        <span class="milk-tea-description-title-text">升级规则说明</span>
+      </div>
+      <div class="milk-tea-description-content">
+        <p>回复帖子每次10exp，最多3次每天</p>
+        <p>发布帖子每次30exp，最多1次每天</p>  
+        <p>发表情每次5exp，最多3次每天</p>  
+      </div>
+    </div>
+    <div class="milk-tea-status-container">
     <div class="milk-tea-status">
-      <div class="status-title">已兑换奶茶人数</div>
+      <div class="status-title">🔥 已兑换奶茶人数</div>
       <ProgressBar :value="info.level1Count" :max="50" />
-      <div class="status-text">{{ info.level1Count }} / 50</div>
+      <div class="status-text">当前 {{ info.level1Count }} / 50</div>
     </div>
-    <div v-if="user" class="user-level">
-      <LevelProgress :exp="user.experience" :current-level="user.currentLevel" :next-exp="user.nextLevelExp" />
+      <div v-if="user" class="user-level">
+        <LevelProgress :exp="user.experience" :current-level="user.currentLevel" :next-exp="user.nextLevelExp" />
+      </div>
     </div>
-    <LoginOverlay v-else />
-    <div v-if="user && user.currentLevel >= 1 && !info.ended" class="redeem-button" @click="openDialog">
-      兑换
-    </div>
+    <div v-if="user && user.currentLevel >= 1 && !info.ended" class="redeem-button" @click="openDialog">兑换</div>
+    <div v-else class="redeem-button disabled">兑换</div> 
     <div v-if="dialogVisible" class="redeem-dialog">
       <div class="redeem-dialog-overlay" @click="closeDialog"></div>
       <div class="redeem-dialog-content">
@@ -28,13 +39,12 @@
 <script>
 import ProgressBar from '../components/ProgressBar.vue'
 import LevelProgress from '../components/LevelProgress.vue'
-import LoginOverlay from '../components/LoginOverlay.vue'
 import { API_BASE_URL, toast } from '../main'
 import { getToken, fetchCurrentUser } from '../utils/auth'
 
 export default {
-  name: 'MilkTeaActivityPageView',
-  components: { ProgressBar, LevelProgress, LoginOverlay },
+  name: 'MilkTeaActivityComponent',
+  components: { ProgressBar, LevelProgress },
   data () {
     return {
       info: { level1Count: 0, ended: false },
@@ -87,38 +97,52 @@ export default {
 </script>
 
 <style scoped>
-.milk-tea-page {
-  padding: 20px;
-  background-color: var(--background-color);
-  height: calc(100vh - var(--header-height) - 40px);
+.milk-tea-description-title-text {
+  font-size: 14px;
+  font-weight: bold;
+  margin-left: 5px;
 }
 
-.milk-tea-status {
-  margin-bottom: 20px;
+.milk-tea-description-content {
+  font-size: 12px;
+  opacity: 0.8;
 }
 
 .status-title {
   font-weight: bold;
-  margin-bottom: 4px;
 }
 
 .status-text {
-  font-size: 14px;
-  margin-top: 4px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.milk-tea-activity {
+  margin-top: 20px;
+  padding: 20px;
 }
 
 .redeem-button {
   margin-top: 20px;
-  padding: 6px 12px;
-  border-radius: 4px;
   background-color: var(--primary-color);
-  color: white;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 10px;
   width: fit-content;
   cursor: pointer;
 }
 
 .redeem-button:hover {
   background-color: var(--primary-color-hover);
+}
+
+.redeem-button.disabled {
+  background-color: var(--primary-color-disabled);
+  cursor: not-allowed;
+}
+
+.redeem-button.disabled:hover {
+  background-color: var(--primary-color-disabled);
 }
 
 .redeem-dialog {
@@ -141,6 +165,22 @@ export default {
   bottom: 0;
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
+}
+
+.milk-tea-status-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.milk-tea-status {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 10px;
+  font-size: 14px;
 }
 
 .redeem-dialog-content {
