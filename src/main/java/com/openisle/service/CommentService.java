@@ -13,6 +13,7 @@ import com.openisle.repository.NotificationRepository;
 import com.openisle.service.NotificationService;
 import com.openisle.service.SubscriptionService;
 import com.openisle.model.Role;
+import com.openisle.exception.RateLimitException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,11 @@ public class CommentService {
     private final ImageUploader imageUploader;
 
     public Comment addComment(String username, Long postId, String content) {
+        long recent = commentRepository.countByAuthorAfter(username,
+                java.time.LocalDateTime.now().minusMinutes(1));
+        if (recent >= 3) {
+            throw new RateLimitException("Too many comments");
+        }
         User author = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Post post = postRepository.findById(postId)
@@ -61,6 +67,11 @@ public class CommentService {
     }
 
     public Comment addReply(String username, Long parentId, String content) {
+        long recent = commentRepository.countByAuthorAfter(username,
+                java.time.LocalDateTime.now().minusMinutes(1));
+        if (recent >= 3) {
+            throw new RateLimitException("Too many comments");
+        }
         User author = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Comment parent = commentRepository.findById(parentId)
