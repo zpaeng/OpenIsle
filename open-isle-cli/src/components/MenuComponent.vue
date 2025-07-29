@@ -6,7 +6,7 @@
           class="menu-item"
           exact-active-class="selected"
           to="/"
-          @click="handleItemClick"
+          @click="handleHomeClick"
         >
           <i class="menu-item-icon fas fa-hashtag"></i>
           <span class="menu-item-text">话题</span>
@@ -197,6 +197,11 @@ export default {
   },
   methods: {
     cycleTheme,
+    handleHomeClick() {
+      this.$router.push('/').then(() => {
+        window.location.reload()
+      })
+    },
     handleItemClick() {
       if (window.innerWidth <= 768) this.$emit('item-click')
     },
