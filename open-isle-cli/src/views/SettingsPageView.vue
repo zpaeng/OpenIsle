@@ -55,7 +55,7 @@
 
 <script>
 import { API_BASE_URL, toast } from '../main'
-import { getToken, fetchCurrentUser } from '../utils/auth'
+import { getToken, fetchCurrentUser, setToken } from '../utils/auth'
 import BaseInput from '../components/BaseInput.vue'
 import Dropdown from '../components/Dropdown.vue'
 import { hatch } from 'ldrs'
@@ -91,6 +91,9 @@ export default {
       if (this.role === 'ADMIN') {
         this.loadAdminConfig()
       }
+    } else {
+      toast.error('请先登录')
+      this.$router.push('/login')
     }
     this.isLoadingPage = false
   },
@@ -154,7 +157,7 @@ export default {
       this.isSaving = true
 
       do {
-        const token = getToken()
+        let token = getToken()
         this.usernameError = ''
         if (!this.username) {
           this.usernameError = '用户名不能为空'
@@ -184,10 +187,15 @@ export default {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
           body: JSON.stringify({ username: this.username, introduction: this.introduction })
         })
+
+        const data = await res.json()
         if (!res.ok) {
-          const data = await res.json()
           toast.error(data.error || '保存失败')
           break
+        }
+        if (data.token) {
+          setToken(data.token)
+          token = data.token
         }
         if (this.role === 'ADMIN') {
           await fetch(`${API_BASE_URL}/api/admin/config`, {

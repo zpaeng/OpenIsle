@@ -122,9 +122,13 @@ public class SubscriptionService {
         if (subscriberName == null || targetName == null || subscriberName.equals(targetName)) {
             return false;
         }
-        User subscriber = userRepo.findByUsername(subscriberName).orElseThrow();
-        User target = findUser(targetName).orElseThrow();
-        return userSubRepo.findBySubscriberAndTarget(subscriber, target).isPresent();
+        Optional<User> subscriber = userRepo.findByUsername(subscriberName);
+        Optional<User> target = findUser(targetName);
+        if (subscriber.isEmpty() || target.isEmpty()) {
+            // 修改个人信息会出现，先不抛出错误
+            return false;
+        }
+        return userSubRepo.findBySubscriberAndTarget(subscriber.get(), target.get()).isPresent();
     }
 
     public boolean isPostSubscribed(String username, Long postId) {

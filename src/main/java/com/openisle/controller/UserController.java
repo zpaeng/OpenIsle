@@ -28,6 +28,7 @@ public class UserController {
     private final PostReadService postReadService;
     private final UserVisitService userVisitService;
     private final LevelService levelService;
+    private final JwtService jwtService;
 
     @Value("${app.upload.check-type:true}")
     private boolean checkImageType;
@@ -73,10 +74,13 @@ public class UserController {
     }
 
     @PutMapping("/me")
-    public ResponseEntity<UserDto> updateProfile(@RequestBody UpdateProfileDto dto,
+    public ResponseEntity<?> updateProfile(@RequestBody UpdateProfileDto dto,
                                                  Authentication auth) {
         User user = userService.updateProfile(auth.getName(), dto.getUsername(), dto.getIntroduction());
-        return ResponseEntity.ok(toDto(user, auth));
+        return ResponseEntity.ok(Map.of(
+                "token", jwtService.generateToken(user.getUsername()),
+                "user", toDto(user, auth)
+        ));
     }
 
     @PostMapping("/me/signin")
