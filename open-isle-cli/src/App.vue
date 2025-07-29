@@ -1,15 +1,19 @@
 <template>
   <div id="app">
-    <HeaderComponent
-      @toggle-menu="menuVisible = !menuVisible"
-      :show-menu-btn="!hideMenu"
-    />
+    <div class="header-container">
+      <HeaderComponent
+        @toggle-menu="menuVisible = !menuVisible"
+        :show-menu-btn="!hideMenu"
+      />
+    </div>
 
     <div class="main-container">
-      <MenuComponent
-        :visible="!hideMenu && menuVisible"
-        @item-click="menuVisible = false"
-      />
+      <div class="menu-container">
+        <MenuComponent
+          :visible="!hideMenu && menuVisible"
+          @item-click="menuVisible = false"
+        />
+      </div>
       <div
         class="content"
         :class="{ 'menu-open': menuVisible && !hideMenu }"
@@ -47,6 +51,17 @@ export default {
 </script>
 
 <style>
+.header-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.menu-container {
+}
+
 .content {
   flex: 1;
   max-width: 100%;

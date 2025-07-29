@@ -49,5 +49,6 @@ onMounted(loadData)
   background-color: var(--background-color);
   margin: 0 auto;
   height: calc(100vh - var(--header-height) - 40px);
+  padding-top: calc(var(--header-height) + 20px);
 }
 </style>

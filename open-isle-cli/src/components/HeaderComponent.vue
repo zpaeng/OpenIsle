@@ -173,7 +173,8 @@ export default {
   justify-content: space-between;
   align-items: center;
   height: var(--header-height);
-  background-color: var(--header-background-color);
+  background-color: var(--background-color-blur);
+  backdrop-filter: blur(10px);
   color: var(--header-text-color);
   border-bottom: 1px solid var(--header-border-color);
 }

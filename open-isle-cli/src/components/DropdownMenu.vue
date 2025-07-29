@@ -73,11 +73,10 @@ export default {
   right: 0;
   background-color: var(--menu-background-color);
   border: 1px solid var(--normal-border-color);
-  border-radius: 4px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
   border-radius: 8px;
   min-width: 100px;
+  z-index: 2000;
 }
 
 .dropdown-item {

@@ -124,6 +124,7 @@ export default {
   align-items: center;
   justify-content: center;
   height: calc(100vh - var(--header-height));
+  padding-top: var(--header-height);
   width: 100%;
   background-color: var(--background-color);
 }

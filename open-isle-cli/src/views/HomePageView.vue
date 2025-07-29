@@ -27,7 +27,7 @@
 
     <div class="article-container">
       <template v-if="selectedTopic === '最新' || selectedTopic === '排行榜' || selectedTopic === '最新回复'">
-        <div class="header-container">
+        <div class="article-header-container">
           <div class="header-item main-item">
             <div class="header-item-text">话题</div>
           </div>
@@ -385,6 +385,7 @@ export default {
 .home-page {
   background-color: var(--background-color);
   height: calc(100vh - var(--header-height));
+  padding-top: var(--header-height);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -437,9 +438,11 @@ export default {
 }
 
 .topic-container {
-  position: sticky;
-  z-index: 1000;
-  background-color: var(--background-color);
+  /* position: sticky;
+  top: 1px;
+  z-index: 1000; */
+  background-color: var(--background-color-blur);
+  backdrop-filter: blur(10px);
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -482,7 +485,7 @@ export default {
   width: 100%;
 }
 
-.header-container {
+.article-header-container {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -692,7 +695,7 @@ export default {
     margin-right: 3%;
   }
 
-  .header-container {
+  .article-header-container {
     display: none;
   }
 
@@ -721,6 +724,7 @@ export default {
 
   .topic-container {
     position: static;
+    z-index: 0;
   }
 }
 

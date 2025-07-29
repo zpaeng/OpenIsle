@@ -262,6 +262,7 @@ export default {
   justify-content: center;
   background-color: var(--background-color);
   height: calc(100vh - var(--header-height));
+  padding-top: var(--header-height);
   padding-right: 20px;
   padding-left: 20px;
   overflow-y: auto;

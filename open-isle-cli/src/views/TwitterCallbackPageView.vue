@@ -35,6 +35,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding-top: var(--header-height);
 }
 
 .twitter-callback-page-text {

@@ -76,10 +76,16 @@ export default {
   background-color: var(--background-color);
   margin: 0 auto;
   height: calc(100vh - var(--header-height));
+  padding-top: var(--header-height);
   overflow-y: auto;
 }
 
 .about-tabs {
+  position: sticky;
+  top: 1px;
+  z-index: 200;
+  background-color: var(--background-color-blur);
+  backdrop-filter: blur(10px);
   display: flex;
   flex-direction: row;
   border-bottom: 1px solid var(--normal-border-color);

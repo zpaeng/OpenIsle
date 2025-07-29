@@ -75,6 +75,7 @@ export default {
   padding: 20px;
   height: calc(100vh - var(--header-height) - 40px);
   overflow-y: auto;
+  padding-top: calc(var(--header-height) + 20px);
 }
 
 .activity-list-page-card {

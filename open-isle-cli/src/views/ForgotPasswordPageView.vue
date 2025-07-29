@@ -132,6 +132,7 @@ export default {
   align-items: center;
   background-color: var(--background-color);
   height: calc(100vh - var(--header-height));
+  padding-top: var(--header-height);
 }
 .forgot-content {
   display: flex;

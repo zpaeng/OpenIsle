@@ -237,13 +237,14 @@ export default {
 .menu {
   width: 200px;
   background-color: var(--menu-background-color);
-  height: calc(100vh - var(--header-height) - 20px);
+  height: calc(100vh - 10px);
   border-right: 1px solid var(--menu-border-color);
   display: flex;
   flex-direction: column;
   padding: 10px;
   overflow-y: auto;
   scrollbar-width: none;
+  padding-top: calc(var(--header-height) + 10px);
 }
 
 .menu-item-container {
@@ -381,6 +382,10 @@ export default {
     border-radius: 20px;
     border-right: none;
     height: 400px;
+    top: calc(var(--header-height) + 10px);
+    padding-top: 10px;
+    background-color: var(--background-color-blur);
+    backdrop-filter: blur(10px);
   }
 
   .slide-enter-active,

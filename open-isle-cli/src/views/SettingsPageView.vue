@@ -226,6 +226,7 @@ export default {
   background-color: var(--background-color);
   padding: 40px;
   height: calc(100vh - var(--header-height) - 80px);
+  padding-top: calc(var(--header-height) + 40px);
   overflow-y: auto;
 }
 

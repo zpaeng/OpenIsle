@@ -8,6 +8,7 @@
   --header-text-color: black;
   --menu-background-color: white;
   --background-color: white;
+  --background-color-blur: rgba(255, 255, 255, 0.57);
   --menu-border-color: lightgray;
   --normal-border-color: lightgray;
   --menu-selected-background-color: rgba(208, 250, 255, 0.659);
@@ -33,6 +34,7 @@
   --header-text-color: white;
   --menu-background-color: #333;
   --background-color: #333;
+  --background-color-blur: #333333a4;
   --menu-border-color: #555;
   --normal-border-color: #555;
   --menu-selected-background-color: rgba(255, 255, 255, 0.1);
