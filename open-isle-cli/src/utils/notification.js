@@ -1,17 +1,30 @@
 import { API_BASE_URL } from '../main'
 import { getToken } from './auth'
+import { reactive } from 'vue'
+
+export const notificationState = reactive({
+  unreadCount: 0
+})
 
 export async function fetchUnreadCount() {
   try {
     const token = getToken()
-    if (!token) return 0
+    if (!token) {
+      notificationState.unreadCount = 0
+      return 0
+    }
     const res = await fetch(`${API_BASE_URL}/api/notifications/unread-count`, {
       headers: { Authorization: `Bearer ${token}` }
     })
-    if (!res.ok) return 0
+    if (!res.ok) {
+      notificationState.unreadCount = 0
+      return 0
+    }
     const data = await res.json()
+    notificationState.unreadCount = data.count
     return data.count
   } catch (e) {
+    notificationState.unreadCount = 0
     return 0
   }
 }
