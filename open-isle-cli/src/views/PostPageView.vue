@@ -103,7 +103,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import VueEasyLightbox from 'vue-easy-lightbox'
 import { useRoute } from 'vue-router'
 import CommentItem from '../components/CommentItem.vue'
@@ -113,7 +113,7 @@ import ArticleTags from '../components/ArticleTags.vue'
 import ArticleCategory from '../components/ArticleCategory.vue'
 import ReactionsGroup from '../components/ReactionsGroup.vue'
 import DropdownMenu from '../components/DropdownMenu.vue'
-import { renderMarkdown, handleMarkdownClick } from '../utils/markdown'
+import { renderMarkdown, handleMarkdownClick, stripMarkdownLength } from '../utils/markdown'
 import { API_BASE_URL, toast } from '../main'
 import { getToken, authState } from '../utils/auth'
 import TimeManager from '../utils/time'
@@ -146,6 +146,26 @@ export default {
     const mainContainer = ref(null)
     const currentIndex = ref(1)
     const subscribed = ref(false)
+
+    // record default metadata from the main document
+    const defaultTitle = document.title
+    const metaDescriptionEl = document.querySelector('meta[name="description"]')
+    const defaultDescription = metaDescriptionEl ? metaDescriptionEl.getAttribute('content') : ''
+
+    watch(title, t => {
+      document.title = `OpenIsle -- ${t}`
+    })
+
+    watch(postContent, c => {
+      if (metaDescriptionEl) {
+        metaDescriptionEl.setAttribute('content', stripMarkdownLength(c, 400))
+      }
+    })
+
+    onBeforeUnmount(() => {
+      document.title = defaultTitle
+      if (metaDescriptionEl) metaDescriptionEl.setAttribute('content', defaultDescription)
+    })
       
     const lightboxVisible = ref(false)
     const lightboxIndex = ref(0)
