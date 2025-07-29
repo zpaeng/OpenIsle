@@ -38,8 +38,7 @@ public class ActivityService {
     }
 
     public void redeem(Activity activity, User user, String contact) {
-        String content = user.getUsername() + " contact: " + contact;
-        notificationService.createActivityRedeemNotifications(user, content);
+        notificationService.createActivityRedeemNotifications(user, contact);
         activity.getParticipants().add(user);
         activityRepository.save(activity);
     }
