@@ -1,5 +1,9 @@
 <template>
   <div class="activity-list-page">
+    <div v-if="isLoadingActivities" class="loading-activities">
+      <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+    </div>
+
     <div class="activity-list-page-card" v-for="a in activities" :key="a.id">
       <div class="activity-list-page-card-normal">
         <div v-if="a.icon" class="activity-card-normal-left">
@@ -29,23 +33,43 @@
 import { API_BASE_URL } from '../main'
 import TimeManager from '../utils/time'
 import MilkTeaActivityComponent from '../components/MilkTeaActivityComponent.vue'
+import { hatch } from 'ldrs'
+hatch.register()
 
 export default {
   name: 'ActivityListPageView',
   components: { MilkTeaActivityComponent },
   data() {
-    return { activities: [], TimeManager }
+    return { 
+      activities: [], 
+      TimeManager, 
+      isLoadingActivities: false 
+    }
   },
   async mounted() {
-    const res = await fetch(`${API_BASE_URL}/api/activities`)
-    if (res.ok) {
-      this.activities = await res.json()
+    this.isLoadingActivities = true
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/activities`)
+      if (res.ok) {
+        this.activities = await res.json()
+      }
+    } catch (e) {
+      console.error(e)
+    } finally {
+      this.isLoadingActivities = false
     }
-  }
+  },
 }
 </script>
 
 <style scoped>
+.loading-activities {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
 .activity-list-page {
   background-color: var(--background-color);
   padding: 20px;

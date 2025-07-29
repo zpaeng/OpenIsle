@@ -17,8 +17,15 @@
       <ProgressBar :value="info.level1Count" :max="50" />
       <div class="status-text">当前 {{ info.level1Count }} / 50</div>
     </div>
-      <div v-if="user" class="user-level">
+      <div v-if="isLoadingUser" class="loading-user">
+        <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+        <div class="user-level-text">加载当前等级中...</div>
+      </div>
+      <div v-else-if="user" class="user-level">
         <LevelProgress :exp="user.experience" :current-level="user.currentLevel" :next-exp="user.nextLevelExp" />
+      </div>
+      <div v-else class="user-level">
+        <div class="user-level-text"><i class="fas fa-user-circle"></i> 请登录查看自身等级</div>
       </div>
     </div>
     <div v-if="user && user.currentLevel >= 1 && !info.ended" class="redeem-button" @click="openDialog">兑换</div>
@@ -42,6 +49,8 @@ import BaseInput from './BaseInput.vue'
 import BasePopup from './BasePopup.vue'
 import { API_BASE_URL, toast } from '../main'
 import { getToken, fetchCurrentUser } from '../utils/auth'
+import { hatch } from 'ldrs'
+hatch.register()
 
 export default {
   name: 'MilkTeaActivityComponent',
@@ -52,12 +61,15 @@ export default {
       user: null,
       dialogVisible: false,
       contact: '',
-      loading: false
+      loading: false,
+      isLoadingUser: true,
     }
   },
   async mounted () {
     await this.loadInfo()
+    this.isLoadingUser = true
     this.user = await fetchCurrentUser()
+    this.isLoadingUser = false
   },
   methods: {
     async loadInfo () {
@@ -167,9 +179,6 @@ export default {
   position: relative;
   z-index: 2;
   background-color: var(--background-color);
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -209,6 +218,11 @@ export default {
 }
 .redeem-cancel-button:hover {
   text-decoration: underline;
+}
+.user-level-text {
+  opacity: 0.8;
+  font-size: 12px;
+  color: var(--primary-color);
 }
 
 

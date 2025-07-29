@@ -41,8 +41,8 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 .popup-content {
   position: relative;
@@ -51,5 +51,8 @@ export default {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  max-width: 80%;
+  max-height: 80%;
+  overflow-y: auto;
 }
 </style>

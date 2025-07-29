@@ -45,9 +45,10 @@ export default {
   gap: 10px;
   min-width: 200px;
 }
+
 .activity-popup-icon {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   object-fit: contain;
 }
 .activity-popup-actions {
