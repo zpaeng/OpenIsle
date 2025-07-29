@@ -202,11 +202,11 @@
                 下对
                 <router-link :to="`/posts/${item.comment.post.id}#comment-${item.comment.parentComment.id}`"
                   class="timeline-link">
-                  {{ item.comment.parentComment.content }}
+                  {{ stripMarkdownLength(item.comment.parentComment.content, 200) }}
                 </router-link>
                 回复了
                 <router-link :to="`/posts/${item.comment.post.id}#comment-${item.comment.id}`" class="timeline-link">
-                  {{ item.comment.content }}
+                  {{ stripMarkdownLength(item.comment.content, 200) }}
                 </router-link>
                 <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
               </template>
