@@ -294,13 +294,12 @@ export default {
   gap: 10px;
 }
 
-/* 容器：定位 + 光标 */
 .avatar-container {
   position: relative;
-  display: inline-block;
+  width: 80px;
+  height: 80px;
+  border-radius: 40px;
   cursor: pointer;
-  background-color: lightgray;
-  border-radius: 50%;
 }
 
 /* 隐藏默认文件选择按钮 */
