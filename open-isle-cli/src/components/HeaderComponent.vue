@@ -45,7 +45,7 @@
 <script>
 import { authState, clearToken, loadCurrentUser } from '../utils/auth'
 import { watch, nextTick } from 'vue'
-import { fetchUnreadCount } from '../utils/notification'
+import { fetchUnreadCount, notificationState } from '../utils/notification'
 import DropdownMenu from './DropdownMenu.vue'
 import SearchDropdown from './SearchDropdown.vue'
 import { isMobile } from '../utils/screen'
@@ -62,8 +62,7 @@ export default {
   data() {
     return {
       avatar: '',
-      showSearch: false,
-      unreadCount: 0
+      showSearch: false
     }
   },
   computed: {
@@ -79,6 +78,9 @@ export default {
         { text: '个人主页', onClick: this.goToProfile },
         { text: '退出', onClick: this.goToLogout }
       ]
+    },
+    unreadCount() {
+      return notificationState.unreadCount
     }
   },
   async mounted() {
@@ -92,9 +94,9 @@ export default {
     }
     const updateUnread = async () => {
       if (authState.loggedIn) {
-        this.unreadCount = await fetchUnreadCount()
+        await fetchUnreadCount()
       } else {
-        this.unreadCount = 0
+        notificationState.unreadCount = 0
       }
     }
 
