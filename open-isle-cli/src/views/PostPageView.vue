@@ -529,7 +529,6 @@ export default {
 
     const fetchComments = async () => {
       isFetchingComments.value = true
-      await new Promise(resolve => setTimeout(resolve, 1000))
       try {
         const token = getToken()
         const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/comments?sort=${commentSort.value}`, {
