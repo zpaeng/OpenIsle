@@ -184,7 +184,7 @@ class PostControllerTest {
         cr.setType(com.openisle.model.ReactionType.LIKE);
 
         Mockito.when(postService.viewPost(eq(1L), Mockito.isNull())).thenReturn(post);
-        Mockito.when(commentService.getCommentsForPost(1L)).thenReturn(List.of(comment));
+        Mockito.when(commentService.getCommentsForPost(eq(1L), any())).thenReturn(List.of(comment));
         Mockito.when(commentService.getReplies(2L)).thenReturn(List.of(reply));
         Mockito.when(commentService.getReplies(3L)).thenReturn(List.of());
         Mockito.when(commentService.getParticipants(Mockito.anyLong(), Mockito.anyInt())).thenReturn(java.util.List.of());

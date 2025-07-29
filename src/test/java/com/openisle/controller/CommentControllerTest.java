@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -53,7 +54,7 @@ class CommentControllerTest {
     void createAndListComments() throws Exception {
         Comment comment = createComment(1L, "hi", "bob");
         Mockito.when(commentService.addComment(eq("bob"), eq(1L), eq("hi"))).thenReturn(comment);
-        Mockito.when(commentService.getCommentsForPost(1L)).thenReturn(List.of(comment));
+        Mockito.when(commentService.getCommentsForPost(eq(1L), any())).thenReturn(List.of(comment));
         Mockito.when(commentService.getReplies(1L)).thenReturn(List.of());
 
         mockMvc.perform(post("/api/posts/1/comments")

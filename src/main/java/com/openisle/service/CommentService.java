@@ -4,6 +4,7 @@ import com.openisle.model.Comment;
 import com.openisle.model.Post;
 import com.openisle.model.User;
 import com.openisle.model.NotificationType;
+import com.openisle.model.CommentSort;
 import com.openisle.repository.CommentRepository;
 import com.openisle.repository.PostRepository;
 import com.openisle.repository.UserRepository;
@@ -104,10 +105,16 @@ public class CommentService {
         return comment;
     }
 
-    public List<Comment> getCommentsForPost(Long postId) {
+    public List<Comment> getCommentsForPost(Long postId, CommentSort sort) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
-        return commentRepository.findByPostAndParentIsNullOrderByCreatedAtAsc(post);
+        List<Comment> list = commentRepository.findByPostAndParentIsNullOrderByCreatedAtAsc(post);
+        if (sort == CommentSort.NEWEST) {
+            list.sort(java.util.Comparator.comparing(Comment::getCreatedAt).reversed());
+        } else if (sort == CommentSort.MOST_INTERACTIONS) {
+            list.sort((a, b) -> Integer.compare(interactionCount(b), interactionCount(a)));
+        }
+        return list;
     }
 
     public List<Comment> getReplies(Long parentId) {
@@ -166,5 +173,11 @@ public class CommentService {
         notificationRepository.deleteAll(notificationRepository.findByComment(comment));
         imageUploader.removeReferences(imageUploader.extractUrls(comment.getContent()));
         commentRepository.delete(comment);
+    }
+
+    private int interactionCount(Comment comment) {
+        int reactions = reactionRepository.findByComment(comment).size();
+        int replies = commentRepository.findByParentOrderByCreatedAtAsc(comment).size();
+        return reactions + replies;
     }
 }

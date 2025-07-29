@@ -4,6 +4,7 @@ import com.openisle.model.Comment;
 import com.openisle.service.CommentService;
 import com.openisle.service.CaptchaService;
 import com.openisle.service.LevelService;
+import com.openisle.model.CommentSort;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -56,8 +57,9 @@ public class CommentController {
     }
 
     @GetMapping("/posts/{postId}/comments")
-    public List<CommentDto> listComments(@PathVariable Long postId) {
-        return commentService.getCommentsForPost(postId).stream()
+    public List<CommentDto> listComments(@PathVariable Long postId,
+                                         @RequestParam(value = "sort", required = false, defaultValue = "OLDEST") CommentSort sort) {
+        return commentService.getCommentsForPost(postId, sort).stream()
                 .map(this::toDtoWithReplies)
                 .collect(Collectors.toList());
     }

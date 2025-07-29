@@ -4,6 +4,7 @@ import com.openisle.model.Comment;
 import com.openisle.model.Post;
 import com.openisle.model.Reaction;
 import com.openisle.service.CommentService;
+import com.openisle.model.CommentSort;
 import com.openisle.service.PostService;
 import com.openisle.service.ReactionService;
 import com.openisle.service.CaptchaService;
@@ -180,7 +181,7 @@ public class PostController {
                 .collect(Collectors.toList());
         dto.setReactions(reactions);
 
-        List<CommentDto> comments = commentService.getCommentsForPost(post.getId())
+        List<CommentDto> comments = commentService.getCommentsForPost(post.getId(), CommentSort.OLDEST)
                 .stream()
                 .map(this::toCommentDtoWithReplies)
                 .collect(Collectors.toList());

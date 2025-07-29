@@ -69,7 +69,7 @@
       <div class="comment-config-container">
         <div class="comment-sort-container">
           <div class="comment-sort-title">Sort by: </div>
-          <Dropdown></Dropdown>
+          <Dropdown v-model="commentSort" :fetch-options="fetchCommentSorts" />
         </div>
       </div>
 
@@ -154,6 +154,7 @@ export default {
     const mainContainer = ref(null)
     const currentIndex = ref(1)
     const subscribed = ref(false)
+    const commentSort = ref('NEWEST')
 
     // record default metadata from the main document
     const defaultTitle = document.title
@@ -287,6 +288,7 @@ export default {
 
     const onCommentDeleted = (id) => {
       removeCommentFromList(Number(id), comments.value)
+      fetchComments()
     }
 
     const fetchPost = async () => {
@@ -310,13 +312,12 @@ export default {
         category.value = data.category
         tags.value = data.tags || []
         postReactions.value = data.reactions || []
-        comments.value = (data.comments || []).map(mapComment)
+        await fetchComments()
         subscribed.value = !!data.subscribed
         status.value = data.status
         pinnedAt.value = data.pinnedAt
         postTime.value = TimeManager.format(data.createdAt)
         await nextTick()
-        gatherPostItems()
       } catch (e) {
         console.error(e)
       }
@@ -379,9 +380,7 @@ export default {
         })
         if (res.ok) {
           const data = await res.json()
-          comments.value.push(mapComment(data))
-          await nextTick()
-          gatherPostItems()
+          await fetchComments()
           if (data.reward && data.reward > 0) {
             toast.success(`评论成功，获得 ${data.reward} 经验值`)
           } else {
@@ -524,6 +523,33 @@ export default {
       }
     }
 
+    const fetchCommentSorts = () => {
+      return Promise.resolve([
+        { id: 'NEWEST', name: '最新', icon: 'fas fa-clock' },
+        { id: 'OLDEST', name: '最旧', icon: 'fas fa-hourglass-start' },
+        { id: 'MOST_INTERACTIONS', name: '最多互动', icon: 'fas fa-fire' }
+      ])
+    }
+
+    const fetchComments = async () => {
+      try {
+        const token = getToken()
+        const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/comments?sort=${commentSort.value}`, {
+          headers: { Authorization: token ? `Bearer ${token}` : '' }
+        })
+        if (res.ok) {
+          const data = await res.json()
+          comments.value = data.map(mapComment)
+          await nextTick()
+          gatherPostItems()
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    watch(commentSort, fetchComments)
+
     const jumpToHashComment = async () => {
       const hash = location.hash
       if (hash.startsWith('#comment-')) {
@@ -546,7 +572,6 @@ export default {
       const hash = location.hash
       const id = hash.startsWith('#comment-') ? hash.substring('#comment-'.length) : null
       await fetchPost()
-      gatherPostItems()
       if (id) expandCommentPath(id)
       updateCurrentIndex()
       await jumpToHashComment()
@@ -595,7 +620,9 @@ export default {
       lightboxImgs,
       handleContentClick,
       isMobile,
-      pinnedAt
+      pinnedAt,
+      commentSort,
+      fetchCommentSorts
     }
   }
 }
