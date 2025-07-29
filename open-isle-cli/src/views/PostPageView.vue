@@ -66,6 +66,13 @@
       <CommentEditor @submit="postComment" :loading="isWaitingPostingComment" :disabled="!loggedIn"
         :show-login-overlay="!loggedIn" />
 
+      <div class="comment-config-container">
+        <div class="comment-sort-container">
+          <div class="comment-sort-title">Sort by: </div>
+          <Dropdown></Dropdown>
+        </div>
+      </div>
+
       <div class="comments-container">
         <BaseTimeline :items="comments"> 
           <template #item="{ item }">
@@ -120,11 +127,12 @@ import TimeManager from '../utils/time'
 import { hatch } from 'ldrs'
 import { useRouter } from 'vue-router'
 import { isMobile } from '../utils/screen'
+import Dropdown from '../components/Dropdown.vue'
 hatch.register()
 
 export default {
   name: 'PostPageView',
-  components: { CommentItem, CommentEditor, BaseTimeline, ArticleTags, ArticleCategory, ReactionsGroup, DropdownMenu, VueEasyLightbox },
+  components: { CommentItem, CommentEditor, BaseTimeline, ArticleTags, ArticleCategory, ReactionsGroup, DropdownMenu, VueEasyLightbox, Dropdown },
   setup() {
     const route = useRoute()
     const postId = route.params.id
@@ -622,6 +630,20 @@ export default {
   display: flex;
   flex-direction: column;
   width: 15%;
+}
+
+.comment-config-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+}
+
+.comment-sort-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
 }
 
 .scroller {
