@@ -18,6 +18,7 @@ import com.openisle.repository.ReactionRepository;
 import com.openisle.repository.PostSubscriptionRepository;
 import com.openisle.repository.NotificationRepository;
 import com.openisle.model.Role;
+import com.openisle.exception.RateLimitException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -87,6 +88,11 @@ public class PostService {
                            String title,
                            String content,
                            java.util.List<Long> tagIds) {
+        long recent = postRepository.countByAuthorAfter(username,
+                java.time.LocalDateTime.now().minusMinutes(5));
+        if (recent >= 1) {
+            throw new RateLimitException("Too many posts");
+        }
         if (tagIds == null || tagIds.isEmpty()) {
             throw new IllegalArgumentException("At least one tag required");
         }
