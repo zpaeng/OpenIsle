@@ -39,7 +39,7 @@
           @click="handleItemClick"
         >
           <i class="menu-item-icon fas fa-gift"></i>
-          <span class="menu-item-text">活动</span>
+          <span class="menu-item-text">🔥 活动</span>
         </router-link>
         <router-link
           v-if="shouldShowStats"
