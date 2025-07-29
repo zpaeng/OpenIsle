@@ -379,6 +379,8 @@ export default {
           } else {
             toast.success('评论成功')
           }
+        } else if (res.status === 429) {
+          toast.error('评论过于频繁，请稍后再试')
         } else {
           toast.error('评论失败')
         }

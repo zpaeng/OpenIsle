@@ -240,6 +240,8 @@ export default {
           if (data.id) {
             window.location.href = `/posts/${data.id}`
           }
+        } else if (res.status === 429) {
+          toast.error('发布过于频繁，请稍后再试')
         } else {
           toast.error(data.error || '发布失败')
         }
