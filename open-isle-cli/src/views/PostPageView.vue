@@ -73,21 +73,16 @@
         </div>
       </div>
 
-      <div class="comments-container">
+      <div v-if="isFetchingComments" class="loading-container">
+        <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+      </div>
+      <div v-else class="comments-container">
         <BaseTimeline :items="comments"> 
           <template #item="{ item }">
             <CommentItem :key="item.id" :comment="item" :level="0" :default-show-replies="item.openReplies"
               @deleted="onCommentDeleted" />
           </template>
         </BaseTimeline>
-        <!-- <CommentItem
-          v-for="comment in comments"
-          :key="comment.id"
-          :comment="comment"
-          :level="0"
-          :default-show-replies="comment.openReplies"
-          ref="postItems"
-        /> -->
       </div>
     </div>
 
@@ -155,6 +150,7 @@ export default {
     const currentIndex = ref(1)
     const subscribed = ref(false)
     const commentSort = ref('NEWEST')
+    const isFetchingComments = ref(false)
 
     // record default metadata from the main document
     const defaultTitle = document.title
@@ -527,11 +523,13 @@ export default {
       return Promise.resolve([
         { id: 'NEWEST', name: '最新', icon: 'fas fa-clock' },
         { id: 'OLDEST', name: '最旧', icon: 'fas fa-hourglass-start' },
-        { id: 'MOST_INTERACTIONS', name: '最多互动', icon: 'fas fa-fire' }
+        // { id: 'MOST_INTERACTIONS', name: '最多互动', icon: 'fas fa-fire' }
       ])
     }
 
     const fetchComments = async () => {
+      isFetchingComments.value = true
+      await new Promise(resolve => setTimeout(resolve, 1000))
       try {
         const token = getToken()
         const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/comments?sort=${commentSort.value}`, {
@@ -545,6 +543,8 @@ export default {
         }
       } catch {
         // ignore
+      } finally {
+        isFetchingComments.value = false
       }
     }
 
@@ -622,7 +622,8 @@ export default {
       isMobile,
       pinnedAt,
       commentSort,
-      fetchCommentSorts
+      fetchCommentSorts,
+      isFetchingComments
     }
   }
 }
