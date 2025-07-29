@@ -336,7 +336,7 @@ export default {
   right: 0;
   bottom: 0;
   background-color: var(--menu-background-color);
-  z-index: 1001;
+  z-index: 1300;
   display: flex;
   flex-direction: column;
 }

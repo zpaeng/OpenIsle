@@ -438,8 +438,7 @@ export default {
 
 .topic-container {
   position: sticky;
-  top: 0;
-  z-index: 10;
+  z-index: 1000;
   background-color: var(--background-color);
   display: flex;
   flex-direction: row;
@@ -718,6 +717,10 @@ export default {
   .main-info-text {
     font-size: 10px;
     opacity: 0.5;
+  }
+
+  .topic-container {
+    position: static;
   }
 }
 
