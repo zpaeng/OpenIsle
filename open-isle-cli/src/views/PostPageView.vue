@@ -153,7 +153,7 @@ export default {
     const defaultDescription = metaDescriptionEl ? metaDescriptionEl.getAttribute('content') : ''
 
     watch(title, t => {
-      document.title = `OpenIsle -- ${t}`
+      document.title = `OpenIsle - ${t}`
     })
 
     watch(postContent, c => {
