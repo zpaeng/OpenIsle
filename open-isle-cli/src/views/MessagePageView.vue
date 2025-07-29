@@ -238,7 +238,7 @@ import BaseTimeline from '../components/BaseTimeline.vue'
 import BasePlaceholder from '../components/BasePlaceholder.vue'
 import NotificationContainer from '../components/NotificationContainer.vue'
 import { getToken, authState } from '../utils/auth'
-import { markNotificationsRead } from '../utils/notification'
+import { markNotificationsRead, fetchUnreadCount } from '../utils/notification'
 import { toast } from '../main'
 import { stripMarkdown } from '../utils/markdown'
 import TimeManager from '../utils/time'
@@ -265,6 +265,7 @@ export default {
       if (ok) {
         const n = notifications.value.find(n => n.id === id)
         if (n) n.read = true
+        await fetchUnreadCount()
       }
     }
 
@@ -276,6 +277,7 @@ export default {
         notifications.value.forEach(n => {
           if (n.type !== 'REGISTER_REQUEST') n.read = true
         })
+        await fetchUnreadCount()
         toast.success('已读所有消息（注册请求除外）')
       }
     }

@@ -111,7 +111,7 @@
 <script>
 import { themeState, cycleTheme, ThemeMode } from '../utils/theme'
 import { authState } from '../utils/auth'
-import { fetchUnreadCount } from '../utils/notification'
+import { fetchUnreadCount, notificationState } from '../utils/notification'
 import { watch } from 'vue'
 import { API_BASE_URL } from '../main'
 import { hatch } from 'ldrs'
@@ -127,7 +127,6 @@ export default {
   },
   data() {
     return {
-      unreadCount: 0,
       categories: [],
       tags: [],
       categoryOpen: true,
@@ -147,6 +146,9 @@ export default {
           return 'fas fa-desktop'
       }
     },
+    unreadCount() {
+      return notificationState.unreadCount
+    },
     showUnreadCount() {
       return this.unreadCount > 99 ? '99+' : this.unreadCount
     },
@@ -157,9 +159,9 @@ export default {
   async mounted() {
     const updateCount = async () => {
       if (authState.loggedIn) {
-        this.unreadCount = await fetchUnreadCount()
+        await fetchUnreadCount()
       } else {
-        this.unreadCount = 0
+        notificationState.unreadCount = 0
       }
     }
     await updateCount()
