@@ -439,7 +439,7 @@ export default {
 .topic-container {
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 10;
   background-color: var(--background-color);
   display: flex;
   flex-direction: row;
