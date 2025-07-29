@@ -10,7 +10,10 @@
         :visible="!hideMenu && menuVisible"
         @item-click="menuVisible = false"
       />
-      <div class="content">
+      <div
+        class="content"
+        :class="{ 'menu-open': menuVisible && !hideMenu }"
+      >
         <router-view />
       </div>
     </div>
@@ -75,7 +78,14 @@ export default {
 <style>
 .content {
   flex: 1;
+  max-width: 100%;
+  transition: max-width 0.3s ease;
 }
+
+.content.menu-open {
+  max-width: calc(100% - var(--menu-width));
+}
+
 .main-container {
   display: flex;
   flex-direction: row;
@@ -83,4 +93,10 @@ export default {
   margin: 0 auto;
 }
 
+@media (max-width: 768px) {
+  .content,
+  .content.menu-open {
+    max-width: 100% !important;
+  }
+}
 </style>
