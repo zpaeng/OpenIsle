@@ -5,6 +5,8 @@ import com.openisle.repository.*;
 import com.openisle.exception.RateLimitException;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Optional;
 import java.util.List;
 
