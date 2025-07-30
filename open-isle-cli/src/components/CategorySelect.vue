@@ -4,7 +4,7 @@
       <div class="option-container">
         <div class="option-main">
           <template v-if="option.icon">
-            <img v-if="isImageIcon(option.icon)" :src="option.icon" class="option-icon" />
+            <img v-if="isImageIcon(option.icon)" :src="option.icon" class="option-icon" :alt="option.name" />
             <i v-else :class="['option-icon', option.icon]"></i>
           </template>
           <span>{{ option.name }}</span>

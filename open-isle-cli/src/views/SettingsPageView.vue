@@ -9,7 +9,7 @@
         <div class="avatar-row">
           <!-- label 充当点击区域，内部隐藏 input -->
           <label class="avatar-container">
-            <img :src="avatar" class="avatar-preview" />
+            <img :src="avatar" class="avatar-preview" alt="avatar" />
             <!-- 半透明蒙层：hover 时出现 -->
             <div class="avatar-overlay">更换头像</div>
             <input type="file" class="avatar-input" accept="image/*" @change="onAvatarChange" />

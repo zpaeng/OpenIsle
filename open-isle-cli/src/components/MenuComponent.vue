@@ -73,7 +73,7 @@
           </div>
           <div v-else v-for="c in categories" :key="c.id" class="section-item" @click="gotoCategory(c)">
             <template v-if="c.smallIcon || c.icon">
-              <img v-if="isImageIcon(c.smallIcon || c.icon)" :src="c.smallIcon || c.icon" class="section-item-icon" />
+              <img v-if="isImageIcon(c.smallIcon || c.icon)" :src="c.smallIcon || c.icon" class="section-item-icon" :alt="c.name" />
               <i v-else :class="['section-item-icon', c.smallIcon || c.icon]"></i>
             </template>
             <span class="section-item-text">{{ c.name }}</span>
@@ -91,7 +91,7 @@
             <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
           </div>
           <div v-else v-for="t in tags" :key="t.id" class="section-item" @click="gotoTag(t)">
-            <img v-if="isImageIcon(t.smallIcon || t.icon)" :src="t.smallIcon || t.icon" class="section-item-icon" />
+            <img v-if="isImageIcon(t.smallIcon || t.icon)" :src="t.smallIcon || t.icon" class="section-item-icon" :alt="t.name" />
             <i v-else class="section-item-icon fas fa-hashtag"></i>
             <span class="section-item-text">{{ t.name }} <span class="section-item-text-count">x {{ t.count
                 }}</span></span>
