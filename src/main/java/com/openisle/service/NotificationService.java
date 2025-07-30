@@ -27,14 +27,16 @@ public class NotificationService {
     private String websiteUrl;
 
     private String buildPayload(String body, String url) {
-        try {
-            return new ObjectMapper().writeValueAsString(Map.of(
-                    "body", body,
-                    "url", url
-            ));
-        } catch (Exception e) {
-            return body;
-        }
+//        try {
+//            return new ObjectMapper().writeValueAsString(Map.of(
+//                    "body", body,
+//                    "url", url
+//            ));
+//        } catch (Exception e) {
+//            return body;
+//        }
+
+        return body;
     }
 
     public void sendCustomPush(User user, String body, String url) {
@@ -60,15 +62,16 @@ public class NotificationService {
 
         if (type == NotificationType.COMMENT_REPLY && user.getEmail() != null && post != null && comment != null) {
             String url = String.format("%s/posts/%d#comment-%d", websiteUrl, post.getId(), comment.getId());
-            emailSender.sendEmail(user.getEmail(), "【OpenIsle】有人回复了你", url);
-            sendCustomPush(user, "有人回复了你", url);
+            String pushContent = comment.getAuthor() + "回复了你: \"" + comment.getContent() + "\"";
+            emailSender.sendEmail(user.getEmail(), "【OpenIsle】您有新的回复", pushContent + ", 点击以查看: " + url);
+            sendCustomPush(user, pushContent, url);
         } else if (type == NotificationType.REACTION && comment != null) {
             long count = reactionRepository.countReceived(comment.getAuthor().getUsername());
             if (count % 5 == 0) {
                 String url = websiteUrl + "/messages";
                 sendCustomPush(comment.getAuthor(), "你有新的互动", url);
                 if (comment.getAuthor().getEmail() != null) {
-                    emailSender.sendEmail(comment.getAuthor().getEmail(), "【OpenIsle】你有新的互动", url);
+                    emailSender.sendEmail(comment.getAuthor().getEmail(), "【OpenIsle】你有新的互动", "你有新的互动, 点击以查看: " + url);
                 }
             }
         } else if (type == NotificationType.REACTION && post != null) {
@@ -77,7 +80,7 @@ public class NotificationService {
                 String url = websiteUrl + "/messages";
                 sendCustomPush(post.getAuthor(), "你有新的互动", url);
                 if (post.getAuthor().getEmail() != null) {
-                    emailSender.sendEmail(post.getAuthor().getEmail(), "【OpenIsle】你有新的互动", url);
+                    emailSender.sendEmail(post.getAuthor().getEmail(), "【OpenIsle】你有新的互动", "你有新的互动, 点击以查看: " + url);
                 }
             }
         }
