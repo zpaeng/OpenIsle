@@ -10,6 +10,7 @@ import com.openisle.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import com.openisle.service.AvatarGenerator;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class GoogleAuthService {
 
     private final UserRepository userRepository;
+    private final AvatarGenerator avatarGenerator;
 
     @Value("${google.client-id:}")
     private String clientId;
@@ -70,7 +72,7 @@ public class GoogleAuthService {
         if (avatar != null) {
             user.setAvatar(avatar);
         } else {
-            user.setAvatar("https://github.com/identicons/" + username + ".png");
+            user.setAvatar(avatarGenerator.generate(username));
         }
         return userRepository.save(user);
     }
