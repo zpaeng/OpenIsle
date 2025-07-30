@@ -37,9 +37,20 @@ public class ActivityService {
         activityRepository.save(activity);
     }
 
-    public void redeem(Activity activity, User user, String contact) {
+    public long countParticipants(Activity activity) {
+        return activity.getParticipants().size();
+    }
+
+    /**
+     * Redeem an activity for the given user.
+     *
+     * @return true if the user redeemed for the first time, false if the
+     *         information was simply updated
+     */
+    public boolean redeem(Activity activity, User user, String contact) {
         notificationService.createActivityRedeemNotifications(user, contact);
-        activity.getParticipants().add(user);
+        boolean added = activity.getParticipants().add(user);
         activityRepository.save(activity);
+        return added;
     }
 }
