@@ -4,6 +4,7 @@ import com.openisle.model.User;
 import com.openisle.model.Role;
 import com.openisle.service.PasswordValidator;
 import com.openisle.service.UsernameValidator;
+import com.openisle.service.AvatarGenerator;
 import com.openisle.exception.FieldException;
 import com.openisle.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class UserService {
     private final UsernameValidator usernameValidator;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final ImageUploader imageUploader;
+    private final AvatarGenerator avatarGenerator;
 
     public User register(String username, String email, String password, String reason, com.openisle.model.RegisterMode mode) {
         usernameValidator.validate(username);
@@ -66,7 +68,7 @@ public class UserService {
         user.setRole(Role.USER);
         user.setVerified(false);
         user.setVerificationCode(genCode());
-        user.setAvatar("https://github.com/identicons/" + username + ".png");
+        user.setAvatar(avatarGenerator.generate(username));
         user.setRegisterReason(reason);
         user.setApproved(mode == com.openisle.model.RegisterMode.DIRECT);
         return userRepository.save(user);

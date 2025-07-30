@@ -10,6 +10,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.HttpClientErrorException;
+import com.openisle.service.AvatarGenerator;
 
 import java.util.Collections;
 import java.util.Map;
@@ -21,6 +22,7 @@ import java.util.Optional;
 public class GithubAuthService {
     private final UserRepository userRepository;
     private final RestTemplate restTemplate = new RestTemplate();
+    private final AvatarGenerator avatarGenerator;
 
     @Value("${github.client-id:}")
     private String clientId;
@@ -117,7 +119,7 @@ public class GithubAuthService {
         if (avatar != null) {
             user.setAvatar(avatar);
         } else {
-            user.setAvatar("https://github.com/" + finalUsername + ".png");
+            user.setAvatar(avatarGenerator.generate(finalUsername));
         }
         return userRepository.save(user);
     }
