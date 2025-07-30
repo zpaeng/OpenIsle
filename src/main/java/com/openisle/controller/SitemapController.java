@@ -56,7 +56,7 @@ public class SitemapController {
                 .append(p.getId())
                 .append("</loc>\n")
                 .append("    <lastmod>")
-                .append(p.getCreatedAt())
+                .append(p.getCreatedAt().toLocalDate())
                 .append("</lastmod>\n")
                 .append("  </url>\n");
         }
