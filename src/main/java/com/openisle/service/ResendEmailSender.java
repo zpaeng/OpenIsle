@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -20,6 +21,7 @@ public class ResendEmailSender extends EmailSender {
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Override
+    @Async("notificationExecutor")
     public void sendEmail(String to, String subject, String text) {
         String url = "https://api.resend.com/emails"; // hypothetical endpoint
 
