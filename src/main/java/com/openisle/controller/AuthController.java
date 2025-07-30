@@ -56,7 +56,7 @@ public class AuthController {
         }
         User user = userService.register(
                 req.getUsername(), req.getEmail(), req.getPassword(), "", registerModeService.getRegisterMode());
-        emailService.sendEmail(user.getEmail(), "Verification Code", "Your verification code is " + user.getVerificationCode());
+        emailService.sendEmail(user.getEmail(), "【OpenIsle】在网站填写验证码以验证", "您的验证码是 " + user.getVerificationCode());
         if (!user.isApproved()) {
             notificationService.createRegisterRequestNotifications(user, user.getRegisterReason());
         }
@@ -92,7 +92,7 @@ public class AuthController {
         User user = userOpt.get();
         if (!user.isVerified()) {
             user = userService.register(user.getUsername(), user.getEmail(), user.getPassword(), user.getRegisterReason(), registerModeService.getRegisterMode());
-            emailService.sendEmail(user.getEmail(), "Verification Code", "Your verification code is " + user.getVerificationCode());
+            emailService.sendEmail(user.getEmail(), "【OpenIsle】在网站填写验证码以验证", "您的验证码是 " + user.getVerificationCode());
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "User not verified",
                     "reason_code", "NOT_VERIFIED",
@@ -279,7 +279,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("error", "User not found"));
         }
         String code = userService.generatePasswordResetCode(req.getEmail());
-        emailService.sendEmail(req.getEmail(), "Password Reset Code", "Your verification code is " + code);
+        emailService.sendEmail(req.getEmail(), "【OpenIsle】请填写验证码以重置密码", "您的验证码是" + code);
         return ResponseEntity.ok(Map.of("message", "Verification code sent"));
     }
 
