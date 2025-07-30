@@ -2,11 +2,14 @@ package com.openisle.service;
 
 import com.openisle.model.*;
 import com.openisle.repository.NotificationRepository;
+import com.openisle.repository.ReactionRepository;
 import com.openisle.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import com.openisle.service.EmailSender;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
 
 import java.util.List;
 
@@ -17,9 +20,28 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
     private final EmailSender emailSender;
+    private final PushNotificationService pushNotificationService;
+    private final ReactionRepository reactionRepository;
 
     @Value("${app.website-url}")
     private String websiteUrl;
+
+    private String buildPayload(String body, String url) {
+//        try {
+//            return new ObjectMapper().writeValueAsString(Map.of(
+//                    "body", body,
+//                    "url", url
+//            ));
+//        } catch (Exception e) {
+//            return body;
+//        }
+
+        return body;
+    }
+
+    public void sendCustomPush(User user, String body, String url) {
+        pushNotificationService.sendNotification(user, buildPayload(body, url));
+    }
 
     public Notification createNotification(User user, NotificationType type, Post post, Comment comment, Boolean approved) {
         return createNotification(user, type, post, comment, approved, null, null, null);
@@ -40,7 +62,27 @@ public class NotificationService {
 
         if (type == NotificationType.COMMENT_REPLY && user.getEmail() != null && post != null && comment != null) {
             String url = String.format("%s/posts/%d#comment-%d", websiteUrl, post.getId(), comment.getId());
-            emailSender.sendEmail(user.getEmail(), "【OpenIsle】有人回复了你", url);
+            String pushContent = comment.getAuthor() + "回复了你: \"" + comment.getContent() + "\"";
+            emailSender.sendEmail(user.getEmail(), "【OpenIsle】您有新的回复", pushContent + ", 点击以查看: " + url);
+            sendCustomPush(user, pushContent, url);
+        } else if (type == NotificationType.REACTION && comment != null) {
+            long count = reactionRepository.countReceived(comment.getAuthor().getUsername());
+            if (count % 5 == 0) {
+                String url = websiteUrl + "/messages";
+                sendCustomPush(comment.getAuthor(), "你有新的互动", url);
+                if (comment.getAuthor().getEmail() != null) {
+                    emailSender.sendEmail(comment.getAuthor().getEmail(), "【OpenIsle】你有新的互动", "你有新的互动, 点击以查看: " + url);
+                }
+            }
+        } else if (type == NotificationType.REACTION && post != null) {
+            long count = reactionRepository.countReceived(post.getAuthor().getUsername());
+            if (count % 5 == 0) {
+                String url = websiteUrl + "/messages";
+                sendCustomPush(post.getAuthor(), "你有新的互动", url);
+                if (post.getAuthor().getEmail() != null) {
+                    emailSender.sendEmail(post.getAuthor().getEmail(), "【OpenIsle】你有新的互动", "你有新的互动, 点击以查看: " + url);
+                }
+            }
         }
 
         return n;
