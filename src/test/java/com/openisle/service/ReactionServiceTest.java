@@ -39,5 +39,6 @@ class ReactionServiceTest {
         service.reactToPost("bob", 3L, ReactionType.LIKE);
 
         verify(email).sendEmail("a@a.com", "【OpenIsle】你有新的互动", "https://ex.com/messages");
+        verify(notif).sendCustomPush(author, "你有新的互动", "https://ex.com/messages");
     }
 }
