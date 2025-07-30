@@ -1,7 +1,7 @@
 <template>
   <BasePopup :visible="visible" @close="close">
     <div class="activity-popup">
-      <img v-if="icon" :src="icon" class="activity-popup-icon" />
+      <img v-if="icon" :src="icon" class="activity-popup-icon" alt="activity icon" />
       <div class="activity-popup-text">{{ text }}</div>
       <div class="activity-popup-actions">
         <div class="activity-popup-button" @click="gotoActivity">立即前往</div>

@@ -6,7 +6,7 @@
         :class="{ clickable: !!item.iconClick }"
         @click="item.iconClick && item.iconClick()"
       >
-        <img v-if="item.src" :src="item.src" class="timeline-img" />
+        <img v-if="item.src" :src="item.src" class="timeline-img" alt="timeline item" />
         <i v-else-if="item.icon" :class="item.icon"></i>
         <span v-else-if="item.emoji" class="timeline-emoji">{{ item.emoji }}</span>
       </div>
