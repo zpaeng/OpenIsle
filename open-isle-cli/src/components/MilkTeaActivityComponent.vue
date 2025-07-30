@@ -14,8 +14,8 @@
     <div class="milk-tea-status-container">
     <div class="milk-tea-status">
       <div class="status-title">🔥 已兑换奶茶人数</div>
-      <ProgressBar :value="info.level1Count" :max="50" />
-      <div class="status-text">当前 {{ info.level1Count }} / 50</div>
+      <ProgressBar :value="info.redeemCount" :max="50" />
+      <div class="status-text">当前 {{ info.redeemCount }} / 50</div>
     </div>
       <div v-if="isLoadingUser" class="loading-user">
         <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
@@ -57,7 +57,7 @@ export default {
   components: { ProgressBar, LevelProgress, BaseInput, BasePopup },
   data () {
     return {
-      info: { level1Count: 0, ended: false },
+      info: { redeemCount: 0, ended: false },
       user: null,
       dialogVisible: false,
       contact: '',
@@ -97,7 +97,12 @@ export default {
         body: JSON.stringify({ contact: this.contact })
       })
       if (res.ok) {
-        toast.success('兑换成功！')
+        const data = await res.json()
+        if (data.message === 'updated') {
+          toast.success('您已提交过兑换，本次更新兑换信息')
+        } else {
+          toast.success('兑换成功！')
+        }
         this.dialogVisible = false
         await this.loadInfo()
       } else {
