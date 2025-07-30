@@ -6,6 +6,7 @@ import com.openisle.repository.PushSubscriptionRepository;
 import com.openisle.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class PushSubscriptionService {
     private final PushSubscriptionRepository subscriptionRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public void saveSubscription(String username, String endpoint, String p256dh, String auth) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));

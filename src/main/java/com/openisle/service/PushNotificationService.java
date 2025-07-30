@@ -3,6 +3,7 @@ package com.openisle.service;
 import com.openisle.model.PushSubscription;
 import com.openisle.model.User;
 import com.openisle.repository.PushSubscriptionRepository;
+import lombok.extern.slf4j.Slf4j;
 import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -15,6 +16,7 @@ import java.security.GeneralSecurityException;
 import java.security.Security;
 import java.util.List;
 
+@Slf4j
 @Service
 public class PushNotificationService {
     private final PushSubscriptionRepository subscriptionRepository;
@@ -35,7 +37,7 @@ public class PushNotificationService {
                 Notification notification = new Notification(sub.getEndpoint(), sub.getP256dh(), sub.getAuth(), payload);
                 pushService.send(notification);
             } catch (GeneralSecurityException | IOException | JoseException | InterruptedException | java.util.concurrent.ExecutionException e) {
-                // ignore
+                log.error(e.getMessage());
             }
         }
     }

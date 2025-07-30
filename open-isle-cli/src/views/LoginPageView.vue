@@ -59,6 +59,7 @@ import { githubAuthorize } from '../utils/github'
 import { discordAuthorize } from '../utils/discord'
 import { twitterAuthorize } from '../utils/twitter'
 import BaseInput from '../components/BaseInput.vue'
+import { registerPush } from '../utils/push'
 export default {
   name: 'LoginPageView',
   components: { BaseInput },
@@ -87,6 +88,7 @@ export default {
           setToken(data.token)
           await loadCurrentUser()
           toast.success('登录成功')
+          registerPush()
           this.$router.push('/')
         } else if (data.reason_code === 'NOT_VERIFIED') {
           toast.info('当前邮箱未验证，已经为您重新发送验证码')

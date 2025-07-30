@@ -1,5 +1,6 @@
 import { API_BASE_URL, GOOGLE_CLIENT_ID, toast } from '../main'
 import { setToken, loadCurrentUser } from './auth'
+import { registerPush } from './push'
 
 export async function googleGetIdToken() {
   return new Promise((resolve, reject) => {
@@ -29,6 +30,7 @@ export async function googleAuthWithToken(idToken, redirect_success, redirect_no
       setToken(data.token)
       await loadCurrentUser()
       toast.success('登录成功')
+      registerPush()
       if (redirect_success) redirect_success()
     } else if (data.reason_code === 'NOT_APPROVED') {
       toast.info('当前为注册审核模式，请填写注册理由')
