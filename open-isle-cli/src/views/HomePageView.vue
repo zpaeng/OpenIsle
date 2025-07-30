@@ -438,9 +438,9 @@ export default {
 }
 
 .topic-container {
-  /* position: sticky;
+  position: sticky;
   top: 1px;
-  z-index: 1000; */
+  z-index: 1000;
   background-color: var(--background-color-blur);
   backdrop-filter: blur(10px);
   display: flex;
@@ -720,11 +720,6 @@ export default {
   .main-info-text {
     font-size: 10px;
     opacity: 0.5;
-  }
-
-  .topic-container {
-    position: static;
-    z-index: 0;
   }
 }
 
