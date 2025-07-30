@@ -18,7 +18,9 @@ class NotificationServiceTest {
     void markReadUpdatesOnlyOwnedNotifications() {
         NotificationRepository nRepo = mock(NotificationRepository.class);
         UserRepository uRepo = mock(UserRepository.class);
-        NotificationService service = new NotificationService(nRepo, uRepo);
+        EmailSender email = mock(EmailSender.class);
+        NotificationService service = new NotificationService(nRepo, uRepo, email);
+        org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
 
         User user = new User();
         user.setId(1L);
@@ -44,7 +46,9 @@ class NotificationServiceTest {
     void listNotificationsWithoutFilter() {
         NotificationRepository nRepo = mock(NotificationRepository.class);
         UserRepository uRepo = mock(UserRepository.class);
-        NotificationService service = new NotificationService(nRepo, uRepo);
+        EmailSender email = mock(EmailSender.class);
+        NotificationService service = new NotificationService(nRepo, uRepo, email);
+        org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
 
         User user = new User();
         user.setId(2L);
@@ -64,7 +68,9 @@ class NotificationServiceTest {
     void countUnreadReturnsRepositoryValue() {
         NotificationRepository nRepo = mock(NotificationRepository.class);
         UserRepository uRepo = mock(UserRepository.class);
-        NotificationService service = new NotificationService(nRepo, uRepo);
+        EmailSender email = mock(EmailSender.class);
+        NotificationService service = new NotificationService(nRepo, uRepo, email);
+        org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
 
         User user = new User();
         user.setId(3L);
@@ -82,7 +88,9 @@ class NotificationServiceTest {
     void createRegisterRequestNotificationsDeletesOldOnes() {
         NotificationRepository nRepo = mock(NotificationRepository.class);
         UserRepository uRepo = mock(UserRepository.class);
-        NotificationService service = new NotificationService(nRepo, uRepo);
+        EmailSender email = mock(EmailSender.class);
+        NotificationService service = new NotificationService(nRepo, uRepo, email);
+        org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
 
         User admin = new User();
         admin.setId(10L);
@@ -101,7 +109,9 @@ class NotificationServiceTest {
     void createActivityRedeemNotificationsDeletesOldOnes() {
         NotificationRepository nRepo = mock(NotificationRepository.class);
         UserRepository uRepo = mock(UserRepository.class);
-        NotificationService service = new NotificationService(nRepo, uRepo);
+        EmailSender email = mock(EmailSender.class);
+        NotificationService service = new NotificationService(nRepo, uRepo, email);
+        org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
 
         User admin = new User();
         admin.setId(10L);
@@ -114,5 +124,26 @@ class NotificationServiceTest {
 
         verify(nRepo).deleteByTypeAndFromUser(NotificationType.ACTIVITY_REDEEM, user);
         verify(nRepo).save(any(Notification.class));
+    }
+
+    @Test
+    void createNotificationSendsEmailForCommentReply() {
+        NotificationRepository nRepo = mock(NotificationRepository.class);
+        UserRepository uRepo = mock(UserRepository.class);
+        EmailSender email = mock(EmailSender.class);
+        NotificationService service = new NotificationService(nRepo, uRepo, email);
+        org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
+
+        User user = new User();
+        user.setEmail("a@a.com");
+        Post post = new Post();
+        post.setId(1L);
+        Comment comment = new Comment();
+        comment.setId(2L);
+        when(nRepo.save(any(Notification.class))).thenAnswer(i -> i.getArgument(0));
+
+        service.createNotification(user, NotificationType.COMMENT_REPLY, post, comment, null, null, null, null);
+
+        verify(email).sendEmail("a@a.com", "【OpenIsle】有人回复了你", "https://ex.com/posts/1#comment-2");
     }
 }
