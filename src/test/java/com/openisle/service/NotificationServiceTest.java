@@ -5,7 +5,6 @@ import com.openisle.repository.NotificationRepository;
 import com.openisle.repository.UserRepository;
 import com.openisle.repository.ReactionRepository;
 import com.openisle.service.PushNotificationService;
-import com.openisle.repository.ReactionRepository;
 import java.util.concurrent.Executor;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -25,7 +24,6 @@ class NotificationServiceTest {
         ReactionRepository rRepo = mock(ReactionRepository.class);
         EmailSender email = mock(EmailSender.class);
         PushNotificationService push = mock(PushNotificationService.class);
-        ReactionRepository rRepo = mock(ReactionRepository.class);
         Executor executor = Runnable::run;
         NotificationService service = new NotificationService(nRepo, uRepo, email, push, rRepo, executor);
         org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
@@ -57,7 +55,6 @@ class NotificationServiceTest {
         ReactionRepository rRepo = mock(ReactionRepository.class);
         EmailSender email = mock(EmailSender.class);
         PushNotificationService push = mock(PushNotificationService.class);
-        ReactionRepository rRepo = mock(ReactionRepository.class);
         Executor executor = Runnable::run;
         NotificationService service = new NotificationService(nRepo, uRepo, email, push, rRepo, executor);
         org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
@@ -83,7 +80,6 @@ class NotificationServiceTest {
         ReactionRepository rRepo = mock(ReactionRepository.class);
         EmailSender email = mock(EmailSender.class);
         PushNotificationService push = mock(PushNotificationService.class);
-        ReactionRepository rRepo = mock(ReactionRepository.class);
         Executor executor = Runnable::run;
         NotificationService service = new NotificationService(nRepo, uRepo, email, push, rRepo, executor);
         org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
@@ -107,7 +103,6 @@ class NotificationServiceTest {
         ReactionRepository rRepo = mock(ReactionRepository.class);
         EmailSender email = mock(EmailSender.class);
         PushNotificationService push = mock(PushNotificationService.class);
-        ReactionRepository rRepo = mock(ReactionRepository.class);
         Executor executor = Runnable::run;
         NotificationService service = new NotificationService(nRepo, uRepo, email, push, rRepo, executor);
         org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
@@ -132,7 +127,6 @@ class NotificationServiceTest {
         ReactionRepository rRepo = mock(ReactionRepository.class);
         EmailSender email = mock(EmailSender.class);
         PushNotificationService push = mock(PushNotificationService.class);
-        ReactionRepository rRepo = mock(ReactionRepository.class);
         Executor executor = Runnable::run;
         NotificationService service = new NotificationService(nRepo, uRepo, email, push, rRepo, executor);
         org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
@@ -157,7 +151,6 @@ class NotificationServiceTest {
         ReactionRepository rRepo = mock(ReactionRepository.class);
         EmailSender email = mock(EmailSender.class);
         PushNotificationService push = mock(PushNotificationService.class);
-        ReactionRepository rRepo = mock(ReactionRepository.class);
         Executor executor = Runnable::run;
         NotificationService service = new NotificationService(nRepo, uRepo, email, push, rRepo, executor);
         org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
