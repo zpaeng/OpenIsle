@@ -9,13 +9,13 @@ import java.nio.charset.StandardCharsets;
 @Service
 public class AvatarGenerator {
 
-    @Value("${app.avatar.base-url:https://api.dicebear.com/6.x}")
+    @Value("${app.avatar.base-url}")
     private String baseUrl;
 
-    @Value("${app.avatar.style:identicon}")
+    @Value("${app.avatar.style}")
     private String style;
 
-    @Value("${app.avatar.size:64}")
+    @Value("${app.avatar.size}")
     private int size;
 
     public String generate(String seed) {

@@ -22,7 +22,7 @@ public class AdminUserController {
         User user = userRepository.findById(id).orElseThrow();
         user.setApproved(true);
         userRepository.save(user);
-        emailSender.sendEmail(user.getEmail(), "【OpenIsle】您的注册已审核通过",
+        emailSender.sendEmail(user.getEmail(), "您的注册已审核通过",
                 "🎉您的注册已经审核通过, 点击以访问网站: " + websiteUrl);
         return ResponseEntity.ok().build();
     }
@@ -32,7 +32,7 @@ public class AdminUserController {
         User user = userRepository.findById(id).orElseThrow();
         user.setApproved(false);
         userRepository.save(user);
-        emailSender.sendEmail(user.getEmail(), "【OpenIsle】您的注册已被管理员拒绝",
+        emailSender.sendEmail(user.getEmail(), "您的注册已被管理员拒绝",
                 "您的注册被管理员拒绝, 点击链接可以重新填写理由申请: " + websiteUrl);
         return ResponseEntity.ok().build();
     }

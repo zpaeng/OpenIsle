@@ -172,7 +172,7 @@ class NotificationServiceTest {
 
         service.createNotification(user, NotificationType.COMMENT_REPLY, post, comment, null, null, null, null);
 
-        verify(email).sendEmail("a@a.com", "【OpenIsle】有人回复了你", "https://ex.com/posts/1#comment-2");
+        verify(email).sendEmail("a@a.com", "有人回复了你", "https://ex.com/posts/1#comment-2");
         verify(push).sendNotification(eq(user), contains("/posts/1#comment-2"));
     }
 }
