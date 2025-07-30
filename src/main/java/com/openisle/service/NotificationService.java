@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import com.openisle.service.EmailSender;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
 
 import java.util.List;
 
@@ -21,6 +23,21 @@ public class NotificationService {
 
     @Value("${app.website-url}")
     private String websiteUrl;
+
+    private String buildPayload(String body, String url) {
+        try {
+            return new ObjectMapper().writeValueAsString(Map.of(
+                    "body", body,
+                    "url", url
+            ));
+        } catch (Exception e) {
+            return body;
+        }
+    }
+
+    public void sendCustomPush(User user, String body, String url) {
+        pushNotificationService.sendNotification(user, buildPayload(body, url));
+    }
 
     public Notification createNotification(User user, NotificationType type, Post post, Comment comment, Boolean approved) {
         return createNotification(user, type, post, comment, approved, null, null, null);
@@ -38,10 +55,16 @@ public class NotificationService {
         n.setReactionType(reactionType);
         n.setContent(content);
         n = notificationRepository.save(n);
-        pushNotificationService.sendNotification(user, "You have a new notification");
+
+        String body = "You have a new notification";
+        String url = websiteUrl + "/messages";
+        if (type == NotificationType.COMMENT_REPLY && post != null && comment != null) {
+            body = "有人回复了你";
+            url = String.format("%s/posts/%d#comment-%d", websiteUrl, post.getId(), comment.getId());
+        }
+        sendCustomPush(user, body, url);
 
         if (type == NotificationType.COMMENT_REPLY && user.getEmail() != null && post != null && comment != null) {
-            String url = String.format("%s/posts/%d#comment-%d", websiteUrl, post.getId(), comment.getId());
             emailSender.sendEmail(user.getEmail(), "【OpenIsle】有人回复了你", url);
         }
 

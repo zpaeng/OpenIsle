@@ -3,6 +3,7 @@ package com.openisle.service;
 import com.openisle.model.*;
 import com.openisle.repository.NotificationRepository;
 import com.openisle.repository.UserRepository;
+import com.openisle.service.PushNotificationService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -19,7 +20,8 @@ class NotificationServiceTest {
         NotificationRepository nRepo = mock(NotificationRepository.class);
         UserRepository uRepo = mock(UserRepository.class);
         EmailSender email = mock(EmailSender.class);
-        NotificationService service = new NotificationService(nRepo, uRepo, email);
+        PushNotificationService push = mock(PushNotificationService.class);
+        NotificationService service = new NotificationService(nRepo, uRepo, email, push);
         org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
 
         User user = new User();
@@ -47,7 +49,8 @@ class NotificationServiceTest {
         NotificationRepository nRepo = mock(NotificationRepository.class);
         UserRepository uRepo = mock(UserRepository.class);
         EmailSender email = mock(EmailSender.class);
-        NotificationService service = new NotificationService(nRepo, uRepo, email);
+        PushNotificationService push = mock(PushNotificationService.class);
+        NotificationService service = new NotificationService(nRepo, uRepo, email, push);
         org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
 
         User user = new User();
@@ -69,7 +72,8 @@ class NotificationServiceTest {
         NotificationRepository nRepo = mock(NotificationRepository.class);
         UserRepository uRepo = mock(UserRepository.class);
         EmailSender email = mock(EmailSender.class);
-        NotificationService service = new NotificationService(nRepo, uRepo, email);
+        PushNotificationService push = mock(PushNotificationService.class);
+        NotificationService service = new NotificationService(nRepo, uRepo, email, push);
         org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
 
         User user = new User();
@@ -89,7 +93,8 @@ class NotificationServiceTest {
         NotificationRepository nRepo = mock(NotificationRepository.class);
         UserRepository uRepo = mock(UserRepository.class);
         EmailSender email = mock(EmailSender.class);
-        NotificationService service = new NotificationService(nRepo, uRepo, email);
+        PushNotificationService push = mock(PushNotificationService.class);
+        NotificationService service = new NotificationService(nRepo, uRepo, email, push);
         org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
 
         User admin = new User();
@@ -110,7 +115,8 @@ class NotificationServiceTest {
         NotificationRepository nRepo = mock(NotificationRepository.class);
         UserRepository uRepo = mock(UserRepository.class);
         EmailSender email = mock(EmailSender.class);
-        NotificationService service = new NotificationService(nRepo, uRepo, email);
+        PushNotificationService push = mock(PushNotificationService.class);
+        NotificationService service = new NotificationService(nRepo, uRepo, email, push);
         org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
 
         User admin = new User();
@@ -131,7 +137,8 @@ class NotificationServiceTest {
         NotificationRepository nRepo = mock(NotificationRepository.class);
         UserRepository uRepo = mock(UserRepository.class);
         EmailSender email = mock(EmailSender.class);
-        NotificationService service = new NotificationService(nRepo, uRepo, email);
+        PushNotificationService push = mock(PushNotificationService.class);
+        NotificationService service = new NotificationService(nRepo, uRepo, email, push);
         org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
 
         User user = new User();
@@ -145,5 +152,6 @@ class NotificationServiceTest {
         service.createNotification(user, NotificationType.COMMENT_REPLY, post, comment, null, null, null, null);
 
         verify(email).sendEmail("a@a.com", "【OpenIsle】有人回复了你", "https://ex.com/posts/1#comment-2");
+        verify(push).sendNotification(eq(user), contains("/posts/1#comment-2"));
     }
 }
