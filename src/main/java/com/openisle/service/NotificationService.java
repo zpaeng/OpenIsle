@@ -2,6 +2,7 @@ package com.openisle.service;
 
 import com.openisle.model.*;
 import com.openisle.repository.NotificationRepository;
+import com.openisle.repository.ReactionRepository;
 import com.openisle.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import com.openisle.service.EmailSender;
@@ -20,6 +21,7 @@ public class NotificationService {
     private final UserRepository userRepository;
     private final EmailSender emailSender;
     private final PushNotificationService pushNotificationService;
+    private final ReactionRepository reactionRepository;
 
     @Value("${app.website-url}")
     private String websiteUrl;
@@ -56,16 +58,28 @@ public class NotificationService {
         n.setContent(content);
         n = notificationRepository.save(n);
 
-        String body = "You have a new notification";
-        String url = websiteUrl + "/messages";
-        if (type == NotificationType.COMMENT_REPLY && post != null && comment != null) {
-            body = "有人回复了你";
-            url = String.format("%s/posts/%d#comment-%d", websiteUrl, post.getId(), comment.getId());
-        }
-        sendCustomPush(user, body, url);
-
         if (type == NotificationType.COMMENT_REPLY && user.getEmail() != null && post != null && comment != null) {
+            String url = String.format("%s/posts/%d#comment-%d", websiteUrl, post.getId(), comment.getId());
             emailSender.sendEmail(user.getEmail(), "【OpenIsle】有人回复了你", url);
+            sendCustomPush(user, "有人回复了你", url);
+        } else if (type == NotificationType.REACTION && comment != null) {
+            long count = reactionRepository.countReceived(comment.getAuthor().getUsername());
+            if (count % 5 == 0) {
+                String url = websiteUrl + "/messages";
+                sendCustomPush(comment.getAuthor(), "你有新的互动", url);
+                if (comment.getAuthor().getEmail() != null) {
+                    emailSender.sendEmail(comment.getAuthor().getEmail(), "【OpenIsle】你有新的互动", url);
+                }
+            }
+        } else if (type == NotificationType.REACTION && post != null) {
+            long count = reactionRepository.countReceived(post.getAuthor().getUsername());
+            if (count % 5 == 0) {
+                String url = websiteUrl + "/messages";
+                sendCustomPush(post.getAuthor(), "你有新的互动", url);
+                if (post.getAuthor().getEmail() != null) {
+                    emailSender.sendEmail(post.getAuthor().getEmail(), "【OpenIsle】你有新的互动", url);
+                }
+            }
         }
 
         return n;

@@ -47,14 +47,6 @@ public class ReactionService {
         reaction = reactionRepository.save(reaction);
         if (!user.getId().equals(post.getAuthor().getId())) {
             notificationService.createNotification(post.getAuthor(), NotificationType.REACTION, post, null, null, user, type, null);
-            long count = reactionRepository.countReceived(post.getAuthor().getUsername());
-            if (count % 5 == 0) {
-                String url = websiteUrl + "/messages";
-                notificationService.sendCustomPush(post.getAuthor(), "你有新的互动", url);
-                if (post.getAuthor().getEmail() != null) {
-                    emailSender.sendEmail(post.getAuthor().getEmail(), "【OpenIsle】你有新的互动", url);
-                }
-            }
         }
         return reaction;
     }
@@ -78,14 +70,6 @@ public class ReactionService {
         reaction = reactionRepository.save(reaction);
         if (!user.getId().equals(comment.getAuthor().getId())) {
             notificationService.createNotification(comment.getAuthor(), NotificationType.REACTION, comment.getPost(), comment, null, user, type, null);
-            long count = reactionRepository.countReceived(comment.getAuthor().getUsername());
-            if (count % 5 == 0) {
-                String url = websiteUrl + "/messages";
-                notificationService.sendCustomPush(comment.getAuthor(), "你有新的互动", url);
-                if (comment.getAuthor().getEmail() != null) {
-                    emailSender.sendEmail(comment.getAuthor().getEmail(), "【OpenIsle】你有新的互动", url);
-                }
-            }
         }
         return reaction;
     }
