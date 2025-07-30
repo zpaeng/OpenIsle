@@ -3,6 +3,7 @@ package com.openisle.service;
 import com.openisle.model.*;
 import com.openisle.repository.NotificationRepository;
 import com.openisle.repository.UserRepository;
+import com.openisle.repository.ReactionRepository;
 import com.openisle.service.PushNotificationService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -19,9 +20,10 @@ class NotificationServiceTest {
     void markReadUpdatesOnlyOwnedNotifications() {
         NotificationRepository nRepo = mock(NotificationRepository.class);
         UserRepository uRepo = mock(UserRepository.class);
+        ReactionRepository rRepo = mock(ReactionRepository.class);
         EmailSender email = mock(EmailSender.class);
         PushNotificationService push = mock(PushNotificationService.class);
-        NotificationService service = new NotificationService(nRepo, uRepo, email, push);
+        NotificationService service = new NotificationService(nRepo, uRepo, email, push, rRepo);
         org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
 
         User user = new User();
@@ -48,9 +50,10 @@ class NotificationServiceTest {
     void listNotificationsWithoutFilter() {
         NotificationRepository nRepo = mock(NotificationRepository.class);
         UserRepository uRepo = mock(UserRepository.class);
+        ReactionRepository rRepo = mock(ReactionRepository.class);
         EmailSender email = mock(EmailSender.class);
         PushNotificationService push = mock(PushNotificationService.class);
-        NotificationService service = new NotificationService(nRepo, uRepo, email, push);
+        NotificationService service = new NotificationService(nRepo, uRepo, email, push, rRepo);
         org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
 
         User user = new User();
@@ -71,9 +74,10 @@ class NotificationServiceTest {
     void countUnreadReturnsRepositoryValue() {
         NotificationRepository nRepo = mock(NotificationRepository.class);
         UserRepository uRepo = mock(UserRepository.class);
+        ReactionRepository rRepo = mock(ReactionRepository.class);
         EmailSender email = mock(EmailSender.class);
         PushNotificationService push = mock(PushNotificationService.class);
-        NotificationService service = new NotificationService(nRepo, uRepo, email, push);
+        NotificationService service = new NotificationService(nRepo, uRepo, email, push, rRepo);
         org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
 
         User user = new User();
@@ -92,9 +96,10 @@ class NotificationServiceTest {
     void createRegisterRequestNotificationsDeletesOldOnes() {
         NotificationRepository nRepo = mock(NotificationRepository.class);
         UserRepository uRepo = mock(UserRepository.class);
+        ReactionRepository rRepo = mock(ReactionRepository.class);
         EmailSender email = mock(EmailSender.class);
         PushNotificationService push = mock(PushNotificationService.class);
-        NotificationService service = new NotificationService(nRepo, uRepo, email, push);
+        NotificationService service = new NotificationService(nRepo, uRepo, email, push, rRepo);
         org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
 
         User admin = new User();
@@ -114,9 +119,10 @@ class NotificationServiceTest {
     void createActivityRedeemNotificationsDeletesOldOnes() {
         NotificationRepository nRepo = mock(NotificationRepository.class);
         UserRepository uRepo = mock(UserRepository.class);
+        ReactionRepository rRepo = mock(ReactionRepository.class);
         EmailSender email = mock(EmailSender.class);
         PushNotificationService push = mock(PushNotificationService.class);
-        NotificationService service = new NotificationService(nRepo, uRepo, email, push);
+        NotificationService service = new NotificationService(nRepo, uRepo, email, push, rRepo);
         org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
 
         User admin = new User();
@@ -136,9 +142,10 @@ class NotificationServiceTest {
     void createNotificationSendsEmailForCommentReply() {
         NotificationRepository nRepo = mock(NotificationRepository.class);
         UserRepository uRepo = mock(UserRepository.class);
+        ReactionRepository rRepo = mock(ReactionRepository.class);
         EmailSender email = mock(EmailSender.class);
         PushNotificationService push = mock(PushNotificationService.class);
-        NotificationService service = new NotificationService(nRepo, uRepo, email, push);
+        NotificationService service = new NotificationService(nRepo, uRepo, email, push, rRepo);
         org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
 
         User user = new User();
