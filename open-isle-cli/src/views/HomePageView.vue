@@ -440,7 +440,7 @@ export default {
 .topic-container {
   position: sticky;
   top: 1px;
-  z-index: 1000;
+  z-index: 10;
   background-color: var(--background-color-blur);
   backdrop-filter: blur(10px);
   display: flex;
