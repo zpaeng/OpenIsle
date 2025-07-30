@@ -53,33 +53,35 @@
         </div>
       </template>
     </div>
-    <div v-if="open && isMobile" class="dropdown-mobile-page">
-      <div class="dropdown-mobile-header">
-        <i class="fas fa-arrow-left" @click="close"></i>
-        <span class="mobile-title">{{ placeholder }}</span>
-      </div>
-      <div class="dropdown-mobile-menu">
-        <div v-if="showSearch" class="dropdown-search">
-          <i class="fas fa-search search-icon"></i>
-          <input type="text" v-model="search" placeholder="搜索" />
+    <Teleport to="body">
+      <div v-if="open && isMobile" class="dropdown-mobile-page">
+        <div class="dropdown-mobile-header">
+          <i class="fas fa-arrow-left" @click="close"></i>
+          <span class="mobile-title">{{ placeholder }}</span>
         </div>
-        <div v-if="loading" class="dropdown-loading">
-          <l-hatch size="20" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
-        </div>
-        <template v-else>
-          <div v-for="o in filteredOptions" :key="o.id" @click="select(o.id)"
-            :class="['dropdown-option', optionClass, { 'selected': isSelected(o.id) }]">
-            <slot name="option" :option="o" :isSelected="isSelected(o.id)">
-              <template v-if="o.icon">
-                <img v-if="isImageIcon(o.icon)" :src="o.icon" class="option-icon" />
-                <i v-else :class="['option-icon', o.icon]"></i>
-              </template>
-              <span>{{ o.name }}</span>
-            </slot>
+        <div class="dropdown-mobile-menu">
+          <div v-if="showSearch" class="dropdown-search">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" v-model="search" placeholder="搜索" />
           </div>
-        </template>
+          <div v-if="loading" class="dropdown-loading">
+            <l-hatch size="20" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+          </div>
+          <template v-else>
+            <div v-for="o in filteredOptions" :key="o.id" @click="select(o.id)"
+              :class="['dropdown-option', optionClass, { 'selected': isSelected(o.id) }]">
+              <slot name="option" :option="o" :isSelected="isSelected(o.id)">
+                <template v-if="o.icon">
+                  <img v-if="isImageIcon(o.icon)" :src="o.icon" class="option-icon" />
+                  <i v-else :class="['option-icon', o.icon]"></i>
+                </template>
+                <span>{{ o.name }}</span>
+              </slot>
+            </div>
+          </template>
+        </div>
       </div>
-    </div>
+    </Teleport>
   </div>
 </template>
 
