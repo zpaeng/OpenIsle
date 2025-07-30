@@ -4,6 +4,8 @@ import com.openisle.model.*;
 import com.openisle.repository.NotificationRepository;
 import com.openisle.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import com.openisle.service.EmailSender;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +16,11 @@ import java.util.List;
 public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final EmailSender emailSender;
     private final PushNotificationService pushNotificationService;
+
+    @Value("${app.website-url}")
+    private String websiteUrl;
 
     public Notification createNotification(User user, NotificationType type, Post post, Comment comment, Boolean approved) {
         return createNotification(user, type, post, comment, approved, null, null, null);
@@ -31,9 +37,15 @@ public class NotificationService {
         n.setFromUser(fromUser);
         n.setReactionType(reactionType);
         n.setContent(content);
-        Notification saved = notificationRepository.save(n);
+        n = notificationRepository.save(n);
         pushNotificationService.sendNotification(user, "You have a new notification");
-        return saved;
+
+        if (type == NotificationType.COMMENT_REPLY && user.getEmail() != null && post != null && comment != null) {
+            String url = String.format("%s/posts/%d#comment-%d", websiteUrl, post.getId(), comment.getId());
+            emailSender.sendEmail(user.getEmail(), "【OpenIsle】有人回复了你", url);
+        }
+
+        return n;
     }
 
     /**
