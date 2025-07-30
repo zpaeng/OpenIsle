@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://your-domain.com/</loc>
+  </url>
+  <url>
+    <loc>https://your-domain.com/about</loc>
+  </url>
+  <url>
+    <loc>https://your-domain.com/about/stats</loc>
+  </url>
+  <url>
+    <loc>https://your-domain.com/activities</loc>
+  </url>
+  <url>
+    <loc>https://your-domain.com/message</loc>
+  </url>
+</urlset>
