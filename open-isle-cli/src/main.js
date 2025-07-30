@@ -13,14 +13,14 @@ import { initTheme } from './utils/theme'
 import { loginWithGoogle } from './utils/google'
 
 // Configurable API domain and port
-export const API_DOMAIN = 'http://127.0.0.1'
-export const API_PORT = 8081
+// export const API_DOMAIN = 'http://127.0.0.1'
+// export const API_PORT = 8081
 
-// export const API_DOMAIN = 'http://47.82.99.208'
-// export const API_PORT = 8080
+export const API_DOMAIN = 'http://47.82.99.208'
+export const API_PORT = 8080
 
-export const API_BASE_URL = API_PORT ? `${API_DOMAIN}:${API_PORT}` : API_DOMAIN
-// export const API_BASE_URL = "";
+// export const API_BASE_URL = API_PORT ? `${API_DOMAIN}:${API_PORT}` : API_DOMAIN
+export const API_BASE_URL = "";
 export const GOOGLE_CLIENT_ID = '777830451304-nt8afkkap18gui4f9entcha99unal744.apps.googleusercontent.com'
 export const GITHUB_CLIENT_ID = 'Ov23liVkO1NPAX5JyWxJ'
 export const DISCORD_CLIENT_ID = '1394985417044000779'
