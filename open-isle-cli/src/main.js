@@ -11,6 +11,7 @@ import { useToast } from 'vue-toastification'
 import { checkToken, clearToken, isLogin } from './utils/auth'
 import { initTheme } from './utils/theme'
 import { loginWithGoogle } from './utils/google'
+import { registerPush } from './utils/push'
 
 // Configurable API domain and port
 // export const API_DOMAIN = 'http://127.0.0.1'
@@ -43,6 +44,7 @@ app.use(
 )
 
 app.mount('#app')
+registerPush()
 
 checkToken().then(valid => {
   if (!valid) {

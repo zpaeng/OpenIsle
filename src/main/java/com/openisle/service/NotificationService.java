@@ -14,6 +14,7 @@ import java.util.List;
 public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final PushNotificationService pushNotificationService;
 
     public Notification createNotification(User user, NotificationType type, Post post, Comment comment, Boolean approved) {
         return createNotification(user, type, post, comment, approved, null, null, null);
@@ -30,7 +31,9 @@ public class NotificationService {
         n.setFromUser(fromUser);
         n.setReactionType(reactionType);
         n.setContent(content);
-        return notificationRepository.save(n);
+        Notification saved = notificationRepository.save(n);
+        pushNotificationService.sendNotification(user, "You have a new notification");
+        return saved;
     }
 
     /**
