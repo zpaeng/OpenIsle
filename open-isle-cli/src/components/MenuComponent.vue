@@ -76,7 +76,10 @@
               <img v-if="isImageIcon(c.smallIcon || c.icon)" :src="c.smallIcon || c.icon" class="section-item-icon" :alt="c.name" />
               <i v-else :class="['section-item-icon', c.smallIcon || c.icon]"></i>
             </template>
-            <span class="section-item-text">{{ c.name }}</span>
+            <span class="section-item-text">
+              {{ c.name }}
+              <span class="section-item-text-count" v-if="c.count >= 0">x {{ c.count }}</span>
+            </span>
           </div>
         </div>
       </div>
