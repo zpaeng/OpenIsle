@@ -37,7 +37,8 @@ export function createVditor(editorId, options = {}) {
     return searchUsers(value)
   }
 
-  return new Vditor(editorId, {
+  let vditor
+  vditor = new Vditor(editorId, {
     placeholder,
     height: 'auto',
     theme: getEditorTheme(),
@@ -87,11 +88,20 @@ export function createVditor(editorId, options = {}) {
         const info = await res.json()
         const put = await fetch(info.uploadUrl, { method: 'PUT', body: file })
         if (!put.ok) return '上传失败'
-        return JSON.stringify({
-          code: 0,
-          msg: '',
-          data: { errFiles: [], succMap: { [file.name]: info.fileUrl } }
-        })
+
+        const ext = file.name.split('.').pop().toLowerCase()
+        const imageExts = ['apng','bmp','gif','ico','cur','jpg','jpeg','jfif','pjp','pjpeg','png','svg','webp']
+        const audioExts = ['wav','mp3','ogg']
+        let md
+        if (imageExts.includes(ext)) {
+          md = `![${file.name}](${info.fileUrl})`
+        } else if (audioExts.includes(ext)) {
+          md = `<audio controls="controls" src="${info.fileUrl}"></audio>`
+        } else {
+          md = `[${file.name}](${info.fileUrl})`
+        }
+        vditor.insertValue(md + '\n')
+        return null
       }
     },
     // upload: {
@@ -125,4 +135,5 @@ export function createVditor(editorId, options = {}) {
     input,
     after
   })
+  return vditor
 }
