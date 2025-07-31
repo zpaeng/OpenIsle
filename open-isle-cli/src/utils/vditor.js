@@ -162,27 +162,32 @@ export function createVditor(editorId, options = {}) {
     input,
     after
   })
-  const container = document.getElementById(editorId)
-  if (container) {
-    container.addEventListener('paste', async (e) => {
-      const items = e.clipboardData && e.clipboardData.items
-      if (!items) return
-      const files = []
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i]
-        if (item.kind === 'file') {
-          const file = item.getAsFile()
-          if (file) files.push(file)
-        }
+  const pasteHandler = async (e) => {
+    const items = e.clipboardData && e.clipboardData.items
+    if (!items) return
+    const files = []
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i]
+      if (item.kind === 'file') {
+        const file = item.getAsFile()
+        if (file) files.push(file)
       }
-      if (files.length > 0) {
-        e.preventDefault()
-        const err = await vditor.options.upload.handler(files)
-        if (typeof err === 'string') {
-          vditor.tip(err)
-        }
+    }
+    if (files.length > 0) {
+      e.preventDefault()
+      const err = await vditor.options.upload.handler(files)
+      if (typeof err === 'string') {
+        vditor.tip(err)
       }
-    })
+    }
   }
+
+  const elements = []
+  if (vditor.wysiwyg) elements.push(vditor.wysiwyg.element)
+  if (vditor.ir) elements.push(vditor.ir.element)
+  if (vditor.sv) elements.push(vditor.sv.element)
+  elements.forEach(el => {
+    el.addEventListener('paste', pasteHandler)
+  })
   return vditor
 }
