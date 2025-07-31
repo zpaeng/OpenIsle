@@ -43,14 +43,18 @@ export function createVditor(editorId, options = {}) {
     theme: getEditorTheme(),
     preview: Object.assign({ theme: { current: getPreviewTheme() } }, preview),
     hint: {
-      delay: 200,
-      at: async (value) => {
-        const list = await fetchMentions(value)
-        return list.map(u => ({
-          value: u.username,
-          html: `<span>@${u.username}</span>`
-        }))
-      }
+      extend: [
+        {
+          key: '@',
+          hint: async (key) => {
+            const list = await fetchMentions(key)
+            return list.map(u => ({
+              value: `@[${u.username}]`,
+              html: `<img src="${u.avatar}" /> @${u.username}`
+            }))
+          },
+        },
+      ],
     },
     cdn: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/vditor',
     toolbar: [
