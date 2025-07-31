@@ -33,7 +33,7 @@ public class NotificationService {
     @Value("${app.website-url}")
     private String websiteUrl;
 
-    private static final Pattern MENTION_PATTERN = Pattern.compile("@([A-Za-z0-9_]+)");
+    private static final Pattern MENTION_PATTERN = Pattern.compile("@\\[([^\\]]+)\\]");
 
     private String buildPayload(String body, String url) {
 //        try {
