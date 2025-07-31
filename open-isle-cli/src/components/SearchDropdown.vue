@@ -74,7 +74,9 @@ export default {
     const iconMap = {
       user: 'fas fa-user',
       post: 'fas fa-file-alt',
-      comment: 'fas fa-comment'
+      comment: 'fas fa-comment',
+      category: 'fas fa-folder',
+      tag: 'fas fa-hashtag'
     }
 
     watch(selected, val => {
@@ -89,6 +91,10 @@ export default {
         if (opt.postId) {
           router.push(`/posts/${opt.postId}#comment-${opt.id}`)
         }
+      } else if (opt.type === 'category') {
+        router.push({ path: '/', query: { category: opt.id } })
+      } else if (opt.type === 'tag') {
+        router.push({ path: '/', query: { tags: opt.id } })
       }
       selected.value = null
       keyword.value = ''
