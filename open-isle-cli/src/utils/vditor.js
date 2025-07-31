@@ -81,17 +81,42 @@ export function createVditor(editorId, options = {}) {
       multiple: false,
       handler: async (files) => {
         const file = files[0]
-        const res = await fetch(`${API_BASE_URL}/api/upload/presign?filename=${encodeURIComponent(file.name)}`, {
-          headers: { Authorization: `Bearer ${getToken()}` }
-        })
-        if (!res.ok) return '获取上传地址失败'
+        vditor.tip.show('图片上传中', 0)
+        vditor.disabled()
+        const res = await fetch(
+          `${API_BASE_URL}/api/upload/presign?filename=${encodeURIComponent(file.name)}`,
+          { headers: { Authorization: `Bearer ${getToken()}` } }
+        )
+        if (!res.ok) {
+          vditor.enable()
+          vditor.tip.hide()
+          return '获取上传地址失败'
+        }
         const info = await res.json()
         const put = await fetch(info.uploadUrl, { method: 'PUT', body: file })
-        if (!put.ok) return '上传失败'
+        if (!put.ok) {
+          vditor.enable()
+          vditor.tip.hide()
+          return '上传失败'
+        }
 
         const ext = file.name.split('.').pop().toLowerCase()
-        const imageExts = ['apng','bmp','gif','ico','cur','jpg','jpeg','jfif','pjp','pjpeg','png','svg','webp']
-        const audioExts = ['wav','mp3','ogg']
+        const imageExts = [
+          'apng',
+          'bmp',
+          'gif',
+          'ico',
+          'cur',
+          'jpg',
+          'jpeg',
+          'jfif',
+          'pjp',
+          'pjpeg',
+          'png',
+          'svg',
+          'webp'
+        ]
+        const audioExts = ['wav', 'mp3', 'ogg']
         let md
         if (imageExts.includes(ext)) {
           md = `![${file.name}](${info.fileUrl})`
@@ -101,6 +126,8 @@ export function createVditor(editorId, options = {}) {
           md = `[${file.name}](${info.fileUrl})`
         }
         vditor.insertValue(md + '\n')
+        vditor.enable()
+        vditor.tip.hide()
         return null
       }
     },
