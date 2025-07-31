@@ -151,13 +151,13 @@ export default {
     const tagOptions = ref([])
     const categoryOptions = ref([])
     const isLoadingPosts = ref(false)
-    const topics = ref(['最新', '最新回复', '排行榜' /*, '热门', '类别'*/])
+    const topics = ref(['最新回复', '最新', '排行榜' /*, '热门', '类别'*/])
     const selectedTopic = ref(
       route.query.view === 'ranking'
         ? '排行榜'
-        : route.query.view === 'latest-reply'
-          ? '最新回复'
-          : '最新'
+        : route.query.view === 'latest'
+          ? '最新'
+          : '最新回复'
     )
 
     const articles = ref([])
