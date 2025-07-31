@@ -11,6 +11,11 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+import java.util.Set;
+import java.util.HashSet;
+
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -27,6 +32,8 @@ public class NotificationService {
 
     @Value("${app.website-url}")
     private String websiteUrl;
+
+    private static final Pattern MENTION_PATTERN = Pattern.compile("@\\[([^\\]]+)\\]");
 
     private String buildPayload(String body, String url) {
 //        try {
@@ -143,5 +150,23 @@ public class NotificationService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         return notificationRepository.countByUserAndRead(user, false);
+    }
+
+    public void notifyMentions(String content, User fromUser, Post post, Comment comment) {
+        if (content == null || fromUser == null) {
+            return;
+        }
+        Matcher matcher = MENTION_PATTERN.matcher(content);
+        Set<String> names = new HashSet<>();
+        while (matcher.find()) {
+            names.add(matcher.group(1));
+        }
+        for (String name : names) {
+            userRepository.findByUsername(name).ifPresent(target -> {
+                if (!target.getId().equals(fromUser.getId())) {
+                    createNotification(target, NotificationType.MENTION, post, comment, null, fromUser, null, null);
+                }
+            });
+        }
     }
 }

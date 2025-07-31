@@ -139,6 +139,7 @@ public class PostService {
                         null);
             }
         }
+        notificationService.notifyMentions(content, author, post, null);
         return post;
     }
 
@@ -407,6 +408,7 @@ public class PostService {
         post.setTags(new java.util.HashSet<>(tags));
         Post updated = postRepository.save(post);
         imageUploader.adjustReferences(oldContent, content);
+        notificationService.notifyMentions(content, user, updated, null);
         return updated;
     }
 

@@ -3,6 +3,30 @@ import hljs from 'highlight.js'
 import 'highlight.js/styles/github.css'
 import { toast } from '../main'
 
+function mentionPlugin(md) {
+  const mentionReg = /^@\[([^\]]+)\]/
+  function mention(state, silent) {
+    const pos = state.pos
+    if (state.src.charCodeAt(pos) !== 0x40) return false
+    const match = mentionReg.exec(state.src.slice(pos))
+    if (!match) return false
+    if (!silent) {
+      const tokenOpen = state.push('link_open', 'a', 1)
+      tokenOpen.attrs = [
+        ['href', `/users/${match[1]}`],
+        ['target', '_blank'],
+        ['class', 'mention-link']
+      ]
+      const text = state.push('text', '', 0)
+      text.content = `@${match[1]}`
+      state.push('link_close', 'a', -1)
+    }
+    state.pos += match[0].length
+    return true
+  }
+  md.inline.ruler.before('emphasis', 'mention', mention)
+}
+
 const md = new MarkdownIt({
   html: false,
   linkify: true,
@@ -17,6 +41,8 @@ const md = new MarkdownIt({
     return `<pre class="code-block"><button class="copy-code-btn">Copy</button><code class="hljs language-${lang || ''}">${code}</code></pre>`
   }
 })
+
+md.use(mentionPlugin)
 
 export function renderMarkdown(text) {
   return md.render(text || '')

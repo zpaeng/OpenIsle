@@ -185,4 +185,11 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(newPassword));
         return userRepository.save(user);
     }
+
+    /**
+     * Get all administrator accounts.
+     */
+    public java.util.List<User> getAdmins() {
+        return userRepository.findByRole(Role.ADMIN);
+    }
 }

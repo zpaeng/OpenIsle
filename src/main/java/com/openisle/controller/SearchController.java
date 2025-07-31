@@ -68,6 +68,7 @@ public class SearchController {
         UserDto dto = new UserDto();
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
+        dto.setAvatar(user.getAvatar());
         return dto;
     }
 
@@ -82,6 +83,7 @@ public class SearchController {
     private static class UserDto {
         private Long id;
         private String username;
+        private String avatar;
     }
 
     @Data

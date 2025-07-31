@@ -147,6 +147,29 @@
                   </router-link>
                 </NotificationContainer>
               </template>
+              <template v-else-if="item.type === 'MENTION' && item.comment">
+                <NotificationContainer :item="item" :markRead="markRead">
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
+                    {{ item.fromUser.username }}
+                  </router-link>
+                  在评论中提到了你：
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
+                    {{ sanitizeDescription(item.comment.content) }}
+                  </router-link>
+                </NotificationContainer>
+              </template>
+              <template v-else-if="item.type === 'MENTION'">
+                <NotificationContainer :item="item" :markRead="markRead">
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
+                    {{ item.fromUser.username }}
+                  </router-link>
+                  在帖子
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                    {{ sanitizeDescription(item.post.title) }}
+                  </router-link>
+                  中提到了你
+                </NotificationContainer>
+              </template>
               <template v-else-if="item.type === 'USER_FOLLOWED'">
                 <NotificationContainer :item="item" :markRead="markRead">
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
@@ -327,7 +350,8 @@ export default {
       POST_SUBSCRIBED: 'fas fa-bookmark',
       POST_UNSUBSCRIBED: 'fas fa-bookmark',
       REGISTER_REQUEST: 'fas fa-user-clock',
-      ACTIVITY_REDEEM: 'fas fa-coffee'
+      ACTIVITY_REDEEM: 'fas fa-coffee',
+      MENTION: 'fas fa-at'
     }
 
     const reactionEmojiMap = {
@@ -414,6 +438,17 @@ export default {
               iconClick: () => {
                 markRead(n.id)
                 router.push(`/users/${n.comment.author.id}`)
+              }
+            })
+          } else if (n.type === 'MENTION') {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+              iconClick: () => {
+                if (n.fromUser) {
+                  markRead(n.id)
+                  router.push(`/users/${n.fromUser.id}`)
+                }
               }
             })
           } else if (n.type === 'USER_FOLLOWED' || n.type === 'USER_UNFOLLOWED') {
@@ -535,6 +570,8 @@ export default {
           return '有人取消关注你'
         case 'USER_ACTIVITY':
           return '关注的用户有新动态'
+        case 'MENTION':
+          return '有人提到了你'
         default:
           return t
       }
