@@ -31,5 +31,7 @@ public enum NotificationType {
     /** A user requested registration approval */
     REGISTER_REQUEST,
     /** A user redeemed an activity reward */
-    ACTIVITY_REDEEM
+    ACTIVITY_REDEEM,
+    /** You were mentioned in a post or comment */
+    MENTION
 }

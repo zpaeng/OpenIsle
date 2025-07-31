@@ -64,6 +64,7 @@ public class CommentService {
                 notificationService.createNotification(u, NotificationType.USER_ACTIVITY, post, comment, null, null, null, null);
             }
         }
+        notificationService.notifyMentions(content, author, post, comment);
         return comment;
     }
 
@@ -102,6 +103,7 @@ public class CommentService {
                 notificationService.createNotification(u, NotificationType.USER_ACTIVITY, parent.getPost(), comment, null, null, null, null);
             }
         }
+        notificationService.notifyMentions(content, author, parent.getPost(), comment);
         return comment;
     }
 

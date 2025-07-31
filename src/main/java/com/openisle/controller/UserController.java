@@ -196,6 +196,16 @@ public class UserController {
                 .collect(java.util.stream.Collectors.toList());
     }
 
+    /**
+     * List all administrator users.
+     */
+    @GetMapping("/admins")
+    public java.util.List<UserDto> admins() {
+        return userService.getAdmins().stream()
+                .map(this::toDto)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
     @GetMapping("/{identifier}/all")
     public ResponseEntity<UserAggregateDto> userAggregate(@PathVariable("identifier") String identifier,
                                                           @RequestParam(value = "postsLimit", required = false) Integer postsLimit,

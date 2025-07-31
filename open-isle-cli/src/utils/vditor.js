@@ -1,7 +1,8 @@
 import Vditor from 'vditor'
 import 'vditor/dist/index.css'
 import { API_BASE_URL } from '../main'
-import { getToken } from './auth'
+import { getToken, authState } from './auth'
+import { searchUsers, fetchFollowings, fetchAdmins } from './user'
 
 export function getEditorTheme() {
   return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'classic'
@@ -19,11 +20,38 @@ export function createVditor(editorId, options = {}) {
     after
   } = options
 
+  const fetchMentions = async (value) => {
+    if (!value) {
+      const [followings, admins] = await Promise.all([
+        fetchFollowings(authState.username),
+        fetchAdmins()
+      ])
+      const combined = [...followings, ...admins]
+      const seen = new Set()
+      return combined.filter(u => {
+        if (seen.has(u.id)) return false
+        seen.add(u.id)
+        return true
+      })
+    }
+    return searchUsers(value)
+  }
+
   return new Vditor(editorId, {
     placeholder,
     height: 'auto',
     theme: getEditorTheme(),
     preview: Object.assign({ theme: { current: getPreviewTheme() } }, preview),
+    hint: {
+      delay: 200,
+      at: async (value) => {
+        const list = await fetchMentions(value)
+        return list.map(u => ({
+          value: u.username,
+          html: `<span>@${u.username}</span>`
+        }))
+      }
+    },
     cdn: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/vditor',
     toolbar: [
       'emoji',
