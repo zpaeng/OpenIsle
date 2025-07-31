@@ -5,6 +5,8 @@ import com.openisle.model.PostStatus;
 import com.openisle.repository.CommentRepository;
 import com.openisle.repository.PostRepository;
 import com.openisle.repository.UserRepository;
+import com.openisle.repository.CategoryRepository;
+import com.openisle.repository.TagRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -19,7 +21,9 @@ class SearchServiceTest {
         UserRepository userRepo = Mockito.mock(UserRepository.class);
         PostRepository postRepo = Mockito.mock(PostRepository.class);
         CommentRepository commentRepo = Mockito.mock(CommentRepository.class);
-        SearchService service = new SearchService(userRepo, postRepo, commentRepo);
+        CategoryRepository categoryRepo = Mockito.mock(CategoryRepository.class);
+        TagRepository tagRepo = Mockito.mock(TagRepository.class);
+        SearchService service = new SearchService(userRepo, postRepo, commentRepo, categoryRepo, tagRepo);
 
         Post post1 = new Post();
         post1.setId(1L);
