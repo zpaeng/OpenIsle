@@ -76,29 +76,22 @@ export function createVditor(editorId, options = {}) {
       'upload'
     ],
     upload: {
-      fieldName: 'file',
-      url: `${API_BASE_URL}/api/upload`,
       accept: 'image/*,video/*',
       multiple: false,
-      headers: { Authorization: `Bearer ${getToken()}` },
-      format(files, responseText) {
-        const res = JSON.parse(responseText)
-        if (res.code === 0) {
-          return JSON.stringify({
-            code: 0,
-            msg: '',
-            data: {
-              errFiles: [],
-              succMap: { [files[0].name]: res.data.url }
-            }
-          })
-        } else {
-          return JSON.stringify({
-            code: 1,
-            msg: '上传失败',
-            data: { errFiles: files.map(f => f.name), succMap: {} }
-          })
-        }
+      handler: async (files) => {
+        const file = files[0]
+        const res = await fetch(`${API_BASE_URL}/api/upload/presign?filename=${encodeURIComponent(file.name)}`, {
+          headers: { Authorization: `Bearer ${getToken()}` }
+        })
+        if (!res.ok) return '获取上传地址失败'
+        const info = await res.json()
+        const put = await fetch(info.uploadUrl, { method: 'PUT', body: file })
+        if (!put.ok) return '上传失败'
+        return JSON.stringify({
+          code: 0,
+          msg: '',
+          data: { errFiles: [], succMap: { [file.name]: info.fileUrl } }
+        })
       }
     },
     toolbarConfig: { pin: true },

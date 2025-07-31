@@ -38,6 +38,14 @@ public abstract class ImageUploader {
 
     protected abstract void deleteFromStore(String key);
 
+    /**
+     * Generate a presigned PUT URL for direct browser upload.
+     * Default implementation is unsupported.
+     */
+    public java.util.Map<String, String> presignUpload(String filename) {
+        throw new UnsupportedOperationException("presignUpload not supported");
+    }
+
     /** Extract COS URLs from text. */
     public Set<String> extractUrls(String text) {
         Set<String> set = new HashSet<>();

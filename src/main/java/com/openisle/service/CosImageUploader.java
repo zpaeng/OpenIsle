@@ -6,6 +6,8 @@ import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
+import com.qcloud.cos.http.HttpMethodName;
+import com.qcloud.cos.model.GeneratePresignedUrlRequest;
 import com.qcloud.cos.region.Region;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
@@ -97,5 +99,26 @@ public class CosImageUploader extends ImageUploader {
         } catch (Exception e) {
             logger.warn("Failed to delete image {} from COS", key, e);
         }
+    }
+
+    @Override
+    public java.util.Map<String, String> presignUpload(String filename) {
+        String ext = "";
+        int dot = filename.lastIndexOf('.');
+        if (dot != -1) {
+            ext = filename.substring(dot);
+        }
+        String randomName = java.util.UUID.randomUUID().toString().replace("-", "") + ext;
+        String objectKey = UPLOAD_DIR + randomName;
+        java.util.Date expiration = new java.util.Date(System.currentTimeMillis() + 15 * 60 * 1000L);
+        GeneratePresignedUrlRequest req = new GeneratePresignedUrlRequest(bucketName, objectKey, HttpMethodName.PUT);
+        req.setExpiration(expiration);
+        java.net.URL url = cosClient.generatePresignedUrl(req);
+        String fileUrl = baseUrl + "/" + objectKey;
+        return java.util.Map.of(
+                "uploadUrl", url.toString(),
+                "fileUrl", fileUrl,
+                "key", objectKey
+        );
     }
 }
