@@ -344,7 +344,7 @@ export default {
       }
     }
 
-    const fetchContent = (reset = false) => {
+    const fetchContent = async (reset = false) => {
       if (selectedTopic.value === '排行榜') {
           fetchRanking(reset)
         } else if (selectedTopic.value === '最新回复') {
@@ -362,8 +362,8 @@ export default {
     }
 
     onMounted(async () => {
-      await loadOptions()
       fetchContent()
+      await loadOptions()
     })
 
     watch([selectedCategory, selectedTags], () => {
