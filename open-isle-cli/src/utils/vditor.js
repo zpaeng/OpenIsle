@@ -81,7 +81,7 @@ export function createVditor(editorId, options = {}) {
       multiple: false,
       handler: async (files) => {
         const file = files[0]
-        vditor.tip.show('图片上传中', 0)
+        vditor.tip('图片上传中', 0)
         vditor.disabled()
         const res = await fetch(
           `${API_BASE_URL}/api/upload/presign?filename=${encodeURIComponent(file.name)}`,
@@ -89,14 +89,14 @@ export function createVditor(editorId, options = {}) {
         )
         if (!res.ok) {
           vditor.enable()
-          vditor.tip.hide()
+          vditor.tip('获取上传地址失败')
           return '获取上传地址失败'
         }
         const info = await res.json()
         const put = await fetch(info.uploadUrl, { method: 'PUT', body: file })
         if (!put.ok) {
           vditor.enable()
-          vditor.tip.hide()
+          vditor.tip('上传失败')
           return '上传失败'
         }
 
@@ -127,7 +127,7 @@ export function createVditor(editorId, options = {}) {
         }
         vditor.insertValue(md + '\n')
         vditor.enable()
-        vditor.tip.hide()
+        vditor.tip('上传成功')
         return null
       }
     },
