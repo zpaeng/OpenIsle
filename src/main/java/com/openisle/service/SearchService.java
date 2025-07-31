@@ -4,9 +4,13 @@ import com.openisle.model.Post;
 import com.openisle.model.PostStatus;
 import com.openisle.model.Comment;
 import com.openisle.model.User;
+import com.openisle.model.Category;
+import com.openisle.model.Tag;
 import com.openisle.repository.PostRepository;
 import com.openisle.repository.CommentRepository;
 import com.openisle.repository.UserRepository;
+import com.openisle.repository.CategoryRepository;
+import com.openisle.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +25,8 @@ public class SearchService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final CategoryRepository categoryRepository;
+    private final TagRepository tagRepository;
 
     @org.springframework.beans.factory.annotation.Value("${app.snippet-length:50}")
     private int snippetLength;
@@ -48,6 +54,14 @@ public class SearchService {
         return commentRepository.findByContentContainingIgnoreCase(keyword);
     }
 
+    public List<Category> searchCategories(String keyword) {
+        return categoryRepository.findByNameContainingIgnoreCase(keyword);
+    }
+
+    public List<Tag> searchTags(String keyword) {
+        return tagRepository.findByNameContainingIgnoreCaseAndApprovedTrue(keyword);
+    }
+
     public List<SearchResult> globalSearch(String keyword) {
         Stream<SearchResult> users = searchUsers(keyword).stream()
                 .map(u -> new SearchResult(
@@ -56,6 +70,26 @@ public class SearchService {
                         u.getUsername(),
                         u.getIntroduction(),
                         null,
+                        null
+                ));
+
+        Stream<SearchResult> categories = searchCategories(keyword).stream()
+                .map(c -> new SearchResult(
+                        "category",
+                        c.getId(),
+                        c.getName(),
+                        null,
+                        c.getDescription(),
+                        null
+                ));
+
+        Stream<SearchResult> tags = searchTags(keyword).stream()
+                .map(t -> new SearchResult(
+                        "tag",
+                        t.getId(),
+                        t.getName(),
+                        null,
+                        t.getDescription(),
                         null
                 ));
 
@@ -101,7 +135,8 @@ public class SearchService {
                         c.getPost().getId()
                 ));
 
-        return Stream.concat(Stream.concat(users, mergedPosts.stream()), comments)
+        return Stream.of(users, categories, tags, mergedPosts.stream(), comments)
+                .flatMap(s -> s)
                 .toList();
     }
 
