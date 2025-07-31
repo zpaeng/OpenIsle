@@ -115,6 +115,38 @@
                   </router-link>
                 </NotificationContainer>
               </template>
+              <template v-else-if="item.type === 'USER_ACTIVITY' && item.parentComment">
+                <NotificationContainer :item="item" :markRead="markRead">
+                  你关注的
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.comment.author.id}`">
+                    {{ item.comment.author.username }}
+                  </router-link>
+                  在 对评论
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.parentComment.id}`">
+                    {{ sanitizeDescription(item.parentComment.content) }}
+                  </router-link>
+                  回复了
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
+                    {{ sanitizeDescription(item.comment.content) }}
+                  </router-link>
+                </NotificationContainer>
+              </template>
+              <template v-else-if="item.type === 'USER_ACTIVITY'">
+                <NotificationContainer :item="item" :markRead="markRead">
+                  你关注的
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.comment.author.id}`">
+                    {{ item.comment.author.username }}
+                  </router-link>
+                  在文章
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
+                    {{ sanitizeDescription(item.post.title) }}
+                  </router-link>
+                  下面评论了
+                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
+                    {{ sanitizeDescription(item.comment.content) }}
+                  </router-link>
+                </NotificationContainer>
+              </template>
               <template v-else-if="item.type === 'USER_FOLLOWED'">
                 <NotificationContainer :item="item" :markRead="markRead">
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.fromUser.id}`">
@@ -371,6 +403,15 @@ export default {
               }
             })
           } else if (n.type === 'POST_UPDATED') {
+            notifications.value.push({
+              ...n,
+              src: n.comment.author.avatar,
+              iconClick: () => {
+                markRead(n.id)
+                router.push(`/users/${n.comment.author.id}`)
+              }
+            })
+          } else if (n.type === 'USER_ACTIVITY') {
             notifications.value.push({
               ...n,
               src: n.comment.author.avatar,
