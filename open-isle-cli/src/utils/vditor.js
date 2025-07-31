@@ -94,6 +94,32 @@ export function createVditor(editorId, options = {}) {
         })
       }
     },
+    // upload: {
+    //   fieldName: 'file',
+    //   url: `${API_BASE_URL}/api/upload`,
+    //   accept: 'image/*,video/*',
+    //   multiple: false,
+    //   headers: { Authorization: `Bearer ${getToken()}` },
+    //   format(files, responseText) {
+    //     const res = JSON.parse(responseText)
+    //     if (res.code === 0) {
+    //       return JSON.stringify({
+    //         code: 0,
+    //         msg: '',
+    //         data: {
+    //           errFiles: [],
+    //           succMap: { [files[0].name]: res.data.url }
+    //         }
+    //       })
+    //     } else {
+    //       return JSON.stringify({
+    //         code: 1,
+    //         msg: '上传失败',
+    //         data: { errFiles: files.map(f => f.name), succMap: {} }
+    //       })
+    //     }
+    //   }
+    // },
     toolbarConfig: { pin: true },
     cache: { enable: false },
     input,
