@@ -36,12 +36,12 @@
                   <span>
                     <router-link class="notif-content-text" @click="markRead(item.id)"
                       :to="`/posts/${item.post.id}#comment-${item.parentComment.id}`">
-                      {{ sanitizeDescription(item.parentComment.content) }}
+                      {{ stripMarkdownLength(item.parentComment.content, 100) }}
                     </router-link>
                   </span> 回复了 <span>
                     <router-link class="notif-content-text" @click="markRead(item.id)"
                       :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
-                      {{ sanitizeDescription(item.comment.content) }}
+                      {{ stripMarkdownLength(item.comment.content, 100) }}
                     </router-link>
                   </span>
                 </NotificationContainer>
@@ -52,12 +52,12 @@
                     :to="`/users/${item.comment.author.id}`">{{ item.comment.author.username }} </router-link> 对我的文章
                   <span>
                     <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                      {{ sanitizeDescription(item.post.title) }}
+                      {{ stripMarkdownLength(item.post.title, 100) }}
                     </router-link>
                   </span> 回复了 <span>
                     <router-link class="notif-content-text" @click="markRead(item.id)"
                       :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
-                      {{ sanitizeDescription(item.comment.content) }}
+                      {{ stripMarkdownLength(item.comment.content, 100) }}
                     </router-link>
                   </span>
                 </NotificationContainer>
@@ -72,7 +72,7 @@
                   <span class="notif-user">{{ item.fromUser.username }} </span> 对我的文章
                   <span>
                     <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                      {{ sanitizeDescription(item.post.title) }}
+                      {{ stripMarkdownLength(item.post.title, 100) }}
                     </router-link>
                   </span>
                   进行了表态
@@ -85,7 +85,7 @@
                   <span>
                     <router-link class="notif-content-text" @click="markRead(item.id)"
                       :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
-                      {{ sanitizeDescription(item.comment.content) }}
+                      {{ stripMarkdownLength(item.comment.content, 100) }}
                     </router-link>
                   </span>
                   进行了表态
@@ -98,7 +98,7 @@
                   </router-link>
                   查看了您的帖子
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                    {{ sanitizeDescription(item.post.title) }}
+                    {{ stripMarkdownLength(item.post.title, 100) }}
                   </router-link>
                 </NotificationContainer>
               </template>
@@ -106,12 +106,12 @@
                 <NotificationContainer :item="item" :markRead="markRead">
                   您关注的帖子
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                    {{ sanitizeDescription(item.post.title) }}
+                    {{ stripMarkdownLength(item.post.title, 100) }}
                   </router-link>
                   下面有新评论
                   <router-link class="notif-content-text" @click="markRead(item.id)"
                     :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
-                    {{ sanitizeDescription(item.comment.content) }}
+                    {{ stripMarkdownLength(item.comment.content, 100) }}
                   </router-link>
                 </NotificationContainer>
               </template>
@@ -123,11 +123,11 @@
                   </router-link>
                   在 对评论
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.parentComment.id}`">
-                    {{ sanitizeDescription(item.parentComment.content) }}
+                    {{ stripMarkdownLength(item.parentComment.content, 100) }}
                   </router-link>
                   回复了
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
-                    {{ sanitizeDescription(item.comment.content) }}
+                    {{ stripMarkdownLength(item.comment.content, 100) }}
                   </router-link>
                 </NotificationContainer>
               </template>
@@ -139,11 +139,11 @@
                   </router-link>
                   在文章
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                    {{ sanitizeDescription(item.post.title) }}
+                      {{ stripMarkdownLength(item.post.title, 100) }}
                   </router-link>
                   下面评论了
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
-                    {{ sanitizeDescription(item.comment.content) }}
+                    {{ stripMarkdownLength(item.comment.content, 100) }}
                   </router-link>
                 </NotificationContainer>
               </template>
@@ -171,7 +171,7 @@
                   </router-link>
                   发布了文章
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                    {{ sanitizeDescription(item.post.title) }}
+                    {{ stripMarkdownLength(item.post.title, 100) }}
                   </router-link>
                 </NotificationContainer>
               </template>
@@ -182,7 +182,7 @@
                   </router-link>
                   订阅了你的文章
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                    {{ sanitizeDescription(item.post.title) }}
+                    {{ stripMarkdownLength(item.post.title, 100) }}
                   </router-link>
                 </NotificationContainer>
               </template>
@@ -193,7 +193,7 @@
                   </router-link>
                   取消订阅了你的文章
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                    {{ sanitizeDescription(item.post.title) }}
+                    {{ stripMarkdownLength(item.post.title, 100) }}
                   </router-link>
                 </NotificationContainer>
               </template>
@@ -204,7 +204,7 @@
                   </router-link>
                   发布了帖子
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                    {{ sanitizeDescription(item.post.title) }}
+                    {{ stripMarkdownLength(item.post.title, 100) }}
                   </router-link>
                   ，请审核
                 </NotificationContainer>
@@ -213,7 +213,7 @@
                 <NotificationContainer :item="item" :markRead="markRead">
                   您发布的帖子
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                    {{ sanitizeDescription(item.post.title) }}
+                    {{ stripMarkdownLength(item.post.title, 100) }}
                   </router-link>
                   已提交审核
                 </NotificationContainer>
@@ -234,7 +234,7 @@
                 <NotificationContainer :item="item" :markRead="markRead">
                   您发布的帖子
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                    {{ sanitizeDescription(item.post.title) }}
+                    {{ stripMarkdownLength(item.post.title, 100) }}
                   </router-link>
                   已审核通过
                 </NotificationContainer>
@@ -243,7 +243,7 @@
                 <NotificationContainer :item="item" :markRead="markRead">
                   您发布的帖子
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                    {{ sanitizeDescription(item.post.title) }}
+                    {{ stripMarkdownLength(item.post.title, 100) }}
                   </router-link>
                   已被管理员拒绝
                 </NotificationContainer>
@@ -272,7 +272,7 @@ import NotificationContainer from '../components/NotificationContainer.vue'
 import { getToken, authState } from '../utils/auth'
 import { markNotificationsRead, fetchUnreadCount } from '../utils/notification'
 import { toast } from '../main'
-import { stripMarkdown } from '../utils/markdown'
+import { stripMarkdownLength } from '../utils/markdown'
 import TimeManager from '../utils/time'
 import { hatch } from 'ldrs'
 hatch.register()
@@ -343,10 +343,6 @@ export default {
       POOP: '💩',
       CLOWN: '🤡',
       SKULL: '☠️'
-    }
-
-    const sanitizeDescription = (text) => {
-      return stripMarkdown(text)
     }
 
     const fetchNotifications = async () => {
@@ -549,8 +545,8 @@ export default {
     return {
       notifications,
       formatType,
-      sanitizeDescription,
       isLoadingMessage,
+      stripMarkdownLength,
       markRead,
       approve,
       reject,
