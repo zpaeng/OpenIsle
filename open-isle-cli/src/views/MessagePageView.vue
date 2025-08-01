@@ -333,7 +333,11 @@ export default {
           if (n.type !== 'REGISTER_REQUEST') n.read = true
         })
         await fetchUnreadCount()
-        toast.success('已读所有消息（注册请求除外）')
+        if (authState.role === 'ADMIN') {
+          toast.success('已读所有消息（注册请求除外）')
+        } else {
+          toast.success('已读所有消息')
+        }
       }
     }
 
