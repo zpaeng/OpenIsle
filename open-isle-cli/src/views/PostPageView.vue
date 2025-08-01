@@ -216,15 +216,15 @@ export default {
       }
     }
 
-    const mapComment = c => ({
+    const mapComment = (c, level = 0) => ({
       id: c.id,
       userName: c.author.username,
       time: TimeManager.format(c.createdAt),
       avatar: c.author.avatar,
       text: c.content,
       reactions: c.reactions || [],
-      reply: (c.replies || []).map(mapComment),
-      openReplies: false,
+      reply: (c.replies || []).map(r => mapComment(r, level + 1)),
+      openReplies: level === 0,
       src: c.author.avatar,
       iconClick: () => router.push(`/users/${c.author.id}`)
     })
