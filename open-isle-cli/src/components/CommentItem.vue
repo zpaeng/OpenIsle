@@ -97,11 +97,11 @@ const CommentItem = {
   },
   setup(props, { emit }) {
     const router = useRouter()
-    const showReplies = ref(props.defaultShowReplies)
+    const showReplies = ref(props.level === 0 ? true : props.defaultShowReplies)
     watch(
       () => props.defaultShowReplies,
       (val) => {
-        showReplies.value = val
+        showReplies.value = props.level === 0 ? true : val
       }
     )
     const showEditor = ref(false)
