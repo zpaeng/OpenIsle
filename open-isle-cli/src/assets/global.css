@@ -108,7 +108,7 @@ body {
   background-color: var(--normal-background-color);
   padding: 8px 12px;
   border-radius: 4px;
-  line-height: 0.8;
+  line-height: 1.5;
   position: relative;
 }
 
@@ -131,7 +131,7 @@ body {
 }
 
 .info-content-text code {
-  font-family: monospace;
+  font-family: 'Roboto Mono', monospace;
   font-size: 13px;
   border-radius: 4px;
   white-space: pre-wrap;
@@ -234,5 +234,9 @@ body {
   .about-content li,
   .info-content-text li {
     font-size: 14px;
+  }
+
+  .info-content-text pre {
+    line-height: 0.8;
   }
 }
