@@ -6,6 +6,7 @@ import com.openisle.model.User;
 import com.openisle.service.CommentService;
 import com.openisle.service.CaptchaService;
 import com.openisle.service.LevelService;
+import com.openisle.service.ReactionService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,8 @@ class CommentControllerTest {
     private CaptchaService captchaService;
     @MockBean
     private LevelService levelService;
+    @MockBean
+    private ReactionService reactionService;
 
     private Comment createComment(Long id, String content, String authorName) {
         User user = new User();
@@ -56,6 +59,7 @@ class CommentControllerTest {
         Mockito.when(commentService.addComment(eq("bob"), eq(1L), eq("hi"))).thenReturn(comment);
         Mockito.when(commentService.getCommentsForPost(eq(1L), any())).thenReturn(List.of(comment));
         Mockito.when(commentService.getReplies(1L)).thenReturn(List.of());
+        Mockito.when(reactionService.getReactionsForComment(1L)).thenReturn(List.of());
 
         mockMvc.perform(post("/api/posts/1/comments")
                         .contentType("application/json")
