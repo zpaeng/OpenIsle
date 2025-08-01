@@ -154,7 +154,7 @@
                   </router-link>
                   在评论中提到了你：
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
-                    {{ sanitizeDescription(item.comment.content) }}
+                    {{ stripMarkdownLength(item.comment.content, 100) }}
                   </router-link>
                 </NotificationContainer>
               </template>
@@ -165,7 +165,7 @@
                   </router-link>
                   在帖子
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                    {{ sanitizeDescription(item.post.title) }}
+                    {{ stripMarkdownLength(item.post.title, 100) }}
                   </router-link>
                   中提到了你
                 </NotificationContainer>
