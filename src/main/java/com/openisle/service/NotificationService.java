@@ -9,6 +9,8 @@ import com.openisle.service.EmailSender;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Map;
 
 import java.util.regex.Pattern;
@@ -58,9 +60,6 @@ public class NotificationService {
 
     public Notification createNotification(User user, NotificationType type, Post post, Comment comment, Boolean approved,
                                            User fromUser, ReactionType reactionType, String content) {
-        if (type == NotificationType.POST_VIEWED && post != null && fromUser != null) {
-            notificationRepository.deleteByTypeAndFromUserAndPost(type, fromUser, post);
-        }
         Notification n = new Notification();
         n.setUser(user);
         n.setType(type);

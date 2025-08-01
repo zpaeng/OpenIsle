@@ -26,6 +26,7 @@ import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PostService {
@@ -143,6 +144,7 @@ public class PostService {
         return post;
     }
 
+    @Transactional
     public Post viewPost(Long id, String viewer) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
@@ -164,9 +166,8 @@ public class PostService {
         if (viewer != null && !viewer.equals(post.getAuthor().getUsername())) {
             User viewerUser = userRepository.findByUsername(viewer).orElse(null);
             if (viewerUser != null) {
+                notificationRepository.deleteByTypeAndFromUserAndPost(NotificationType.POST_VIEWED, viewerUser, post);
                 notificationService.createNotification(post.getAuthor(), NotificationType.POST_VIEWED, post, null, null, viewerUser, null, null);
-            } else {
-                notificationService.createNotification(post.getAuthor(), NotificationType.POST_VIEWED, post, null, null, null, null, null);
             }
         }
         return post;
