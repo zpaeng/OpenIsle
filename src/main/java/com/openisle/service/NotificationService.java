@@ -58,6 +58,9 @@ public class NotificationService {
 
     public Notification createNotification(User user, NotificationType type, Post post, Comment comment, Boolean approved,
                                            User fromUser, ReactionType reactionType, String content) {
+        if (type == NotificationType.POST_VIEWED && post != null) {
+            notificationRepository.deleteByUserAndTypeAndPostAndFromUser(user, type, post, fromUser);
+        }
         Notification n = new Notification();
         n.setUser(user);
         n.setType(type);
