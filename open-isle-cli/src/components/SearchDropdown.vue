@@ -92,9 +92,13 @@ export default {
           router.push(`/posts/${opt.postId}#comment-${opt.id}`)
         }
       } else if (opt.type === 'category') {
-        router.push({ path: '/', query: { category: opt.id } })
+        router.push({ path: '/', query: { category: opt.id } }).then(() => {
+          window.location.reload()
+        })  
       } else if (opt.type === 'tag') {
-        router.push({ path: '/', query: { tags: opt.id } })
+        router.push({ path: '/', query: { tags: opt.id } }).then(() => {
+          window.location.reload()
+        })
       }
       selected.value = null
       keyword.value = ''
