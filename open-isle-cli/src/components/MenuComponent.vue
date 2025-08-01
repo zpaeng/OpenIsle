@@ -167,7 +167,7 @@ export default {
         notificationState.unreadCount = 0
       }
     }
-    await updateCount()
+    
     watch(() => authState.loggedIn, async () => {
       await updateCount()
     })
@@ -188,6 +188,9 @@ export default {
         this.tags = JSON.parse(cachedTags)
       } catch { /* ignore */ }
     }
+
+    this.isLoadingCategory = !cachedCategories
+    this.isLoadingTag = !cachedTags
 
     const fetchCategories = () => {
       fetch(`${API_BASE_URL}/api/categories`).then(res => {
@@ -213,9 +216,6 @@ export default {
       })
     }
 
-    this.isLoadingCategory = !cachedCategories
-    this.isLoadingTag = !cachedTags
-
     if (cachedCategories) {
       setTimeout(fetchCategories, 1500)
     } else {
@@ -227,6 +227,8 @@ export default {
     } else {
       fetchTags()
     }
+
+    await updateCount()
   },
   methods: {
     cycleTheme,
