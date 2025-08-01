@@ -4,6 +4,7 @@ import com.openisle.model.Comment;
 import com.openisle.service.CommentService;
 import com.openisle.service.CaptchaService;
 import com.openisle.service.LevelService;
+import com.openisle.service.ReactionService;
 import com.openisle.model.CommentSort;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class CommentController {
     private final CommentService commentService;
     private final LevelService levelService;
     private final CaptchaService captchaService;
+    private final ReactionService reactionService;
 
     @Value("${app.captcha.enabled:false}")
     private boolean captchaEnabled;
@@ -70,6 +72,10 @@ public class CommentController {
                 .map(this::toDtoWithReplies)
                 .collect(Collectors.toList());
         dto.setReplies(replies);
+        List<ReactionDto> reactions = reactionService.getReactionsForComment(comment.getId()).stream()
+                .map(this::toReactionDto)
+                .collect(Collectors.toList());
+        dto.setReactions(reactions);
         return dto;
     }
 
@@ -109,6 +115,7 @@ public class CommentController {
         private LocalDateTime createdAt;
         private AuthorDto author;
         private List<CommentDto> replies;
+        private List<ReactionDto> reactions;
         private int reward;
     }
 
@@ -117,5 +124,30 @@ public class CommentController {
         private Long id;
         private String username;
         private String avatar;
+    }
+
+    private ReactionDto toReactionDto(com.openisle.model.Reaction reaction) {
+        ReactionDto dto = new ReactionDto();
+        dto.setId(reaction.getId());
+        dto.setType(reaction.getType());
+        dto.setUser(reaction.getUser().getUsername());
+        if (reaction.getPost() != null) {
+            dto.setPostId(reaction.getPost().getId());
+        }
+        if (reaction.getComment() != null) {
+            dto.setCommentId(reaction.getComment().getId());
+        }
+        dto.setReward(0);
+        return dto;
+    }
+
+    @Data
+    private static class ReactionDto {
+        private Long id;
+        private com.openisle.model.ReactionType type;
+        private String user;
+        private Long postId;
+        private Long commentId;
+        private int reward;
     }
 }
