@@ -167,38 +167,68 @@ export default {
         notificationState.unreadCount = 0
       }
     }
-    await updateCount()
+    
     watch(() => authState.loggedIn, async () => {
       await updateCount()
     })
 
-    try {
-      this.isLoadingCategory = true
-      fetch(`${API_BASE_URL}/api/categories`).then(
-        res => {
-          if (res.ok) {
-            res.json().then(data => {
-              this.categories = data.slice(0, 10)
-            })
-          }
-          this.isLoadingCategory = false
-        }
-      )
-    } catch { /* ignore */ }
+    const CAT_CACHE_KEY = 'menu-categories'
+    const TAG_CACHE_KEY = 'menu-tags'
 
-    try {
-      this.isLoadingTag = true
-      fetch(`${API_BASE_URL}/api/tags?limit=10`).then(
-        res => {
-          if (res.ok) {
-            res.json().then(data => {
-              this.tags = data
-            })
-          }
-          this.isLoadingTag = false
+    const cachedCategories = localStorage.getItem(CAT_CACHE_KEY)
+    if (cachedCategories) {
+      try {
+        this.categories = JSON.parse(cachedCategories)
+      } catch { /* ignore */ }
+    }
+
+    const cachedTags = localStorage.getItem(TAG_CACHE_KEY)
+    if (cachedTags) {
+      try {
+        this.tags = JSON.parse(cachedTags)
+      } catch { /* ignore */ }
+    }
+
+    this.isLoadingCategory = !cachedCategories
+    this.isLoadingTag = !cachedTags
+
+    const fetchCategories = () => {
+      fetch(`${API_BASE_URL}/api/categories`).then(res => {
+        if (res.ok) {
+          res.json().then(data => {
+            this.categories = data.slice(0, 10)
+            localStorage.setItem(CAT_CACHE_KEY, JSON.stringify(this.categories))
+          })
         }
-      )
-    } catch { /* ignore */ }
+        this.isLoadingCategory = false
+      })
+    }
+
+    const fetchTags = () => {
+      fetch(`${API_BASE_URL}/api/tags?limit=10`).then(res => {
+        if (res.ok) {
+          res.json().then(data => {
+            this.tags = data
+            localStorage.setItem(TAG_CACHE_KEY, JSON.stringify(this.tags))
+          })
+        }
+        this.isLoadingTag = false
+      })
+    }
+
+    if (cachedCategories) {
+      setTimeout(fetchCategories, 1500)
+    } else {
+      fetchCategories()
+    }
+
+    if (cachedTags) {
+      setTimeout(fetchTags, 1500)
+    } else {
+      fetchTags()
+    }
+
+    await updateCount()
   },
   methods: {
     cycleTheme,
