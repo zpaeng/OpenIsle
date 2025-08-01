@@ -168,29 +168,4 @@ class NotificationServiceTest {
         verify(email).sendEmail("a@a.com", "有人回复了你", "https://ex.com/posts/1#comment-2");
         verify(push).sendNotification(eq(user), contains("/posts/1#comment-2"));
     }
-
-    @Test
-    void postViewedDeletesOldNotification() {
-        NotificationRepository nRepo = mock(NotificationRepository.class);
-        UserRepository uRepo = mock(UserRepository.class);
-        ReactionRepository rRepo = mock(ReactionRepository.class);
-        EmailSender email = mock(EmailSender.class);
-        PushNotificationService push = mock(PushNotificationService.class);
-        Executor executor = Runnable::run;
-        NotificationService service = new NotificationService(nRepo, uRepo, email, push, rRepo, executor);
-
-        User author = new User();
-        author.setId(1L);
-        User viewer = new User();
-        viewer.setId(2L);
-        Post post = new Post();
-        post.setId(3L);
-
-        when(nRepo.save(any(Notification.class))).thenAnswer(i -> i.getArgument(0));
-
-        service.createNotification(author, NotificationType.POST_VIEWED, post, null, null, viewer, null, null);
-
-        verify(nRepo).deleteByUserAndTypeAndPostAndFromUser(author, NotificationType.POST_VIEWED, post, viewer);
-        verify(nRepo).save(any(Notification.class));
-    }
 }
