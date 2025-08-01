@@ -74,4 +74,9 @@ public class UploadController {
             return ResponseEntity.internalServerError().body(Map.of("code", 3, "msg", "Upload failed"));
         }
     }
+
+    @GetMapping("/presign")
+    public java.util.Map<String, String> presign(@RequestParam("filename") String filename) {
+        return imageUploader.presignUpload(filename);
+    }
 }
