@@ -168,4 +168,27 @@ class NotificationServiceTest {
         verify(email).sendEmail("a@a.com", "有人回复了你", "https://ex.com/posts/1#comment-2");
         verify(push).sendNotification(eq(user), contains("/posts/1#comment-2"));
     }
+
+    @Test
+    void postViewedNotificationDeletesOldOnes() {
+        NotificationRepository nRepo = mock(NotificationRepository.class);
+        UserRepository uRepo = mock(UserRepository.class);
+        ReactionRepository rRepo = mock(ReactionRepository.class);
+        EmailSender email = mock(EmailSender.class);
+        PushNotificationService push = mock(PushNotificationService.class);
+        Executor executor = Runnable::run;
+        NotificationService service = new NotificationService(nRepo, uRepo, email, push, rRepo, executor);
+        org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
+
+        User owner = new User();
+        User viewer = new User();
+        Post post = new Post();
+
+        when(nRepo.save(any(Notification.class))).thenAnswer(i -> i.getArgument(0));
+
+        service.createNotification(owner, NotificationType.POST_VIEWED, post, null, null, viewer, null, null);
+
+        verify(nRepo).deleteByTypeAndFromUserAndPost(NotificationType.POST_VIEWED, viewer, post);
+        verify(nRepo).save(any(Notification.class));
+    }
 }

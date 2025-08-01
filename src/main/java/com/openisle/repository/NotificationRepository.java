@@ -18,4 +18,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     List<Notification> findByComment(Comment comment);
 
     void deleteByTypeAndFromUser(NotificationType type, User fromUser);
+
+    void deleteByTypeAndFromUserAndPost(NotificationType type, User fromUser, Post post);
 }
