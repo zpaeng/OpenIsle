@@ -35,10 +35,10 @@
       <div class="comment-editor-wrapper">
         <CommentEditor v-if="showEditor" @submit="submitReply" :loading="isWaitingForReply" :disabled="!loggedIn" :show-login-overlay="!loggedIn" />
       </div>
-      <div v-if="comment.reply && comment.reply.length" class="reply-toggle" @click="toggleReplies">
+      <div v-if="replyCount" class="reply-toggle" @click="toggleReplies">
         <i v-if="showReplies" class="fas fa-chevron-up reply-toggle-icon"></i>
         <i v-else class="fas fa-chevron-down reply-toggle-icon"></i>
-        {{ comment.reply.length }}条回复
+        {{ replyCount }}条回复
       </div>
       <div v-if="showReplies" class="reply-list">
         <BaseTimeline :items="comment.reply">
@@ -110,6 +110,8 @@ const CommentItem = {
     const lightboxIndex = ref(0)
     const lightboxImgs = ref([])
     const loggedIn = computed(() => authState.loggedIn)
+    const countReplies = (list) => list.reduce((sum, r) => sum + 1 + countReplies(r.reply || []), 0)
+    const replyCount = computed(() => countReplies(props.comment.reply || []))
     const toggleReplies = () => {
       showReplies.value = !showReplies.value
     }
@@ -206,7 +208,7 @@ const CommentItem = {
         lightboxVisible.value = true
       }
     }
-    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply, commentMenuItems, deleteComment, lightboxVisible, lightboxIndex, lightboxImgs, handleContentClick, loggedIn }
+    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply, commentMenuItems, deleteComment, lightboxVisible, lightboxIndex, lightboxImgs, handleContentClick, loggedIn, replyCount }
   }
 }
 

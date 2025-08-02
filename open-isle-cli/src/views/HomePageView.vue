@@ -165,6 +165,9 @@ export default {
     const pageSize = 10
     const allLoaded = ref(false)
 
+    const countComments = (list) =>
+      list.reduce((sum, c) => sum + 1 + countComments(c.replies || []), 0)
+
     const loadOptions = async () => {
       if (selectedCategory.value && !isNaN(selectedCategory.value)) {
         try {
@@ -254,7 +257,7 @@ export default {
             category: p.category,
             tags: p.tags || [],
             members: (p.participants || []).map(m => ({ id: m.id, avatar: m.avatar })),
-            comments: (p.comments || []).length,
+            comments: countComments(p.comments || []),
             views: p.views,
             time: TimeManager.format(p.createdAt),
             pinned: !!p.pinnedAt
@@ -291,7 +294,7 @@ export default {
             category: p.category,
             tags: p.tags || [],
             members: (p.participants || []).map(m => ({ id: m.id, avatar: m.avatar })),
-            comments: (p.comments || []).length,
+            comments: countComments(p.comments || []),
             views: p.views,
             time: TimeManager.format(p.createdAt),
             pinned: !!p.pinnedAt
@@ -328,7 +331,7 @@ export default {
             category: p.category,
             tags: p.tags || [],
             members: (p.participants || []).map(m => ({ id: m.id, avatar: m.avatar })),
-            comments: (p.comments || []).length,
+            comments: countComments(p.comments || []),
             views: p.views,
             time: TimeManager.format(p.lastReplyAt || p.createdAt),
             pinned: !!p.pinnedAt
