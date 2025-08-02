@@ -545,6 +545,7 @@ export default {
         if (res.ok) {
           const data = await res.json()
           comments.value = data.map(mapComment)
+          isFetchingComments.value = false
           await nextTick()
           gatherPostItems()
         }
