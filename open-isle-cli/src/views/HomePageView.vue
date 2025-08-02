@@ -715,6 +715,7 @@ export default {
   .article-item-description {
     margin-top: 2px;
     font-size: 10px;
+    max-width: 100%;
   }
 
   .main-info-text {

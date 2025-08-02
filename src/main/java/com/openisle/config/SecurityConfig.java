@@ -79,6 +79,8 @@ public class SecurityConfig {
                 "http://localhost",
                 "http://30.211.97.254:8080",
                 "http://30.211.97.254",
+                "http://192.168.7.70",
+                "http://192.168.7.70:8080",
                 websiteUrl,
                 websiteUrl.replace("://www.", "://")
         ));
