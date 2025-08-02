@@ -128,10 +128,23 @@ export default {
         toast.error('请先登录')
         return
       }
+      const url = props.contentType === 'post'
+        ? `${API_BASE_URL}/api/posts/${props.contentId}/reactions`
+        : `${API_BASE_URL}/api/comments/${props.contentId}/reactions`
+
+      // optimistic update
+      const existingIdx = reactions.value.findIndex(r => r.type === type && r.user === authState.username)
+      let tempReaction = null
+      let removedReaction = null
+      if (existingIdx > -1) {
+        removedReaction = reactions.value.splice(existingIdx, 1)[0]
+      } else {
+        tempReaction = { type, user: authState.username }
+        reactions.value.push(tempReaction)
+      }
+      emit('update:modelValue', reactions.value)
+
       try {
-        const url = props.contentType === 'post'
-          ? `${API_BASE_URL}/api/posts/${props.contentId}/reactions`
-          : `${API_BASE_URL}/api/comments/${props.contentId}/reactions`
         const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -139,20 +152,40 @@ export default {
         })
         if (res.ok) {
           if (res.status === 204) {
-            const idx = reactions.value.findIndex(r => r.type === type && r.user === authState.username)
-            if (idx > -1) reactions.value.splice(idx, 1)
+            // removal already reflected
           } else {
             const data = await res.json()
-            reactions.value.push(data)
+            const idx = tempReaction ? reactions.value.indexOf(tempReaction) : -1
+            if (idx > -1) {
+              reactions.value.splice(idx, 1, data)
+            } else if (removedReaction) {
+              // server added back reaction even though we removed? restore data
+              reactions.value.push(data)
+            }
             if (data.reward && data.reward > 0) {
               toast.success(`获得 ${data.reward} 经验值`)
             }
           }
           emit('update:modelValue', reactions.value)
         } else {
+          // revert optimistic update on failure
+          if (tempReaction) {
+            const idx = reactions.value.indexOf(tempReaction)
+            if (idx > -1) reactions.value.splice(idx, 1)
+          } else if (removedReaction) {
+            reactions.value.push(removedReaction)
+          }
+          emit('update:modelValue', reactions.value)
           toast.error('操作失败')
         }
       } catch (e) {
+        if (tempReaction) {
+          const idx = reactions.value.indexOf(tempReaction)
+          if (idx > -1) reactions.value.splice(idx, 1)
+        } else if (removedReaction) {
+          reactions.value.push(removedReaction)
+        }
+        emit('update:modelValue', reactions.value)
         toast.error('操作失败')
       }
     }
