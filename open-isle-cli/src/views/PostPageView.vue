@@ -89,7 +89,7 @@
     <div class="post-page-scroller-container">
       <div class="scroller">
         <div v-if="isWaitingFetchingPost" class="scroller-time">loading...</div>
-        <div v-else class="scroller-time">{{ postTime }}</div>
+        <div v-else class="scroller-time">{{ scrollerTopTime }}</div>
         <div class="scroller-middle">
           <input type="range" class="scroller-range" :max="totalPosts" :min="1" v-model.number="currentIndex"
             @input="onSliderInput" />
@@ -323,6 +323,12 @@ export default {
     const lastReplyTime = computed(() =>
       comments.value.length ? comments.value[comments.value.length - 1].time : postTime.value
     )
+    const firstReplyTime = computed(() =>
+      comments.value.length ? comments.value[0].time : postTime.value
+    )
+    const scrollerTopTime = computed(() =>
+      commentSort.value === 'OLDEST' ? postTime.value : firstReplyTime.value
+    )
 
     watch(
       () => comments.value.length,
@@ -351,8 +357,10 @@ export default {
       }
     }
 
-    const onSliderInput = () => {
-      const target = postItems.value[currentIndex.value - 1]
+    const onSliderInput = (e) => {
+      const index = Number(e.target.value)
+      currentIndex.value = index
+      const target = postItems.value[index - 1]
       if (target && mainContainer.value) {
         const top = getTopRelativeTo(target, mainContainer.value)
         mainContainer.value.scrollTo({ top, behavior: 'instant' })
@@ -584,6 +592,7 @@ export default {
       tags,
       comments,
       postTime,
+      scrollerTopTime,
       lastReplyTime,
       postItems,
       mainContainer,
