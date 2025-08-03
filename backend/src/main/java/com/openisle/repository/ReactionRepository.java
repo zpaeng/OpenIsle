@@ -31,12 +31,17 @@ public interface ReactionRepository extends JpaRepository<Reaction, Long> {
     long countByUserAfter(@Param("username") String username, @Param("start") java.time.LocalDateTime start);
 
     @Query("""
-            SELECT COUNT(r) FROM Reaction r
-            LEFT JOIN r.post p
+            SELECT COUNT(DISTINCT r.id)
+            FROM Reaction r
+            LEFT JOIN r.post    p
+            LEFT JOIN p.author  pa
             LEFT JOIN r.comment c
-            WHERE r.type = com.openisle.model.ReactionType.LIKE AND
-                  ((p IS NOT NULL AND p.author.username = :username) OR
-                   (c IS NOT NULL AND c.author.username = :username))
+            LEFT JOIN c.author  ca
+            WHERE r.type = com.openisle.model.ReactionType.LIKE
+              AND (
+                   (r.post    IS NOT NULL AND pa.username = :username)
+                OR (r.comment IS NOT NULL AND ca.username = :username)
+              )
             """)
     long countLikesReceived(@Param("username") String username);
 
