@@ -283,4 +283,11 @@ export default CommentItem
     background-color: transparent;
   }
 }
+
+@media (max-width: 768px) {
+  .reply-icon {
+    margin-right: 3px;
+    margin-left: 3px;
+  }
+}
 </style>
