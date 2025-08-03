@@ -8,7 +8,8 @@ import './assets/toast.css'
 // Use Sugar theme from vue-toast-notification for better toast styling.
 // If you prefer Bootstrap style, replace with theme-bootstrap.css instead.
 import { useToast } from 'vue-toastification'
-import { checkToken, clearToken } from './utils/auth'
+import { checkToken, clearToken, isLogin } from './utils/auth'
+import { loginWithGoogle } from './utils/google'
 import { initTheme } from './utils/theme'
 import { clearVditorStorage } from './utils/clearVditorStorage'
 
@@ -50,6 +51,7 @@ checkToken().then(valid => {
     clearToken()
   }
 
+  // 引导用户优先采用Google Login登录
   if (!isLogin()) {
     setTimeout(() => {
       loginWithGoogle()
