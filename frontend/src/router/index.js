@@ -16,6 +16,7 @@ import NotFoundPageView from '../views/NotFoundPageView.vue'
 import GithubCallbackPageView from '../views/GithubCallbackPageView.vue'
 import DiscordCallbackPageView from '../views/DiscordCallbackPageView.vue'
 import TwitterCallbackPageView from '../views/TwitterCallbackPageView.vue'
+import GoogleCallbackPageView from '../views/GoogleCallbackPageView.vue'
 import ForgotPasswordPageView from '../views/ForgotPasswordPageView.vue'
 
 const routes = [
@@ -103,6 +104,11 @@ const routes = [
     path: '/twitter-callback',
     name: 'twitter-callback',
     component: TwitterCallbackPageView
+  },
+  {
+    path: '/google-callback',
+    name: 'google-callback',
+    component: GoogleCallbackPageView
   },
   {
     path: '/404',
