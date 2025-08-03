@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch, onUnmounted } from 'vue'
 import { themeState } from '../utils/theme'
 import {
   createVditor,
@@ -26,6 +26,7 @@ import {
   getPreviewTheme as getPreviewThemeUtil
 } from '../utils/vditor'
 import LoginOverlay from './LoginOverlay.vue'
+import { clearVditorStorage } from '../utils/clearVditorStorage'
 
 export default {
   name: 'CommentEditor',
@@ -88,6 +89,10 @@ export default {
         }
       })
       // applyTheme()
+    })
+
+    onUnmounted(() => {
+      clearVditorStorage()
     })
 
     watch(
