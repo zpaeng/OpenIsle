@@ -8,13 +8,14 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, onUnmounted } from 'vue'
 import { themeState } from '../utils/theme'
 import {
   createVditor,
   getEditorTheme as getEditorThemeUtil,
   getPreviewTheme as getPreviewThemeUtil
 } from '../utils/vditor'
+import { clearVditorStorage } from '../utils/clearVditorStorage'
 import { hatch } from 'ldrs'
 hatch.register()
 
@@ -104,6 +105,10 @@ export default {
         }
       })
       // applyTheme()
+    })
+
+    onUnmounted(() => {
+      clearVditorStorage()
     })
 
     return {}

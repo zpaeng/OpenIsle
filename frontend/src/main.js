@@ -11,6 +11,7 @@ import { useToast } from 'vue-toastification'
 import { checkToken, clearToken, isLogin } from './utils/auth'
 import { initTheme } from './utils/theme'
 import { loginWithGoogle } from './utils/google'
+import { clearVditorStorage } from './utils/clearVditorStorage'
 
 // Configurable API domain and port
 // export const API_DOMAIN = 'http://127.0.0.1'
@@ -28,6 +29,7 @@ export const TWITTER_CLIENT_ID = 'ZTRTU05KSk9KTTJrTTdrVC1tc1E6MTpjaQ'
 export const toast = useToast()
 
 initTheme()
+clearVditorStorage()
 
 const app = createApp(App)
 app.use(router)
