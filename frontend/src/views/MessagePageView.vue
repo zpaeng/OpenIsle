@@ -118,15 +118,18 @@
               <template v-else-if="item.type === 'USER_ACTIVITY' && item.parentComment">
                 <NotificationContainer :item="item" :markRead="markRead">
                   你关注的
-                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.comment.author.id}`">
+                  <router-link class="notif-content-text" @click="markRead(item.id)"
+                    :to="`/users/${item.comment.author.id}`">
                     {{ item.comment.author.username }}
                   </router-link>
                   在 对评论
-                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.parentComment.id}`">
+                  <router-link class="notif-content-text" @click="markRead(item.id)"
+                    :to="`/posts/${item.post.id}#comment-${item.parentComment.id}`">
                     {{ stripMarkdownLength(item.parentComment.content, 100) }}
                   </router-link>
                   回复了
-                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
+                  <router-link class="notif-content-text" @click="markRead(item.id)"
+                    :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
                     {{ stripMarkdownLength(item.comment.content, 100) }}
                   </router-link>
                 </NotificationContainer>
@@ -134,15 +137,17 @@
               <template v-else-if="item.type === 'USER_ACTIVITY'">
                 <NotificationContainer :item="item" :markRead="markRead">
                   你关注的
-                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/users/${item.comment.author.id}`">
+                  <router-link class="notif-content-text" @click="markRead(item.id)"
+                    :to="`/users/${item.comment.author.id}`">
                     {{ item.comment.author.username }}
                   </router-link>
                   在文章
                   <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}`">
-                      {{ stripMarkdownLength(item.post.title, 100) }}
+                    {{ stripMarkdownLength(item.post.title, 100) }}
                   </router-link>
                   下面评论了
-                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
+                  <router-link class="notif-content-text" @click="markRead(item.id)"
+                    :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
                     {{ stripMarkdownLength(item.comment.content, 100) }}
                   </router-link>
                 </NotificationContainer>
@@ -153,7 +158,8 @@
                     {{ item.fromUser.username }}
                   </router-link>
                   在评论中提到了你：
-                  <router-link class="notif-content-text" @click="markRead(item.id)" :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
+                  <router-link class="notif-content-text" @click="markRead(item.id)"
+                    :to="`/posts/${item.post.id}#comment-${item.comment.id}`">
                     {{ stripMarkdownLength(item.comment.content, 100) }}
                   </router-link>
                 </NotificationContainer>
@@ -707,6 +713,7 @@ export default {
   font-weight: bold;
   color: var(--primary-color) !important;
   text-decoration: none !important;
+  word-break: break-all;
 }
 
 .optional-buttons {
@@ -766,6 +773,10 @@ export default {
 @media (max-width: 768px) {
   .has_read_button {
     display: none;
+  }
+
+  .message-page {
+    overflow-x: hidden;
   }
 }
 </style>
