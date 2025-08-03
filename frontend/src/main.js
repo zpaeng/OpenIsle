@@ -8,9 +8,8 @@ import './assets/toast.css'
 // Use Sugar theme from vue-toast-notification for better toast styling.
 // If you prefer Bootstrap style, replace with theme-bootstrap.css instead.
 import { useToast } from 'vue-toastification'
-import { checkToken, clearToken, isLogin } from './utils/auth'
+import { checkToken, clearToken } from './utils/auth'
 import { initTheme } from './utils/theme'
-import { loginWithGoogle } from './utils/google'
 import { clearVditorStorage } from './utils/clearVditorStorage'
 
 // Configurable API domain and port
@@ -49,11 +48,5 @@ app.mount('#app')
 checkToken().then(valid => {
   if (!valid) {
     clearToken()
-  }
-
-  if (!isLogin()) {
-    setTimeout(() => {
-      loginWithGoogle()
-    }, 3000)
   }
 })
