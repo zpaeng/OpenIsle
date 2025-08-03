@@ -270,6 +270,7 @@ export default {
   height: 32px;
   border-radius: 50%;
   background-color: lightgray;
+  object-fit: cover;
 }
 
 .dropdown-icon {
