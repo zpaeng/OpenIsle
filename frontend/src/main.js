@@ -49,4 +49,10 @@ checkToken().then(valid => {
   if (!valid) {
     clearToken()
   }
+
+  if (!isLogin()) {
+    setTimeout(() => {
+      loginWithGoogle()
+    }, 3000)
+  }
 })

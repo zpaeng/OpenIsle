@@ -1,23 +1,14 @@
 <template>
   <div id="app">
     <div class="header-container">
-      <HeaderComponent
-        @toggle-menu="menuVisible = !menuVisible"
-        :show-menu-btn="!hideMenu"
-      />
+      <HeaderComponent @toggle-menu="menuVisible = !menuVisible" :show-menu-btn="!hideMenu" />
     </div>
 
     <div class="main-container">
       <div class="menu-container">
-        <MenuComponent
-          :visible="!hideMenu && menuVisible"
-          @item-click="menuVisible = false"
-        />
+        <MenuComponent :visible="!hideMenu && menuVisible" @item-click="menuVisible = false" />
       </div>
-      <div
-        class="content"
-        :class="{ 'menu-open': menuVisible && !hideMenu }"
-      >
+      <div class="content" :class="{ 'menu-open': menuVisible && !hideMenu }">
         <router-view />
       </div>
     </div>
@@ -40,7 +31,17 @@ export default {
   },
   computed: {
     hideMenu() {
-      return ['/login', '/signup', '/404', '/signup-reason', '/github-callback', '/twitter-callback', '/discord-callback', '/forgot-password'].includes(this.$route.path)
+      return [
+        '/login',
+        '/signup', 
+        '/404',
+        '/signup-reason',
+        '/github-callback',
+        '/twitter-callback',
+        '/discord-callback',
+        '/forgot-password',
+        '/google-callback'
+      ].includes(this.$route.path)
     }
   },
   async mounted() {
@@ -59,8 +60,7 @@ export default {
   z-index: 1000;
 }
 
-.menu-container {
-}
+.menu-container {}
 
 .content {
   flex: 1;
@@ -80,6 +80,7 @@ export default {
 }
 
 @media (max-width: 768px) {
+
   .content,
   .content.menu-open {
     max-width: 100% !important;
