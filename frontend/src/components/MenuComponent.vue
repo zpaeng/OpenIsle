@@ -270,7 +270,7 @@ export default {
 .menu {
   width: 200px;
   background-color: var(--menu-background-color);
-  height: calc(100vh - 10px);
+  height: calc(100vh - 20px - var(--header-height));
   border-right: 1px solid var(--menu-border-color);
   display: flex;
   flex-direction: column;
