@@ -4,6 +4,7 @@ import com.openisle.model.Reaction;
 import com.openisle.model.ReactionType;
 import com.openisle.service.ReactionService;
 import com.openisle.service.LevelService;
+import jakarta.transaction.Transactional;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ public class ReactionController {
     }
 
     @PostMapping("/posts/{postId}/reactions")
+    @Transactional
     public ResponseEntity<ReactionDto> reactToPost(@PathVariable Long postId,
                                                   @RequestBody ReactionRequest req,
                                                   Authentication auth) {
@@ -39,6 +41,7 @@ public class ReactionController {
     }
 
     @PostMapping("/comments/{commentId}/reactions")
+    @Transactional
     public ResponseEntity<ReactionDto> reactToComment(@PathVariable Long commentId,
                                                      @RequestBody ReactionRequest req,
                                                      Authentication auth) {

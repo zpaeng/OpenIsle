@@ -78,23 +78,23 @@ public class NotificationService {
                 emailSender.sendEmail(user.getEmail(), "您有新的回复", pushContent + ", 点击以查看: " + url);
                 sendCustomPush(user, pushContent, url);
             } else if (type == NotificationType.REACTION && comment != null) {
-                long count = reactionRepository.countReceived(comment.getAuthor().getUsername());
-                if (count % 5 == 0) {
-                    String url = websiteUrl + "/messages";
-                    sendCustomPush(comment.getAuthor(), "你有新的互动", url);
-                    if (comment.getAuthor().getEmail() != null) {
-                        emailSender.sendEmail(comment.getAuthor().getEmail(), "你有新的互动", "你有新的互动, 点击以查看: " + url);
-                    }
-                }
+//                long count = reactionRepository.countReceived(comment.getAuthor().getUsername());
+//                if (count % 5 == 0) {
+//                    String url = websiteUrl + "/messages";
+//                    sendCustomPush(comment.getAuthor(), "你有新的互动", url);
+//                    if (comment.getAuthor().getEmail() != null) {
+//                        emailSender.sendEmail(comment.getAuthor().getEmail(), "你有新的互动", "你有新的互动, 点击以查看: " + url);
+//                    }
+//                }
             } else if (type == NotificationType.REACTION && post != null) {
-                long count = reactionRepository.countReceived(post.getAuthor().getUsername());
-                if (count % 5 == 0) {
-                    String url = websiteUrl + "/messages";
-                    sendCustomPush(post.getAuthor(), "你有新的互动", url);
-                    if (post.getAuthor().getEmail() != null) {
-                        emailSender.sendEmail(post.getAuthor().getEmail(), "你有新的互动", "你有新的互动, 点击以查看: " + url);
-                    }
-                }
+//                long count = reactionRepository.countReceived(post.getAuthor().getUsername());
+//                if (count % 5 == 0) {
+//                    String url = websiteUrl + "/messages";
+//                    sendCustomPush(post.getAuthor(), "你有新的互动", url);
+//                    if (post.getAuthor().getEmail() != null) {
+//                        emailSender.sendEmail(post.getAuthor().getEmail(), "你有新的互动", "你有新的互动, 点击以查看: " + url);
+//                    }
+//                }
             }
         });
 
