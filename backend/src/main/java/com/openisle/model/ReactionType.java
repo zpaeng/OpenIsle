@@ -15,5 +15,16 @@ public enum ReactionType {
     MIND_BLOWN,
     POOP,
     CLOWN,
-    SKULL
+    SKULL,
+    FIRE,
+    EYES,
+    FROWN,
+    HOT,
+    EAGLE,
+    SPIDER,
+    BAT,
+    CHINA,
+    USA,
+    JAPAN,
+    KOREA
 }
