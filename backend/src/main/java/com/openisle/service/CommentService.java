@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +36,7 @@ public class CommentService {
     private final NotificationRepository notificationRepository;
     private final ImageUploader imageUploader;
 
+    @Transactional
     public Comment addComment(String username, Long postId, String content) {
         long recent = commentRepository.countByAuthorAfter(username,
                 java.time.LocalDateTime.now().minusMinutes(1));
