@@ -10,7 +10,11 @@
     <div class="info-content">
       <div class="common-info-content-header">
         <div class="info-content-header-left">
-          <div class="user-name">{{ comment.userName }}</div>
+          <span class="user-name">{{ comment.userName }}</span>
+          <span v-if="level >= 2">
+            <i class="fas fa-reply reply-icon"></i>
+            <span class="user-name reply-user-name">{{ comment.parentUserName }}</span>
+          </span>
           <div class="post-time">{{ comment.time }}</div>
         </div>
         <div class="info-content-header-right">
@@ -33,33 +37,23 @@
         </ReactionsGroup>
       </div>
       <div class="comment-editor-wrapper">
-        <CommentEditor v-if="showEditor" @submit="submitReply" :loading="isWaitingForReply" :disabled="!loggedIn" :show-login-overlay="!loggedIn" />
+        <CommentEditor v-if="showEditor" @submit="submitReply" :loading="isWaitingForReply" :disabled="!loggedIn"
+          :show-login-overlay="!loggedIn" />
       </div>
-      <div v-if="replyCount" class="reply-toggle" @click="toggleReplies">
+      <div v-if="replyCount && level < 2" class="reply-toggle" @click="toggleReplies">
         <i v-if="showReplies" class="fas fa-chevron-up reply-toggle-icon"></i>
         <i v-else class="fas fa-chevron-down reply-toggle-icon"></i>
         {{ replyCount }}条回复
       </div>
-      <div v-if="showReplies" class="reply-list">
-        <BaseTimeline :items="comment.reply">
+      <div v-if="showReplies && level < 2" class="reply-list">
+        <BaseTimeline :items="replyList">
           <template #item="{ item }">
             <CommentItem :key="item.id" :comment="item" :level="level + 1" :default-show-replies="item.openReplies" />
           </template>
         </BaseTimeline>
-        <!-- <CommentItem
-          v-for="r in comment.reply"
-          :key="r.id"
-          :comment="r"
-          :level="level + 1"
-          :default-show-replies="r.openReplies"
-        /> -->
       </div>
-      <vue-easy-lightbox
-        :visible="lightboxVisible"
-        :imgs="lightboxImgs"
-        :index="lightboxIndex"
-        @hide="lightboxVisible = false"
-      />
+      <vue-easy-lightbox :visible="lightboxVisible" :imgs="lightboxImgs" :index="lightboxIndex"
+        @hide="lightboxVisible = false" />
     </div>
   </div>
 </template>
@@ -118,6 +112,27 @@ const CommentItem = {
     const toggleEditor = () => {
       showEditor.value = !showEditor.value
     }
+
+    // 合并所有子回复为一个扁平数组
+    const flattenReplies = (list) => {
+      let result = []
+      for (const r of list) {
+        result.push(r)
+        if (r.reply && r.reply.length > 0) {
+          result = result.concat(flattenReplies(r.reply))
+        }
+      }
+      return result
+    }
+
+    const replyList = computed(() => {
+      if (props.level < 1) {
+        return props.comment.reply
+      }
+
+      return flattenReplies(props.comment.reply || [])
+    })
+
     const isAuthor = computed(() => authState.username === props.comment.userName)
     const isAdmin = computed(() => authState.role === 'ADMIN')
     const commentMenuItems = computed(() =>
@@ -208,7 +223,7 @@ const CommentItem = {
         lightboxVisible.value = true
       }
     }
-    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply, commentMenuItems, deleteComment, lightboxVisible, lightboxIndex, lightboxImgs, handleContentClick, loggedIn, replyCount }
+    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply, commentMenuItems, deleteComment, lightboxVisible, lightboxIndex, lightboxImgs, handleContentClick, loggedIn, replyCount, replyList }
   }
 }
 
@@ -249,6 +264,15 @@ export default CommentItem
   justify-content: space-between;
 }
 
+.reply-icon {
+  margin-right: 10px;
+  margin-left: 10px;
+  opacity: 0.5;
+}
+
+.reply-user-name {
+  opacity: 0.3;
+}
 
 @keyframes highlight {
   from {

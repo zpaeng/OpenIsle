@@ -216,17 +216,18 @@ export default {
       }
     }
 
-    const mapComment = (c, level = 0) => ({
+    const mapComment = (c, parentUserName = '', level = 0) => ({
       id: c.id,
       userName: c.author.username,
       time: TimeManager.format(c.createdAt),
       avatar: c.author.avatar,
       text: c.content,
       reactions: c.reactions || [],
-      reply: (c.replies || []).map(r => mapComment(r, level + 1)),
+      reply: (c.replies || []).map(r => mapComment(r, c.author.username, level + 1)),
       openReplies: level === 0,
       src: c.author.avatar,
-      iconClick: () => router.push(`/users/${c.author.id}`)
+      iconClick: () => router.push(`/users/${c.author.id}`),
+      parentUserName: parentUserName
     })
 
     const getTopRelativeTo = (el, container) => {
