@@ -70,6 +70,7 @@ public class CommentService {
         return comment;
     }
 
+    @Transactional
     public Comment addReply(String username, Long parentId, String content) {
         long recent = commentRepository.countByAuthorAfter(username,
                 java.time.LocalDateTime.now().minusMinutes(1));
@@ -154,7 +155,7 @@ public class CommentService {
         return commentRepository.findLastCommentTime(post);
     }
 
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public void deleteComment(String username, Long id) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
@@ -166,7 +167,7 @@ public class CommentService {
         deleteCommentCascade(comment);
     }
 
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public void deleteCommentCascade(Comment comment) {
         List<Comment> replies = commentRepository.findByParentOrderByCreatedAtAsc(comment);
         for (Comment c : replies) {

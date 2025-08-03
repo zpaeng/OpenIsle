@@ -15,6 +15,7 @@ import com.openisle.service.EmailSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,7 @@ public class ReactionService {
     @Value("${app.website-url}")
     private String websiteUrl;
 
+    @Transactional
     public Reaction reactToPost(String username, Long postId, ReactionType type) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
@@ -51,6 +53,7 @@ public class ReactionService {
         return reaction;
     }
 
+    @Transactional
     public Reaction reactToComment(String username, Long commentId, ReactionType type) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));

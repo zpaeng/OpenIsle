@@ -27,7 +27,6 @@ public class ReactionController {
     }
 
     @PostMapping("/posts/{postId}/reactions")
-    @Transactional
     public ResponseEntity<ReactionDto> reactToPost(@PathVariable Long postId,
                                                   @RequestBody ReactionRequest req,
                                                   Authentication auth) {
@@ -41,7 +40,6 @@ public class ReactionController {
     }
 
     @PostMapping("/comments/{commentId}/reactions")
-    @Transactional
     public ResponseEntity<ReactionDto> reactToComment(@PathVariable Long commentId,
                                                      @RequestBody ReactionRequest req,
                                                      Authentication auth) {
