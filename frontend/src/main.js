@@ -9,8 +9,8 @@ import './assets/toast.css'
 // If you prefer Bootstrap style, replace with theme-bootstrap.css instead.
 import { useToast } from 'vue-toastification'
 import { checkToken, clearToken, isLogin } from './utils/auth'
-import { initTheme } from './utils/theme'
 import { loginWithGoogle } from './utils/google'
+import { initTheme } from './utils/theme'
 import { clearVditorStorage } from './utils/clearVditorStorage'
 
 // Configurable API domain and port
@@ -51,6 +51,7 @@ checkToken().then(valid => {
     clearToken()
   }
 
+  // 引导用户优先采用Google Login登录
   if (!isLogin()) {
     setTimeout(() => {
       loginWithGoogle()
