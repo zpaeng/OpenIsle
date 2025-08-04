@@ -155,7 +155,7 @@ public class AuthController {
             ));
         }
 
-        if (req.reason == null || req.reason.length() <= 20) {
+        if (req.reason == null || req.reason.trim().length() <= 20) {
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "Reason's length must longer than 20",
                     "reason_code", "INVALID_CREDENTIALS"
