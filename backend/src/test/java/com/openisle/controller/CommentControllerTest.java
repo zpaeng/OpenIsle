@@ -1,10 +1,12 @@
 package com.openisle.controller;
 
+import com.openisle.dto.CommentDto;
+import com.openisle.mapper.CommentMapper;
 import com.openisle.model.Comment;
 import com.openisle.model.Post;
 import com.openisle.model.User;
-import com.openisle.service.CommentService;
 import com.openisle.service.CaptchaService;
+import com.openisle.service.CommentService;
 import com.openisle.service.LevelService;
 import com.openisle.service.ReactionService;
 import org.junit.jupiter.api.Test;
@@ -40,6 +42,8 @@ class CommentControllerTest {
     private LevelService levelService;
     @MockBean
     private ReactionService reactionService;
+    @MockBean
+    private CommentMapper commentMapper;
 
     private Comment createComment(Long id, String content, String authorName) {
         User user = new User();
@@ -60,6 +64,11 @@ class CommentControllerTest {
         Mockito.when(commentService.getCommentsForPost(eq(1L), any())).thenReturn(List.of(comment));
         Mockito.when(commentService.getReplies(1L)).thenReturn(List.of());
         Mockito.when(reactionService.getReactionsForComment(1L)).thenReturn(List.of());
+        CommentDto dto = new CommentDto();
+        dto.setId(comment.getId());
+        dto.setContent(comment.getContent());
+        Mockito.when(commentMapper.toDto(comment)).thenReturn(dto);
+        Mockito.when(commentMapper.toDtoWithReplies(comment)).thenReturn(dto);
 
         mockMvc.perform(post("/api/posts/1/comments")
                         .contentType("application/json")
@@ -77,6 +86,10 @@ class CommentControllerTest {
     void replyComment() throws Exception {
         Comment reply = createComment(2L, "re", "alice");
         Mockito.when(commentService.addReply(eq("alice"), eq(1L), eq("re"))).thenReturn(reply);
+        CommentDto dto = new CommentDto();
+        dto.setId(reply.getId());
+        dto.setContent(reply.getContent());
+        Mockito.when(commentMapper.toDto(reply)).thenReturn(dto);
 
         mockMvc.perform(post("/api/comments/1/replies")
                         .contentType("application/json")
