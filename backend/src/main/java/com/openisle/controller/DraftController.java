@@ -1,14 +1,14 @@
 package com.openisle.controller;
 
+import com.openisle.dto.DraftDto;
+import com.openisle.dto.DraftRequest;
 import com.openisle.model.Draft;
 import com.openisle.service.DraftService;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -48,20 +48,4 @@ public class DraftController {
         return dto;
     }
 
-    @Data
-    private static class DraftRequest {
-        private String title;
-        private String content;
-        private Long categoryId;
-        private List<Long> tagIds;
-    }
-
-    @Data
-    private static class DraftDto {
-        private Long id;
-        private String title;
-        private String content;
-        private Long categoryId;
-        private List<Long> tagIds;
-    }
 }

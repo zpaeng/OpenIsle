@@ -1,9 +1,12 @@
 package com.openisle.controller;
 
+import com.openisle.dto.CategoryDto;
+import com.openisle.dto.CategoryRequest;
+import com.openisle.dto.PostSummaryDto;
+import com.openisle.mapper.PostMapper;
 import com.openisle.model.Category;
 import com.openisle.service.CategoryService;
 import com.openisle.service.PostService;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +19,7 @@ import java.util.stream.Collectors;
 public class CategoryController {
     private final CategoryService categoryService;
     private final PostService postService;
+    private final PostMapper postMapper;
 
     @PostMapping
     public CategoryDto create(@RequestBody CategoryRequest req) {
@@ -57,12 +61,7 @@ public class CategoryController {
                                                     @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         return postService.listPostsByCategories(java.util.List.of(id), page, pageSize)
                 .stream()
-                .map(p -> {
-                    PostSummaryDto dto = new PostSummaryDto();
-                    dto.setId(p.getId());
-                    dto.setTitle(p.getTitle());
-                    return dto;
-                })
+                .map(postMapper::toSummaryDto)
                 .collect(Collectors.toList());
     }
 
@@ -75,29 +74,5 @@ public class CategoryController {
         dto.setDescription(c.getDescription());
         dto.setCount(count);
         return dto;
-    }
-
-    @Data
-    private static class CategoryRequest {
-        private String name;
-        private String description;
-        private String icon;
-        private String smallIcon;
-    }
-
-    @Data
-    private static class CategoryDto {
-        private Long id;
-        private String name;
-        private String description;
-        private String icon;
-        private String smallIcon;
-        private Long count;
-    }
-
-    @Data
-    private static class PostSummaryDto {
-        private Long id;
-        private String title;
     }
 }

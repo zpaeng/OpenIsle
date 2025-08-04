@@ -1,10 +1,11 @@
 package com.openisle.controller;
 
+import com.openisle.dto.PostSummaryDto;
+import com.openisle.dto.SearchResultDto;
+import com.openisle.dto.UserDto;
 import com.openisle.model.Post;
-import com.openisle.model.Comment;
 import com.openisle.model.User;
 import com.openisle.service.SearchService;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,21 +29,21 @@ public class SearchController {
     }
 
     @GetMapping("/posts")
-    public List<PostDto> searchPosts(@RequestParam String keyword) {
+    public List<PostSummaryDto> searchPosts(@RequestParam String keyword) {
         return searchService.searchPosts(keyword).stream()
                 .map(this::toPostDto)
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/posts/content")
-    public List<PostDto> searchPostsByContent(@RequestParam String keyword) {
+    public List<PostSummaryDto> searchPostsByContent(@RequestParam String keyword) {
         return searchService.searchPostsByContent(keyword).stream()
                 .map(this::toPostDto)
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/posts/title")
-    public List<PostDto> searchPostsByTitle(@RequestParam String keyword) {
+    public List<PostSummaryDto> searchPostsByTitle(@RequestParam String keyword) {
         return searchService.searchPostsByTitle(keyword).stream()
                 .map(this::toPostDto)
                 .collect(Collectors.toList());
@@ -72,33 +73,10 @@ public class SearchController {
         return dto;
     }
 
-    private PostDto toPostDto(Post post) {
-        PostDto dto = new PostDto();
+    private PostSummaryDto toPostDto(Post post) {
+        PostSummaryDto dto = new PostSummaryDto();
         dto.setId(post.getId());
         dto.setTitle(post.getTitle());
         return dto;
-    }
-
-    @Data
-    private static class UserDto {
-        private Long id;
-        private String username;
-        private String avatar;
-    }
-
-    @Data
-    private static class PostDto {
-        private Long id;
-        private String title;
-    }
-
-    @Data
-    private static class SearchResultDto {
-        private String type;
-        private Long id;
-        private String text;
-        private String subText;
-        private String extra;
-        private Long postId;
     }
 }

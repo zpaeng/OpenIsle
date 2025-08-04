@@ -2,16 +2,11 @@ package com.openisle.dto;
 
 import lombok.Data;
 
-/**
- * DTO representing a post category.
- */
+/** Request body for creating or updating a category. */
 @Data
-public class CategoryDto {
-    private Long id;
+public class CategoryRequest {
     private String name;
     private String description;
     private String icon;
     private String smallIcon;
-    private Long count;
 }
-

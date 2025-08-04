@@ -1,12 +1,15 @@
 package com.openisle.controller;
 
-import com.openisle.model.Tag;
-import com.openisle.service.TagService;
-import com.openisle.service.PostService;
-import com.openisle.repository.UserRepository;
+import com.openisle.dto.PostSummaryDto;
+import com.openisle.dto.TagDto;
+import com.openisle.dto.TagRequest;
+import com.openisle.mapper.PostMapper;
 import com.openisle.model.PublishMode;
 import com.openisle.model.Role;
-import lombok.Data;
+import com.openisle.model.Tag;
+import com.openisle.repository.UserRepository;
+import com.openisle.service.PostService;
+import com.openisle.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +23,7 @@ public class TagController {
     private final TagService tagService;
     private final PostService postService;
     private final UserRepository userRepository;
+    private final PostMapper postMapper;
 
     @PostMapping
     public TagDto create(@RequestBody TagRequest req, org.springframework.security.core.Authentication auth) {
@@ -79,12 +83,7 @@ public class TagController {
                                                @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         return postService.listPostsByTags(java.util.List.of(id), page, pageSize)
                 .stream()
-                .map(p -> {
-                    PostSummaryDto dto = new PostSummaryDto();
-                    dto.setId(p.getId());
-                    dto.setTitle(p.getTitle());
-                    return dto;
-                })
+                .map(postMapper::toSummaryDto)
                 .collect(Collectors.toList());
     }
 
@@ -95,31 +94,8 @@ public class TagController {
         dto.setIcon(tag.getIcon());
         dto.setSmallIcon(tag.getSmallIcon());
         dto.setDescription(tag.getDescription());
+        dto.setCreatedAt(tag.getCreatedAt());
         dto.setCount(count);
         return dto;
-    }
-
-    @Data
-    private static class TagRequest {
-        private String name;
-        private String description;
-        private String icon;
-        private String smallIcon;
-    }
-
-    @Data
-    private static class TagDto {
-        private Long id;
-        private String name;
-        private String description;
-        private String icon;
-        private String smallIcon;
-        private Long count;
-    }
-
-    @Data
-    private static class PostSummaryDto {
-        private Long id;
-        private String title;
     }
 }

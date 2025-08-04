@@ -2,6 +2,8 @@ package com.openisle.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 /**
  * DTO representing a tag.
  */
@@ -12,5 +14,7 @@ public class TagDto {
     private String description;
     private String icon;
     private String smallIcon;
+    private LocalDateTime createdAt;
+    private Long count;
 }
 

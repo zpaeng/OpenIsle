@@ -1,9 +1,9 @@
 package com.openisle.controller;
 
+import com.openisle.dto.TagDto;
 import com.openisle.model.Tag;
-import com.openisle.service.TagService;
 import com.openisle.service.PostService;
-import lombok.Data;
+import com.openisle.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,17 +38,8 @@ public class AdminTagController {
         dto.setDescription(tag.getDescription());
         dto.setIcon(tag.getIcon());
         dto.setSmallIcon(tag.getSmallIcon());
+        dto.setCreatedAt(tag.getCreatedAt());
         dto.setCount(count);
         return dto;
-    }
-
-    @Data
-    private static class TagDto {
-        private Long id;
-        private String name;
-        private String description;
-        private String icon;
-        private String smallIcon;
-        private Long count;
     }
 }

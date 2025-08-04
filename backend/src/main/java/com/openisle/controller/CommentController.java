@@ -1,16 +1,19 @@
 package com.openisle.controller;
 
+import com.openisle.dto.AuthorDto;
+import com.openisle.dto.CommentDto;
+import com.openisle.dto.CommentRequest;
+import com.openisle.dto.ReactionDto;
 import com.openisle.model.Comment;
-import com.openisle.service.CommentService;
+import com.openisle.model.CommentSort;
 import com.openisle.service.CaptchaService;
+import com.openisle.service.CommentService;
 import com.openisle.service.LevelService;
 import com.openisle.service.ReactionService;
-import com.openisle.model.CommentSort;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -102,41 +105,13 @@ public class CommentController {
         dto.setId(comment.getId());
         dto.setContent(comment.getContent());
         dto.setCreatedAt(comment.getCreatedAt());
-        dto.setAuthor(toAuthorDto(comment.getAuthor()));
+        AuthorDto author = new AuthorDto();
+        author.setId(comment.getAuthor().getId());
+        author.setUsername(comment.getAuthor().getUsername());
+        author.setAvatar(comment.getAuthor().getAvatar());
+        dto.setAuthor(author);
         dto.setReward(0);
         return dto;
-    }
-
-    private AuthorDto toAuthorDto(com.openisle.model.User user) {
-        AuthorDto dto = new AuthorDto();
-        dto.setId(user.getId());
-        dto.setUsername(user.getUsername());
-        dto.setAvatar(user.getAvatar());
-        return dto;
-    }
-
-    @Data
-    private static class CommentRequest {
-        private String content;
-        private String captcha;
-    }
-
-    @Data
-    private static class CommentDto {
-        private Long id;
-        private String content;
-        private LocalDateTime createdAt;
-        private AuthorDto author;
-        private List<CommentDto> replies;
-        private List<ReactionDto> reactions;
-        private int reward;
-    }
-
-    @Data
-    private static class AuthorDto {
-        private Long id;
-        private String username;
-        private String avatar;
     }
 
     private ReactionDto toReactionDto(com.openisle.model.Reaction reaction) {
@@ -152,15 +127,5 @@ public class CommentController {
         }
         dto.setReward(0);
         return dto;
-    }
-
-    @Data
-    private static class ReactionDto {
-        private Long id;
-        private com.openisle.model.ReactionType type;
-        private String user;
-        private Long postId;
-        private Long commentId;
-        private int reward;
     }
 }

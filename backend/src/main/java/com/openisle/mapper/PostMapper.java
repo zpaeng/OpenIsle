@@ -126,6 +126,7 @@ public class PostMapper {
         dto.setDescription(tag.getDescription());
         dto.setIcon(tag.getIcon());
         dto.setSmallIcon(tag.getSmallIcon());
+        dto.setCreatedAt(tag.getCreatedAt());
         return dto;
     }
 

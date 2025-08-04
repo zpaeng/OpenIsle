@@ -1,9 +1,8 @@
 package com.openisle.controller;
 
-import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
+import com.openisle.dto.SiteConfigDto;
 import com.openisle.service.RegisterModeService;
-import com.openisle.model.RegisterMode;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,8 +33,8 @@ public class ConfigController {
     private final RegisterModeService registerModeService;
 
     @GetMapping("/config")
-    public ConfigResponse getConfig() {
-        ConfigResponse resp = new ConfigResponse();
+    public SiteConfigDto getConfig() {
+        SiteConfigDto resp = new SiteConfigDto();
         resp.setCaptchaEnabled(captchaEnabled);
         resp.setRegisterCaptchaEnabled(registerCaptchaEnabled);
         resp.setLoginCaptchaEnabled(loginCaptchaEnabled);
@@ -44,16 +43,5 @@ public class ConfigController {
         resp.setAiFormatLimit(aiFormatLimit);
         resp.setRegisterMode(registerModeService.getRegisterMode());
         return resp;
-    }
-
-    @Data
-    private static class ConfigResponse {
-        private boolean captchaEnabled;
-        private boolean registerCaptchaEnabled;
-        private boolean loginCaptchaEnabled;
-        private boolean postCaptchaEnabled;
-        private boolean commentCaptchaEnabled;
-        private int aiFormatLimit;
-        private RegisterMode registerMode;
     }
 }

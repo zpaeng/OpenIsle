@@ -1,10 +1,16 @@
 package com.openisle.controller;
 
+import com.openisle.dto.CommentInfoDto;
+import com.openisle.dto.ParentCommentDto;
+import com.openisle.dto.PostMetaDto;
+import com.openisle.dto.TagDto;
+import com.openisle.dto.UpdateProfileDto;
+import com.openisle.dto.UserAggregateDto;
+import com.openisle.dto.UserDto;
 import com.openisle.exception.NotFoundException;
 import com.openisle.model.User;
 import com.openisle.service.*;
 import org.springframework.beans.factory.annotation.Value;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -139,13 +145,13 @@ public class UserController {
     }
 
     @GetMapping("/{identifier}/hot-tags")
-    public java.util.List<TagInfoDto> hotTags(@PathVariable("identifier") String identifier,
-                                              @RequestParam(value = "limit", required = false) Integer limit) {
+    public java.util.List<TagDto> hotTags(@PathVariable("identifier") String identifier,
+                                          @RequestParam(value = "limit", required = false) Integer limit) {
         int l = limit != null ? limit : 10;
         User user = userService.findByIdentifier(identifier).orElseThrow();
         return tagService.getTagsByUser(user.getUsername()).stream()
                 .map(t -> {
-                    TagInfoDto dto = new TagInfoDto();
+                    TagDto dto = new TagDto();
                     dto.setId(t.getId());
                     dto.setName(t.getName());
                     dto.setDescription(t.getDescription());
@@ -161,13 +167,13 @@ public class UserController {
     }
 
     @GetMapping("/{identifier}/tags")
-    public java.util.List<TagInfoDto> userTags(@PathVariable("identifier") String identifier,
-                                               @RequestParam(value = "limit", required = false) Integer limit) {
+    public java.util.List<TagDto> userTags(@PathVariable("identifier") String identifier,
+                                           @RequestParam(value = "limit", required = false) Integer limit) {
         int l = limit != null ? limit : defaultTagsLimit;
         User user = userService.findByIdentifier(identifier).orElseThrow();
         return tagService.getRecentTagsByUser(user.getUsername(), l).stream()
                 .map(t -> {
-                    TagInfoDto dto = new TagInfoDto();
+                    TagDto dto = new TagDto();
                     dto.setId(t.getId());
                     dto.setName(t.getName());
                     dto.setDescription(t.getDescription());
@@ -293,79 +299,5 @@ public class UserController {
             dto.setParentComment(pc);
         }
         return dto;
-    }
-
-    @Data
-    private static class UserDto {
-        private Long id;
-        private String username;
-        private String email;
-        private String avatar;
-        private String role;
-        private String introduction;
-        private long followers;
-        private long following;
-        private java.time.LocalDateTime createdAt;
-        private java.time.LocalDateTime lastPostTime;
-        private java.time.LocalDateTime lastCommentTime;
-        private long totalViews;
-        private long visitedDays;
-        private long readPosts;
-        private long likesSent;
-        private long likesReceived;
-        private boolean subscribed;
-        private int experience;
-        private int currentLevel;
-        private int nextLevelExp;
-    }
-
-    @Data
-    private static class PostMetaDto {
-        private Long id;
-        private String title;
-        private String snippet;
-        private java.time.LocalDateTime createdAt;
-        private String category;
-        private long views;
-    }
-
-    @Data
-    private static class CommentInfoDto {
-        private Long id;
-        private String content;
-        private java.time.LocalDateTime createdAt;
-        private PostMetaDto post;
-        private ParentCommentDto parentComment;
-    }
-
-    @Data
-    private static class TagInfoDto {
-        private Long id;
-        private String name;
-        private String description;
-        private String icon;
-        private String smallIcon;
-        private java.time.LocalDateTime createdAt;
-        private Long count;
-    }
-
-    @Data
-    private static class ParentCommentDto {
-        private Long id;
-        private String author;
-        private String content;
-    }
-
-    @Data
-    private static class UpdateProfileDto {
-        private String username;
-        private String introduction;
-    }
-
-    @Data
-    private static class UserAggregateDto {
-        private UserDto user;
-        private java.util.List<PostMetaDto> posts;
-        private java.util.List<CommentInfoDto> replies;
     }
 }

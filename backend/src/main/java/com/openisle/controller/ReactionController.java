@@ -1,11 +1,12 @@
 package com.openisle.controller;
 
+import com.openisle.dto.ReactionDto;
+import com.openisle.dto.ReactionRequest;
 import com.openisle.model.Reaction;
 import com.openisle.model.ReactionType;
-import com.openisle.service.ReactionService;
 import com.openisle.service.LevelService;
+import com.openisle.service.ReactionService;
 import jakarta.transaction.Transactional;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -65,20 +66,5 @@ public class ReactionController {
         }
         dto.setReward(0);
         return dto;
-    }
-
-    @Data
-    private static class ReactionRequest {
-        private ReactionType type;
-    }
-
-    @Data
-    private static class ReactionDto {
-        private Long id;
-        private ReactionType type;
-        private String user;
-        private Long postId;
-        private Long commentId;
-        private int reward;
     }
 }
