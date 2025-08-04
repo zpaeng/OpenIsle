@@ -3,6 +3,7 @@ package com.openisle.controller;
 import com.openisle.dto.CategoryDto;
 import com.openisle.dto.CategoryRequest;
 import com.openisle.dto.PostSummaryDto;
+import com.openisle.mapper.CategoryMapper;
 import com.openisle.mapper.PostMapper;
 import com.openisle.model.Category;
 import com.openisle.service.CategoryService;
@@ -20,19 +21,20 @@ public class CategoryController {
     private final CategoryService categoryService;
     private final PostService postService;
     private final PostMapper postMapper;
+    private final CategoryMapper categoryMapper;
 
     @PostMapping
     public CategoryDto create(@RequestBody CategoryRequest req) {
         Category c = categoryService.createCategory(req.getName(), req.getDescription(), req.getIcon(), req.getSmallIcon());
         long count = postService.countPostsByCategory(c.getId());
-        return toDto(c, count);
+        return categoryMapper.toDto(c, count);
     }
 
     @PutMapping("/{id}")
     public CategoryDto update(@PathVariable Long id, @RequestBody CategoryRequest req) {
         Category c = categoryService.updateCategory(id, req.getName(), req.getDescription(), req.getIcon(), req.getSmallIcon());
         long count = postService.countPostsByCategory(c.getId());
-        return toDto(c, count);
+        return categoryMapper.toDto(c, count);
     }
 
     @DeleteMapping("/{id}")
@@ -43,7 +45,7 @@ public class CategoryController {
     @GetMapping
     public List<CategoryDto> list() {
         return categoryService.listCategories().stream()
-                .map(c -> toDto(c, postService.countPostsByCategory(c.getId())))
+                .map(c -> categoryMapper.toDto(c, postService.countPostsByCategory(c.getId())))
                 .sorted((a, b) -> Long.compare(b.getCount(), a.getCount()))
                 .collect(Collectors.toList());
     }
@@ -52,7 +54,7 @@ public class CategoryController {
     public CategoryDto get(@PathVariable Long id) {
         Category c = categoryService.getCategory(id);
         long count = postService.countPostsByCategory(c.getId());
-        return toDto(c, count);
+        return categoryMapper.toDto(c, count);
     }
 
     @GetMapping("/{id}/posts")
@@ -63,16 +65,5 @@ public class CategoryController {
                 .stream()
                 .map(postMapper::toSummaryDto)
                 .collect(Collectors.toList());
-    }
-
-    private CategoryDto toDto(Category c, long count) {
-        CategoryDto dto = new CategoryDto();
-        dto.setId(c.getId());
-        dto.setName(c.getName());
-        dto.setIcon(c.getIcon());
-        dto.setSmallIcon(c.getSmallIcon());
-        dto.setDescription(c.getDescription());
-        dto.setCount(count);
-        return dto;
     }
 }
