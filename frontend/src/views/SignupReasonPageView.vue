@@ -6,7 +6,7 @@
         为了我们社区的良性发展，请填写注册理由，我们将根据你的理由审核你的注册, 谢谢!
       </div>
       <div class="reason-input-container">
-        <BaseInput textarea rows="4" v-model="reason" placeholder="20个字以上" ></BaseInput>
+        <BaseInput textarea rows="4" v-model="reason" placeholder="20个字以上"></BaseInput>
         <div class="char-count">{{ reason.length }}/20</div>
       </div>
       <div v-if="error" class="error-message">{{ error }}</div>
@@ -18,11 +18,11 @@
 
 <script>
 import BaseInput from '../components/BaseInput.vue'
-import { API_BASE_URL, toast } from '../main'
+import {API_BASE_URL, toast} from '../main'
 
 export default {
   name: 'SignupReasonPageView',
-  components: { BaseInput },
+  components: {BaseInput},
   data() {
     return {
       reason: '',
@@ -34,12 +34,12 @@ export default {
   mounted() {
     this.token = this.$route.query.token || ''
     if (!this.token) {
-        this.$router.push('/signup')
+      this.$router.push('/signup')
     }
   },
   methods: {
     async submit() {
-      if (!this.reason || this.reason.length < 20) {
+      if (!this.reason || this.reason.trim().length < 20) {
         this.error = '请至少输入20个字'
         return
       }
@@ -48,7 +48,7 @@ export default {
         this.isWaitingForRegister = true
         const res = await fetch(`${API_BASE_URL}/api/auth/reason`, {
           method: 'POST',
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
