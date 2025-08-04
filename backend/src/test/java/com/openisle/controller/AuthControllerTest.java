@@ -3,6 +3,7 @@ package com.openisle.controller;
 import com.openisle.model.User;
 import com.openisle.service.*;
 import com.openisle.model.RegisterMode;
+import com.openisle.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,16 @@ class AuthControllerTest {
     private GoogleAuthService googleAuthService;
     @MockBean
     private RegisterModeService registerModeService;
+    @MockBean
+    private GithubAuthService githubAuthService;
+    @MockBean
+    private DiscordAuthService discordAuthService;
+    @MockBean
+    private TwitterAuthService twitterAuthService;
+    @MockBean
+    private NotificationService notificationService;
+    @MockBean
+    private UserRepository userRepository;
 
     @Test
     void registerSendsEmail() throws Exception {
