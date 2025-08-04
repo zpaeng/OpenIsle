@@ -66,6 +66,7 @@ export default {
     const submit = () => {
       if (!vditorInstance.value || isDisabled.value) return
       const value = vditorInstance.value.getValue()
+      console.debug('CommentEditor submit', value)
       emit('submit', value)
       vditorInstance.value.setValue('')
       text.value = ''
