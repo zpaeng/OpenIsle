@@ -23,7 +23,8 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: HomePageView
+    component: HomePageView,
+    meta: { keepAlive: true }
   },
   {
     path: '/message',
