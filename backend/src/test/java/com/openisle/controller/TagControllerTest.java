@@ -1,6 +1,9 @@
 package com.openisle.controller;
 
+import com.openisle.mapper.TagMapper;
+import com.openisle.mapper.PostMapper;
 import com.openisle.model.Tag;
+import com.openisle.repository.UserRepository;
 import com.openisle.service.TagService;
 import com.openisle.service.PostService;
 import org.junit.jupiter.api.Test;
@@ -9,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -21,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(TagController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@Import(TagMapper.class)
 class TagControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -30,6 +35,12 @@ class TagControllerTest {
 
     @MockBean
     private PostService postService;
+
+    @MockBean
+    private UserRepository userRepository;
+
+    @MockBean
+    private PostMapper postMapper;
 
     @Test
     void createAndGetTag() throws Exception {
@@ -64,7 +75,7 @@ class TagControllerTest {
         t.setDescription("d2");
         t.setIcon("i2");
         t.setSmallIcon("s2");
-        Mockito.when(tagService.listTags()).thenReturn(List.of(t));
+        Mockito.when(tagService.searchTags(null)).thenReturn(List.of(t));
 
         mockMvc.perform(get("/api/tags"))
                 .andExpect(status().isOk())
