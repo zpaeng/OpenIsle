@@ -2,6 +2,8 @@ package com.openisle.controller;
 
 import com.openisle.model.User;
 import com.openisle.service.*;
+import com.openisle.mapper.TagMapper;
+import com.openisle.mapper.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,14 @@ class UserControllerTest {
     private CommentService commentService;
     @MockBean
     private LevelService levelService;
+    @MockBean
+    private TagService tagService;
+    @MockBean
+    private JwtService jwtService;
+    @MockBean
+    private UserMapper userMapper;
+    @MockBean
+    private TagMapper tagMapper;
 
     @Test
     void getCurrentUser() throws Exception {
