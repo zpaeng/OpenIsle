@@ -75,7 +75,7 @@ public class UserController {
 
     @PutMapping("/me")
     public ResponseEntity<?> updateProfile(@RequestBody UpdateProfileDto dto,
-                                                 Authentication auth) {
+                                           Authentication auth) {
         User user = userService.updateProfile(auth.getName(), dto.getUsername(), dto.getIntroduction());
         return ResponseEntity.ok(Map.of(
                 "token", jwtService.generateToken(user.getUsername()),
@@ -239,6 +239,7 @@ public class UserController {
         dto.setFollowing(subscriptionService.countSubscribed(user.getUsername()));
         dto.setCreatedAt(user.getCreatedAt());
         dto.setLastPostTime(postService.getLastPostTime(user.getUsername()));
+        dto.setLastCommentTime(commentService.getLastCommentTimeOfUserByUserId(user.getId()));
         dto.setTotalViews(postService.getTotalViews(user.getUsername()));
         dto.setVisitedDays(userVisitService.countVisits(user.getUsername()));
         dto.setReadPosts(postReadService.countReads(user.getUsername()));
@@ -306,6 +307,7 @@ public class UserController {
         private long following;
         private java.time.LocalDateTime createdAt;
         private java.time.LocalDateTime lastPostTime;
+        private java.time.LocalDateTime lastCommentTime;
         private long totalViews;
         private long visitedDays;
         private long readPosts;
