@@ -72,6 +72,7 @@ class AuthControllerTest {
     @Test
     void verifyCodeEndpoint() throws Exception {
         Mockito.when(userService.verifyCode("u", "123")).thenReturn(true);
+        Mockito.when(jwtService.generateReasonToken("u")).thenReturn("reason_token");
 
         mockMvc.perform(post("/api/auth/verify")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -84,6 +85,7 @@ class AuthControllerTest {
     void loginReturnsToken() throws Exception {
         User user = new User();
         user.setUsername("u");
+        user.setVerified(true);
         Mockito.when(userService.findByUsername("u")).thenReturn(Optional.of(user));
         Mockito.when(userService.matchesPassword(user, "p")).thenReturn(true);
         Mockito.when(jwtService.generateToken("u")).thenReturn("token");
