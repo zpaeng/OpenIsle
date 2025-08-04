@@ -6,6 +6,7 @@
     <div v-else>
       <div class="settings-title">个人资料设置</div>
       <div class="profile-section">
+
         <div class="avatar-row">
           <!-- label 充当点击区域，内部隐藏 input -->
           <label class="avatar-container">
