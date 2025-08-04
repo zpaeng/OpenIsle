@@ -1,5 +1,7 @@
 package com.openisle.controller;
 
+import com.openisle.mapper.CategoryMapper;
+import com.openisle.mapper.PostMapper;
 import com.openisle.model.Category;
 import com.openisle.service.CategoryService;
 import com.openisle.service.PostService;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -20,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(CategoryController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@Import(CategoryMapper.class)
 class CategoryControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -29,6 +33,9 @@ class CategoryControllerTest {
 
     @MockBean
     private PostService postService;
+
+    @MockBean
+    private PostMapper postMapper;
 
     @Test
     void createAndGetCategory() throws Exception {
