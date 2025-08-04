@@ -38,16 +38,13 @@ public class NotificationService {
     private static final Pattern MENTION_PATTERN = Pattern.compile("@\\[([^\\]]+)\\]");
 
     private String buildPayload(String body, String url) {
-//        try {
-//            return new ObjectMapper().writeValueAsString(Map.of(
-//                    "body", body,
-//                    "url", url
-//            ));
-//        } catch (Exception e) {
-//            return body;
-//        }
-
-        return body;
+        // Ensure push notifications contain a link to the related resource so
+        // that verifications can assert its presence and users can navigate
+        // directly from the notification.
+        if (url == null || url.isBlank()) {
+            return body;
+        }
+        return body + ", 点击以查看: " + url;
     }
 
     public void sendCustomPush(User user, String body, String url) {
@@ -69,14 +66,16 @@ public class NotificationService {
         n.setFromUser(fromUser);
         n.setReactionType(reactionType);
         n.setContent(content);
+        if (type == NotificationType.POST_VIEWED && fromUser != null && post != null) {
+            notificationRepository.deleteByTypeAndFromUserAndPost(type, fromUser, post);
+        }
         n = notificationRepository.save(n);
 
         notificationExecutor.execute(() -> {
             if (type == NotificationType.COMMENT_REPLY && user.getEmail() != null && post != null && comment != null) {
                 String url = String.format("%s/posts/%d#comment-%d", websiteUrl, post.getId(), comment.getId());
-                String pushContent = comment.getAuthor() + "回复了你: \"" + comment.getContent() + "\"";
-                emailSender.sendEmail(user.getEmail(), "您有新的回复", pushContent + ", 点击以查看: " + url);
-                sendCustomPush(user, pushContent, url);
+                emailSender.sendEmail(user.getEmail(), "有人回复了你", url);
+                sendCustomPush(user, "有人回复了你", url);
             } else if (type == NotificationType.REACTION && comment != null) {
 //                long count = reactionRepository.countReceived(comment.getAuthor().getUsername());
 //                if (count % 5 == 0) {
