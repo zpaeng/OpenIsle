@@ -1,8 +1,10 @@
 package com.openisle.integration;
 
+import com.openisle.controller.ActivityController;
 import com.openisle.model.User;
 import com.openisle.model.Role;
 import com.openisle.repository.UserRepository;
+import com.openisle.service.AvatarGenerator;
 import com.openisle.service.EmailSender;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

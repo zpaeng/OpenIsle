@@ -4,6 +4,7 @@ import com.openisle.model.Role;
 import com.openisle.model.User;
 import com.openisle.repository.UserRepository;
 import com.openisle.service.EmailSender;
+import com.openisle.service.PushNotificationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
