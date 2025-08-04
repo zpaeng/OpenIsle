@@ -1,5 +1,5 @@
 <template>
-  <div class="home-page" @scroll="handleScroll">
+  <div ref="homePage" class="home-page" @scroll="handleScroll">
     <div v-if="!isMobile" class="search-container">
       <div class="search-title">一切可能，从此刻启航</div>
       <div class="search-subtitle">愿你在此遇见灵感与共鸣。若有疑惑，欢迎发问，亦可在知识的海洋中搜寻答案。</div>
@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, onActivated, onDeactivated, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { stripMarkdown } from '../utils/markdown'
 import { API_BASE_URL } from '../main'
@@ -134,6 +134,8 @@ export default {
   },
   setup() {
     const route = useRoute()
+    const homePage = ref(null)
+    const savedScrollTop = ref(0)
     const selectedCategory = ref('')
     if (route.query.category) {
       const c = decodeURIComponent(route.query.category)
@@ -164,6 +166,20 @@ export default {
     const page = ref(0)
     const pageSize = 10
     const allLoaded = ref(false)
+
+    onActivated(() => {
+      nextTick(() => {
+        if (homePage.value) {
+          homePage.value.scrollTop = savedScrollTop.value
+        }
+      })
+    })
+
+    onDeactivated(() => {
+      if (homePage.value) {
+        savedScrollTop.value = homePage.value.scrollTop
+      }
+    })
 
     const countComments = (list) =>
       list.reduce((sum, c) => sum + 1 + countComments(c.replies || []), 0)
@@ -379,7 +395,7 @@ export default {
 
     const sanitizeDescription = (text) => stripMarkdown(text)
 
-    return { topics, selectedTopic, articles, sanitizeDescription, isLoadingPosts, handleScroll, selectedCategory, selectedTags, tagOptions, categoryOptions, isMobile }
+    return { topics, selectedTopic, articles, sanitizeDescription, isLoadingPosts, handleScroll, selectedCategory, selectedTags, tagOptions, categoryOptions, isMobile, homePage }
   }
 }
 </script>
