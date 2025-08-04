@@ -1,6 +1,11 @@
 package com.openisle.controller;
 
+import com.openisle.mapper.CategoryMapper;
+import com.openisle.mapper.CommentMapper;
 import com.openisle.mapper.PostMapper;
+import com.openisle.mapper.ReactionMapper;
+import com.openisle.mapper.TagMapper;
+import com.openisle.mapper.UserMapper;
 import com.openisle.model.*;
 import com.openisle.service.*;
 import org.junit.jupiter.api.Test;
@@ -24,7 +29,8 @@ import static org.mockito.Mockito.*;
 
 @WebMvcTest(PostController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@Import(PostMapper.class)
+@Import({PostMapper.class, CommentMapper.class, ReactionMapper.class,
+        UserMapper.class, TagMapper.class, CategoryMapper.class})
 class PostControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -47,6 +53,8 @@ class PostControllerTest {
     private SubscriptionService subscriptionService;
     @MockBean
     private UserVisitService userVisitService;
+    @MockBean
+    private PostReadService postReadService;
 
     @Test
     void createAndGetPost() throws Exception {
