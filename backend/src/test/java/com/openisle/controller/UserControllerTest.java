@@ -4,6 +4,9 @@ import com.openisle.model.User;
 import com.openisle.service.*;
 import com.openisle.mapper.TagMapper;
 import com.openisle.mapper.UserMapper;
+import com.openisle.dto.UserDto;
+import com.openisle.dto.PostMetaDto;
+import com.openisle.dto.CommentInfoDto;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +62,11 @@ class UserControllerTest {
         u.setEmail("a@b.com");
         u.setAvatar("http://x/avatar.png");
         Mockito.when(userService.findByUsername("alice")).thenReturn(Optional.of(u));
+        UserDto dto = new UserDto();
+        dto.setId(1L);
+        dto.setUsername("alice");
+        dto.setAvatar("http://x/avatar.png");
+        Mockito.when(userMapper.toDto(eq(u), any())).thenReturn(dto);
 
         mockMvc.perform(get("/api/users/me").principal(new UsernamePasswordAuthenticationToken("alice","p")))
                 .andExpect(status().isOk())
@@ -94,6 +102,10 @@ class UserControllerTest {
         u.setId(2L);
         u.setUsername("bob");
         Mockito.when(userService.findByIdentifier("bob")).thenReturn(Optional.of(u));
+        UserDto dto = new UserDto();
+        dto.setId(2L);
+        dto.setUsername("bob");
+        Mockito.when(userMapper.toDto(eq(u), any())).thenReturn(dto);
 
         mockMvc.perform(get("/api/users/bob"))
                 .andExpect(status().isOk())
@@ -114,6 +126,10 @@ class UserControllerTest {
         post.setAuthor(user);
         Mockito.when(userService.findByIdentifier("bob")).thenReturn(Optional.of(user));
         Mockito.when(postService.getRecentPostsByUser("bob", 10)).thenReturn(java.util.List.of(post));
+        PostMetaDto meta = new PostMetaDto();
+        meta.setId(3L);
+        meta.setTitle("hello");
+        Mockito.when(userMapper.toMetaDto(post)).thenReturn(meta);
 
         mockMvc.perform(get("/api/users/bob/posts"))
                 .andExpect(status().isOk())
@@ -137,6 +153,10 @@ class UserControllerTest {
         comment.setPost(post);
         Mockito.when(userService.findByIdentifier("bob")).thenReturn(Optional.of(user));
         Mockito.when(commentService.getRecentCommentsByUser("bob", 50)).thenReturn(java.util.List.of(comment));
+        CommentInfoDto info = new CommentInfoDto();
+        info.setId(4L);
+        info.setContent("hi");
+        Mockito.when(userMapper.toCommentInfoDto(comment)).thenReturn(info);
 
         mockMvc.perform(get("/api/users/bob/replies"))
                 .andExpect(status().isOk())
@@ -167,6 +187,18 @@ class UserControllerTest {
         Mockito.when(userService.findByIdentifier("bob")).thenReturn(Optional.of(user));
         Mockito.when(postService.getRecentPostsByUser("bob", 10)).thenReturn(java.util.List.of(post));
         Mockito.when(commentService.getRecentCommentsByUser("bob", 50)).thenReturn(java.util.List.of(comment));
+        UserDto dtoAgg = new UserDto();
+        dtoAgg.setId(2L);
+        dtoAgg.setUsername("bob");
+        Mockito.when(userMapper.toDto(eq(user), any())).thenReturn(dtoAgg);
+        PostMetaDto metaAgg = new PostMetaDto();
+        metaAgg.setId(3L);
+        metaAgg.setTitle("hello");
+        Mockito.when(userMapper.toMetaDto(post)).thenReturn(metaAgg);
+        CommentInfoDto infoAgg = new CommentInfoDto();
+        infoAgg.setId(4L);
+        infoAgg.setContent("hi");
+        Mockito.when(userMapper.toCommentInfoDto(comment)).thenReturn(infoAgg);
 
         mockMvc.perform(get("/api/users/bob/all"))
                 .andExpect(status().isOk())
