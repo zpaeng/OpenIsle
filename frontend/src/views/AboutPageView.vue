@@ -28,10 +28,10 @@ export default {
   setup() {
     const isFetching = ref(false)
     const tabs = [
-      { name: 'about', label: '关于', file: '/about/about.md' },
-      { name: 'agreement', label: '用户协议', file: '/about/agreement.md' },
-      { name: 'guideline', label: '创作准则', file: '/about/guideline.md' },
-      { name: 'privacy', label: '隐私政策', file: '/about/privacy.md' },
+      { name: 'about', label: '关于', file: '/about_markdown/about.md' },
+      { name: 'agreement', label: '用户协议', file: '/about_markdown/agreement.md' },
+      { name: 'guideline', label: '创作准则', file: '/about_markdown/guideline.md' },
+      { name: 'privacy', label: '隐私政策', file: '/about_markdown/privacy.md' },
     ]
     const selectedTab = ref(tabs[0].name)
     const content = ref('')
