@@ -1,11 +1,13 @@
 package com.openisle.controller;
 
+import com.openisle.dto.NotificationDto;
+import com.openisle.dto.PostSummaryDto;
+import com.openisle.mapper.NotificationMapper;
 import com.openisle.model.Notification;
 import com.openisle.model.NotificationType;
 import com.openisle.model.Post;
 import com.openisle.service.NotificationService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -31,6 +33,9 @@ class NotificationControllerTest {
     @MockBean
     private NotificationService notificationService;
 
+    @MockBean
+    private NotificationMapper notificationMapper;
+
     @Test
     void listNotifications() throws Exception {
         Notification n = new Notification();
@@ -40,8 +45,15 @@ class NotificationControllerTest {
         p.setId(2L);
         n.setPost(p);
         n.setCreatedAt(LocalDateTime.now());
-        Mockito.when(notificationService.listNotifications("alice", null))
+        when(notificationService.listNotifications("alice", null))
                 .thenReturn(List.of(n));
+
+        NotificationDto dto = new NotificationDto();
+        dto.setId(1L);
+        PostSummaryDto ps = new PostSummaryDto();
+        ps.setId(2L);
+        dto.setPost(ps);
+        when(notificationMapper.toDto(n)).thenReturn(dto);
 
         mockMvc.perform(get("/api/notifications")
                         .principal(new UsernamePasswordAuthenticationToken("alice","p")))
@@ -63,7 +75,7 @@ class NotificationControllerTest {
 
     @Test
     void unreadCountEndpoint() throws Exception {
-        Mockito.when(notificationService.countUnread("alice")).thenReturn(3L);
+        when(notificationService.countUnread("alice")).thenReturn(3L);
 
         mockMvc.perform(get("/api/notifications/unread-count")
                         .principal(new UsernamePasswordAuthenticationToken("alice","p")))
