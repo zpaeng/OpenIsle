@@ -375,6 +375,7 @@ export default {
 
     const handleScroll = (e) => {
       const el = e.target
+      savedScrollTop.value = el.scrollTop
       if (el.scrollHeight - el.scrollTop <= el.clientHeight + 50) {
         fetchContent()
       }
