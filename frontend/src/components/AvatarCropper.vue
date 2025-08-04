@@ -83,7 +83,8 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.8);
+  opacity: 1.0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -91,7 +92,7 @@ export default {
 }
 
 .cropper-body {
-  background: #fff;
+  background: var(--background-color);
   padding: 10px;
   border-radius: 6px;
   display: flex;
@@ -118,15 +119,16 @@ export default {
 
 .cropper-btn {
   padding: 6px 12px;
-  border: 1px solid #ccc;
-  background: #fff;
   border-radius: 4px;
+  color: var(--primary-color);
+  border: none;
+  background: transparent;
   cursor: pointer;
 }
 
 .cropper-btn.primary {
   background: var(--primary-color);
-  color: #fff;
+  color: var(--text-color);
   border-color: var(--primary-color);
 }
 
