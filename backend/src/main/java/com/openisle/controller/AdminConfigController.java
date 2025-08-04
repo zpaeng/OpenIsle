@@ -1,13 +1,10 @@
 package com.openisle.controller;
 
-import com.openisle.model.PasswordStrength;
-import com.openisle.model.PublishMode;
+import com.openisle.dto.ConfigDto;
+import com.openisle.service.AiUsageService;
 import com.openisle.service.PasswordValidator;
 import com.openisle.service.PostService;
-import com.openisle.service.AiUsageService;
 import com.openisle.service.RegisterModeService;
-import com.openisle.model.RegisterMode;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,11 +44,4 @@ public class AdminConfigController {
         return getConfig();
     }
 
-    @Data
-    public static class ConfigDto {
-        private PublishMode publishMode;
-        private PasswordStrength passwordStrength;
-        private Integer aiFormatLimit;
-        private RegisterMode registerMode;
-    }
 }

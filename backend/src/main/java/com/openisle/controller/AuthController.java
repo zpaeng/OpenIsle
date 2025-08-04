@@ -1,24 +1,16 @@
 package com.openisle.controller;
 
-import com.openisle.model.User;
-import com.openisle.service.EmailSender;
-import com.openisle.service.JwtService;
-import com.openisle.service.UserService;
-import com.openisle.service.CaptchaService;
-import com.openisle.service.GoogleAuthService;
-import com.openisle.service.GithubAuthService;
-import com.openisle.service.DiscordAuthService;
-import com.openisle.service.TwitterAuthService;
-import com.openisle.service.RegisterModeService;
-import com.openisle.service.NotificationService;
-import com.openisle.model.RegisterMode;
-import com.openisle.repository.UserRepository;
+import com.openisle.dto.*;
 import com.openisle.exception.FieldException;
-import lombok.Data;
+import com.openisle.model.RegisterMode;
+import com.openisle.model.User;
+import com.openisle.repository.UserRepository;
+import com.openisle.service.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Value;
+
 import java.util.Map;
 import java.util.Optional;
 
@@ -154,8 +146,8 @@ public class AuthController {
             ));
         }
 
-        if (req.getReason() == null || req.getReason().length() <= 20) {
-            return ResponseEntity.badRequest().body(Map.of(
+        if (req.getReason() == null || req.getReason().trim().length() <= 20) {
+             return ResponseEntity.badRequest().body(Map.of(
                     "error", "Reason's length must longer than 20",
                     "reason_code", "INVALID_CREDENTIALS"
             ));
@@ -306,71 +298,5 @@ public class AuthController {
         }
     }
 
-    @Data
-    private static class RegisterRequest {
-        private String username;
-        private String email;
-        private String password;
-        private String captcha;
-    }
-
-    @Data
-    private static class LoginRequest {
-        private String username;
-        private String password;
-        private String captcha;
-    }
-
-    @Data
-    private static class GoogleLoginRequest {
-        private String idToken;
-    }
-
-    @Data
-    private static class GithubLoginRequest {
-        private String code;
-        private String redirectUri;
-    }
-
-    @Data
-    private static class DiscordLoginRequest {
-        private String code;
-        private String redirectUri;
-    }
-  
-    @Data
-    private static class TwitterLoginRequest {
-        private String code;
-        private String redirectUri;
-        private String codeVerifier;
-    }
-
-    @Data
-    private static class VerifyRequest {
-        private String username;
-        private String code;
-    }
-
-    @Data
-    private static class MakeReasonRequest {
-        private String token;
-        private String reason;
-    }
-
-    @Data
-    private static class ForgotPasswordRequest {
-        private String email;
-    }
-
-    @Data
-    private static class VerifyForgotRequest {
-        private String email;
-        private String code;
-    }
-
-    @Data
-    private static class ResetPasswordRequest {
-        private String token;
-        private String password;
-    }
+    // DTO classes moved to com.openisle.dto package
 }
