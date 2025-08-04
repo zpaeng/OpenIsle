@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class AdminUserController {
     private final UserRepository userRepository;
     private final EmailSender emailSender;
-    @Value("${app.website-url}")
+    @Value("${app.website-url:https://www.open-isle.com}")
     private String websiteUrl;
 
     @PostMapping("/{id}/approve")
