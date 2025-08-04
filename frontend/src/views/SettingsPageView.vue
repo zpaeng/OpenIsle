@@ -1,5 +1,11 @@
 <template>
   <div class="settings-page">
+    <AvatarCropper
+      :src="tempAvatar"
+      :show="showCropper"
+      @close="showCropper = false"
+      @crop="onCropped"
+    />
     <div v-if="isLoadingPage" class="loading-page">
       <l-hatch size="20" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
     </div>
@@ -58,11 +64,12 @@ import { API_BASE_URL, toast } from '../main'
 import { getToken, fetchCurrentUser, setToken } from '../utils/auth'
 import BaseInput from '../components/BaseInput.vue'
 import Dropdown from '../components/Dropdown.vue'
+import AvatarCropper from '../components/AvatarCropper.vue'
 import { hatch } from 'ldrs'
 hatch.register()
 export default {
   name: 'SettingsPageView',
-  components: { BaseInput, Dropdown },
+  components: { BaseInput, Dropdown, AvatarCropper },
   data() {
     return {
       username: '',
@@ -70,6 +77,8 @@ export default {
       usernameError: '',
       avatar: '',
       avatarFile: null,
+      tempAvatar: '',
+      showCropper: false,
       role: '',
       publishMode: 'DIRECT',
       passwordStrength: 'LOW',
@@ -100,14 +109,18 @@ export default {
   methods: {
     onAvatarChange(e) {
       const file = e.target.files[0]
-      this.avatarFile = file
       if (file) {
         const reader = new FileReader()
         reader.onload = () => {
-          this.avatar = reader.result
+          this.tempAvatar = reader.result
+          this.showCropper = true
         }
         reader.readAsDataURL(file)
       }
+    },
+    onCropped({ file, url }) {
+      this.avatarFile = file
+      this.avatar = url
     },
     fetchPublishModes() {
       return Promise.resolve([
