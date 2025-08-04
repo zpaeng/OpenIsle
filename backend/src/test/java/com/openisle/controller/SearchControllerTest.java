@@ -1,5 +1,9 @@
 package com.openisle.controller;
 
+import com.openisle.dto.PostSummaryDto;
+import com.openisle.dto.UserDto;
+import com.openisle.mapper.PostMapper;
+import com.openisle.mapper.UserMapper;
 import com.openisle.model.Comment;
 import com.openisle.model.Post;
 import com.openisle.model.User;
@@ -26,6 +30,10 @@ class SearchControllerTest {
 
     @MockBean
     private SearchService searchService;
+    @MockBean
+    private UserMapper userMapper;
+    @MockBean
+    private PostMapper postMapper;
 
     @Test
     void userSearchEndpoint() throws Exception {
@@ -33,6 +41,10 @@ class SearchControllerTest {
         user.setId(1L);
         user.setUsername("alice");
         Mockito.when(searchService.searchUsers("ali")).thenReturn(List.of(user));
+        UserDto userDto = new UserDto();
+        userDto.setId(1L);
+        userDto.setUsername("alice");
+        Mockito.when(userMapper.toDto(user)).thenReturn(userDto);
 
         mockMvc.perform(get("/api/search/users").param("keyword", "ali"))
                 .andExpect(status().isOk())
@@ -70,6 +82,10 @@ class SearchControllerTest {
         p.setId(2L);
         p.setTitle("spring");
         Mockito.when(searchService.searchPostsByTitle("spr")).thenReturn(List.of(p));
+        PostSummaryDto summaryDto1 = new PostSummaryDto();
+        summaryDto1.setId(2L);
+        summaryDto1.setTitle("spring");
+        Mockito.when(postMapper.toSummaryDto(p)).thenReturn(summaryDto1);
 
         mockMvc.perform(get("/api/search/posts/title").param("keyword", "spr"))
                 .andExpect(status().isOk())
@@ -82,6 +98,10 @@ class SearchControllerTest {
         p.setId(5L);
         p.setTitle("hello");
         Mockito.when(searchService.searchPosts("he")).thenReturn(List.of(p));
+        PostSummaryDto summaryDto2 = new PostSummaryDto();
+        summaryDto2.setId(5L);
+        summaryDto2.setTitle("hello");
+        Mockito.when(postMapper.toSummaryDto(p)).thenReturn(summaryDto2);
 
         mockMvc.perform(get("/api/search/posts").param("keyword", "he"))
                 .andExpect(status().isOk())
