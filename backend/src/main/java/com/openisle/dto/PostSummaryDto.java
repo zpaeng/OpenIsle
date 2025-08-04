@@ -1,0 +1,30 @@
+package com.openisle.dto;
+
+import com.openisle.model.PostStatus;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+/**
+ * Lightweight DTO for listing posts without comments.
+ */
+@Data
+public class PostSummaryDto {
+    private Long id;
+    private String title;
+    private String content;
+    private LocalDateTime createdAt;
+    private AuthorDto author;
+    private CategoryDto category;
+    private List<TagDto> tags;
+    private long views;
+    private PostStatus status;
+    private LocalDateTime pinnedAt;
+    private LocalDateTime lastReplyAt;
+    private List<ReactionDto> reactions;
+    private List<AuthorDto> participants;
+    private boolean subscribed;
+    private int reward;
+}
+
