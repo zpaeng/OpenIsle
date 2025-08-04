@@ -30,7 +30,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception ex) {
-        return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        String message = ex.getMessage();
+        if (message == null) {
+            message = ex.getClass().getSimpleName();
+        }
+        return ResponseEntity.badRequest().body(Map.of("error", message));
     }
 }
 
