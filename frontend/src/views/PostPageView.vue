@@ -370,6 +370,7 @@ export default {
 
     const postComment = async (text) => {
       if (!text.trim()) return
+      console.debug('Posting comment', { postId, text })
       isWaitingPostingComment.value = true
       const token = getToken()
       if (!token) {
@@ -383,8 +384,10 @@ export default {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
           body: JSON.stringify({ content: text })
         })
+        console.debug('Post comment response status', res.status)
         if (res.ok) {
           const data = await res.json()
+          console.debug('Post comment response data', data)
           await fetchComments()
           if (data.reward && data.reward > 0) {
             toast.success(`评论成功，获得 ${data.reward} 经验值`)
@@ -397,6 +400,7 @@ export default {
           toast.error('评论失败')
         }
       } catch (e) {
+        console.debug('Post comment error', e)
         toast.error('评论失败')
       } finally {
         isWaitingPostingComment.value = false
@@ -538,20 +542,23 @@ export default {
 
     const fetchComments = async () => {
       isFetchingComments.value = true
+      console.debug('Fetching comments', { postId, sort: commentSort.value })
       try {
         const token = getToken()
         const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/comments?sort=${commentSort.value}`, {
           headers: { Authorization: token ? `Bearer ${token}` : '' }
         })
+        console.debug('Fetch comments response status', res.status)
         if (res.ok) {
           const data = await res.json()
+          console.debug('Fetched comments count', data.length)
           comments.value = data.map(mapComment)
           isFetchingComments.value = false
           await nextTick()
           gatherPostItems()
         }
-      } catch {
-        // ignore
+      } catch (e) {
+        console.debug('Fetch comments error', e)
       } finally {
         isFetchingComments.value = false
       }

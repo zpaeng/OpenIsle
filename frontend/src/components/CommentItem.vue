@@ -144,10 +144,12 @@ const CommentItem = {
         toast.error('请先登录')
         return
       }
+      console.debug('Deleting comment', props.comment.id)
       const res = await fetch(`${API_BASE_URL}/api/comments/${props.comment.id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       })
+      console.debug('Delete comment response status', res.status)
       if (res.ok) {
         toast.success('已删除')
         emit('deleted', props.comment.id)
@@ -164,14 +166,17 @@ const CommentItem = {
         isWaitingForReply.value = false
         return
       }
+      console.debug('Submitting reply', { parentId: props.comment.id, text })
       try {
         const res = await fetch(`${API_BASE_URL}/api/comments/${props.comment.id}/replies`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
           body: JSON.stringify({ content: text })
         })
+        console.debug('Submit reply response status', res.status)
         if (res.ok) {
           const data = await res.json()
+          console.debug('Submit reply response data', data)
           const replyList = props.comment.reply || (props.comment.reply = [])
           replyList.push({
             id: data.id,
@@ -202,6 +207,7 @@ const CommentItem = {
           toast.error('回复失败')
         }
       } catch (e) {
+        console.debug('Submit reply error', e)
         toast.error('回复失败')
       } finally {
         isWaitingForReply.value = false
