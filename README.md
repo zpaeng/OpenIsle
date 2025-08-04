@@ -22,11 +22,6 @@ OpenIsle 是一个使用 Spring Boot 和 Vue 3 构建的全栈开源社区平台
 2. 执行 `npm install`
 3. `npm run serve`可在本地启动开发服务，产品环境使用 `npm run build`生成 `dist/` 文件，配合线上网站方式部署
 
-### 日志
-
-后端使用 Logback 按小时滚动输出日志，日志文件位于 `backend/logs/`，文件名格式为 `application-YYYY-MM-dd_HH.log.gz`，系统会自动保留最近三天的日志。
-若需要解压最近三天的日志，可在后端目录执行 `./scripts/extract_logs.sh`，脚本会将日志解压到 `scripts/extracted/` 目录或指定的目标目录。
-
 ## ✨ 项目特点
 - JWT 认证以及 Google、GitHub、Discord、Twitter 等多种 OAuth 登录
 - 支持分类、标签的贴文管理以及草稿保存功能
