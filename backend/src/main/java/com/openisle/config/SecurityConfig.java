@@ -41,7 +41,7 @@ public class SecurityConfig {
     private final UserRepository userRepository;
     private final AccessDeniedHandler customAccessDeniedHandler;
     private final UserVisitService userVisitService;
-    @Value("${app.website-url}")
+    @Value("${app.website-url:https://www.open-isle.com}")
     private String websiteUrl;
 
     @Bean
