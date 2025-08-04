@@ -9,7 +9,12 @@
         <MenuComponent :visible="!hideMenu && menuVisible" @item-click="menuVisible = false" />
       </div>
       <div class="content" :class="{ 'menu-open': menuVisible && !hideMenu }">
-        <router-view />
+        <router-view v-slot="{ Component }">
+          <keep-alive>
+            <component :is="Component" v-if="$route.meta.keepAlive" />
+          </keep-alive>
+          <component :is="Component" v-if="!$route.meta.keepAlive" />
+        </router-view>
       </div>
     </div>
     <GlobalPopups />
