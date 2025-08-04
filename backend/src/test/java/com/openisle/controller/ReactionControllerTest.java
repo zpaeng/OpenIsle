@@ -7,12 +7,14 @@ import com.openisle.model.ReactionType;
 import com.openisle.model.User;
 import com.openisle.service.ReactionService;
 import com.openisle.service.LevelService;
+import com.openisle.mapper.ReactionMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -24,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ReactionController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@Import(ReactionMapper.class)
 class ReactionControllerTest {
     @Autowired
     private MockMvc mockMvc;
