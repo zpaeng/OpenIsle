@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import { ref, onMounted, watch, onActivated, onDeactivated, nextTick } from 'vue'
+import { ref, onMounted, watch, onActivated, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { stripMarkdown } from '../utils/markdown'
 import { API_BASE_URL } from '../main'
@@ -173,12 +173,6 @@ export default {
           homePage.value.scrollTop = savedScrollTop.value
         }
       })
-    })
-
-    onDeactivated(() => {
-      if (homePage.value) {
-        savedScrollTop.value = homePage.value.scrollTop
-      }
     })
 
     const countComments = (list) =>
