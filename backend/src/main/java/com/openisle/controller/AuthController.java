@@ -17,7 +17,6 @@ import com.openisle.exception.FieldException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Value;
 import java.util.Map;
@@ -155,7 +154,7 @@ public class AuthController {
             ));
         }
 
-        if (req.reason == null || req.reason.length() <= 20) {
+        if (req.getReason() == null || req.getReason().length() <= 20) {
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "Reason's length must longer than 20",
                     "reason_code", "INVALID_CREDENTIALS"

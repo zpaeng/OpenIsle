@@ -1,6 +1,10 @@
 package com.openisle.controller;
 
 import com.openisle.model.Comment;
+import com.openisle.dto.CommentDto;
+import com.openisle.dto.CommentRequest;
+import com.openisle.mapper.CommentMapper;
+import com.openisle.service.CaptchaService;
 import com.openisle.service.CommentService;
 import com.openisle.service.CaptchaService;
 import com.openisle.service.LevelService;
