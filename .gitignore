@@ -4,3 +4,4 @@ openisle.iml
 node_modules
 dist
 open-isle.env
+logs
