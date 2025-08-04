@@ -76,6 +76,10 @@ public class CommentService {
         return comment;
     }
 
+    public java.time.LocalDateTime getLastCommentTimeOfUserByUserId(Long userId) { // 根据用户id查询该用户最后回复时间
+        return commentRepository.findLastCommentTimeOfUserByUserId(userId);
+    }
+
     @Transactional
     public Comment addReply(String username, Long parentId, String content) {
         log.debug("addReply called by user {} for parent comment {}", username, parentId);
