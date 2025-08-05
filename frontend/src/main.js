@@ -12,7 +12,6 @@ import { checkToken, clearToken, isLogin } from './utils/auth'
 import { loginWithGoogle } from './utils/google'
 import { initTheme } from './utils/theme'
 import { clearVditorStorage } from './utils/clearVditorStorage'
-import { initIOSKeyboardFix } from './utils/iosKeyboardFix'
 
 // 采用本地开发环境
 // export const API_DOMAIN = 'http://127.0.0.1'
@@ -35,7 +34,6 @@ export const toast = useToast()
 
 initTheme()
 clearVditorStorage()
-initIOSKeyboardFix()
 
 const app = createApp(App)
 app.use(router)
