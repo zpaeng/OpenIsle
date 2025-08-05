@@ -51,10 +51,7 @@ public class NotificationService {
         pushNotificationService.sendNotification(user, buildPayload(body, url));
     }
 
-    public Notification createNotification(User user, NotificationType type, Post post, Comment comment, Boolean approved) {
-        return createNotification(user, type, post, comment, approved, null, null, null);
-    }
-
+    @Transactional
     public Notification createNotification(User user, NotificationType type, Post post, Comment comment, Boolean approved,
                                            User fromUser, ReactionType reactionType, String content) {
         Notification n = new Notification();
@@ -71,7 +68,7 @@ public class NotificationService {
         }
         n = notificationRepository.save(n);
 
-        notificationExecutor.execute(() -> {
+//        notificationExecutor.execute(() -> {
             if (type == NotificationType.COMMENT_REPLY && user.getEmail() != null && post != null && comment != null) {
                 String url = String.format("%s/posts/%d#comment-%d", websiteUrl, post.getId(), comment.getId());
                 emailSender.sendEmail(user.getEmail(), "有人回复了你", url);
@@ -95,7 +92,7 @@ public class NotificationService {
 //                    }
 //                }
             }
-        });
+//        });
 
         return n;
     }
