@@ -156,6 +156,7 @@ export default {
     const defaultTitle = document.title
     const metaDescriptionEl = document.querySelector('meta[name="description"]')
     const defaultDescription = metaDescriptionEl ? metaDescriptionEl.getAttribute('content') : ''
+    const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0
 
     watch(title, t => {
       document.title = `OpenIsle - ${t}`
@@ -358,8 +359,8 @@ export default {
       currentIndex.value = index
       const target = postItems.value[index - 1]
       if (target) {
-        const top = getTop(target)
-        window.scrollTo({ top, behavior: 'instant' })
+        const top = getTop(target) - headerHeight - 20 // 20 for beauty
+        window.scrollTo({ top, behavior: 'auto' })
       }
     }
 
@@ -568,10 +569,10 @@ export default {
         await nextTick()
         const el = document.getElementById('comment-' + id)
         if (el) {
-          const top = el.getBoundingClientRect().top + window.scrollY
-          window.scrollTo({ top, behavior: 'instant' })
+          const top = el.getBoundingClientRect().top + window.scrollY - headerHeight - 20 // 20 for beauty
+          window.scrollTo({ top, behavior: 'smooth' })
           el.classList.add('comment-highlight')
-          setTimeout(() => el.classList.remove('comment-highlight'), 2000)
+          setTimeout(() => el.classList.remove('comment-highlight'), 4000)
         }
       }
     }
@@ -668,7 +669,7 @@ export default {
   flex-direction: column;
   width: 15%;
   position: sticky;
-  top: 0;
+  top: var(--header-height);
   align-self: flex-start;
 }
 
