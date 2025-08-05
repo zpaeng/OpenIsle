@@ -572,8 +572,9 @@ export default {
         const id = hash.substring('#comment-'.length)
         await nextTick()
         const el = document.getElementById('comment-' + id)
-        if (el && mainContainer.value) {
-          mainContainer.value.scrollTo({ top: getTopRelativeTo(el, mainContainer.value), behavior: 'instant' })
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.scrollY
+          window.scrollTo({ top, behavior: 'instant' })
           el.classList.add('comment-highlight')
           setTimeout(() => el.classList.remove('comment-highlight'), 2000)
         }
@@ -671,6 +672,9 @@ export default {
   display: flex;
   flex-direction: column;
   width: 15%;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
 }
 
 .comment-config-container {
