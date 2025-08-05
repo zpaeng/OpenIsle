@@ -397,11 +397,11 @@ export default {
         } else if (res.status === 429) {
           toast.error('评论过于频繁，请稍后再试')
         } else {
-          toast.error('评论失败')
+          toast.error(`评论失败: ${res.status} ${res.statusText}`)
         }
       } catch (e) {
         console.debug('Post comment error', e)
-        toast.error('评论失败')
+        toast.error(`评论失败: ${e.message}`)
       } finally {
         isWaitingPostingComment.value = false
       }
