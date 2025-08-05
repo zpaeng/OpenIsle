@@ -58,10 +58,8 @@ export default {
 
 <style>
 .header-container {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
   z-index: 1000;
 }
 
@@ -69,7 +67,7 @@ export default {
 
 .content {
   /* height: calc(100vh - var(--header-height)); */
-  padding-top: var(--header-height);
+  /* padding-top: var(--header-height); */
   flex: 1;
   max-width: 100%;
   transition: max-width 0.3s ease;
