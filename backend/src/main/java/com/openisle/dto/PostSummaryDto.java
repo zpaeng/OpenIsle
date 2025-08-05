@@ -19,6 +19,7 @@ public class PostSummaryDto {
     private CategoryDto category;
     private List<TagDto> tags;
     private long views;
+    private long commentCount;
     private PostStatus status;
     private LocalDateTime pinnedAt;
     private LocalDateTime lastReplyAt;

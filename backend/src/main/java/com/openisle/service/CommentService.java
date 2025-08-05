@@ -186,6 +186,13 @@ public class CommentService {
         return time;
     }
 
+    public long countComments(Long postId) {
+        log.debug("countComments called for post {}", postId);
+        long count = commentRepository.countByPostId(postId);
+        log.debug("countComments for post {} is {}", postId, count);
+        return count;
+    }
+
     @Transactional
     public void deleteComment(String username, Long id) {
         log.debug("deleteComment called by user {} for comment {}", username, id);
