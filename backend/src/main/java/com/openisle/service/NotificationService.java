@@ -72,7 +72,7 @@ public class NotificationService {
         }
         n = notificationRepository.save(n);
 
-        Runnable asyncTask = () -> {
+//        Runnable asyncTask = () -> {
             if (type == NotificationType.COMMENT_REPLY && user.getEmail() != null && post != null && comment != null) {
                 String url = String.format("%s/posts/%d#comment-%d", websiteUrl, post.getId(), comment.getId());
                 emailSender.sendEmail(user.getEmail(), "有人回复了你", url);
@@ -96,18 +96,18 @@ public class NotificationService {
 //                    }
 //                }
             }
-        };
+//        };
 
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-                @Override
-                public void afterCommit() {
-                    notificationExecutor.execute(asyncTask);
-                }
-            });
-        } else {
-            notificationExecutor.execute(asyncTask);
-        }
+//        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+//            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+//                @Override
+//                public void afterCommit() {
+//                    notificationExecutor.execute(asyncTask);
+//                }
+//            });
+//        } else {
+//            notificationExecutor.execute(asyncTask);
+//        }
 
         return n;
     }
