@@ -628,8 +628,6 @@ export default {
 
 .message-page {
   background-color: var(--background-color);
-  height: 100%;
-  overflow-y: auto;
 }
 
 .message-page-header {
