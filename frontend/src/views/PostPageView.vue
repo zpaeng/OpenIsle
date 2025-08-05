@@ -566,7 +566,8 @@ export default {
       const hash = location.hash
       if (hash.startsWith('#comment-')) {
         const id = hash.substring('#comment-'.length)
-        await nextTick()
+        // 不清楚啥原因，先wait一下子不然会定不准 😅
+        await new Promise(resolve => setTimeout(resolve, 500))
         const el = document.getElementById('comment-' + id)
         if (el) {
           const top = el.getBoundingClientRect().top + window.scrollY - headerHeight - 20 // 20 for beauty
