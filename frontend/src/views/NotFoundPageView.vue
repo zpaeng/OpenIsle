@@ -17,8 +17,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: calc(100vh - var(--header-height));
-  padding-top: var(--header-height);
+  height: 100%;
   text-align: center;
   background-color: var(--background-color);
 }

@@ -650,7 +650,7 @@ export default {
   background-color: var(--background-color);
   display: flex;
   flex-direction: row;
-  height: 100vh;
+  height: 100%;
 }
 
 .loading-container {
@@ -662,16 +662,12 @@ export default {
 }
 
 .post-page-main-container {
-  overflow-y: auto;
   scrollbar-width: none;
   padding: 20px;
-  height: calc(100% - 40px - var(--header-height));
   width: calc(85% - 40px);
-  padding-top: calc(var(--header-height) + 20px);
 }
 
 .post-page-scroller-container {
-  padding-top: var(--header-height);
   display: flex;
   flex-direction: column;
   width: 15%;
@@ -974,7 +970,6 @@ export default {
   .post-page-main-container {
     width: calc(100% - 20px);
     padding: 10px;
-    padding-top: calc(var(--header-height) + 10px);
   }
 
   .article-title {

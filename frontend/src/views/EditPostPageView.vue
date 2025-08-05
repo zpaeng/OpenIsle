@@ -211,8 +211,7 @@ export default {
   display: flex;
   justify-content: center;
   background-color: var(--background-color);
-  height: calc(100vh - var(--header-height));
-  padding-top: var(--header-height);
+  height: 100%;
   padding-right: 20px;
   padding-left: 20px;
   overflow-y: auto;

@@ -73,9 +73,8 @@ export default {
 .activity-list-page {
   background-color: var(--background-color);
   padding: 20px;
-  height: calc(100vh - var(--header-height) - 40px);
+  height: calc(100% - 40px);
   overflow-y: auto;
-  padding-top: calc(var(--header-height) + 20px);
 }
 
 .activity-list-page-card {

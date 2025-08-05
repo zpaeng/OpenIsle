@@ -8,7 +8,8 @@
   --header-text-color: black;
   --menu-background-color: white;
   --background-color: white;
-  --background-color-blur: rgba(255, 255, 255, 0.57);
+  /* --background-color-blur: rgba(255, 255, 255, 0.57); */
+  --background-color-blur: var(--background-color);
   --menu-border-color: lightgray;
   --normal-border-color: lightgray;
   --menu-selected-background-color: rgba(208, 250, 255, 0.659);
@@ -34,7 +35,8 @@
   --header-text-color: white;
   --menu-background-color: #333;
   --background-color: #333;
-  --background-color-blur: #333333a4;
+  /* --background-color-blur: #333333a4; */
+  --background-color-blur: var(--background-color);
   --menu-border-color: #555;
   --normal-border-color: #555;
   --menu-selected-background-color: rgba(255, 255, 255, 0.1);
@@ -54,9 +56,8 @@ body {
   font-family: 'Roboto', sans-serif;
   background-color: var(--normal-background-color);
   color: var(--text-color);
-  overflow: hidden; /* 禁止滚动 */
+  /* overflow: hidden; 禁止滚动 */
 }
-
 
 /*************************
  * Vditor 自定义皮肤覆写

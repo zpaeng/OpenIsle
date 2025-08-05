@@ -1,5 +1,5 @@
 <template>
-  <div ref="homePage" class="home-page" @scroll="handleScroll">
+  <div class="home-page">
     <div v-if="!isMobile" class="search-container">
       <div class="search-title">一切可能，从此刻启航</div>
       <div class="search-subtitle">愿你在此遇见灵感与共鸣。若有疑惑，欢迎发问，亦可在知识的海洋中搜寻答案。</div>
@@ -107,8 +107,9 @@
 </template>
 
 <script>
-import { ref, onMounted, watch, onActivated, nextTick } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useScrollLoadMore } from '../utils/loadMore'
 import { stripMarkdown } from '../utils/markdown'
 import { API_BASE_URL } from '../main'
 import { getToken } from '../utils/auth'
@@ -134,8 +135,6 @@ export default {
   },
   setup() {
     const route = useRoute()
-    const homePage = ref(null)
-    const savedScrollTop = ref(0)
     const selectedCategory = ref('')
     if (route.query.category) {
       const c = decodeURIComponent(route.query.category)
@@ -166,14 +165,6 @@ export default {
     const page = ref(0)
     const pageSize = 10
     const allLoaded = ref(false)
-
-    onActivated(() => {
-      nextTick(() => {
-        if (homePage.value) {
-          homePage.value.scrollTop = savedScrollTop.value
-        }
-      })
-    })
 
     // Backend now returns comment counts directly
 
@@ -366,13 +357,7 @@ export default {
         }
     }
 
-    const handleScroll = (e) => {
-      const el = e.target
-      savedScrollTop.value = el.scrollTop
-      if (el.scrollHeight - el.scrollTop <= el.clientHeight + 50) {
-        fetchContent()
-      }
-    }
+    useScrollLoadMore(fetchContent)
 
     onMounted(async () => {
       fetchContent()
@@ -389,7 +374,7 @@ export default {
 
     const sanitizeDescription = (text) => stripMarkdown(text)
 
-    return { topics, selectedTopic, articles, sanitizeDescription, isLoadingPosts, handleScroll, selectedCategory, selectedTags, tagOptions, categoryOptions, isMobile, homePage }
+    return { topics, selectedTopic, articles, sanitizeDescription, isLoadingPosts, selectedCategory, selectedTags, tagOptions, categoryOptions, isMobile }
   }
 }
 </script>
@@ -397,13 +382,9 @@ export default {
 <style scoped>
 .home-page {
   background-color: var(--background-color);
-  height: calc(100vh - var(--header-height));
-  padding-top: var(--header-height);
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow-y: auto;
-  /* enable container queries */
   container-type: inline-size;
   container-name: home-page;
 }
@@ -455,7 +436,6 @@ export default {
   top: 1px;
   z-index: 10;
   background-color: var(--background-color-blur);
-  backdrop-filter: blur(10px);
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -735,6 +715,10 @@ export default {
   .main-info-text {
     font-size: 10px;
     opacity: 0.5;
+  }
+
+  .topic-container {
+    position: initial;
   }
 }
 
