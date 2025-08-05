@@ -18,8 +18,6 @@ export default {
 <style scoped>
 .callback-page {
   background-color: var(--background-color);
-  height: calc(100vh - var(--header-height));
-  padding-top: var(--header-height);
   display: flex;
   flex-direction: column;
   align-items: center;

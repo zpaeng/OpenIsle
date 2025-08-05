@@ -131,8 +131,7 @@ export default {
   justify-content: center;
   align-items: center;
   background-color: var(--background-color);
-  height: calc(100vh - var(--header-height));
-  padding-top: var(--header-height);
+  height: 100%;
 }
 .forgot-content {
   display: flex;

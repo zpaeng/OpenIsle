@@ -626,12 +626,8 @@ export default {
   height: 300px;
 }
 
-
 .message-page {
   background-color: var(--background-color);
-  height: calc(100vh - var(--header-height));
-  padding-top: var(--header-height);
-  overflow-y: auto;
 }
 
 .message-page-header {
@@ -639,7 +635,6 @@ export default {
   top: 1px;
   z-index: 200;
   background-color: var(--background-color-blur);
-  backdrop-filter: blur(10px);
   display: flex;
   flex-direction: row;
   justify-content: space-between;

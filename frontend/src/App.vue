@@ -68,9 +68,13 @@ export default {
 .menu-container {}
 
 .content {
+  /* height: calc(100vh - var(--header-height)); */
+  padding-top: var(--header-height);
   flex: 1;
   max-width: 100%;
   transition: max-width 0.3s ease;
+  background-color: var(--background-color);
+  min-height: calc(100vh - var(--header-height)); 
 }
 
 .content.menu-open {

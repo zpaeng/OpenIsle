@@ -3,7 +3,7 @@
     <div v-if="isWaitingFetchingPost" class="loading-container">
       <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
     </div>
-    <div v-else class="post-page-main-container" ref="mainContainer" @scroll="onScroll">
+    <div v-else class="post-page-main-container" ref="mainContainer">
       <div class="article-title-container">
         <div class="article-title-container-left">
           <div class="article-title">{{ title }}</div>
@@ -156,6 +156,7 @@ export default {
     const defaultTitle = document.title
     const metaDescriptionEl = document.querySelector('meta[name="description"]')
     const defaultDescription = metaDescriptionEl ? metaDescriptionEl.getAttribute('content') : ''
+    const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0
 
     watch(title, t => {
       document.title = `OpenIsle - ${t}`
@@ -170,6 +171,7 @@ export default {
     onBeforeUnmount(() => {
       document.title = defaultTitle
       if (metaDescriptionEl) metaDescriptionEl.setAttribute('content', defaultDescription)
+      window.removeEventListener('scroll', updateCurrentIndex)
     })
       
     const lightboxVisible = ref(false)
@@ -202,12 +204,12 @@ export default {
       const items = []
       if (mainContainer.value) {
         const main = mainContainer.value.querySelector('.info-content-container')
-        if (main) items.push({ el: main, top: 0 })
+        if (main) items.push({ el: main, top: getTop(main) })
 
         for (const c of comments.value) {
           const el = document.getElementById('comment-' + c.id)
           if (el) {
-            items.push({ el, top: getTopRelativeTo(el, mainContainer.value) })
+            items.push({ el, top: getTop(el) })
           }
         }
         // 根据 top 排序，防止评论异步插入后顺序错乱
@@ -230,11 +232,8 @@ export default {
       parentUserName: parentUserName
     })
 
-    const getTopRelativeTo = (el, container) => {
-      const elRect = el.getBoundingClientRect()
-      const parentRect = container.getBoundingClientRect()
-      // 加上 scrollTop，得到相对于 container 内部顶部的距离
-      return elRect.top - parentRect.top + container.scrollTop
+    const getTop = (el) => {
+      return el.getBoundingClientRect().top + window.scrollY
     }
 
     const findCommentPath = (id, list) => {
@@ -336,19 +335,16 @@ export default {
       async () => {
         await nextTick()
         gatherPostItems()
+        updateCurrentIndex()
       }
     )
 
     const updateCurrentIndex = () => {
-      const container = mainContainer.value
-      if (!container) return
-
-      const scrollTop = container.scrollTop
+      const scrollTop = window.scrollY
 
       for (let i = 0; i < postItems.value.length; i++) {
         const el = postItems.value[i]
-        // 计算元素相对 container 顶部的 top
-        const top = getTopRelativeTo(el, container)
+        const top = getTop(el)
         const bottom = top + el.offsetHeight
 
         if (bottom > scrollTop) {
@@ -362,9 +358,9 @@ export default {
       const index = Number(e.target.value)
       currentIndex.value = index
       const target = postItems.value[index - 1]
-      if (target && mainContainer.value) {
-        const top = getTopRelativeTo(target, mainContainer.value)
-        mainContainer.value.scrollTo({ top, behavior: 'instant' })
+      if (target) {
+        const top = getTop(target) - headerHeight - 20 // 20 for beauty
+        window.scrollTo({ top, behavior: 'auto' })
       }
     }
 
@@ -570,12 +566,14 @@ export default {
       const hash = location.hash
       if (hash.startsWith('#comment-')) {
         const id = hash.substring('#comment-'.length)
-        await nextTick()
+        // 不清楚啥原因，先wait一下子不然会定不准 😅
+        await new Promise(resolve => setTimeout(resolve, 500))
         const el = document.getElementById('comment-' + id)
-        if (el && mainContainer.value) {
-          mainContainer.value.scrollTo({ top: getTopRelativeTo(el, mainContainer.value), behavior: 'instant' })
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.scrollY - headerHeight - 20 // 20 for beauty
+          window.scrollTo({ top, behavior: 'smooth' })
           el.classList.add('comment-highlight')
-          setTimeout(() => el.classList.remove('comment-highlight'), 2000)
+          setTimeout(() => el.classList.remove('comment-highlight'), 4000)
         }
       }
     }
@@ -590,6 +588,7 @@ export default {
       await fetchPost()
       if (id) expandCommentPath(id)
       updateCurrentIndex()
+      window.addEventListener('scroll', updateCurrentIndex)
       await jumpToHashComment()
     })
 
@@ -612,7 +611,6 @@ export default {
       postId,
       postComment,
       onSliderInput,
-      onScroll: updateCurrentIndex,
       copyPostLink,
       subscribePost,
       unsubscribePost,
@@ -650,7 +648,7 @@ export default {
   background-color: var(--background-color);
   display: flex;
   flex-direction: row;
-  height: 100vh;
+  height: 100%;
 }
 
 .loading-container {
@@ -662,19 +660,18 @@ export default {
 }
 
 .post-page-main-container {
-  overflow-y: auto;
   scrollbar-width: none;
   padding: 20px;
-  height: calc(100% - 40px - var(--header-height));
   width: calc(85% - 40px);
-  padding-top: calc(var(--header-height) + 20px);
 }
 
 .post-page-scroller-container {
-  padding-top: var(--header-height);
   display: flex;
   flex-direction: column;
   width: 15%;
+  position: sticky;
+  top: var(--header-height);
+  align-self: flex-start;
 }
 
 .comment-config-container {
@@ -974,7 +971,6 @@ export default {
   .post-page-main-container {
     width: calc(100% - 20px);
     padding: 10px;
-    padding-top: calc(var(--header-height) + 10px);
   }
 
   .article-title {
