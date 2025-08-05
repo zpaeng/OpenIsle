@@ -397,13 +397,11 @@ export default {
 <style scoped>
 .home-page {
   background-color: var(--background-color);
-  height: calc(100vh - var(--header-height));
-  padding-top: var(--header-height);
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   overflow-y: auto;
-  /* enable container queries */
   container-type: inline-size;
   container-name: home-page;
 }
@@ -455,7 +453,6 @@ export default {
   top: 1px;
   z-index: 10;
   background-color: var(--background-color-blur);
-  backdrop-filter: blur(10px);
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -735,6 +732,10 @@ export default {
   .main-info-text {
     font-size: 10px;
     opacity: 0.5;
+  }
+
+  .topic-container {
+    position: initial;
   }
 }
 

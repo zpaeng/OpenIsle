@@ -268,6 +268,8 @@ export default {
 
 <style scoped>
 .menu {
+  position: sticky;
+  top: 0;
   width: 200px;
   background-color: var(--menu-background-color);
   height: calc(100vh - 20px - var(--header-height));
@@ -418,7 +420,6 @@ export default {
     top: calc(var(--header-height) + 10px);
     padding-top: 10px;
     background-color: var(--background-color-blur);
-    backdrop-filter: blur(10px);
   }
 
   .slide-enter-active,
