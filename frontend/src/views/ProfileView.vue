@@ -282,7 +282,7 @@ export default {
     const isLoading = ref(true)
     const tabLoading = ref(false)
     const selectedTab = ref('summary')
-   const followTab = ref('followers')
+    const followTab = ref('followers')
 
     const levelInfo = computed(() => {
       const exp = user.value.experience || 0
@@ -336,9 +336,11 @@ export default {
     }
 
     const fetchTimeline = async () => {
-      const postsRes = await fetch(`${API_BASE_URL}/api/users/${username}/posts?limit=50`)
-      const repliesRes = await fetch(`${API_BASE_URL}/api/users/${username}/replies?limit=50`)
-      const tagsRes = await fetch(`${API_BASE_URL}/api/users/${username}/tags?limit=50`)
+      const [postsRes, repliesRes, tagsRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/api/users/${username}/posts?limit=50`),
+        fetch(`${API_BASE_URL}/api/users/${username}/replies?limit=50`),
+        fetch(`${API_BASE_URL}/api/users/${username}/tags?limit=50`)
+      ])
       const posts = postsRes.ok ? await postsRes.json() : []
       const replies = repliesRes.ok ? await repliesRes.json() : []
       const tags = tagsRes.ok ? await tagsRes.json() : []
@@ -367,8 +369,10 @@ export default {
     }
 
     const fetchFollowUsers = async () => {
-      const followerRes = await fetch(`${API_BASE_URL}/api/users/${username}/followers`)
-      const followingRes = await fetch(`${API_BASE_URL}/api/users/${username}/following`)
+      const [followerRes, followingRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/api/users/${username}/followers`),
+        fetch(`${API_BASE_URL}/api/users/${username}/following`)
+      ])
       followers.value = followerRes.ok ? await followerRes.json() : []
       followings.value = followingRes.ok ? await followingRes.json() : []
     }
