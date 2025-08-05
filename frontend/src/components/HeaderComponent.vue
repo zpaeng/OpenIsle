@@ -173,8 +173,6 @@ export default {
   justify-content: space-between;
   align-items: center;
   height: var(--header-height);
-  padding-top: var(--safe-area-inset-top);
-  box-sizing: border-box;
   background-color: var(--background-color-blur);
   backdrop-filter: blur(10px);
   color: var(--header-text-color);
