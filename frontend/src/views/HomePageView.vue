@@ -175,8 +175,7 @@ export default {
       })
     })
 
-    const countComments = (list) =>
-      list.reduce((sum, c) => sum + 1 + countComments(c.replies || []), 0)
+    // Backend now returns comment counts directly
 
     const loadOptions = async () => {
       if (selectedCategory.value && !isNaN(selectedCategory.value)) {
@@ -267,7 +266,7 @@ export default {
             category: p.category,
             tags: p.tags || [],
             members: (p.participants || []).map(m => ({ id: m.id, avatar: m.avatar })),
-            comments: countComments(p.comments || []),
+            comments: p.commentCount,
             views: p.views,
             time: TimeManager.format(p.createdAt),
             pinned: !!p.pinnedAt
@@ -304,7 +303,7 @@ export default {
             category: p.category,
             tags: p.tags || [],
             members: (p.participants || []).map(m => ({ id: m.id, avatar: m.avatar })),
-            comments: countComments(p.comments || []),
+            comments: p.commentCount,
             views: p.views,
             time: TimeManager.format(p.createdAt),
             pinned: !!p.pinnedAt
@@ -341,7 +340,7 @@ export default {
             category: p.category,
             tags: p.tags || [],
             members: (p.participants || []).map(m => ({ id: m.id, avatar: m.avatar })),
-            comments: countComments(p.comments || []),
+            comments: p.commentCount,
             views: p.views,
             time: TimeManager.format(p.lastReplyAt || p.createdAt),
             pinned: !!p.pinnedAt
