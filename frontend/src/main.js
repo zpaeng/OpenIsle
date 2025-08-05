@@ -13,15 +13,19 @@ import { loginWithGoogle } from './utils/google'
 import { initTheme } from './utils/theme'
 import { clearVditorStorage } from './utils/clearVditorStorage'
 
-// Configurable API domain and port
+// 采用本地开发环境
 // export const API_DOMAIN = 'http://127.0.0.1'
 // export const API_PORT = 8081
 
-export const API_DOMAIN = 'http://47.82.99.208'
-export const API_PORT = 8080
+// 采用线上环境
+export const API_DOMAIN = 'https://www.open-isle.com'
+export const API_PORT = ''
 
+// For 开发
 // export const API_BASE_URL = API_PORT ? `${API_DOMAIN}:${API_PORT}` : API_DOMAIN
-export const API_BASE_URL = "";
+// 线上部署
+export const API_BASE_URL = ""
+
 export const GOOGLE_CLIENT_ID = '777830451304-nt8afkkap18gui4f9entcha99unal744.apps.googleusercontent.com'
 export const GITHUB_CLIENT_ID = 'Ov23liVkO1NPAX5JyWxJ'
 export const DISCORD_CLIENT_ID = '1394985417044000779'

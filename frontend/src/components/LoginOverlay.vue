@@ -49,7 +49,6 @@ export default {
   right: 0;
   bottom: 0;
   backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(3px);
   z-index: 1;
 }
 
