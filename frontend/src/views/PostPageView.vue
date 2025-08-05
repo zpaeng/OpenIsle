@@ -3,7 +3,7 @@
     <div v-if="isWaitingFetchingPost" class="loading-container">
       <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
     </div>
-    <div v-else class="post-page-main-container" ref="mainContainer" @scroll="onScroll">
+    <div v-else class="post-page-main-container" ref="mainContainer">
       <div class="article-title-container">
         <div class="article-title-container-left">
           <div class="article-title">{{ title }}</div>
@@ -170,6 +170,7 @@ export default {
     onBeforeUnmount(() => {
       document.title = defaultTitle
       if (metaDescriptionEl) metaDescriptionEl.setAttribute('content', defaultDescription)
+      window.removeEventListener('scroll', updateCurrentIndex)
     })
       
     const lightboxVisible = ref(false)
@@ -202,12 +203,12 @@ export default {
       const items = []
       if (mainContainer.value) {
         const main = mainContainer.value.querySelector('.info-content-container')
-        if (main) items.push({ el: main, top: 0 })
+        if (main) items.push({ el: main, top: getTop(main) })
 
         for (const c of comments.value) {
           const el = document.getElementById('comment-' + c.id)
           if (el) {
-            items.push({ el, top: getTopRelativeTo(el, mainContainer.value) })
+            items.push({ el, top: getTop(el) })
           }
         }
         // 根据 top 排序，防止评论异步插入后顺序错乱
@@ -230,11 +231,8 @@ export default {
       parentUserName: parentUserName
     })
 
-    const getTopRelativeTo = (el, container) => {
-      const elRect = el.getBoundingClientRect()
-      const parentRect = container.getBoundingClientRect()
-      // 加上 scrollTop，得到相对于 container 内部顶部的距离
-      return elRect.top - parentRect.top + container.scrollTop
+    const getTop = (el) => {
+      return el.getBoundingClientRect().top + window.scrollY
     }
 
     const findCommentPath = (id, list) => {
@@ -336,19 +334,16 @@ export default {
       async () => {
         await nextTick()
         gatherPostItems()
+        updateCurrentIndex()
       }
     )
 
     const updateCurrentIndex = () => {
-      const container = mainContainer.value
-      if (!container) return
-
-      const scrollTop = container.scrollTop
+      const scrollTop = window.scrollY
 
       for (let i = 0; i < postItems.value.length; i++) {
         const el = postItems.value[i]
-        // 计算元素相对 container 顶部的 top
-        const top = getTopRelativeTo(el, container)
+        const top = getTop(el)
         const bottom = top + el.offsetHeight
 
         if (bottom > scrollTop) {
@@ -362,9 +357,9 @@ export default {
       const index = Number(e.target.value)
       currentIndex.value = index
       const target = postItems.value[index - 1]
-      if (target && mainContainer.value) {
-        const top = getTopRelativeTo(target, mainContainer.value)
-        mainContainer.value.scrollTo({ top, behavior: 'instant' })
+      if (target) {
+        const top = getTop(target)
+        window.scrollTo({ top, behavior: 'instant' })
       }
     }
 
@@ -591,6 +586,7 @@ export default {
       await fetchPost()
       if (id) expandCommentPath(id)
       updateCurrentIndex()
+      window.addEventListener('scroll', updateCurrentIndex)
       await jumpToHashComment()
     })
 
@@ -613,7 +609,6 @@ export default {
       postId,
       postComment,
       onSliderInput,
-      onScroll: updateCurrentIndex,
       copyPostLink,
       subscribePost,
       unsubscribePost,
