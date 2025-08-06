@@ -4,7 +4,7 @@
       <div class="reactions-viewer-item-container" @click="openPanel" @mouseenter="cancelHide"
         @mouseleave="scheduleHide">
         <template v-if="displayedReactions.length">
-          <div v-for="r in displayedReactions" :key="r.type" class="reactions-viewer-item">{{ iconMap[r.type] }}</div>
+          <div v-for="r in displayedReactions" :key="r.type" class="reactions-viewer-item">{{ reactionEmojiMap[r.type] }}</div>
           <div class="reactions-count">{{ totalCount }}</div>
         </template>
         <div v-else class="reactions-viewer-item placeholder">
@@ -24,7 +24,7 @@
     <div v-if="panelVisible" class="reactions-panel" @mouseenter="cancelHide" @mouseleave="scheduleHide">
       <div v-for="t in panelTypes" :key="t" class="reaction-option" @click="toggleReaction(t)"
         :class="{ selected: userReacted(t) }">
-        {{ iconMap[t] }}<span v-if="counts[t]">{{ counts[t] }}</span>
+        {{ reactionEmojiMap[t] }}<span v-if="counts[t]">{{ counts[t] }}</span>
       </div>
     </div>
   </div>
@@ -34,6 +34,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { API_BASE_URL, toast } from '../main'
 import { getToken, authState } from '../utils/auth'
+import { reactionEmojiMap } from '../utils/reactions'
 
 let cachedTypes = null
 const fetchTypes = async () => {
@@ -52,32 +53,6 @@ const fetchTypes = async () => {
     cachedTypes = []
   }
   return cachedTypes
-}
-
-const iconMap = {
-  LIKE: '❤️',
-  DISLIKE: '👎',
-  RECOMMEND: '👏',
-  ANGRY: '😡',
-  FLUSHED: '😳',
-  STAR_STRUCK: '🤩',
-  ROFL: '🤣',
-  HOLDING_BACK_TEARS: '🥹',
-  MIND_BLOWN: '🤯',
-  POOP: '💩',
-  CLOWN: '🤡',
-  SKULL: '☠️',
-  FIRE: '🔥',
-  EYES: '👀',
-  FROWN: '☹️',
-  HOT: '🥵',
-  EAGLE: '🦅',
-  SPIDER: '🕷️',
-  BAT: '🦇',
-  CHINA: '🇨🇳',
-  USA: '🇺🇸',
-  JAPAN: '🇯🇵',
-  KOREA: '🇰🇷'
 }
 
 export default {
@@ -202,7 +177,7 @@ export default {
     }
 
     return {
-      iconMap,
+      reactionEmojiMap,
       counts,
       totalCount,
       likeCount,
