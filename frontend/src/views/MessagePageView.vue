@@ -628,11 +628,12 @@ export default {
 
 .message-page {
   background-color: var(--background-color);
+  overflow-x: hidden;
 }
 
 .message-page-header {
   position: sticky;
-  top: calc(var(--header-height) + 1px);
+  top: 1px;
   z-index: 200;
   background-color: var(--background-color-blur);
   display: flex;
@@ -768,10 +769,6 @@ export default {
 @media (max-width: 768px) {
   .has_read_button {
     display: none;
-  }
-
-  .message-page {
-    overflow-x: hidden;
   }
 }
 </style>
