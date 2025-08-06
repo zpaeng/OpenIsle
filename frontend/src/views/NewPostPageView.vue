@@ -3,7 +3,7 @@
     <div class="new-post-form">
       <input class="post-title-input" v-model="title" placeholder="标题" />
       <div class="post-editor-container">
-        <PostEditor v-model="content" :loading="isAiLoading" :disabled="!isLogin" />
+        <PostEditor v-model="content" v-model:loading="isAiLoading" :disabled="!isLogin" />
         <LoginOverlay v-if="!isLogin" />
       </div>
       <div class="post-options">
