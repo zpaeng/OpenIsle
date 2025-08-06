@@ -75,13 +75,11 @@ export default {
   max-width: var(--page-max-width);
   background-color: var(--background-color);
   margin: 0 auto;
-  height: 100%;
-  overflow-y: auto;
 }
 
 .about-tabs {
   position: sticky;
-  top: 1px;
+  top: calc(var(--header-height) + 1px);
   z-index: 200;
   background-color: var(--background-color-blur);
   display: flex;

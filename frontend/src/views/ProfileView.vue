@@ -497,9 +497,6 @@ export default {
 
 .profile-page {
   background-color: var(--background-color);
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden; 
 }
 
 .profile-page-header {
@@ -639,7 +636,7 @@ export default {
 
 .profile-tabs {
   position: sticky;
-  top: 1px;
+  top: calc(var(--header-height) + 1px);
   z-index: 200;
   background-color: var(--background-color-blur);
   display: flex;
