@@ -364,7 +364,7 @@ export default {
       }
     }
 
-    const postComment = async (text) => {
+    const postComment = async (text, clear) => {
       if (!text.trim()) return
       console.debug('Posting comment', { postId, text })
       isWaitingPostingComment.value = true
@@ -385,6 +385,7 @@ export default {
           const data = await res.json()
           console.debug('Post comment response data', data)
           await fetchComments()
+          clear()
           if (data.reward && data.reward > 0) {
             toast.success(`评论成功，获得 ${data.reward} 经验值`)
           } else {
