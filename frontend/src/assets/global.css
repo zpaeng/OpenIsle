@@ -255,6 +255,11 @@ body {
     margin-bottom: 3px;
   }
 
+
+  .vditor-toolbar--pin {
+    top: 0 !important;
+  }
+
   .about-content li,
   .info-content-text li {
     font-size: 14px;
