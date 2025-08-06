@@ -38,6 +38,28 @@ export function createVditor(editorId, options = {}) {
     return searchUsers(value)
   }
 
+  const isMobile = window.innerWidth <= 768
+  const toolbar = isMobile
+    ? ['emoji', 'bold', 'italic', 'strike', '|', 'link', 'upload']
+    : [
+        'emoji',
+        'bold',
+        'italic',
+        'strike',
+        '|',
+        'list',
+        'line',
+        'quote',
+        'code',
+        'inline-code',
+        '|',
+        'undo',
+        'redo',
+        '|',
+        'link',
+        'upload'
+      ]
+
   let vditor
   vditor = new Vditor(editorId, {
     placeholder,
@@ -62,24 +84,7 @@ export function createVditor(editorId, options = {}) {
       ],
     },
     cdn: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/vditor',
-    toolbar: [
-      'emoji',
-      'bold',
-      'italic',
-      'strike',
-      '|',
-      'list',
-      'line',
-      'quote',
-      'code',
-      'inline-code',
-      '|',
-      'undo',
-      'redo',
-      '|',
-      'link',
-      'upload'
-    ],
+    toolbar,
     upload: {
       accept: 'image/*,video/*',
       multiple: false,
