@@ -71,6 +71,16 @@ body {
   top: var(--header-height) !important;
 }
 
+.vditor-panel {
+  min-width: 400px;
+}
+
+.emoji {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+}
+
 /* .vditor {
   --textarea-background-color: transparent;
   border: none !important;
@@ -225,7 +235,7 @@ body {
   } 
 
   .vditor-toolbar {
-    display: none;
+    overflow-x: auto;
   }
 
   .about-content h1,
@@ -243,6 +253,11 @@ body {
     font-size: 14px;
     margin-top: 3px;
     margin-bottom: 3px;
+  }
+
+
+  .vditor-toolbar--pin {
+    top: 0 !important;
   }
 
   .about-content li,

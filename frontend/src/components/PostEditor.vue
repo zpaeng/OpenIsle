@@ -123,7 +123,6 @@ export default {
 
 <style scoped>
 .post-editor-container {
-  border: 1px solid var(--normal-border-color);
   position: relative;
   min-height: 200px;
 }
@@ -141,4 +140,11 @@ export default {
   pointer-events: all;
   z-index: 10;
 }
+
+@media (max-width: 768px) {
+  .post-editor-container {
+    min-height: 100px;
+  }
+}
+
 </style>
