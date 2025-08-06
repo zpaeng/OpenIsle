@@ -3,6 +3,7 @@ import 'vditor/dist/index.css'
 import { API_BASE_URL } from '../main'
 import { getToken, authState } from './auth'
 import { searchUsers, fetchFollowings, fetchAdmins } from './user'
+import { tiebaEmoji, TIEBA_EMOJI_CDN } from './tiebaEmoji'
 
 export function getEditorTheme() {
   return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'classic'
@@ -42,8 +43,14 @@ export function createVditor(editorId, options = {}) {
     placeholder,
     height: 'auto',
     theme: getEditorTheme(),
-    preview: Object.assign({ theme: { current: getPreviewTheme() } }, preview),
+    preview: Object.assign({
+      theme: { current: getPreviewTheme() },
+      customEmoji: tiebaEmoji,
+      emojiPath: TIEBA_EMOJI_CDN
+    }, preview),
     hint: {
+      emoji: tiebaEmoji,
+      emojiPath: TIEBA_EMOJI_CDN,
       extend: [
         {
           key: '@',
