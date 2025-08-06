@@ -71,6 +71,16 @@ body {
   top: var(--header-height) !important;
 }
 
+.vditor-panel {
+  min-width: 400px;
+}
+
+.emoji {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+}
+
 /* .vditor {
   --textarea-background-color: transparent;
   border: none !important;

@@ -2,7 +2,7 @@ import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github.css'
 import { toast } from '../main'
-import { tiebaEmoji, TIEBA_EMOJI_CDN } from './tiebaEmoji'
+import { tiebaEmoji } from './tiebaEmoji'
 
 function mentionPlugin(md) {
   const mentionReg = /^@\[([^\]]+)\]/
@@ -32,7 +32,7 @@ function tiebaEmojiPlugin(md) {
   md.renderer.rules['tieba-emoji'] = (tokens, idx) => {
     const name = tokens[idx].content
     const file = tiebaEmoji[name]
-    return `<img class="emoji" src="${TIEBA_EMOJI_CDN}${file}" alt="${name}">`
+    return `<img class="emoji" src="${file}" alt="${name}">`
   }
   md.inline.ruler.before('emphasis', 'tieba-emoji', (state, silent) => {
     const pos = state.pos
