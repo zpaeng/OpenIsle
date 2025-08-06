@@ -12,6 +12,8 @@ import { checkToken, clearToken, isLogin } from './utils/auth'
 import { loginWithGoogle } from './utils/google'
 import { initTheme } from './utils/theme'
 import { clearVditorStorage } from './utils/clearVditorStorage'
+import ClickOutside from './directives/clickOutside' // 确保路径正确
+
 
 // 采用本地开发环境
 // export const API_DOMAIN = 'http://127.0.0.1'
@@ -38,15 +40,17 @@ clearVditorStorage()
 const app = createApp(App)
 app.use(router)
 app.use(
-  Toast, 
-  { 
+  Toast,
+  {
     position: POSITION.TOP_RIGHT,
     containerClassName: "open-isle-toast-style-v1",
     transition: "Vue-Toastification__fade",
     // closeButton: false,
     timeout: 2000,
-  }, 
+  },
 )
+
+app.directive('click-outside', ClickOutside)
 
 app.mount('#app')
 
