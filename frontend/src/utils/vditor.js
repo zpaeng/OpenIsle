@@ -40,7 +40,7 @@ export function createVditor(editorId, options = {}) {
 
   const isMobile = window.innerWidth <= 768
   const toolbar = isMobile
-    ? ['emoji', 'bold', 'italic', 'strike', '|', 'link', 'upload']
+    ? ['emoji', 'upload']
     : [
         'emoji',
         'bold',
