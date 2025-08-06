@@ -299,7 +299,7 @@ import BaseTimeline from '../components/BaseTimeline.vue'
 import BasePlaceholder from '../components/BasePlaceholder.vue'
 import NotificationContainer from '../components/NotificationContainer.vue'
 import { getToken, authState } from '../utils/auth'
-import { markNotificationsRead, fetchUnreadCount } from '../utils/notification'
+import { markNotificationsRead, fetchUnreadCount, notificationState } from '../utils/notification'
 import { toast } from '../main'
 import { stripMarkdownLength } from '../utils/markdown'
 import TimeManager from '../utils/time'
@@ -322,28 +322,42 @@ export default {
 
     const markRead = async id => {
       if (!id) return
+      const n = notifications.value.find(n => n.id === id)
+      if (!n || n.read) return
+      n.read = true
+      if (notificationState.unreadCount > 0) notificationState.unreadCount--
       const ok = await markNotificationsRead([id])
-      if (ok) {
-        const n = notifications.value.find(n => n.id === id)
-        if (n) n.read = true
-        await fetchUnreadCount()
+      if (!ok) {
+        n.read = false
+        notificationState.unreadCount++
+      } else {
+        fetchUnreadCount()
       }
     }
 
     const markAllRead = async () => {
       // 除了 REGISTER_REQUEST 类型消息
-      const idsToMark = notifications.value.filter(n => n.type !== 'REGISTER_REQUEST').map(n => n.id)
+      const idsToMark = notifications.value
+        .filter(n => n.type !== 'REGISTER_REQUEST' && !n.read)
+        .map(n => n.id)
+      if (idsToMark.length === 0) return
+      notifications.value.forEach(n => {
+        if (n.type !== 'REGISTER_REQUEST') n.read = true
+      })
+      notificationState.unreadCount = notifications.value.filter(n => !n.read).length
       const ok = await markNotificationsRead(idsToMark)
-      if (ok) {
+      if (!ok) {
         notifications.value.forEach(n => {
-          if (n.type !== 'REGISTER_REQUEST') n.read = true
+          if (idsToMark.includes(n.id)) n.read = false
         })
         await fetchUnreadCount()
-        if (authState.role === 'ADMIN') {
-          toast.success('已读所有消息（注册请求除外）')
-        } else {
-          toast.success('已读所有消息')
-        }
+        return
+      }
+      fetchUnreadCount()
+      if (authState.role === 'ADMIN') {
+        toast.success('已读所有消息（注册请求除外）')
+      } else {
+        toast.success('已读所有消息')
       }
     }
 
