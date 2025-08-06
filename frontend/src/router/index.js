@@ -89,8 +89,7 @@ const routes = [
   {
     path: '/users/:id',
     name: 'users',
-    component: ProfileView, 
-    meta: { keepAlive: true }
+    component: ProfileView
   },
   {
     path: '/github-callback',
