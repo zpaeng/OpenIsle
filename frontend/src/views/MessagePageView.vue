@@ -304,6 +304,7 @@ import { toast } from '../main'
 import { stripMarkdownLength } from '../utils/markdown'
 import TimeManager from '../utils/time'
 import { hatch } from 'ldrs'
+import { reactionEmojiMap } from '../utils/reactions'
 hatch.register()
 
 export default {
@@ -362,32 +363,6 @@ export default {
       REGISTER_REQUEST: 'fas fa-user-clock',
       ACTIVITY_REDEEM: 'fas fa-coffee',
       MENTION: 'fas fa-at'
-    }
-
-    const reactionEmojiMap = {
-      LIKE: '❤️',
-      DISLIKE: '👎',
-      RECOMMEND: '👏',
-      ANGRY: '😡',
-      FLUSHED: '😳',
-      STAR_STRUCK: '🤩',
-      ROFL: '🤣',
-      HOLDING_BACK_TEARS: '🥹',
-      MIND_BLOWN: '🤯',
-      POOP: '💩',
-      CLOWN: '🤡',
-      SKULL: '☠️',
-      FIRE: '🔥',
-      EYES: '👀',
-      FROWN: '☹️',
-      HOT: '🥵',
-      EAGLE: '🦅',
-      SPIDER: '🕷️',
-      BAT: '🦇',
-      CHINA: '🇨🇳',
-      USA: '🇺🇸',
-      JAPAN: '🇯🇵',
-      KOREA: '🇰🇷'
     }
 
     const fetchNotifications = async () => {
