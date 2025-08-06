@@ -268,4 +268,9 @@ body {
   .info-content-text pre {
     line-height: 1.1;
   }
+
+  .vditor-panel {
+    position: relative;
+    min-width: 0;
+  }
 }
