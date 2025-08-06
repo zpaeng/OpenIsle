@@ -94,6 +94,13 @@ body {
   padding-left: 1.5em;
 }
 
+.info-content-text h1,
+.info-content-text h2 {
+  border-bottom: 1px solid var(--normal-border-color);
+  padding-bottom: 0.3em;
+  margin-bottom: 0.8em;
+}
+
 .info-content-text {
   word-break: break-word;
   max-width: 100%;
