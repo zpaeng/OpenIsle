@@ -65,7 +65,12 @@ body {
  *************************/
 .vditor {
   min-height: 200px;
-} 
+}
+
+.vditor-toolbar--pin {
+  top: var(--header-height) !important;
+}
+
 /* .vditor {
   --textarea-background-color: transparent;
   border: none !important;

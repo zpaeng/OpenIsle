@@ -261,10 +261,8 @@ export default {
   display: flex;
   justify-content: center;
   background-color: var(--background-color);
-  height: 100%;
   padding-right: 20px;
   padding-left: 20px;
-  overflow-y: auto;
 }
 
 .new-post-form {

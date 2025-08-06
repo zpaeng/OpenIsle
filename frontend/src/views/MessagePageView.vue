@@ -632,7 +632,7 @@ export default {
 
 .message-page-header {
   position: sticky;
-  top: 1px;
+  top: calc(var(--header-height) + 1px);
   z-index: 200;
   background-color: var(--background-color-blur);
   display: flex;

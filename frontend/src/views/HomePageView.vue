@@ -433,7 +433,7 @@ export default {
 
 .topic-container {
   position: sticky;
-  top: 1px;
+  top: calc(var(--header-height) + 1px);
   z-index: 10;
   background-color: var(--background-color-blur);
   display: flex;
