@@ -17,5 +17,6 @@ public class CommentDto {
     private List<CommentDto> replies;
     private List<ReactionDto> reactions;
     private int reward;
+    private int pointReward;
 }
 

@@ -27,5 +27,6 @@ public class PostSummaryDto {
     private List<AuthorDto> participants;
     private boolean subscribed;
     private int reward;
+    private int pointReward;
 }
 

@@ -1,15 +1,15 @@
 <template>
   <div class="new-post-page">
     <div class="new-post-form">
-      <input class="post-title-input" v-model="title" placeholder="标题" />
+      <input class="post-title-input" v-model="title" placeholder="标题"/>
       <div class="post-editor-container">
         <PostEditor v-model="content" v-model:loading="isAiLoading" :disabled="!isLogin" />
         <LoginOverlay v-if="!isLogin" />
       </div>
       <div class="post-options">
         <div class="post-options-left">
-          <CategorySelect v-model="selectedCategory" />
-          <TagSelect v-model="selectedTags" creatable />
+          <CategorySelect v-model="selectedCategory"/>
+          <TagSelect v-model="selectedTags" creatable/>
         </div>
         <div class="post-options-right">
           <div class="post-clear" @click="clearPost">
@@ -24,12 +24,13 @@
             存草稿
           </div>
           <div
-            v-if="!isWaitingPosting"
-            class="post-submit"
-            :class="{ disabled: !isLogin }"
-            @click="submitPost"
-          >发布</div>
-          <div v-else class="post-submit-loading"> <i class="fa-solid fa-spinner fa-spin"></i> 发布中...</div>
+              v-if="!isWaitingPosting"
+              class="post-submit"
+              :class="{ disabled: !isLogin }"
+              @click="submitPost"
+          >发布
+          </div>
+          <div v-else class="post-submit-loading"><i class="fa-solid fa-spinner fa-spin"></i> 发布中...</div>
         </div>
       </div>
     </div>
@@ -37,17 +38,17 @@
 </template>
 
 <script>
-import { ref, onMounted, computed } from 'vue'
+import {ref, onMounted, computed} from 'vue'
 import PostEditor from '../components/PostEditor.vue'
 import CategorySelect from '../components/CategorySelect.vue'
 import TagSelect from '../components/TagSelect.vue'
-import { API_BASE_URL, toast } from '../main'
-import { getToken, authState } from '../utils/auth'
+import {API_BASE_URL, toast} from '../main'
+import {getToken, authState} from '../utils/auth'
 import LoginOverlay from '../components/LoginOverlay.vue'
 
 export default {
   name: 'NewPostPageView',
-  components: { PostEditor, CategorySelect, TagSelect, LoginOverlay },
+  components: {PostEditor, CategorySelect, TagSelect, LoginOverlay},
   setup() {
     const title = ref('')
     const content = ref('')
@@ -62,7 +63,7 @@ export default {
       if (!token) return
       try {
         const res = await fetch(`${API_BASE_URL}/api/drafts/me`, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: {Authorization: `Bearer ${token}`}
         })
         if (res.ok && res.status !== 204) {
           const data = await res.json()
@@ -144,7 +145,7 @@ export default {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${token}`
             },
-            body: JSON.stringify({ name, description: '' })
+            body: JSON.stringify({name, description: ''})
           })
           if (res.ok) {
             const data = await res.json()
@@ -179,7 +180,7 @@ export default {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify({ text: content.value })
+          body: JSON.stringify({text: content.value})
         })
         if (res.ok) {
           const data = await res.json()
@@ -232,11 +233,19 @@ export default {
         })
         const data = await res.json()
         if (res.ok) {
-          if (data.reward && data.reward > 0) {
-            toast.success(`发布成功，获得 ${data.reward} 经验值`)
+          const reward = Math.max(0, Number(data?.reward) || 0);        // 经验值
+          const points = Math.max(0, Number(data?.pointReward) || 0);   // 积分值
+
+          if (reward && points) {
+            toast.success(`发布成功，获得 ${reward} 经验值、${points} 积分值`);
+          } else if (reward) {
+            toast.success(`发布成功，获得 ${reward} 经验值`);
+          } else if (points) {
+            toast.success(`发布成功，获得 ${points} 积分值`);
           } else {
-            toast.success('发布成功')
+            toast.success('发布成功');
           }
+
           if (data.id) {
             window.location.href = `/posts/${data.id}`
           }
@@ -251,7 +260,19 @@ export default {
         isWaitingPosting.value = false
       }
     }
-    return { title, content, selectedCategory, selectedTags, submitPost, saveDraft, clearPost, isWaitingPosting, aiGenerate, isAiLoading, isLogin }
+    return {
+      title,
+      content,
+      selectedCategory,
+      selectedTags,
+      submitPost,
+      saveDraft,
+      clearPost,
+      isWaitingPosting,
+      aiGenerate,
+      isAiLoading,
+      isLogin
+    }
   }
 }
 </script>
@@ -301,7 +322,6 @@ export default {
 }
 
 
-
 .post-clear {
   color: var(--primary-color);
   cursor: pointer;
@@ -329,6 +349,7 @@ export default {
 .post-submit:hover {
   background-color: var(--primary-color-hover);
 }
+
 .post-submit.disabled:hover {
   background-color: var(--primary-color-disabled);
 }

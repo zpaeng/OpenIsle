@@ -5,9 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import java.time.LocalDateTime;
 
-import com.openisle.model.Role;
+import java.time.LocalDateTime;
 
 /**
  * Simple user entity with basic fields and a role.
@@ -43,6 +42,9 @@ public class User {
 
     @Column(nullable = false)
     private int experience = 0;
+
+    @Column(nullable = false)
+    private int point = 0;
 
     @Column(length = 1000)
     private String introduction;
