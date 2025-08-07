@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'http://www.open-isle.com'
+export const API_BASE_URL = 'https://www.open-isle.com'
 // export const API_BASE_URL = 'http://127.0.0.1:8081'
 export const GOOGLE_CLIENT_ID = '777830451304-nt8afkkap18gui4f9entcha99unal744.apps.googleusercontent.com'
 export const GITHUB_CLIENT_ID = 'Ov23liVkO1NPAX5JyWxJ'
