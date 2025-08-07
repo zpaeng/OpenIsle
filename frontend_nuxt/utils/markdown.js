@@ -1,6 +1,54 @@
 import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github.css'
+import { toast } from '../main'
+import { tiebaEmoji } from './tiebaEmoji'
+
+function mentionPlugin(md) {
+  const mentionReg = /^@\[([^\]]+)\]/
+  function mention(state, silent) {
+    const pos = state.pos
+    if (state.src.charCodeAt(pos) !== 0x40) return false
+    const match = mentionReg.exec(state.src.slice(pos))
+    if (!match) return false
+    if (!silent) {
+      const tokenOpen = state.push('link_open', 'a', 1)
+      tokenOpen.attrs = [
+        ['href', `/users/${match[1]}`],
+        ['target', '_blank'],
+        ['class', 'mention-link']
+      ]
+      const text = state.push('text', '', 0)
+      text.content = `@${match[1]}`
+      state.push('link_close', 'a', -1)
+    }
+    state.pos += match[0].length
+    return true
+  }
+  md.inline.ruler.before('emphasis', 'mention', mention)
+}
+
+function tiebaEmojiPlugin(md) {
+  md.renderer.rules['tieba-emoji'] = (tokens, idx) => {
+    const name = tokens[idx].content
+    const file = tiebaEmoji[name]
+    return `<img class="emoji" src="${file}" alt="${name}">`
+  }
+  md.inline.ruler.before('emphasis', 'tieba-emoji', (state, silent) => {
+    const pos = state.pos
+    if (state.src.charCodeAt(pos) !== 0x3a) return false
+    const match = state.src.slice(pos).match(/^:tieba(\d+):/)
+    if (!match) return false
+    const key = `tieba${match[1]}`
+    if (!tiebaEmoji[key]) return false
+    if (!silent) {
+      const token = state.push('tieba-emoji', '', 0)
+      token.content = key
+    }
+    state.pos += match[0].length
+    return true
+  })
+}
 
 const md = new MarkdownIt({
   html: false,
@@ -17,10 +65,30 @@ const md = new MarkdownIt({
   }
 })
 
-// todo: 简单用正则操作一下，后续体验不佳可以采用 striptags 
+md.use(mentionPlugin)
+md.use(tiebaEmojiPlugin)
+
+export function renderMarkdown(text) {
+  return md.render(text || '')
+}
+
+export function handleMarkdownClick(e) {
+  if (e.target.classList.contains('copy-code-btn')) {
+    const pre = e.target.closest('pre')
+    const codeEl = pre && pre.querySelector('code')
+    if (codeEl) {
+      navigator.clipboard.writeText(codeEl.innerText).then(() => {
+        toast.success('已复制')
+      })
+    }
+  }
+}
+
 export function stripMarkdown(text) {
-  const html = md.render(text)
-  return html.replace(/<\/?[^>]+>/g, '') 
+  const html = md.render(text || '')
+  const el = document.createElement('div')
+  el.innerHTML = html
+  return el.textContent || el.innerText || ''
 }
 
 export function stripMarkdownLength(text, length) {
@@ -28,5 +96,6 @@ export function stripMarkdownLength(text, length) {
   if (!length || plain.length <= length) {
     return plain
   }
+  // 截断并加省略号
   return plain.slice(0, length) + '...'
 }
