@@ -10,28 +10,26 @@
         <div class="about-tabs-item-label">{{ tab.label }}</div>
       </div>
     </div>
-    <div class="about-content" v-html="renderMarkdown(content)" @click="handleContentClick"></div>
     <div class="about-loading" v-if="isFetching">
       <l-hatch-spinner size="100" stroke="10" speed="1" color="var(--primary-color)" />
     </div>
+    <div v-else class="about-content" v-html="renderMarkdown(content)" @click="handleContentClick"></div>
   </div>
 </template>
 
 <script>
 import { ref, onMounted } from 'vue'
 import { renderMarkdown, handleMarkdownClick } from '../utils/markdown'
-import { hatch } from 'ldrs'
-hatch.register()
 
 export default {
   name: 'AboutPageView',
   setup() {
     const isFetching = ref(false)
     const tabs = [
-      { name: 'about', label: '关于', file: '/about_markdown/about.md' },
-      { name: 'agreement', label: '用户协议', file: '/about_markdown/agreement.md' },
-      { name: 'guideline', label: '创作准则', file: '/about_markdown/guideline.md' },
-      { name: 'privacy', label: '隐私政策', file: '/about_markdown/privacy.md' },
+      { name: 'about', label: '关于', file: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/about/about.md' },
+      { name: 'agreement', label: '用户协议', file: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/about/agreement.md' },
+      { name: 'guideline', label: '创作准则', file: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/about/guideline.md' },
+      { name: 'privacy', label: '隐私政策', file: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/about/privacy.md' },
     ]
     const selectedTab = ref(tabs[0].name)
     const content = ref('')
@@ -47,8 +45,9 @@ export default {
         }
       } catch (e) {
         content.value = '# 内容加载失败'
+      } finally {
+        isFetching.value = false
       }
-      isFetching.value = false
     }
 
     const selectTab = (name) => {
