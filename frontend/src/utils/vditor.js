@@ -3,6 +3,7 @@ import 'vditor/dist/index.css'
 import { API_BASE_URL } from '../main'
 import { getToken, authState } from './auth'
 import { searchUsers, fetchFollowings, fetchAdmins } from './user'
+import { tiebaEmoji } from './tiebaEmoji'
 
 export function getEditorTheme() {
   return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'classic'
@@ -37,13 +38,38 @@ export function createVditor(editorId, options = {}) {
     return searchUsers(value)
   }
 
+  const isMobile = window.innerWidth <= 768
+  const toolbar = isMobile
+    ? ['emoji', 'upload']
+    : [
+        'emoji',
+        'bold',
+        'italic',
+        'strike',
+        '|',
+        'list',
+        'line',
+        'quote',
+        'code',
+        'inline-code',
+        '|',
+        'undo',
+        'redo',
+        '|',
+        'link',
+        'upload'
+      ]
+
   let vditor
   vditor = new Vditor(editorId, {
     placeholder,
     height: 'auto',
     theme: getEditorTheme(),
-    preview: Object.assign({ theme: { current: getPreviewTheme() } }, preview),
+    preview: Object.assign({
+      theme: { current: getPreviewTheme() },
+    }, preview),
     hint: {
+      emoji: tiebaEmoji,
       extend: [
         {
           key: '@',
@@ -58,24 +84,7 @@ export function createVditor(editorId, options = {}) {
       ],
     },
     cdn: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/vditor',
-    toolbar: [
-      'emoji',
-      'bold',
-      'italic',
-      'strike',
-      '|',
-      'list',
-      'line',
-      'quote',
-      'code',
-      'inline-code',
-      '|',
-      'undo',
-      'redo',
-      '|',
-      'link',
-      'upload'
-    ],
+    toolbar,
     upload: {
       accept: 'image/*,video/*',
       multiple: false,

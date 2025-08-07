@@ -62,7 +62,7 @@ public class PointService {
             isTheRewardCapped = true;
         }
 
-        // 如果发帖人与评论者是同一个，则只计算发帖加分
+        // 如果发帖人与评论者是同一个，则只计算单次加分
         if (poster.getId().equals(commenter.getId())) {
             if (isTheRewardCapped) {
                 return 0;
@@ -71,14 +71,18 @@ public class PointService {
                 pointLogRepository.save(log);
                 return addPoint(commenter, 10);
             }
+        } else {
+            addPoint(poster, 10);
+            // 如果发帖人与评论者不是同一个，则根据是否达到积分上限来判断评论者加分情况
+            if (isTheRewardCapped) {
+                return 0;
+            } else {
+                return addPoint(commenter, 10);
+            }
         }
-
-        // 如果不是同一个，则为发帖人和评论者同时加分
-        addPoint(poster, 10);
-        return addPoint(commenter, 10);
     }
 
-    // 考虑点赞者和发帖人是同一个的情况
+    // 需要考虑点赞者和发帖人是同一个的情况
     public int awardForReactionOfPost(String reactionerName, Long postId) {
         // 根据帖子id找到发帖人
         User poster = postRepository.findById(postId).orElseThrow().getAuthor();

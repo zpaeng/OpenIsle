@@ -3,8 +3,8 @@
     <div class="new-post-form">
       <input class="post-title-input" v-model="title" placeholder="标题"/>
       <div class="post-editor-container">
-        <PostEditor v-model="content" :loading="isAiLoading" :disabled="!isLogin"/>
-        <LoginOverlay v-if="!isLogin"/>
+        <PostEditor v-model="content" v-model:loading="isAiLoading" :disabled="!isLogin" />
+        <LoginOverlay v-if="!isLogin" />
       </div>
       <div class="post-options">
         <div class="post-options-left">
@@ -282,10 +282,8 @@ export default {
   display: flex;
   justify-content: center;
   background-color: var(--background-color);
-  height: 100%;
   padding-right: 20px;
   padding-left: 20px;
-  overflow-y: auto;
 }
 
 .new-post-form {

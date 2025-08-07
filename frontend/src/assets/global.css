@@ -65,7 +65,22 @@ body {
  *************************/
 .vditor {
   min-height: 200px;
-} 
+}
+
+.vditor-toolbar--pin {
+  top: var(--header-height) !important;
+}
+
+.vditor-panel {
+  min-width: 400px;
+}
+
+.emoji {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+}
+
 /* .vditor {
   --textarea-background-color: transparent;
   border: none !important;
@@ -220,7 +235,7 @@ body {
   } 
 
   .vditor-toolbar {
-    display: none;
+    overflow-x: auto;
   }
 
   .about-content h1,
@@ -240,6 +255,11 @@ body {
     margin-bottom: 3px;
   }
 
+
+  .vditor-toolbar--pin {
+    top: 0 !important;
+  }
+
   .about-content li,
   .info-content-text li {
     font-size: 14px;
@@ -247,5 +267,10 @@ body {
 
   .info-content-text pre {
     line-height: 1.1;
+  }
+
+  .vditor-panel {
+    position: relative;
+    min-width: 0;
   }
 }

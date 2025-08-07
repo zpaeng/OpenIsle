@@ -157,7 +157,7 @@ const CommentItem = {
         toast.error('操作失败')
       }
     }
-    const submitReply = async (text) => {
+    const submitReply = async (text, clear) => {
       if (!text.trim()) return
       isWaitingForReply.value = true
       const token = getToken()
@@ -201,6 +201,7 @@ const CommentItem = {
             src: data.author.avatar,
             iconClick: () => router.push(`/users/${data.author.id}`)
           })
+          clear()
           showEditor.value = false
           toast.success('回复成功')
         } else if (res.status === 429) {
