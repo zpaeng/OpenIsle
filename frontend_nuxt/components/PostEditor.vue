@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { ref, onMounted, watch, onUnmounted } from 'vue'
+import { ref, onMounted, watch, onUnmounted, useId } from 'vue'
 import { themeState } from '../utils/theme'
 import {
   createVditor,
@@ -27,7 +27,7 @@ export default {
     },
     editorId: {
       type: String,
-      default: () => 'post-editor-' + Math.random().toString(36).slice(2)
+      default: ''
     },
     loading: {
       type: Boolean,
@@ -41,6 +41,10 @@ export default {
   setup(props, { emit }) {
     const vditorInstance = ref(null)
     let vditorRender = false
+    const editorId = ref(props.editorId)
+    if (!editorId.value) {
+      editorId.value = 'post-editor-' + useId()
+    }
 
     const getEditorTheme = getEditorThemeUtil
     const getPreviewTheme = getPreviewThemeUtil
@@ -92,7 +96,7 @@ export default {
 
     onMounted(() => {
       emit('update:loading', true)
-      vditorInstance.value = createVditor(props.editorId, {
+      vditorInstance.value = createVditor(editorId.value, {
         placeholder: '请输入正文...',
         input(value) {
           emit('update:modelValue', value)
@@ -114,7 +118,7 @@ export default {
       clearVditorStorage()
     })
 
-    return {}
+    return { editorId }
   }
 }
 </script>

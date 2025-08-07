@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { ref, onMounted, computed, watch, onUnmounted } from 'vue'
+import { ref, onMounted, computed, watch, onUnmounted, useId } from 'vue'
 import { themeState } from '../utils/theme'
 import {
   createVditor,
@@ -34,7 +34,7 @@ export default {
   props: {
     editorId: {
       type: String,
-      default: () => 'editor-' + Math.random().toString(36).slice(2)
+      default: ''
     },
     loading: {
       type: Boolean,
@@ -53,6 +53,10 @@ export default {
   setup(props, { emit }) {
     const vditorInstance = ref(null)
     const text = ref('')
+    const editorId = ref(props.editorId)
+    if (!editorId.value) {
+      editorId.value = 'editor-' + useId()
+    }
     const getEditorTheme = getEditorThemeUtil
     const getPreviewTheme = getPreviewThemeUtil
     const applyTheme = () => {
@@ -75,7 +79,7 @@ export default {
     }
 
     onMounted(() => {
-      vditorInstance.value = createVditor(props.editorId, {
+      vditorInstance.value = createVditor(editorId.value, {
         placeholder: '说点什么...',
         preview: {
           actions: [],
@@ -129,7 +133,7 @@ export default {
       }
     )
 
-    return { submit, isDisabled }
+    return { submit, isDisabled, editorId }
   }
 }
 </script>
