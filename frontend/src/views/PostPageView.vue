@@ -375,7 +375,7 @@ export default {
       }
     }
 
-    const postComment = async (text) => {
+    const postComment = async (text, clear) => {
       if (!text.trim()) return
       console.debug('Posting comment', {postId, text})
       isWaitingPostingComment.value = true
@@ -396,6 +396,7 @@ export default {
           const data = await res.json()
           console.debug('Post comment response data', data)
           await fetchComments()
+          clear()
 
           const reward = Math.max(0, Number(data?.reward) || 0)        // 经验值
           const points = Math.max(0, Number(data?.pointReward) || 0)   // 积分值
