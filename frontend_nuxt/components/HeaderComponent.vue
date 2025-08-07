@@ -241,12 +241,16 @@ export default {
 }
 
 .header-content-item-main {
+  background-color: var(--primary-color);
+  color: white;
   padding: 8px 16px;
   border-radius: 10px;
   cursor: pointer;
 }
 
+
 .header-content-item-main:hover {
+  background-color: var(--primary-color-hover);
 }
 
 .header-content-item-secondary {

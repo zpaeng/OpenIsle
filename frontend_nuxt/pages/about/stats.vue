@@ -1,6 +1,8 @@
 <template>
   <div class="site-stats-page">
-    <VChart v-if="option" :option="option" :autoresize="true" style="height:400px" />
+    <ClientOnly>
+      <VChart v-if="option" :option="option" :autoresize="true" style="height:400px" />
+    </ClientOnly>
   </div>
 </template>
 
