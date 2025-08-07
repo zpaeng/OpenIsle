@@ -53,6 +53,7 @@ public class UserMapper {
         dto.setLikesSent(reactionService.countLikesSent(user.getUsername()));
         dto.setLikesReceived(reactionService.countLikesReceived(user.getUsername()));
         dto.setExperience(user.getExperience());
+        dto.setPoint(user.getPoint());
         dto.setCurrentLevel(levelService.getLevel(user.getExperience()));
         dto.setNextLevelExp(levelService.nextLevelExp(user.getExperience()));
         if (viewer != null) {

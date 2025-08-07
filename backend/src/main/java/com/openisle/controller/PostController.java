@@ -5,12 +5,7 @@ import com.openisle.dto.PostRequest;
 import com.openisle.dto.PostSummaryDto;
 import com.openisle.mapper.PostMapper;
 import com.openisle.model.Post;
-import com.openisle.service.CaptchaService;
-import com.openisle.service.DraftService;
-import com.openisle.service.LevelService;
-import com.openisle.service.PostService;
-import com.openisle.service.SubscriptionService;
-import com.openisle.service.UserVisitService;
+import com.openisle.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +20,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
-    private final SubscriptionService subscriptionService;
     private final LevelService levelService;
     private final CaptchaService captchaService;
     private final DraftService draftService;
     private final UserVisitService userVisitService;
     private final PostMapper postMapper;
+    private final PointService pointService;
 
     @Value("${app.captcha.enabled:false}")
     private boolean captchaEnabled;
@@ -48,6 +43,7 @@ public class PostController {
         draftService.deleteDraft(auth.getName());
         PostDetailDto dto = postMapper.toDetailDto(post, auth.getName());
         dto.setReward(levelService.awardForPost(auth.getName()));
+        dto.setPointReward(pointService.awardForPost(auth.getName()));
         return ResponseEntity.ok(dto);
     }
 

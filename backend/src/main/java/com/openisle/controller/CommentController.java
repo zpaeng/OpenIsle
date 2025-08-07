@@ -7,6 +7,7 @@ import com.openisle.mapper.CommentMapper;
 import com.openisle.service.CaptchaService;
 import com.openisle.service.CommentService;
 import com.openisle.service.LevelService;
+import com.openisle.service.PointService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,7 @@ public class CommentController {
     private final LevelService levelService;
     private final CaptchaService captchaService;
     private final CommentMapper commentMapper;
+    private final PointService pointService;
 
     @Value("${app.captcha.enabled:false}")
     private boolean captchaEnabled;
@@ -45,6 +47,7 @@ public class CommentController {
         Comment comment = commentService.addComment(auth.getName(), postId, req.getContent());
         CommentDto dto = commentMapper.toDto(comment);
         dto.setReward(levelService.awardForComment(auth.getName()));
+        dto.setPointReward(pointService.awardForComment(auth.getName(),postId));
         log.debug("createComment succeeded for comment {}", comment.getId());
         return ResponseEntity.ok(dto);
     }

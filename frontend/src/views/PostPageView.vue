@@ -8,8 +8,8 @@
         <div class="article-title-container-left">
           <div class="article-title">{{ title }}</div>
           <div class="article-info-container">
-            <ArticleCategory :category="category" />
-            <ArticleTags :tags="tags" />
+            <ArticleCategory :category="category"/>
+            <ArticleTags :tags="tags"/>
           </div>
         </div>
         <div class="article-title-container-right">
@@ -64,12 +64,12 @@
       </div>
 
       <CommentEditor @submit="postComment" :loading="isWaitingPostingComment" :disabled="!loggedIn"
-        :show-login-overlay="!loggedIn" />
+                     :show-login-overlay="!loggedIn"/>
 
       <div class="comment-config-container">
         <div class="comment-sort-container">
-          <div class="comment-sort-title">Sort by: </div>
-          <Dropdown v-model="commentSort" :fetch-options="fetchCommentSorts" />
+          <div class="comment-sort-title">Sort by:</div>
+          <Dropdown v-model="commentSort" :fetch-options="fetchCommentSorts"/>
         </div>
       </div>
 
@@ -77,10 +77,10 @@
         <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
       </div>
       <div v-else class="comments-container">
-        <BaseTimeline :items="comments"> 
+        <BaseTimeline :items="comments">
           <template #item="{ item }">
             <CommentItem :key="item.id" :comment="item" :level="0" :default-show-replies="item.openReplies"
-              @deleted="onCommentDeleted" />
+                         @deleted="onCommentDeleted"/>
           </template>
         </BaseTimeline>
       </div>
@@ -92,7 +92,7 @@
         <div v-else class="scroller-time">{{ scrollerTopTime }}</div>
         <div class="scroller-middle">
           <input type="range" class="scroller-range" :max="totalPosts" :min="1" v-model.number="currentIndex"
-            @input="onSliderInput" />
+                 @input="onSliderInput"/>
           <div class="scroller-index">{{ currentIndex }}/{{ totalPosts }}</div>
         </div>
         <div v-if="isWaitingFetchingPost" class="scroller-time">loading...</div>
@@ -100,14 +100,14 @@
       </div>
     </div>
     <vue-easy-lightbox :visible="lightboxVisible" :index="lightboxIndex" :imgs="lightboxImgs"
-      @hide="lightboxVisible = false" />
+                       @hide="lightboxVisible = false"/>
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
+import {ref, computed, onMounted, onBeforeUnmount, nextTick, watch} from 'vue'
 import VueEasyLightbox from 'vue-easy-lightbox'
-import { useRoute } from 'vue-router'
+import {useRoute} from 'vue-router'
 import CommentItem from '../components/CommentItem.vue'
 import CommentEditor from '../components/CommentEditor.vue'
 import BaseTimeline from '../components/BaseTimeline.vue'
@@ -115,19 +115,30 @@ import ArticleTags from '../components/ArticleTags.vue'
 import ArticleCategory from '../components/ArticleCategory.vue'
 import ReactionsGroup from '../components/ReactionsGroup.vue'
 import DropdownMenu from '../components/DropdownMenu.vue'
-import { renderMarkdown, handleMarkdownClick, stripMarkdownLength } from '../utils/markdown'
-import { API_BASE_URL, toast } from '../main'
-import { getToken, authState } from '../utils/auth'
+import {renderMarkdown, handleMarkdownClick, stripMarkdownLength} from '../utils/markdown'
+import {API_BASE_URL, toast} from '../main'
+import {getToken, authState} from '../utils/auth'
 import TimeManager from '../utils/time'
-import { hatch } from 'ldrs'
-import { useRouter } from 'vue-router'
-import { isMobile } from '../utils/screen'
+import {hatch} from 'ldrs'
+import {useRouter} from 'vue-router'
+import {isMobile} from '../utils/screen'
 import Dropdown from '../components/Dropdown.vue'
+
 hatch.register()
 
 export default {
   name: 'PostPageView',
-  components: { CommentItem, CommentEditor, BaseTimeline, ArticleTags, ArticleCategory, ReactionsGroup, DropdownMenu, VueEasyLightbox, Dropdown },
+  components: {
+    CommentItem,
+    CommentEditor,
+    BaseTimeline,
+    ArticleTags,
+    ArticleCategory,
+    ReactionsGroup,
+    DropdownMenu,
+    VueEasyLightbox,
+    Dropdown
+  },
   setup() {
     const route = useRoute()
     const postId = route.params.id
@@ -173,7 +184,7 @@ export default {
       if (metaDescriptionEl) metaDescriptionEl.setAttribute('content', defaultDescription)
       window.removeEventListener('scroll', updateCurrentIndex)
     })
-      
+
     const lightboxVisible = ref(false)
     const lightboxIndex = ref(0)
     const lightboxImgs = ref([])
@@ -183,19 +194,19 @@ export default {
     const articleMenuItems = computed(() => {
       const items = []
       if (isAuthor.value || isAdmin.value) {
-        items.push({ text: '编辑文章', onClick: () => editPost() })
-        items.push({ text: '删除文章', color: 'red', onClick: () => deletePost() })
+        items.push({text: '编辑文章', onClick: () => editPost()})
+        items.push({text: '删除文章', color: 'red', onClick: () => deletePost()})
       }
       if (isAdmin.value) {
         if (pinnedAt.value) {
-          items.push({ text: '取消置顶', onClick: () => unpinPost() })
+          items.push({text: '取消置顶', onClick: () => unpinPost()})
         } else {
-          items.push({ text: '置顶', onClick: () => pinPost() })
+          items.push({text: '置顶', onClick: () => pinPost()})
         }
       }
       if (isAdmin.value && status.value === 'PENDING') {
-        items.push({ text: '通过审核', onClick: () => approvePost() })
-        items.push({ text: '驳回', color: 'red', onClick: () => rejectPost() })
+        items.push({text: '通过审核', onClick: () => approvePost()})
+        items.push({text: '驳回', color: 'red', onClick: () => rejectPost()})
       }
       return items
     })
@@ -204,12 +215,12 @@ export default {
       const items = []
       if (mainContainer.value) {
         const main = mainContainer.value.querySelector('.info-content-container')
-        if (main) items.push({ el: main, top: getTop(main) })
+        if (main) items.push({el: main, top: getTop(main)})
 
         for (const c of comments.value) {
           const el = document.getElementById('comment-' + c.id)
           if (el) {
-            items.push({ el, top: getTop(el) })
+            items.push({el, top: getTop(el)})
           }
         }
         // 根据 top 排序，防止评论异步插入后顺序错乱
@@ -292,7 +303,7 @@ export default {
         isWaitingFetchingPost.value = true;
         const token = getToken()
         const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
-          headers: { Authorization: token ? `Bearer ${token}` : '' }
+          headers: {Authorization: token ? `Bearer ${token}` : ''}
         })
         isWaitingFetchingPost.value = false;
         if (!res.ok) {
@@ -321,22 +332,22 @@ export default {
 
     const totalPosts = computed(() => comments.value.length + 1)
     const lastReplyTime = computed(() =>
-      comments.value.length ? comments.value[comments.value.length - 1].time : postTime.value
+        comments.value.length ? comments.value[comments.value.length - 1].time : postTime.value
     )
     const firstReplyTime = computed(() =>
-      comments.value.length ? comments.value[0].time : postTime.value
+        comments.value.length ? comments.value[0].time : postTime.value
     )
     const scrollerTopTime = computed(() =>
-      commentSort.value === 'OLDEST' ? postTime.value : firstReplyTime.value
+        commentSort.value === 'OLDEST' ? postTime.value : firstReplyTime.value
     )
 
     watch(
-      () => comments.value.length,
-      async () => {
-        await nextTick()
-        gatherPostItems()
-        updateCurrentIndex()
-      }
+        () => comments.value.length,
+        async () => {
+          await nextTick()
+          gatherPostItems()
+          updateCurrentIndex()
+        }
     )
 
     const updateCurrentIndex = () => {
@@ -360,13 +371,13 @@ export default {
       const target = postItems.value[index - 1]
       if (target) {
         const top = getTop(target) - headerHeight - 20 // 20 for beauty
-        window.scrollTo({ top, behavior: 'auto' })
+        window.scrollTo({top, behavior: 'auto'})
       }
     }
 
     const postComment = async (text) => {
       if (!text.trim()) return
-      console.debug('Posting comment', { postId, text })
+      console.debug('Posting comment', {postId, text})
       isWaitingPostingComment.value = true
       const token = getToken()
       if (!token) {
@@ -377,19 +388,28 @@ export default {
       try {
         const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/comments`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ content: text })
+          headers: {'Content-Type': 'application/json', Authorization: `Bearer ${token}`},
+          body: JSON.stringify({content: text})
         })
         console.debug('Post comment response status', res.status)
         if (res.ok) {
           const data = await res.json()
           console.debug('Post comment response data', data)
           await fetchComments()
-          if (data.reward && data.reward > 0) {
-            toast.success(`评论成功，获得 ${data.reward} 经验值`)
+
+          const reward = Math.max(0, Number(data?.reward) || 0)        // 经验值
+          const points = Math.max(0, Number(data?.pointReward) || 0)   // 积分值
+
+          if (reward && points) {
+            toast.success(`评论成功，获得 ${reward} 经验值、${points} 积分值`)
+          } else if (reward) {
+            toast.success(`评论成功，获得 ${reward} 经验值`)
+          } else if (points) {
+            toast.success(`评论成功，获得 ${points} 积分值`)
           } else {
             toast.success('评论成功')
           }
+
         } else if (res.status === 429) {
           toast.error('评论过于频繁，请稍后再试')
         } else {
@@ -417,7 +437,7 @@ export default {
       }
       const res = await fetch(`${API_BASE_URL}/api/subscriptions/posts/${postId}`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: {Authorization: `Bearer ${token}`}
       })
       if (res.ok) {
         subscribed.value = true
@@ -432,7 +452,7 @@ export default {
       if (!token) return
       const res = await fetch(`${API_BASE_URL}/api/admin/posts/${postId}/approve`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: {Authorization: `Bearer ${token}`}
       })
       if (res.ok) {
         status.value = 'PUBLISHED'
@@ -447,7 +467,7 @@ export default {
       if (!token) return
       const res = await fetch(`${API_BASE_URL}/api/admin/posts/${postId}/pin`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: {Authorization: `Bearer ${token}`}
       })
       if (res.ok) {
         pinnedAt.value = new Date().toISOString()
@@ -462,7 +482,7 @@ export default {
       if (!token) return
       const res = await fetch(`${API_BASE_URL}/api/admin/posts/${postId}/unpin`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: {Authorization: `Bearer ${token}`}
       })
       if (res.ok) {
         pinnedAt.value = null
@@ -471,7 +491,7 @@ export default {
         toast.error('操作失败')
       }
     }
-    
+
     const editPost = () => {
       router.push(`/posts/${postId}/edit`)
     }
@@ -484,7 +504,7 @@ export default {
       }
       const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: {Authorization: `Bearer ${token}`}
       })
       if (res.ok) {
         toast.success('已删除')
@@ -499,7 +519,7 @@ export default {
       if (!token) return
       const res = await fetch(`${API_BASE_URL}/api/admin/posts/${postId}/reject`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: {Authorization: `Bearer ${token}`}
       })
       if (res.ok) {
         status.value = 'REJECTED'
@@ -518,7 +538,7 @@ export default {
 
       const res = await fetch(`${API_BASE_URL}/api/subscriptions/posts/${postId}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: {Authorization: `Bearer ${token}`}
       })
       if (res.ok) {
         subscribed.value = false
@@ -530,19 +550,19 @@ export default {
 
     const fetchCommentSorts = () => {
       return Promise.resolve([
-        { id: 'NEWEST', name: '最新', icon: 'fas fa-clock' },
-        { id: 'OLDEST', name: '最旧', icon: 'fas fa-hourglass-start' },
+        {id: 'NEWEST', name: '最新', icon: 'fas fa-clock'},
+        {id: 'OLDEST', name: '最旧', icon: 'fas fa-hourglass-start'},
         // { id: 'MOST_INTERACTIONS', name: '最多互动', icon: 'fas fa-fire' }
       ])
     }
 
     const fetchComments = async () => {
       isFetchingComments.value = true
-      console.debug('Fetching comments', { postId, sort: commentSort.value })
+      console.debug('Fetching comments', {postId, sort: commentSort.value})
       try {
         const token = getToken()
         const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/comments?sort=${commentSort.value}`, {
-          headers: { Authorization: token ? `Bearer ${token}` : '' }
+          headers: {Authorization: token ? `Bearer ${token}` : ''}
         })
         console.debug('Fetch comments response status', res.status)
         if (res.ok) {
@@ -571,7 +591,7 @@ export default {
         const el = document.getElementById('comment-' + id)
         if (el) {
           const top = el.getBoundingClientRect().top + window.scrollY - headerHeight - 20 // 20 for beauty
-          window.scrollTo({ top, behavior: 'smooth' })
+          window.scrollTo({top, behavior: 'smooth'})
           el.classList.add('comment-highlight')
           setTimeout(() => el.classList.remove('comment-highlight'), 4000)
         }

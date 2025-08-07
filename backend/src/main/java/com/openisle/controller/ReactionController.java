@@ -6,8 +6,8 @@ import com.openisle.mapper.ReactionMapper;
 import com.openisle.model.Reaction;
 import com.openisle.model.ReactionType;
 import com.openisle.service.LevelService;
+import com.openisle.service.PointService;
 import com.openisle.service.ReactionService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -20,6 +20,7 @@ public class ReactionController {
     private final ReactionService reactionService;
     private final LevelService levelService;
     private final ReactionMapper reactionMapper;
+    private final PointService pointService;
 
     /**
      * Get all available reaction types.
@@ -31,27 +32,29 @@ public class ReactionController {
 
     @PostMapping("/posts/{postId}/reactions")
     public ResponseEntity<ReactionDto> reactToPost(@PathVariable Long postId,
-                                                  @RequestBody ReactionRequest req,
-                                                  Authentication auth) {
+                                                   @RequestBody ReactionRequest req,
+                                                   Authentication auth) {
         Reaction reaction = reactionService.reactToPost(auth.getName(), postId, req.getType());
         if (reaction == null) {
             return ResponseEntity.noContent().build();
         }
         ReactionDto dto = reactionMapper.toDto(reaction);
         dto.setReward(levelService.awardForReaction(auth.getName()));
+        pointService.awardForReactionOfPost(auth.getName(), postId);
         return ResponseEntity.ok(dto);
     }
 
     @PostMapping("/comments/{commentId}/reactions")
     public ResponseEntity<ReactionDto> reactToComment(@PathVariable Long commentId,
-                                                     @RequestBody ReactionRequest req,
-                                                     Authentication auth) {
+                                                      @RequestBody ReactionRequest req,
+                                                      Authentication auth) {
         Reaction reaction = reactionService.reactToComment(auth.getName(), commentId, req.getType());
         if (reaction == null) {
             return ResponseEntity.noContent().build();
         }
         ReactionDto dto = reactionMapper.toDto(reaction);
         dto.setReward(levelService.awardForReaction(auth.getName()));
+        pointService.awardForReactionOfComment(auth.getName(), commentId);
         return ResponseEntity.ok(dto);
     }
 }

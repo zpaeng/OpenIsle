@@ -25,6 +25,7 @@ public class UserDto {
     private long likesReceived;
     private boolean subscribed;
     private int experience;
+    private int point;
     private int currentLevel;
     private int nextLevelExp;
 }
