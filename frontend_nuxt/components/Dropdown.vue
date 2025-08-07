@@ -147,11 +147,8 @@
 
 <script>
 import { ref, computed, watch, onMounted } from "vue"
-import { hatch } from "ldrs"
 import { isMobile } from "~/utils/screen"
-if (process.client) {
-  hatch.register()
-}
+
 
 export default {
   name: "BaseDropdown",
@@ -255,7 +252,7 @@ export default {
       }
     })
 
-    onMounted(() => {
+    onMounted(async () => {
       if (!props.remote) {
         loadOptions()
       }

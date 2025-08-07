@@ -8,7 +8,9 @@
     "start": "nuxt start"
   },
   "dependencies": {
-    "nuxt": "latest",
-    "ldrs": "^1.0.0"
+    "highlight.js": "^11.11.1",
+    "ldrs": "^1.0.0",
+    "markdown-it": "^14.1.0",
+    "nuxt": "latest"
   }
 }

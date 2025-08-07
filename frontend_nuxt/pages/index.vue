@@ -119,12 +119,7 @@ import TagSelect from '~/components/TagSelect.vue'
 import ArticleTags from '~/components/ArticleTags.vue'
 import ArticleCategory from '~/components/ArticleCategory.vue'
 import SearchDropdown from '~/components/SearchDropdown.vue'
-import { hatch } from 'ldrs'
 import { isMobile } from '~/utils/screen'
-if (process.client) {
-  hatch.register()
-}
-
 
 export default {
   name: 'HomePageView',
@@ -133,10 +128,15 @@ export default {
     TagSelect,
     ArticleTags,
     ArticleCategory,
-    SearchDropdown
+    SearchDropdown,
+    ClientOnly: () => import('vue').then(m => m.defineAsyncComponent(() => import('vue').then(() => ({ template: '<slot />' }))))
   },
   setup() {
     const route = useRoute()
+
+    /**
+     * -------- 1. PARAMS & REFS --------
+     */
     const selectedCategory = ref('')
     if (route.query.category) {
       const c = decodeURIComponent(route.query.category)
@@ -151,6 +151,7 @@ export default {
         .map(v => decodeURIComponent(v))
         .map(v => (isNaN(v) ? v : Number(v)))
     }
+
     const tagOptions = ref([])
     const categoryOptions = ref([])
     const isLoadingPosts = ref(false)
@@ -168,8 +169,19 @@ export default {
     const pageSize = 10
     const allLoaded = ref(false)
 
-    // Backend now returns comment counts directly
+    /**
+     * -------- 2. CLIENT‑SIDE ONLY: LDRS REGISTER --------
+     * 这里使用动态 import 避免 SSR 阶段触发 HTMLElement 未定义错误。
+     */
+    onMounted(async () => {
+      // 首次加载
+      fetchContent()
+      await loadOptions()
+    })
 
+    /**
+     * -------- 3. FETCH OPTION HELPERS --------
+     */
     const loadOptions = async () => {
       if (selectedCategory.value && !isNaN(selectedCategory.value)) {
         try {
@@ -233,6 +245,9 @@ export default {
       return url
     }
 
+    /**
+     * -------- 4. FETCH CORE --------
+     */
     const fetchPosts = async (reset = false) => {
       if (reset) {
         page.value = 0
@@ -351,20 +366,15 @@ export default {
 
     const fetchContent = async (reset = false) => {
       if (selectedTopic.value === '排行榜') {
-          fetchRanking(reset)
-        } else if (selectedTopic.value === '最新回复') {
-          fetchLatestReply(reset)
-        } else {
-          fetchPosts(reset)
-        }
+        fetchRanking(reset)
+      } else if (selectedTopic.value === '最新回复') {
+        fetchLatestReply(reset)
+      } else {
+        fetchPosts(reset)
+      }
     }
 
     useScrollLoadMore(fetchContent)
-
-    onMounted(async () => {
-      fetchContent()
-      await loadOptions()
-    })
 
     watch([selectedCategory, selectedTags], () => {
       fetchContent(true)
@@ -374,9 +384,20 @@ export default {
       fetchContent(true)
     })
 
-    const sanitizeDescription = (text) => stripMarkdown(text)
+    const sanitizeDescription = text => stripMarkdown(text)
 
-    return { topics, selectedTopic, articles, sanitizeDescription, isLoadingPosts, selectedCategory, selectedTags, tagOptions, categoryOptions, isMobile }
+    return {
+      topics,
+      selectedTopic,
+      articles,
+      sanitizeDescription,
+      isLoadingPosts,
+      selectedCategory,
+      selectedTags,
+      tagOptions,
+      categoryOptions,
+      isMobile
+    }
   }
 }
 </script>

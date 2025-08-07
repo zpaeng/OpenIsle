@@ -117,10 +117,6 @@ import { authState } from '~/utils/auth'
 import { fetchUnreadCount, notificationState } from '~/utils/notification'
 import { watch } from 'vue'
 import { API_BASE_URL } from '~/main'
-import { hatch } from 'ldrs'
-if (process.client) {
-  hatch.register()
-}
 
 export default {
   name: 'MenuComponent',
