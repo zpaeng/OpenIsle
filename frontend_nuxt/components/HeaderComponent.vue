@@ -247,7 +247,6 @@ export default {
 }
 
 .header-content-item-main:hover {
-  background-color: var(--menu-selected-background-color);
 }
 
 .header-content-item-secondary {
