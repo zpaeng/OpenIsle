@@ -2,7 +2,8 @@ import { defineNuxtConfig } from 'nuxt/config'
 
 export default defineNuxtConfig({
   ssr: true,
-  css: ['~/assets/global.css'],
+  // Ensure Vditor styles load before our overrides in global.css
+  css: ['vditor/dist/index.css', '~/assets/global.css'],
   app: {
     head: {
       script: [
