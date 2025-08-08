@@ -5,6 +5,21 @@ export default defineNuxtConfig({
   css: ['~/assets/global.css'],
   app: {
     head: {
+      script: [
+        {
+          tagPriority: 'high',
+          children: `
+            (function () {
+              try {
+                const mode = localStorage.getItem('theme-mode');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const theme = mode === 'dark' || mode === 'light' ? mode : (prefersDark ? 'dark' : 'light');
+                document.documentElement.dataset.theme = theme;
+              } catch (e) {}
+            })();
+          `
+        }
+      ],
       link: [
         {
           rel: 'stylesheet',
