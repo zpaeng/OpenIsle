@@ -93,4 +93,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     long countByCategory_Id(Long categoryId);
 
     long countDistinctByTags_Id(Long tagId);
+
+    long countByAuthor_Id(Long userId);
 }
