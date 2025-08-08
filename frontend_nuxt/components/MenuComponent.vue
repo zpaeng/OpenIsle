@@ -71,7 +71,7 @@
           <div v-if="isLoadingCategory" class="menu-loading-container">
             <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
           </div>
-          <div v-else v-for="c in categories" :key="c.id" class="section-item" @click="gotoCategory(c)">
+          <div v-else v-for="c in categoryData" :key="c.id" class="section-item" @click="gotoCategory(c)">
             <template v-if="c.smallIcon || c.icon">
               <img v-if="isImageIcon(c.smallIcon || c.icon)" :src="c.smallIcon || c.icon" class="section-item-icon" :alt="c.name" />
               <i v-else :class="['section-item-icon', c.smallIcon || c.icon]"></i>
@@ -93,7 +93,7 @@
           <div v-if="isLoadingTag" class="menu-loading-container">
             <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
           </div>
-          <div v-else v-for="t in tags" :key="t.id" class="section-item" @click="gotoTag(t)">
+          <div v-else v-for="t in tagData" :key="t.id" class="section-item" @click="gotoTag(t)">
             <img v-if="isImageIcon(t.smallIcon || t.icon)" :src="t.smallIcon || t.icon" class="section-item-icon" :alt="t.name" />
             <i v-else class="section-item-icon fas fa-hashtag"></i>
             <span class="section-item-text">{{ t.name }} <span class="section-item-text-count">x {{ t.count
@@ -127,40 +127,35 @@ export default {
     }
   },
   async setup(props, { emit }) {
-    // `useRouter` must be called before any `await` to retain Nuxt instance
     const router = useRouter()
-
     const categories = ref([])
     const tags = ref([])
     const categoryOpen = ref(true)
     const tagOpen = ref(true)
-    const { data: categoryData, pending: isLoadingCategory } = await fetch(
-      `${API_BASE_URL}/api/categories`,
-      { server: true }
-    )
-    const { data: tagData, pending: isLoadingTag } = await fetch(
-      `${API_BASE_URL}/api/tags?limit=10`,
-      { server: true }
-    )
+    const isLoadingCategory = ref(false)
+    const isLoadingTag = ref(false)
+    const categoryData = ref([])
+    const tagData = ref([])
 
-    watch(
-      categoryData,
-      (val) => {
-        categories.value = (val || []).slice(0, 10)
-      },
-      { immediate: true }
-    )
-    watch(
-      tagData,
-      (val) => {
-        tags.value = val || []
-      },
-      { immediate: true }
-    )
+    const fetchCategoryData = async () => {
+      isLoadingCategory.value = true
+      const res = await fetch(`${API_BASE_URL}/api/categories`)
+      const data = await res.json()
+      categoryData.value = data
+      isLoadingCategory.value = false
+    }
+
+    const fetchTagData = async () => {
+      isLoadingTag.value = true
+      const res = await fetch(`${API_BASE_URL}/api/tags?limit=10`)
+      const data = await res.json()
+      tagData.value = data
+      isLoadingTag.value = false
+    }
 
     onMounted(() => {
-      localStorage.setItem('menu-categories', JSON.stringify(categories.value))
-      localStorage.setItem('menu-tags', JSON.stringify(tags.value))
+      // fetchCategoryData()
+      // fetchTagData()
     })
 
     const iconClass = computed(() => {
@@ -226,9 +221,11 @@ export default {
       handleItemClick()
     }
 
+    await Promise.all([fetchCategoryData(), fetchTagData()])
+
     return {
-      categories,
-      tags,
+      categoryData,
+      tagData,
       categoryOpen,
       tagOpen,
       isLoadingCategory,

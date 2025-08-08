@@ -376,8 +376,7 @@ export default {
 
     const sanitizeDescription = text => stripMarkdown(text)
 
-    await loadOptions()
-    await fetchContent()
+    await Promise.all([loadOptions(), fetchContent()])
 
     return {
       topics,
