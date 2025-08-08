@@ -133,10 +133,6 @@ export default {
   },
   async setup() {
     const route = useRoute()
-
-    /**
-     * -------- 1. PARAMS & REFS --------
-     */
     const selectedCategory = ref('')
     if (route.query.category) {
       const c = decodeURIComponent(route.query.category)
@@ -169,16 +165,6 @@ export default {
     const pageSize = 10
     const allLoaded = ref(false)
 
-    /**
-     * -------- 2. INIT FETCH FOR SSR --------
-     * 服务端渲染阶段也需要获取首页内容和选项。
-     */
-    await loadOptions()
-    await fetchContent()
-
-    /**
-     * -------- 3. FETCH OPTION HELPERS --------
-     */
     const loadOptions = async () => {
       if (selectedCategory.value && !isNaN(selectedCategory.value)) {
         try {
@@ -242,9 +228,6 @@ export default {
       return url
     }
 
-    /**
-     * -------- 4. FETCH CORE --------
-     */
     const fetchPosts = async (reset = false) => {
       if (reset) {
         page.value = 0
@@ -296,7 +279,12 @@ export default {
       if (isLoadingPosts.value || allLoaded.value) return
       try {
         isLoadingPosts.value = true
-        const res = await fetch(buildRankUrl())
+        const token = getToken()
+        const res = await fetch(buildRankUrl(), {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : ''
+          }
+        })
         isLoadingPosts.value = false
         if (!res.ok) return
         const data = await res.json()
@@ -333,7 +321,12 @@ export default {
       if (isLoadingPosts.value || allLoaded.value) return
       try {
         isLoadingPosts.value = true
-        const res = await fetch(buildReplyUrl())
+        const token = getToken()
+        const res = await fetch(buildReplyUrl(), {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : ''
+          }
+        })
         isLoadingPosts.value = false
         if (!res.ok) return
         const data = await res.json()
@@ -363,11 +356,11 @@ export default {
 
     const fetchContent = async (reset = false) => {
       if (selectedTopic.value === '排行榜') {
-        fetchRanking(reset)
+        await fetchRanking(reset)
       } else if (selectedTopic.value === '最新回复') {
-        fetchLatestReply(reset)
+        await fetchLatestReply(reset)
       } else {
-        fetchPosts(reset)
+        await fetchPosts(reset)
       }
     }
 
@@ -382,6 +375,9 @@ export default {
     })
 
     const sanitizeDescription = text => stripMarkdown(text)
+
+    await loadOptions()
+    await fetchContent()
 
     return {
       topics,

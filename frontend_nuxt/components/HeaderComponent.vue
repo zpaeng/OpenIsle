@@ -76,7 +76,9 @@ export default {
     const router = useRouter()
 
     const goToHome = () => {
-      router.push('/')
+      router.push('/').then(() => {
+        window.location.reload()
+      })
     }
     const search = () => {
       showSearch.value = true

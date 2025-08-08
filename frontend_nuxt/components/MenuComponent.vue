@@ -245,13 +245,17 @@ export default {
     gotoCategory(c) {
       const value = encodeURIComponent(c.id ?? c.name)
       this.$router
-        .push({ path: '/', query: { category: value } })
+        .push({ path: '/', query: { category: value } }).then(() => {
+          window.location.reload()
+        })
       this.handleItemClick()
     },
     gotoTag(t) {
       const value = encodeURIComponent(t.id ?? t.name)
       this.$router
-        .push({ path: '/', query: { tags: value } })
+        .push({ path: '/', query: { tags: value } }).then(() => {
+          window.location.reload()
+        })
       this.handleItemClick()
     }
   }
