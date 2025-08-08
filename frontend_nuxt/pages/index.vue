@@ -106,12 +106,6 @@
   </div>
 </template>
 
-<script setup>
-definePageMeta({
-  keepalive: true
-})
-</script>
-
 <script>
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'

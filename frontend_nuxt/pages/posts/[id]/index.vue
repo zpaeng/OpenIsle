@@ -104,12 +104,6 @@
   </div>
 </template>
 
-<script setup>
-definePageMeta({
-  keepalive: true
-})
-</script>
-
 <script>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import VueEasyLightbox from 'vue-easy-lightbox'

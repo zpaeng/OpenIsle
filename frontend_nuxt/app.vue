@@ -9,7 +9,7 @@
         <MenuComponent :visible="!hideMenu && menuVisible" @item-click="menuVisible = false" />
       </div>
       <div class="content" :class="{ 'menu-open': menuVisible && !hideMenu }">
-        <NuxtPage keepalive />
+        <NuxtPage />
       </div>
     </div>
     <GlobalPopups />
