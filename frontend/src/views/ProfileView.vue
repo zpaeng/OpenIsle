@@ -440,8 +440,7 @@ export default {
 
     const init = async () => {
       try {
-        await fetchUser()
-        await loadSummary()
+        await Promise.all([fetchUser(), loadSummary()])
       } catch (e) {
         console.error(e)
       } finally {
