@@ -52,7 +52,7 @@ export default {
   methods: {}
 }
 </script>
-
+<style src="~/assets/global.css"></style>
 <style>
 .header-container {
   position: fixed;
