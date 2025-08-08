@@ -131,12 +131,11 @@ export default {
     const tags = ref([])
     const categoryOpen = ref(true)
     const tagOpen = ref(true)
-
-    const { data: categoryData, pending: isLoadingCategory } = await useFetch(
+    const { data: categoryData, pending: isLoadingCategory } = await fetch(
       `${API_BASE_URL}/api/categories`,
       { server: true }
     )
-    const { data: tagData, pending: isLoadingTag } = await useFetch(
+    const { data: tagData, pending: isLoadingTag } = await fetch(
       `${API_BASE_URL}/api/tags?limit=10`,
       { server: true }
     )
@@ -210,19 +209,39 @@ export default {
 
     const gotoCategory = (c) => {
       const value = encodeURIComponent(c.id ?? c.name)
-      this.$router
+      router
         .push({ path: '/', query: { category: value } }).then(() => {
           window.location.reload()
         })
-      this.handleItemClick()
-    },
-    gotoTag(t) {
+      handleItemClick()
+    }
+
+    const gotoTag = (t) => {
       const value = encodeURIComponent(t.id ?? t.name)
-      this.$router
+      router
         .push({ path: '/', query: { tags: value } }).then(() => {
           window.location.reload()
         })
-      this.handleItemClick()
+      handleItemClick()
+    }
+
+    return {
+      categories,
+      tags,
+      categoryOpen,
+      tagOpen,
+      isLoadingCategory,
+      isLoadingTag,
+      iconClass,
+      unreadCount,
+      showUnreadCount,
+      shouldShowStats,
+      cycleTheme,
+      handleHomeClick,
+      handleItemClick,
+      isImageIcon,
+      gotoCategory,
+      gotoTag
     }
   }
 }
