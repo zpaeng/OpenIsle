@@ -109,6 +109,7 @@
 <script>
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useState } from '#app'
 import { useScrollLoadMore } from '~/utils/loadMore'
 import { stripMarkdown } from '~/utils/markdown'
 import { API_BASE_URL } from '~/main'
@@ -148,8 +149,8 @@ export default {
         .map(v => (isNaN(v) ? v : Number(v)))
     }
 
-    const tagOptions = ref([])
-    const categoryOptions = ref([])
+    const tagOptions = useState('index-tagOptions', () => [])
+    const categoryOptions = useState('index-categoryOptions', () => [])
     const isLoadingPosts = ref(false)
     const topics = ref(['最新回复', '最新', '排行榜' /*, '热门', '类别'*/])
     const selectedTopic = ref(
@@ -160,10 +161,11 @@ export default {
           : '最新回复'
     )
 
-    const articles = ref([])
-    const page = ref(0)
+    const articles = useState('index-articles', () => [])
+    const page = useState('index-page', () => 0)
     const pageSize = 10
-    const allLoaded = ref(false)
+    const allLoaded = useState('index-allLoaded', () => false)
+    const initialized = useState('index-initialized', () => false)
 
     const loadOptions = async () => {
       if (selectedCategory.value && !isNaN(selectedCategory.value)) {
@@ -376,7 +378,10 @@ export default {
 
     const sanitizeDescription = text => stripMarkdown(text)
 
-    await Promise.all([loadOptions(), fetchContent()])
+    if (!initialized.value) {
+      await Promise.all([loadOptions(), fetchContent()])
+      initialized.value = true
+    }
 
     return {
       topics,
