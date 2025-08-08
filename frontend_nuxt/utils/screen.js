@@ -1,12 +1,14 @@
 import { ref, computed } from 'vue'
 
 const width = ref(0)
+const isClient = ref(false)
 
-if (process.client) {
+if (typeof window !== 'undefined') {
+  isClient.value = true
   width.value = window.innerWidth
   window.addEventListener('resize', () => {
     width.value = window.innerWidth
   })
 }
 
-export const isMobile = computed(() => width.value <= 768)
+export const isMobile = computed(() => isClient.value && width.value <= 768)

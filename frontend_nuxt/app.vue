@@ -26,7 +26,7 @@ export default {
   components: { HeaderComponent, MenuComponent, GlobalPopups },
   data() {
     return {
-      menuVisible: process.client ? window.innerWidth > 768 : false
+      menuVisible: true
     }
   },
   computed: {
@@ -45,7 +45,9 @@ export default {
     }
   },
   async mounted() {
-    // placeholder for future global initializations
+    if (typeof window !== 'undefined') {
+      this.menuVisible = window.innerWidth > 768
+    }
   },
   methods: {}
 }
