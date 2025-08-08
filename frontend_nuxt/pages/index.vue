@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useScrollLoadMore } from '~/utils/loadMore'
 import { stripMarkdown } from '~/utils/markdown'
@@ -131,7 +131,7 @@ export default {
     SearchDropdown,
     ClientOnly: () => import('vue').then(m => m.defineAsyncComponent(() => import('vue').then(() => ({ template: '<slot />' }))))
   },
-  setup() {
+  async setup() {
     const route = useRoute()
 
     /**
@@ -170,14 +170,11 @@ export default {
     const allLoaded = ref(false)
 
     /**
-     * -------- 2. CLIENT‑SIDE ONLY: LDRS REGISTER --------
-     * 这里使用动态 import 避免 SSR 阶段触发 HTMLElement 未定义错误。
+     * -------- 2. INIT FETCH FOR SSR --------
+     * 服务端渲染阶段也需要获取首页内容和选项。
      */
-    onMounted(async () => {
-      // 首次加载
-      fetchContent()
-      await loadOptions()
-    })
+    await loadOptions()
+    await fetchContent()
 
     /**
      * -------- 3. FETCH OPTION HELPERS --------
