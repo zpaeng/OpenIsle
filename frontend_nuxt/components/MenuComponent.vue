@@ -127,6 +127,9 @@ export default {
     }
   },
   async setup(props, { emit }) {
+    // `useRouter` must be called before any `await` to retain Nuxt instance
+    const router = useRouter()
+
     const categories = ref([])
     const tags = ref([])
     const categoryOpen = ref(true)
@@ -189,8 +192,6 @@ export default {
       await updateCount()
       watch(() => authState.loggedIn, updateCount)
     })
-
-    const router = useRouter()
 
     const handleHomeClick = () => {
       router.push('/').then(() => {
