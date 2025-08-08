@@ -122,6 +122,10 @@ import ArticleCategory from '~/components/ArticleCategory.vue'
 import SearchDropdown from '~/components/SearchDropdown.vue'
 import { isMobile } from '~/utils/screen'
 
+definePageMeta({
+  scrollToTop: false,
+})
+
 export default {
   name: 'HomePageView',
   components: {
