@@ -9,7 +9,7 @@ export default defineNuxtConfig({
       script: [
         {
           tagPriority: 'high',
-          children: `
+          innerHTML: `
             (function () {
               try {
                 const mode = localStorage.getItem('theme-mode');
