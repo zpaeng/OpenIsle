@@ -115,7 +115,7 @@
 import { themeState, cycleTheme, ThemeMode } from '~/utils/theme'
 import { authState } from '~/utils/auth'
 import { fetchUnreadCount, notificationState } from '~/utils/notification'
-import { watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { API_BASE_URL } from '~/main'
 
 export default {
@@ -126,18 +126,42 @@ export default {
       default: true
     }
   },
-  data() {
-    return {
-      categories: [],
-      tags: [],
-      categoryOpen: true,
-      tagOpen: true,
-      isLoadingCategory: false,
-      isLoadingTag: false
-    }
-  },
-  computed: {
-    iconClass() {
+  async setup(props, { emit }) {
+    const categories = ref([])
+    const tags = ref([])
+    const categoryOpen = ref(true)
+    const tagOpen = ref(true)
+
+    const { data: categoryData, pending: isLoadingCategory } = await useFetch(
+      `${API_BASE_URL}/api/categories`,
+      { server: true }
+    )
+    const { data: tagData, pending: isLoadingTag } = await useFetch(
+      `${API_BASE_URL}/api/tags?limit=10`,
+      { server: true }
+    )
+
+    watch(
+      categoryData,
+      (val) => {
+        categories.value = (val || []).slice(0, 10)
+      },
+      { immediate: true }
+    )
+    watch(
+      tagData,
+      (val) => {
+        tags.value = val || []
+      },
+      { immediate: true }
+    )
+
+    onMounted(() => {
+      localStorage.setItem('menu-categories', JSON.stringify(categories.value))
+      localStorage.setItem('menu-tags', JSON.stringify(tags.value))
+    })
+
+    const iconClass = computed(() => {
       switch (themeState.mode) {
         case ThemeMode.DARK:
           return 'fas fa-moon'
@@ -146,18 +170,14 @@ export default {
         default:
           return 'fas fa-desktop'
       }
-    },
-    unreadCount() {
-      return notificationState.unreadCount
-    },
-    showUnreadCount() {
-      return this.unreadCount > 99 ? '99+' : this.unreadCount
-    },
-    shouldShowStats() {
-      return authState.role === 'ADMIN'
-    }
-  },
-  async mounted() {
+    })
+
+    const unreadCount = computed(() => notificationState.unreadCount)
+    const showUnreadCount = computed(() =>
+      unreadCount.value > 99 ? '99+' : unreadCount.value
+    )
+    const shouldShowStats = computed(() => authState.role === 'ADMIN')
+
     const updateCount = async () => {
       if (authState.loggedIn) {
         await fetchUnreadCount()
@@ -165,94 +185,58 @@ export default {
         notificationState.unreadCount = 0
       }
     }
-    
-    watch(() => authState.loggedIn, async () => {
+
+    onMounted(async () => {
       await updateCount()
+      watch(() => authState.loggedIn, updateCount)
     })
 
-    const CAT_CACHE_KEY = 'menu-categories'
-    const TAG_CACHE_KEY = 'menu-tags'
+    const router = useRouter()
 
-    const cachedCategories = localStorage.getItem(CAT_CACHE_KEY)
-    if (cachedCategories) {
-      try {
-        this.categories = JSON.parse(cachedCategories)
-      } catch { /* ignore */ }
-    }
-
-    const cachedTags = localStorage.getItem(TAG_CACHE_KEY)
-    if (cachedTags) {
-      try {
-        this.tags = JSON.parse(cachedTags)
-      } catch { /* ignore */ }
-    }
-
-    this.isLoadingCategory = !cachedCategories
-    this.isLoadingTag = !cachedTags
-
-    const fetchCategories = () => {
-      fetch(`${API_BASE_URL}/api/categories`).then(res => {
-        if (res.ok) {
-          res.json().then(data => {
-            this.categories = data.slice(0, 10)
-            localStorage.setItem(CAT_CACHE_KEY, JSON.stringify(this.categories))
-          })
-        }
-        this.isLoadingCategory = false
-      })
-    }
-
-    const fetchTags = () => {
-      fetch(`${API_BASE_URL}/api/tags?limit=10`).then(res => {
-        if (res.ok) {
-          res.json().then(data => {
-            this.tags = data
-            localStorage.setItem(TAG_CACHE_KEY, JSON.stringify(this.tags))
-          })
-        }
-        this.isLoadingTag = false
-      })
-    }
-
-    if (cachedCategories) {
-      setTimeout(fetchCategories, 1500)
-    } else {
-      fetchCategories()
-    }
-
-    if (cachedTags) {
-      setTimeout(fetchTags, 1500)
-    } else {
-      fetchTags()
-    }
-
-    await updateCount()
-  },
-  methods: {
-    cycleTheme,
-    handleHomeClick() {
-      this.$router.push('/').then(() => {
+    const handleHomeClick = () => {
+      router.push('/').then(() => {
         window.location.reload()
       })
-    },
-    handleItemClick() {
-      if (window.innerWidth <= 768) this.$emit('item-click')
-    },
-    isImageIcon(icon) {
+    }
+
+    const handleItemClick = () => {
+      if (window.innerWidth <= 768) emit('item-click')
+    }
+
+    const isImageIcon = (icon) => {
       if (!icon) return false
       return /^https?:\/\//.test(icon) || icon.startsWith('/')
-    },
-    gotoCategory(c) {
+    }
+
+    const gotoCategory = (c) => {
       const value = encodeURIComponent(c.id ?? c.name)
-      this.$router
-        .push({ path: '/', query: { category: value } })
-      this.handleItemClick()
-    },
-    gotoTag(t) {
+      router.push({ path: '/', query: { category: value } })
+      handleItemClick()
+    }
+
+    const gotoTag = (t) => {
       const value = encodeURIComponent(t.id ?? t.name)
-      this.$router
-        .push({ path: '/', query: { tags: value } })
-      this.handleItemClick()
+      router.push({ path: '/', query: { tags: value } })
+      handleItemClick()
+    }
+
+    return {
+      categories,
+      tags,
+      categoryOpen,
+      tagOpen,
+      isLoadingCategory,
+      isLoadingTag,
+      iconClass,
+      unreadCount,
+      showUnreadCount,
+      shouldShowStats,
+      cycleTheme,
+      handleHomeClick,
+      handleItemClick,
+      isImageIcon,
+      gotoCategory,
+      gotoTag
     }
   }
 }
