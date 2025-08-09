@@ -66,7 +66,7 @@
         <div :class="['profile-tabs-item', { selected: selectedTab === 'achievements' }]"
           @click="selectedTab = 'achievements'">
           <i class="fas fa-medal"></i>
-          <div class="profile-tabs-item-label">勋章与成就</div>
+          <div class="profile-tabs-item-label">勋章</div>
         </div>
       </div>
 
@@ -466,7 +466,15 @@ export default {
     const init = async () => {
       try {
         await fetchUser()
-        await loadSummary()
+        if (selectedTab.value === 'summary') {
+          await loadSummary()
+        } else if (selectedTab.value === 'timeline') {
+          await loadTimeline()
+        } else if (selectedTab.value === 'following') {
+          await loadFollow()
+        } else if (selectedTab.value === 'achievements') {
+          await loadAchievements()
+        }
       } catch (e) {
         console.error(e)
       } finally {
@@ -477,7 +485,7 @@ export default {
     onMounted(init)
 
     watch(selectedTab, async val => {
-      router.replace({ query: { ...route.query, tab: val } })
+      // router.replace({ query: { ...route.query, tab: val } })
       if (val === 'timeline' && timelineItems.value.length === 0) {
         await loadTimeline()
       } else if (val === 'following' && followers.value.length === 0 && followings.value.length === 0) {

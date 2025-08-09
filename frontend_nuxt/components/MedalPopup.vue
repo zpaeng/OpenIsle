@@ -9,8 +9,8 @@
         </div>
       </div>
       <div class="medal-popup-actions">
-        <div class="medal-popup-button" @click="gotoMedals">去看看</div>
         <div class="medal-popup-close" @click="close">知道了</div>
+        <div class="medal-popup-button" @click="gotoMedals">去看看</div>
       </div>
     </div>
   </BasePopup>
@@ -75,8 +75,8 @@ export default {
 }
 
 .medal-popup-item-icon {
-  width: 60px;
-  height: 60px;
+  width: 100px;
+  height: 100px;
   object-fit: contain;
 }
 
