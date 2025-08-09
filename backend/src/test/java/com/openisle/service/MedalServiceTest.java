@@ -41,13 +41,55 @@ class MedalServiceTest {
         User user = new User();
         user.setId(1L);
         user.setCreatedAt(LocalDateTime.of(2025, 9, 15, 0, 0));
+        user.setDisplayMedal(MedalType.COMMENT);
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepo.findByUsername("user")).thenReturn(Optional.of(user));
 
         MedalService service = new MedalService(commentRepo, postRepo, userRepo);
         List<MedalDto> medals = service.getMedals(1L);
 
         assertTrue(medals.stream().filter(m -> m.getType() == MedalType.COMMENT).findFirst().orElseThrow().isCompleted());
+        assertTrue(medals.stream().filter(m -> m.getType() == MedalType.COMMENT).findFirst().orElseThrow().isSelected());
         assertFalse(medals.stream().filter(m -> m.getType() == MedalType.POST).findFirst().orElseThrow().isCompleted());
+        assertFalse(medals.stream().filter(m -> m.getType() == MedalType.POST).findFirst().orElseThrow().isSelected());
         assertTrue(medals.stream().filter(m -> m.getType() == MedalType.SEED).findFirst().orElseThrow().isCompleted());
+        assertFalse(medals.stream().filter(m -> m.getType() == MedalType.SEED).findFirst().orElseThrow().isSelected());
+    }
+
+    @Test
+    void selectMedal() {
+        CommentRepository commentRepo = mock(CommentRepository.class);
+        PostRepository postRepo = mock(PostRepository.class);
+        UserRepository userRepo = mock(UserRepository.class);
+
+        when(commentRepo.countByAuthor_Id(1L)).thenReturn(120L);
+        when(postRepo.countByAuthor_Id(1L)).thenReturn(0L);
+        User user = new User();
+        user.setId(1L);
+        user.setCreatedAt(LocalDateTime.of(2025, 9, 15, 0, 0));
+        when(userRepo.findByUsername("user")).thenReturn(Optional.of(user));
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+
+        MedalService service = new MedalService(commentRepo, postRepo, userRepo);
+        service.selectMedal("user", MedalType.COMMENT);
+        assertEquals(MedalType.COMMENT, user.getDisplayMedal());
+    }
+
+    @Test
+    void selectMedalNotCompleted() {
+        CommentRepository commentRepo = mock(CommentRepository.class);
+        PostRepository postRepo = mock(PostRepository.class);
+        UserRepository userRepo = mock(UserRepository.class);
+
+        when(commentRepo.countByAuthor_Id(1L)).thenReturn(10L);
+        when(postRepo.countByAuthor_Id(1L)).thenReturn(0L);
+        User user = new User();
+        user.setId(1L);
+        user.setCreatedAt(LocalDateTime.of(2025, 9, 15, 0, 0));
+        when(userRepo.findByUsername("user")).thenReturn(Optional.of(user));
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+
+        MedalService service = new MedalService(commentRepo, postRepo, userRepo);
+        assertThrows(IllegalArgumentException.class, () -> service.selectMedal("user", MedalType.COMMENT));
     }
 }

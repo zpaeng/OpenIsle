@@ -3,14 +3,15 @@
     <div
       v-for="medal in sortedMedals"
       :key="medal.type"
-      class="achievements-list-item select"
+      :class="['achievements-list-item', { select: medal.selected, clickable: canSelect }]"
+      @click="selectMedal(medal)"
     >
       <img
         :src="medal.icon"
         :alt="medal.title"
         :class="['achievements-list-item-icon', { not_completed: !medal.completed }]"
       />
-      <div class="achievements-list-item-top-right-label">展示</div>
+      <div v-if="medal.selected" class="achievements-list-item-top-right-label">展示</div>
       <div class="achievements-list-item-title">{{ medal.title }}</div>
       <div class="achievements-list-item-description">
         {{ medal.description }}
@@ -27,12 +28,18 @@
 
 <script setup>
 import { computed } from 'vue'
+import { API_BASE_URL, toast } from '../main'
+import { getToken } from '../utils/auth'
 
 const props = defineProps({
   medals: {
     type: Array,
     required: true,
     default: () => []
+  },
+  canSelect: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -42,6 +49,32 @@ const sortedMedals = computed(() => {
     return a.completed ? -1 : 1
   })
 })
+
+const selectMedal = async (medal) => {
+  if (!props.canSelect || medal.selected) return
+  if (!medal.completed) {
+    toast('该勋章尚未完成')
+    return
+  }
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/medals/select`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`
+      },
+      body: JSON.stringify({ type: medal.type })
+    })
+    if (res.ok) {
+      props.medals.forEach(m => { m.selected = m.type === medal.type })
+      toast('展示勋章已更新')
+    } else {
+      toast('选择勋章失败')
+    }
+  } catch (e) {
+    toast('选择勋章失败')
+  }
+}
 
 </script>
 
@@ -64,6 +97,10 @@ const sortedMedals = computed(() => {
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
   padding: 10px;
   border-radius: 10px;
+}
+
+.achievements-list-item.clickable {
+  cursor: pointer;
 }
 
 .achievements-list-item.select {

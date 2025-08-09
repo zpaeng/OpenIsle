@@ -31,6 +31,7 @@ public class UserMapper {
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
         dto.setAvatar(user.getAvatar());
+        dto.setDisplayMedal(user.getDisplayMedal());
         return dto;
     }
 
