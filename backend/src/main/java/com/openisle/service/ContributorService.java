@@ -28,8 +28,10 @@ public class ContributorService {
     public void updateContributions() {
         for (ContributorConfig config : repository.findAll()) {
             long lines = fetchContributionLines(config.getGithubId());
-            config.setContributionLines(lines);
-            repository.save(config);
+            if (lines != -1) {
+                config.setContributionLines(lines);
+                repository.save(config);
+            }
         }
     }
 
@@ -41,7 +43,7 @@ public class ContributorService {
             // 检查是否为202，GitHub有时会返回202表示正在生成统计数据
             if (response.getStatusCodeValue() == 202) {
                 log.warn("GitHub API 返回202，统计数据正在生成中，githubId: {}", githubId);
-                return 0;
+                return -1;
             }
 
             Object body = response.getBody();
