@@ -73,7 +73,7 @@ public class MedalService {
         medals.add(postMedal);
 
         ContributorMedalDto contributorMedal = new ContributorMedalDto();
-        contributorMedal.setIcon("https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/icons/achi_contributor.png");
+        contributorMedal.setIcon("https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/icons/achi_coder.png");
         contributorMedal.setTitle("贡献者");
         contributorMedal.setDescription("对仓库贡献超过1行代码");
         contributorMedal.setType(MedalType.CONTRIBUTOR);

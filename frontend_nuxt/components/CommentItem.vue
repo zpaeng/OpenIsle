@@ -11,6 +11,7 @@
       <div class="common-info-content-header">
         <div class="info-content-header-left">
           <span class="user-name">{{ comment.userName }}</span>
+          <i class="fas fa-medal medal-icon"></i>
           <router-link
             v-if="comment.medal"
             class="medal-name"
@@ -291,9 +292,19 @@ export default CommentItem
 
 .medal-name {
   font-size: 12px;
-  margin-left: 4px;
+  margin-left: 1px;
   opacity: 0.6;
   cursor: pointer;
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+.medal-icon {
+  font-size: 12px;
+  opacity: 0.6;
+  cursor: pointer;
+  text-decoration: none;
+  margin-left: 10px;
 }
 
 @keyframes highlight {

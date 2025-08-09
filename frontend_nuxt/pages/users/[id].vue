@@ -255,7 +255,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { API_BASE_URL, toast } from '../main'
-import { getToken, authState } from '../utils/auth'
+import { getToken, authState } from '../../utils/auth'
 import BaseTimeline from '../components/BaseTimeline.vue'
 import UserList from '../components/UserList.vue'
 import BasePlaceholder from '../components/BasePlaceholder.vue'
@@ -306,7 +306,11 @@ export default {
       return { exp, currentLevel, nextExp, percent }
     })
 
-    const isMine = computed(() => authState.username === username)
+    const isMine = computed(function() {
+      const mine = authState.username === username || String(authState.userId) === username
+      console.log(mine)
+      return mine
+    })
 
     const formatDate = (d) => {
       if (!d) return ''
