@@ -9,11 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -48,5 +50,25 @@ class MedalControllerTest {
         mockMvc.perform(get("/api/medals").param("userId", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].completed").value(true));
+    }
+
+    @Test
+    void selectMedal() throws Exception {
+        mockMvc.perform(post("/api/medals/select")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"type\":\"COMMENT\"}")
+                .principal(() -> "user"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void selectMedalBadRequest() throws Exception {
+        Mockito.doThrow(new IllegalArgumentException()).when(medalService)
+                .selectMedal("user", MedalType.COMMENT);
+        mockMvc.perform(post("/api/medals/select")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"type\":\"COMMENT\"}")
+                .principal(() -> "user"))
+                .andExpect(status().isBadRequest());
     }
 }

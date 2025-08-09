@@ -244,7 +244,7 @@
         </div>
 
         <div v-else-if="selectedTab === 'achievements'" class="achievements-container">
-          <AchievementList :medals="medals" />
+          <AchievementList :medals="medals" :can-select="isMine" />
         </div>
       </template>
     </div>

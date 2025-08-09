@@ -5,6 +5,7 @@ import com.openisle.dto.MedalDto;
 import com.openisle.dto.PostMedalDto;
 import com.openisle.dto.SeedUserMedalDto;
 import com.openisle.model.MedalType;
+import com.openisle.model.User;
 import com.openisle.repository.CommentRepository;
 import com.openisle.repository.PostRepository;
 import com.openisle.repository.UserRepository;
@@ -28,6 +29,11 @@ public class MedalService {
 
     public List<MedalDto> getMedals(Long userId) {
         List<MedalDto> medals = new ArrayList<>();
+        User user = null;
+        if (userId != null) {
+            user = userRepository.findById(userId).orElse(null);
+        }
+        MedalType selected = user != null ? user.getDisplayMedal() : null;
 
         CommentMedalDto commentMedal = new CommentMedalDto();
         commentMedal.setIcon("https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/icons/achi_comment.png");
@@ -35,7 +41,7 @@ public class MedalService {
         commentMedal.setDescription("评论超过100条");
         commentMedal.setType(MedalType.COMMENT);
         commentMedal.setTargetCommentCount(COMMENT_TARGET);
-        if (userId != null) {
+        if (user != null) {
             long count = commentRepository.countByAuthor_Id(userId);
             commentMedal.setCurrentCommentCount(count);
             commentMedal.setCompleted(count >= COMMENT_TARGET);
@@ -43,6 +49,7 @@ public class MedalService {
             commentMedal.setCurrentCommentCount(0);
             commentMedal.setCompleted(false);
         }
+        commentMedal.setSelected(selected == MedalType.COMMENT);
         medals.add(commentMedal);
 
         PostMedalDto postMedal = new PostMedalDto();
@@ -51,7 +58,7 @@ public class MedalService {
         postMedal.setDescription("发帖超过100条");
         postMedal.setType(MedalType.POST);
         postMedal.setTargetPostCount(POST_TARGET);
-        if (userId != null) {
+        if (user != null) {
             long count = postRepository.countByAuthor_Id(userId);
             postMedal.setCurrentPostCount(count);
             postMedal.setCompleted(count >= POST_TARGET);
@@ -59,6 +66,7 @@ public class MedalService {
             postMedal.setCurrentPostCount(0);
             postMedal.setCompleted(false);
         }
+        postMedal.setSelected(selected == MedalType.POST);
         medals.add(postMedal);
 
         SeedUserMedalDto seedUserMedal = new SeedUserMedalDto();
@@ -66,19 +74,29 @@ public class MedalService {
         seedUserMedal.setTitle("种子用户");
         seedUserMedal.setDescription("2025.9.16前注册的用户");
         seedUserMedal.setType(MedalType.SEED);
-        if (userId != null) {
-            userRepository.findById(userId).ifPresent(user -> {
-                seedUserMedal.setRegisterDate(user.getCreatedAt());
-                seedUserMedal.setCompleted(user.getCreatedAt().isBefore(SEED_USER_DEADLINE));
-            });
-            if (seedUserMedal.getRegisterDate() == null) {
-                seedUserMedal.setCompleted(false);
-            }
+        if (user != null) {
+            seedUserMedal.setRegisterDate(user.getCreatedAt());
+            seedUserMedal.setCompleted(user.getCreatedAt().isBefore(SEED_USER_DEADLINE));
         } else {
             seedUserMedal.setCompleted(false);
         }
+        seedUserMedal.setSelected(selected == MedalType.SEED);
         medals.add(seedUserMedal);
 
         return medals;
+    }
+
+    public void selectMedal(String username, MedalType type) {
+        User user = userRepository.findByUsername(username).orElseThrow();
+        boolean completed = getMedals(user.getId()).stream()
+                .filter(m -> m.getType() == type)
+                .findFirst()
+                .map(MedalDto::isCompleted)
+                .orElse(false);
+        if (!completed) {
+            throw new IllegalArgumentException("Medal not completed");
+        }
+        user.setDisplayMedal(type);
+        userRepository.save(user);
     }
 }

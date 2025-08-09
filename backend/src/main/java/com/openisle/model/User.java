@@ -59,6 +59,9 @@ public class User {
     @Column(nullable = false)
     private Role role = Role.USER;
 
+    @Enumerated(EnumType.STRING)
+    private MedalType displayMedal;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false,
             columnDefinition = "DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6)")

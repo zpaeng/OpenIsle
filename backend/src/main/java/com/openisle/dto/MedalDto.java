@@ -10,4 +10,5 @@ public class MedalDto {
     private String description;
     private MedalType type;
     private boolean completed;
+    private boolean selected;
 }
