@@ -1,7 +1,7 @@
 <template>
   <div class="achievements-list">
     <div
-      v-for="medal in medals"
+      v-for="medal in props.medals"
       :key="medal.type"
       class="achievements-list-item"
     >
@@ -25,37 +25,13 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
-import { API_BASE_URL, toast } from '../main'
-
-const props = defineProps({
-  userId: {
-    type: Number,
-    required: true
+defineProps({
+  medals: {
+    type: Array,
+    required: true,
+    default: () => []
   }
 })
-
-const medals = ref([])
-
-const fetchMedals = async () => {
-  const res = await fetch(`${API_BASE_URL}/api/medals?userId=${props.userId}`)
-  if (res.ok) {
-    medals.value = await res.json()
-  } else {
-    medals.value = []
-    toast.error('获取成就失败')
-  }
-}
-
-watch(
-  () => props.userId,
-  id => {
-    if (id) {
-      fetchMedals()
-    }
-  },
-  { immediate: true }
-)
 </script>
 
 <style scoped>

@@ -244,7 +244,7 @@
         </div>
 
         <div v-else-if="selectedTab === 'achievements'" class="achievements-container">
-          <AchievementList :user-id="user.id" />
+          <AchievementList :medals="medals" />
         </div>
       </template>
     </div>
@@ -284,6 +284,7 @@ export default {
     const timelineItems = ref([])
     const followers = ref([])
     const followings = ref([])
+    const medals = ref([])
     const subscribed = ref(false)
     const isLoading = ref(true)
     const tabLoading = ref(false)
@@ -401,6 +402,22 @@ export default {
       tabLoading.value = false
     }
 
+    const fetchAchievements = async () => {
+      const res = await fetch(`${API_BASE_URL}/api/medals?userId=${user.value.id}`)
+      if (res.ok) {
+        medals.value = await res.json()
+      } else {
+        medals.value = []
+        toast.error('获取成就失败')
+      }
+    }
+
+    const loadAchievements = async () => {
+      tabLoading.value = true
+      await fetchAchievements()
+      tabLoading.value = false
+    }
+
     const subscribeUser = async () => {
       const token = getToken()
       if (!token) {
@@ -455,11 +472,16 @@ export default {
 
     onMounted(init)
 
+    const achievementsLoaded = ref(false)
+
     watch(selectedTab, async val => {
       if (val === 'timeline' && timelineItems.value.length === 0) {
         await loadTimeline()
       } else if (val === 'following' && followers.value.length === 0 && followings.value.length === 0) {
         await loadFollow()
+      } else if (val === 'achievements' && !achievementsLoaded.value) {
+        await loadAchievements()
+        achievementsLoaded.value = true
       }
     })
     return {
@@ -469,6 +491,7 @@ export default {
       timelineItems,
       followers,
       followings,
+      medals,
       subscribed,
       isMine,
       isLoading,
@@ -480,6 +503,7 @@ export default {
       stripMarkdownLength,
       loadTimeline,
       loadFollow,
+      loadAchievements,
       loadSummary,
       subscribeUser,
       unsubscribeUser,
