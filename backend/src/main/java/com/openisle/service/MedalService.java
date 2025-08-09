@@ -83,6 +83,17 @@ public class MedalService {
         seedUserMedal.setSelected(selected == MedalType.SEED);
         medals.add(seedUserMedal);
 
+        if (user != null && medals.stream().noneMatch(MedalDto::isSelected)) {
+            medals.stream()
+                    .filter(MedalDto::isCompleted)
+                    .findFirst()
+                    .ifPresent(m -> {
+                        m.setSelected(true);
+                        user.setDisplayMedal(m.getType());
+                        userRepository.save(user);
+                    });
+        }
+
         return medals;
     }
 
