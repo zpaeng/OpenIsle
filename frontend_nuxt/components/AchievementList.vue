@@ -3,7 +3,7 @@
     <div
       v-for="medal in sortedMedals"
       :key="medal.type"
-      :class="['achievements-list-item', { select: medal.selected, clickable: canSelect }]"
+      :class="['achievements-list-item', { select: medal.selected && canSelect, clickable: canSelect }]"
       @click="selectMedal(medal)"
     >
       <img
@@ -11,7 +11,7 @@
         :alt="medal.title"
         :class="['achievements-list-item-icon', { not_completed: !medal.completed }]"
       />
-      <div v-if="medal.selected" class="achievements-list-item-top-right-label">展示</div>
+      <div v-if="medal.selected && canSelect" class="achievements-list-item-top-right-label">展示</div>
       <div class="achievements-list-item-title">{{ medal.title }}</div>
       <div class="achievements-list-item-description">
         {{ medal.description }}
