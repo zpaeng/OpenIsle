@@ -43,7 +43,11 @@
           <div v-if="isMobile" class="info-content-header">
             <div class="user-name">
               {{ author.username }}
-              <span v-if="author.displayMedal" class="user-medal">{{ getMedalTitle(author.displayMedal) }}</span>
+              <router-link
+                v-if="author.displayMedal"
+                class="user-medal"
+                :to="`/users/${author.id}?tab=achievements`"
+              >{{ getMedalTitle(author.displayMedal) }}</router-link>
             </div>
             <div class="post-time">{{ postTime }}</div>
           </div>
@@ -53,7 +57,11 @@
           <div v-if="!isMobile" class="info-content-header">
             <div class="user-name">
               {{ author.username }}
-              <span v-if="author.displayMedal" class="user-medal">{{ getMedalTitle(author.displayMedal) }}</span>
+              <router-link
+                v-if="author.displayMedal"
+                class="user-medal"
+                :to="`/users/${author.id}?tab=achievements`"
+              >{{ getMedalTitle(author.displayMedal) }}</router-link>
             </div>
             <div class="post-time">{{ postTime }}</div>
           </div>
@@ -236,6 +244,7 @@ export default {
       id: c.id,
       userName: c.author.username,
       medal: c.author.displayMedal,
+      userId: c.author.id,
       time: TimeManager.format(c.createdAt),
       avatar: c.author.avatar,
       text: c.content,
@@ -940,6 +949,7 @@ export default {
   font-size: 12px;
   margin-left: 4px;
   opacity: 0.6;
+  cursor: pointer;
 }
 
 .post-time {

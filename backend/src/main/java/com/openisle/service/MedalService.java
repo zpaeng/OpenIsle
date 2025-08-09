@@ -82,6 +82,16 @@ public class MedalService {
         }
         seedUserMedal.setSelected(selected == MedalType.SEED);
         medals.add(seedUserMedal);
+        if (user != null && selected == null) {
+            for (MedalDto medal : medals) {
+                if (medal.isCompleted()) {
+                    medal.setSelected(true);
+                    user.setDisplayMedal(medal.getType());
+                    userRepository.save(user);
+                    break;
+                }
+            }
+        }
 
         return medals;
     }

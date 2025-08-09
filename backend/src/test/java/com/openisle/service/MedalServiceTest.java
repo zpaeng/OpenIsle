@@ -41,19 +41,20 @@ class MedalServiceTest {
         User user = new User();
         user.setId(1L);
         user.setCreatedAt(LocalDateTime.of(2025, 9, 15, 0, 0));
-        user.setDisplayMedal(MedalType.COMMENT);
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
         when(userRepo.findByUsername("user")).thenReturn(Optional.of(user));
 
         MedalService service = new MedalService(commentRepo, postRepo, userRepo);
         List<MedalDto> medals = service.getMedals(1L);
 
+        assertEquals(MedalType.COMMENT, user.getDisplayMedal());
         assertTrue(medals.stream().filter(m -> m.getType() == MedalType.COMMENT).findFirst().orElseThrow().isCompleted());
         assertTrue(medals.stream().filter(m -> m.getType() == MedalType.COMMENT).findFirst().orElseThrow().isSelected());
         assertFalse(medals.stream().filter(m -> m.getType() == MedalType.POST).findFirst().orElseThrow().isCompleted());
         assertFalse(medals.stream().filter(m -> m.getType() == MedalType.POST).findFirst().orElseThrow().isSelected());
         assertTrue(medals.stream().filter(m -> m.getType() == MedalType.SEED).findFirst().orElseThrow().isCompleted());
         assertFalse(medals.stream().filter(m -> m.getType() == MedalType.SEED).findFirst().orElseThrow().isSelected());
+        verify(userRepo).save(user);
     }
 
     @Test
