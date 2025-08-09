@@ -6,24 +6,36 @@
       text="建站送奶茶活动火热进行中，快来参与吧！"
       @close="closeMilkTeaPopup"
     />
+    <MedalPopup
+      :visible="showMedalPopup"
+      :medals="newMedals"
+      @close="closeMedalPopup"
+    />
   </div>
 </template>
 
 <script>
 import ActivityPopup from '~/components/ActivityPopup.vue'
+import MedalPopup from '~/components/MedalPopup.vue'
 import { API_BASE_URL } from '~/main'
+import { authState } from '~/utils/auth'
 
 export default {
   name: 'GlobalPopups',
-  components: { ActivityPopup },
+  components: { ActivityPopup, MedalPopup },
   data () {
     return {
       showMilkTeaPopup: false,
-      milkTeaIcon: ''
+      milkTeaIcon: '',
+      showMedalPopup: false,
+      newMedals: []
     }
   },
   async mounted () {
     await this.checkMilkTeaActivity()
+    if (!this.showMilkTeaPopup) {
+      await this.checkNewMedals()
+    }
   },
   methods: {
     async checkMilkTeaActivity () {
@@ -47,7 +59,34 @@ export default {
       if (!process.client) return
       localStorage.setItem('milkTeaActivityPopupShown', 'true')
       this.showMilkTeaPopup = false
+      this.checkNewMedals()
+    },
+    async checkNewMedals () {
+      if (!process.client) return
+      if (!authState.loggedIn || !authState.userId) return
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/medals?userId=${authState.userId}`)
+        if (res.ok) {
+          const medals = await res.json()
+          const seen = JSON.parse(localStorage.getItem('seenMedals') || '[]')
+          const m = medals.filter(i => i.completed && !seen.includes(i.type))
+          if (m.length > 0) {
+            this.newMedals = m
+            this.showMedalPopup = true
+          }
+        }
+      } catch (e) {
+        // ignore errors
+      }
+    },
+    closeMedalPopup () {
+      if (!process.client) return
+      const seen = new Set(JSON.parse(localStorage.getItem('seenMedals') || '[]'))
+      this.newMedals.forEach(m => seen.add(m.type))
+      localStorage.setItem('seenMedals', JSON.stringify([...seen]))
+      this.showMedalPopup = false
     }
   }
 }
 </script>
+

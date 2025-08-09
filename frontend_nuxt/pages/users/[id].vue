@@ -288,7 +288,11 @@ export default {
     const subscribed = ref(false)
     const isLoading = ref(true)
     const tabLoading = ref(false)
-    const selectedTab = ref('summary')
+    const selectedTab = ref(
+      ['summary', 'timeline', 'following', 'achievements'].includes(route.query.tab)
+        ? route.query.tab
+        : 'summary'
+    )
     const followTab = ref('followers')
 
     const levelInfo = computed(() => {
@@ -473,6 +477,7 @@ export default {
     onMounted(init)
 
     watch(selectedTab, async val => {
+      router.replace({ query: { ...route.query, tab: val } })
       if (val === 'timeline' && timelineItems.value.length === 0) {
         await loadTimeline()
       } else if (val === 'following' && followers.value.length === 0 && followings.value.length === 0) {
