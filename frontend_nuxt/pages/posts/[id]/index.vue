@@ -43,6 +43,7 @@
           <div v-if="isMobile" class="info-content-header">
             <div class="user-name">
               {{ author.username }}
+              <i class="fas fa-medal medal-icon"></i>
               <router-link
                 v-if="author.displayMedal"
                 class="user-medal"
@@ -57,6 +58,7 @@
           <div v-if="!isMobile" class="info-content-header">
             <div class="user-name">
               {{ author.username }}
+              <i class="fas fa-medal medal-icon"></i>
               <router-link
                 v-if="author.displayMedal"
                 class="user-medal"
@@ -739,6 +741,14 @@ export default {
   gap: 8px;
 }
 
+.medal-icon {
+  font-size: 12px;
+  margin-left: 4px;
+  opacity: 0.6;
+  cursor: pointer;
+  text-decoration: none;
+}
+
 .scroller-range {
   writing-mode: vertical-rl;
   direction: ltr;
@@ -950,6 +960,8 @@ export default {
   margin-left: 4px;
   opacity: 0.6;
   cursor: pointer;
+  text-decoration: none;
+  color: var(--text-color);
 }
 
 .post-time {
