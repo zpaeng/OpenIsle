@@ -26,7 +26,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import { API_BASE_URL } from '../main'
+import { API_BASE_URL, toast } from '../main'
 
 const props = defineProps({
   userId: {
@@ -41,6 +41,9 @@ const fetchMedals = async () => {
   const res = await fetch(`${API_BASE_URL}/api/medals?userId=${props.userId}`)
   if (res.ok) {
     medals.value = await res.json()
+  } else {
+    medals.value = []
+    toast.error('获取成就失败')
   }
 }
 
