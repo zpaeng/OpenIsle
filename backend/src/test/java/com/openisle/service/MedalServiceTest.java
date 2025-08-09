@@ -21,13 +21,13 @@ class MedalServiceTest {
         CommentRepository commentRepo = mock(CommentRepository.class);
         PostRepository postRepo = mock(PostRepository.class);
         UserRepository userRepo = mock(UserRepository.class);
+        ContributorService contributorService = mock(ContributorService.class);
 
-        MedalService service = new MedalService(commentRepo, postRepo, userRepo);
+        MedalService service = new MedalService(commentRepo, postRepo, userRepo, contributorService);
 
         List<MedalDto> medals = service.getMedals(null);
-        assertFalse(medals.get(0).isCompleted());
-        assertFalse(medals.get(1).isCompleted());
-        assertFalse(medals.get(2).isCompleted());
+        medals.forEach(m -> assertFalse(m.isCompleted()));
+        assertEquals(4, medals.size());
     }
 
     @Test
@@ -35,16 +35,18 @@ class MedalServiceTest {
         CommentRepository commentRepo = mock(CommentRepository.class);
         PostRepository postRepo = mock(PostRepository.class);
         UserRepository userRepo = mock(UserRepository.class);
+        ContributorService contributorService = mock(ContributorService.class);
 
         when(commentRepo.countByAuthor_Id(1L)).thenReturn(120L);
         when(postRepo.countByAuthor_Id(1L)).thenReturn(80L);
+        when(contributorService.getContributionLines(anyString())).thenReturn(0L);
         User user = new User();
         user.setId(1L);
         user.setCreatedAt(LocalDateTime.of(2025, 9, 15, 0, 0));
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
         when(userRepo.findByUsername("user")).thenReturn(Optional.of(user));
 
-        MedalService service = new MedalService(commentRepo, postRepo, userRepo);
+        MedalService service = new MedalService(commentRepo, postRepo, userRepo, contributorService);
         List<MedalDto> medals = service.getMedals(1L);
 
         assertEquals(MedalType.COMMENT, user.getDisplayMedal());
@@ -62,16 +64,18 @@ class MedalServiceTest {
         CommentRepository commentRepo = mock(CommentRepository.class);
         PostRepository postRepo = mock(PostRepository.class);
         UserRepository userRepo = mock(UserRepository.class);
+        ContributorService contributorService = mock(ContributorService.class);
 
         when(commentRepo.countByAuthor_Id(1L)).thenReturn(120L);
         when(postRepo.countByAuthor_Id(1L)).thenReturn(0L);
+        when(contributorService.getContributionLines(anyString())).thenReturn(0L);
         User user = new User();
         user.setId(1L);
         user.setCreatedAt(LocalDateTime.of(2025, 9, 15, 0, 0));
         when(userRepo.findByUsername("user")).thenReturn(Optional.of(user));
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
 
-        MedalService service = new MedalService(commentRepo, postRepo, userRepo);
+        MedalService service = new MedalService(commentRepo, postRepo, userRepo, contributorService);
         service.selectMedal("user", MedalType.COMMENT);
         assertEquals(MedalType.COMMENT, user.getDisplayMedal());
     }
@@ -81,16 +85,18 @@ class MedalServiceTest {
         CommentRepository commentRepo = mock(CommentRepository.class);
         PostRepository postRepo = mock(PostRepository.class);
         UserRepository userRepo = mock(UserRepository.class);
+        ContributorService contributorService = mock(ContributorService.class);
 
         when(commentRepo.countByAuthor_Id(1L)).thenReturn(10L);
         when(postRepo.countByAuthor_Id(1L)).thenReturn(0L);
+        when(contributorService.getContributionLines(anyString())).thenReturn(0L);
         User user = new User();
         user.setId(1L);
         user.setCreatedAt(LocalDateTime.of(2025, 9, 15, 0, 0));
         when(userRepo.findByUsername("user")).thenReturn(Optional.of(user));
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
 
-        MedalService service = new MedalService(commentRepo, postRepo, userRepo);
+        MedalService service = new MedalService(commentRepo, postRepo, userRepo, contributorService);
         assertThrows(IllegalArgumentException.class, () -> service.selectMedal("user", MedalType.COMMENT));
     }
 }
