@@ -112,6 +112,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.POST,"/api/auth/reason").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/medals/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/push/public-key").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/reaction-types").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/activities/**").permitAll()
@@ -147,7 +148,7 @@ public class SecurityConfig {
                         uri.startsWith("/api/search") || uri.startsWith("/api/users") ||
                          uri.startsWith("/api/reaction-types") || uri.startsWith("/api/config") ||
                          uri.startsWith("/api/activities") || uri.startsWith("/api/push/public-key") ||
-                         uri.startsWith("/api/sitemap.xml"));
+                         uri.startsWith("/api/sitemap.xml") || uri.startsWith("/api/medals"));
 
                 if (authHeader != null && authHeader.startsWith("Bearer ")) {
                     String token = authHeader.substring(7);

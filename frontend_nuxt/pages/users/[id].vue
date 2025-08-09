@@ -20,17 +20,10 @@
             <i class="fas fa-user-minus"></i>
             取消关注
           </div>
-          <LevelProgress
-            :exp="levelInfo.exp"
-            :current-level="levelInfo.currentLevel"
-            :next-exp="levelInfo.nextExp"
-          />
+          <LevelProgress :exp="levelInfo.exp" :current-level="levelInfo.currentLevel" :next-exp="levelInfo.nextExp" />
           <div class="profile-level-target">
             目标 Lv.{{ levelInfo.currentLevel + 1 }}
-            <i
-              class="fas fa-info-circle profile-exp-info"
-              title="经验值可通过发帖、评论等操作获得，达到目标后即可提升等级，解锁更多功能。"
-            ></i>
+            <i class="fas fa-info-circle profile-exp-info" title="经验值可通过发帖、评论等操作获得，达到目标后即可提升等级，解锁更多功能。"></i>
           </div>
         </div>
       </div>
@@ -46,7 +39,9 @@
         </div>
         <div class="profile-info-item">
           <div class="profile-info-item-label">最后评论时间:</div>
-          <div class="profile-info-item-value">{{ user.lastCommentTime!=null?formatDate(user.lastCommentTime):"暂无评论" }}</div>
+          <div class="profile-info-item-value">{{ user.lastCommentTime != null ? formatDate(user.lastCommentTime) :
+            "暂无评论" }}
+          </div>
         </div>
         <div class="profile-info-item">
           <div class="profile-info-item-label">浏览量:</div>
@@ -67,6 +62,11 @@
           @click="selectedTab = 'following'">
           <i class="fas fa-user-plus"></i>
           <div class="profile-tabs-item-label">关注</div>
+        </div>
+        <div :class="['profile-tabs-item', { selected: selectedTab === 'achievements' }]"
+          @click="selectedTab = 'achievements'">
+          <i class="fas fa-medal"></i>
+          <div class="profile-tabs-item-label">勋章</div>
         </div>
       </div>
 
@@ -228,13 +228,13 @@
           </BaseTimeline>
         </div>
 
-        <div v-else class="follow-container">
+        <div v-else-if="selectedTab === 'following'" class="follow-container">
           <div class="follow-tabs">
-            <div :class="['follow-tab-item', { selected: followTab === 'followers' }]"
-              @click="followTab = 'followers'">关注者
+            <div :class="['follow-tab-item', { selected: followTab === 'followers' }]" @click="followTab = 'followers'">
+              关注者
             </div>
-            <div :class="['follow-tab-item', { selected: followTab === 'following' }]"
-              @click="followTab = 'following'">正在关注
+            <div :class="['follow-tab-item', { selected: followTab === 'following' }]" @click="followTab = 'following'">
+              正在关注
             </div>
           </div>
           <div class="follow-list">
@@ -243,6 +243,9 @@
           </div>
         </div>
 
+        <div v-else-if="selectedTab === 'achievements'" class="achievements-container">
+          <AchievementList :medals="medals" :can-select="isMine" />
+        </div>
       </template>
     </div>
   </div>
@@ -252,7 +255,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { API_BASE_URL, toast } from '../main'
-import { getToken, authState } from '../utils/auth'
+import { getToken, authState } from '../../utils/auth'
 import BaseTimeline from '../components/BaseTimeline.vue'
 import UserList from '../components/UserList.vue'
 import BasePlaceholder from '../components/BasePlaceholder.vue'
@@ -260,6 +263,7 @@ import LevelProgress from '../components/LevelProgress.vue'
 import { stripMarkdown, stripMarkdownLength } from '../utils/markdown'
 import TimeManager from '../utils/time'
 import { prevLevelExp } from '../utils/level'
+import AchievementList from '../components/AchievementList.vue'
 
 definePageMeta({
   alias: ['/users/:id/']
@@ -267,7 +271,7 @@ definePageMeta({
 
 export default {
   name: 'ProfileView',
-  components: { BaseTimeline, UserList, BasePlaceholder, LevelProgress },
+  components: { BaseTimeline, UserList, BasePlaceholder, LevelProgress, AchievementList },
   setup() {
     const route = useRoute()
     const router = useRouter()
@@ -280,10 +284,15 @@ export default {
     const timelineItems = ref([])
     const followers = ref([])
     const followings = ref([])
+    const medals = ref([])
     const subscribed = ref(false)
     const isLoading = ref(true)
     const tabLoading = ref(false)
-    const selectedTab = ref('summary')
+    const selectedTab = ref(
+      ['summary', 'timeline', 'following', 'achievements'].includes(route.query.tab)
+        ? route.query.tab
+        : 'summary'
+    )
     const followTab = ref('followers')
 
     const levelInfo = computed(() => {
@@ -297,7 +306,11 @@ export default {
       return { exp, currentLevel, nextExp, percent }
     })
 
-    const isMine = computed(() => authState.username === username)
+    const isMine = computed(function() {
+      const mine = authState.username === username || String(authState.userId) === username
+      console.log(mine)
+      return mine
+    })
 
     const formatDate = (d) => {
       if (!d) return ''
@@ -397,6 +410,22 @@ export default {
       tabLoading.value = false
     }
 
+    const fetchAchievements = async () => {
+      const res = await fetch(`${API_BASE_URL}/api/medals?userId=${user.value.id}`)
+      if (res.ok) {
+        medals.value = await res.json()
+      } else {
+        medals.value = []
+        toast.error('获取成就失败')
+      }
+    }
+
+    const loadAchievements = async () => {
+      tabLoading.value = true
+      await fetchAchievements()
+      tabLoading.value = false
+    }
+
     const subscribeUser = async () => {
       const token = getToken()
       if (!token) {
@@ -441,7 +470,15 @@ export default {
     const init = async () => {
       try {
         await fetchUser()
-        await loadSummary()
+        if (selectedTab.value === 'summary') {
+          await loadSummary()
+        } else if (selectedTab.value === 'timeline') {
+          await loadTimeline()
+        } else if (selectedTab.value === 'following') {
+          await loadFollow()
+        } else if (selectedTab.value === 'achievements') {
+          await loadAchievements()
+        }
       } catch (e) {
         console.error(e)
       } finally {
@@ -452,12 +489,16 @@ export default {
     onMounted(init)
 
     watch(selectedTab, async val => {
+      // router.replace({ query: { ...route.query, tab: val } })
       if (val === 'timeline' && timelineItems.value.length === 0) {
         await loadTimeline()
       } else if (val === 'following' && followers.value.length === 0 && followings.value.length === 0) {
         await loadFollow()
+      } else if (val === 'achievements' && medals.value.length === 0) {
+        await loadAchievements()
       }
     })
+
     return {
       user,
       hotPosts,
@@ -465,6 +506,7 @@ export default {
       timelineItems,
       followers,
       followings,
+      medals,
       subscribed,
       isMine,
       isLoading,
@@ -476,6 +518,7 @@ export default {
       stripMarkdownLength,
       loadTimeline,
       loadFollow,
+      loadAchievements,
       loadSummary,
       subscribeUser,
       unsubscribeUser,
@@ -612,7 +655,7 @@ export default {
   gap: 20px;
   border-top: 1px solid var(--normal-border-color);
   border-bottom: 1px solid var(--normal-border-color);
-  scrollbar-width: none; 
+  scrollbar-width: none;
   overflow-x: auto;
 }
 
@@ -622,7 +665,7 @@ export default {
   gap: 5px;
   align-items: center;
   padding: 10px 0;
-  white-space: nowrap; 
+  white-space: nowrap;
 }
 
 .profile-info-item-label {
@@ -643,9 +686,9 @@ export default {
   flex-direction: row;
   padding: 0 20px;
   border-bottom: 1px solid var(--normal-border-color);
-  scrollbar-width: none; 
+  scrollbar-width: none;
   overflow-x: auto;
- }
+}
 
 .profile-tabs-item {
   display: flex;
@@ -657,7 +700,7 @@ export default {
   padding: 10px 0;
   width: 200px;
   cursor: pointer;
-  white-space: nowrap; 
+  white-space: nowrap;
 }
 
 .profile-tabs-item.selected {

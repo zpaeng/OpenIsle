@@ -41,14 +41,28 @@
             <img class="user-avatar-item-img" :src="author.avatar" alt="avatar">
           </div>
           <div v-if="isMobile" class="info-content-header">
-            <div class="user-name">{{ author.username }}</div>
+            <div class="user-name">
+              {{ author.username }}
+              <router-link
+                v-if="author.displayMedal"
+                class="user-medal"
+                :to="`/users/${author.id}?tab=achievements`"
+              >{{ getMedalTitle(author.displayMedal) }}</router-link>
+            </div>
             <div class="post-time">{{ postTime }}</div>
           </div>
         </div>
 
         <div class="info-content">
           <div v-if="!isMobile" class="info-content-header">
-            <div class="user-name">{{ author.username }}</div>
+            <div class="user-name">
+              {{ author.username }}
+              <router-link
+                v-if="author.displayMedal"
+                class="user-medal"
+                :to="`/users/${author.id}?tab=achievements`"
+              >{{ getMedalTitle(author.displayMedal) }}</router-link>
+            </div>
             <div class="post-time">{{ postTime }}</div>
           </div>
           <div class="info-content-text" v-html="renderMarkdown(postContent)" @click="handleContentClick"></div>
@@ -116,6 +130,7 @@ import ArticleCategory from '../../../components/ArticleCategory.vue'
 import ReactionsGroup from '../../../components/ReactionsGroup.vue'
 import DropdownMenu from '../../../components/DropdownMenu.vue'
 import { renderMarkdown, handleMarkdownClick, stripMarkdownLength } from '../../../utils/markdown'
+import { getMedalTitle } from '../../../utils/medal'
 import { API_BASE_URL, toast } from '../../../main'
 import { getToken, authState } from '../../../utils/auth'
 import TimeManager from '../../../utils/time'
@@ -228,6 +243,8 @@ export default {
     const mapComment = (c, parentUserName = '', level = 0) => ({
       id: c.id,
       userName: c.author.username,
+      medal: c.author.displayMedal,
+      userId: c.author.id,
       time: TimeManager.format(c.createdAt),
       avatar: c.author.avatar,
       text: c.content,
@@ -648,6 +665,8 @@ export default {
       commentSort,
       fetchCommentSorts,
       isFetchingComments
+      ,
+      getMedalTitle
     }
   }
 }
@@ -926,6 +945,13 @@ export default {
   opacity: 0.7;
 }
 
+.user-medal {
+  font-size: 12px;
+  margin-left: 4px;
+  opacity: 0.6;
+  cursor: pointer;
+}
+
 .post-time {
   font-size: 14px;
   opacity: 0.5;
@@ -988,6 +1014,10 @@ export default {
 
   .user-name {
     font-size: 14px;
+  }
+
+  .user-medal {
+    font-size: 12px;
   }
 
   .post-time {

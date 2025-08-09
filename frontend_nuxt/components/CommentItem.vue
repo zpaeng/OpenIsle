@@ -11,6 +11,12 @@
       <div class="common-info-content-header">
         <div class="info-content-header-left">
           <span class="user-name">{{ comment.userName }}</span>
+          <i class="fas fa-medal medal-icon"></i>
+          <router-link
+            v-if="comment.medal"
+            class="medal-name"
+            :to="`/users/${comment.userId}?tab=achievements`"
+          >{{ getMedalTitle(comment.medal) }}</router-link>
           <span v-if="level >= 2">
             <i class="fas fa-reply reply-icon"></i>
             <span class="user-name reply-user-name">{{ comment.parentUserName }}</span>
@@ -64,6 +70,7 @@ import VueEasyLightbox from 'vue-easy-lightbox'
 import { useRouter } from 'vue-router'
 import CommentEditor from './CommentEditor.vue'
 import { renderMarkdown, handleMarkdownClick } from '../utils/markdown'
+import { getMedalTitle } from '../utils/medal'
 import TimeManager from '../utils/time'
 import BaseTimeline from './BaseTimeline.vue'
 import { API_BASE_URL, toast } from '../main'
@@ -232,7 +239,7 @@ const CommentItem = {
         lightboxVisible.value = true
       }
     }
-    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply, commentMenuItems, deleteComment, lightboxVisible, lightboxIndex, lightboxImgs, handleContentClick, loggedIn, replyCount, replyList }
+    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply, commentMenuItems, deleteComment, lightboxVisible, lightboxIndex, lightboxImgs, handleContentClick, loggedIn, replyCount, replyList, getMedalTitle }
   }
 }
 
@@ -281,6 +288,23 @@ export default CommentItem
 
 .reply-user-name {
   opacity: 0.3;
+}
+
+.medal-name {
+  font-size: 12px;
+  margin-left: 1px;
+  opacity: 0.6;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+.medal-icon {
+  font-size: 12px;
+  opacity: 0.6;
+  cursor: pointer;
+  text-decoration: none;
+  margin-left: 10px;
 }
 
 @keyframes highlight {
