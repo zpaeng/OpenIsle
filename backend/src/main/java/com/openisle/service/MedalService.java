@@ -30,7 +30,7 @@ public class MedalService {
         List<MedalDto> medals = new ArrayList<>();
 
         CommentMedalDto commentMedal = new CommentMedalDto();
-        commentMedal.setIcon("comment.png");
+        commentMedal.setIcon("https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/icons/achi_comment.png");
         commentMedal.setTitle("评论达人");
         commentMedal.setDescription("评论超过100条");
         commentMedal.setType(MedalType.COMMENT);
@@ -46,9 +46,9 @@ public class MedalService {
         medals.add(commentMedal);
 
         PostMedalDto postMedal = new PostMedalDto();
-        postMedal.setIcon("post.png");
+        postMedal.setIcon("https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/icons/achi_post.png");
         postMedal.setTitle("发帖达人");
-        postMedal.setDescription("评论超过100条");
+        postMedal.setDescription("发帖超过100条");
         postMedal.setType(MedalType.POST);
         postMedal.setTargetPostCount(POST_TARGET);
         if (userId != null) {
@@ -62,7 +62,7 @@ public class MedalService {
         medals.add(postMedal);
 
         SeedUserMedalDto seedUserMedal = new SeedUserMedalDto();
-        seedUserMedal.setIcon("seed.png");
+        seedUserMedal.setIcon("https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/icons/achi_seed.png");
         seedUserMedal.setTitle("种子用户");
         seedUserMedal.setDescription("2025.9.16前注册的用户");
         seedUserMedal.setType(MedalType.SEED);

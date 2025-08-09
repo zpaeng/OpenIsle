@@ -1,31 +1,58 @@
 <template>
   <div class="achievements-list">
-    <div class="achievements-list-item">
-      <img src="https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/icons/achi_comment.png" alt="comment"
-        class="achievements-list-item-icon">
-      <div class="achievements-list-item-title">评论达人</div>
-      <div class="achievements-list-item-description">评论达到300条 718/300</div>
-    </div>
-
-    <div class="achievements-list-item">
-      <img src="https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/icons/achi_comment.png" alt="comment"
-        class="achievements-list-item-icon not_completed">
-      <div class="achievements-list-item-title">评论达人</div>
-      <div class="achievements-list-item-description">评论达到300条 718/300</div>
+    <div
+      v-for="medal in medals"
+      :key="medal.type"
+      class="achievements-list-item"
+    >
+      <img
+        :src="medal.icon"
+        :alt="medal.title"
+        :class="['achievements-list-item-icon', { not_completed: !medal.completed }]"
+      />
+      <div class="achievements-list-item-title">{{ medal.title }}</div>
+      <div class="achievements-list-item-description">
+        {{ medal.description }}
+        <template v-if="medal.type === 'COMMENT'">
+          {{ medal.currentCommentCount }}/{{ medal.targetCommentCount }}
+        </template>
+        <template v-else-if="medal.type === 'POST'">
+          {{ medal.currentPostCount }}/{{ medal.targetPostCount }}
+        </template>
+      </div>
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, watch } from 'vue'
+import { API_BASE_URL } from '../main'
 
-export default {
-  data() {
-    return {
-      value: 7,
-      max: 10,
+const props = defineProps({
+  userId: {
+    type: Number,
+    required: true
+  }
+})
+
+const medals = ref([])
+
+const fetchMedals = async () => {
+  const res = await fetch(`${API_BASE_URL}/api/medals?userId=${props.userId}`)
+  if (res.ok) {
+    medals.value = await res.json()
+  }
+}
+
+watch(
+  () => props.userId,
+  id => {
+    if (id) {
+      fetchMedals()
     }
   },
-}
+  { immediate: true }
+)
 </script>
 
 <style scoped>
@@ -66,5 +93,5 @@ export default {
 .not_completed {
   filter: grayscale(100%);
 }
-
 </style>
+
