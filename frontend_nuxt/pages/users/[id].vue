@@ -244,7 +244,7 @@
         </div>
 
         <div v-else-if="selectedTab === 'achievements'" class="achievements-container">
-          <AchievementList />
+          <AchievementList :user-id="user.id" />
         </div>
       </template>
     </div>
