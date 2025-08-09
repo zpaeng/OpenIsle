@@ -1,6 +1,7 @@
 package com.openisle.service;
 
 import com.openisle.dto.CommentMedalDto;
+import com.openisle.dto.ContributorMedalDto;
 import com.openisle.dto.MedalDto;
 import com.openisle.dto.PostMedalDto;
 import com.openisle.dto.SeedUserMedalDto;
@@ -22,10 +23,12 @@ public class MedalService {
     private static final long COMMENT_TARGET = 100;
     private static final long POST_TARGET = 100;
     private static final LocalDateTime SEED_USER_DEADLINE = LocalDateTime.of(2025, 9, 16, 0, 0);
+    private static final long CONTRIBUTION_TARGET = 1;
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final ContributorService contributorService;
 
     public List<MedalDto> getMedals(Long userId) {
         List<MedalDto> medals = new ArrayList<>();
@@ -69,6 +72,23 @@ public class MedalService {
         postMedal.setSelected(selected == MedalType.POST);
         medals.add(postMedal);
 
+        ContributorMedalDto contributorMedal = new ContributorMedalDto();
+        contributorMedal.setIcon("https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/icons/achi_contributor.png");
+        contributorMedal.setTitle("贡献者");
+        contributorMedal.setDescription("对仓库贡献超过1行代码");
+        contributorMedal.setType(MedalType.CONTRIBUTOR);
+        contributorMedal.setTargetContributionLines(CONTRIBUTION_TARGET);
+        if (user != null) {
+            long lines = contributorService.getContributionLines(user.getUsername());
+            contributorMedal.setCurrentContributionLines(lines);
+            contributorMedal.setCompleted(lines >= CONTRIBUTION_TARGET);
+        } else {
+            contributorMedal.setCurrentContributionLines(0);
+            contributorMedal.setCompleted(false);
+        }
+        contributorMedal.setSelected(selected == MedalType.CONTRIBUTOR);
+        medals.add(contributorMedal);
+
         SeedUserMedalDto seedUserMedal = new SeedUserMedalDto();
         seedUserMedal.setIcon("https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/icons/achi_seed.png");
         seedUserMedal.setTitle("种子用户");
@@ -104,6 +124,8 @@ public class MedalService {
             user.setDisplayMedal(MedalType.COMMENT);
         } else if (postRepository.countByAuthor_Id(user.getId()) >= POST_TARGET) {
             user.setDisplayMedal(MedalType.POST);
+        } else if (contributorService.getContributionLines(user.getUsername()) >= CONTRIBUTION_TARGET) {
+            user.setDisplayMedal(MedalType.CONTRIBUTOR);
         } else if (user.getCreatedAt().isBefore(SEED_USER_DEADLINE)) {
             user.setDisplayMedal(MedalType.SEED);
         }
