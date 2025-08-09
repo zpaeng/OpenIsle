@@ -1,7 +1,7 @@
 <template>
   <div class="achievements-list">
     <div
-      v-for="medal in props.medals"
+      v-for="medal in sortedMedals"
       :key="medal.type"
       class="achievements-list-item"
     >
@@ -25,13 +25,23 @@
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+
+const props = defineProps({
   medals: {
     type: Array,
     required: true,
     default: () => []
   }
 })
+
+const sortedMedals = computed(() => {
+  return [...props.medals].sort((a, b) => {
+    if (a.completed === b.completed) return 0
+    return a.completed ? -1 : 1
+  })
+})
+
 </script>
 
 <style scoped>

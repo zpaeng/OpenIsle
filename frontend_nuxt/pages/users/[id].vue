@@ -472,18 +472,16 @@ export default {
 
     onMounted(init)
 
-    const achievementsLoaded = ref(false)
-
     watch(selectedTab, async val => {
       if (val === 'timeline' && timelineItems.value.length === 0) {
         await loadTimeline()
       } else if (val === 'following' && followers.value.length === 0 && followings.value.length === 0) {
         await loadFollow()
-      } else if (val === 'achievements' && !achievementsLoaded.value) {
+      } else if (val === 'achievements' && medals.value.length === 0) {
         await loadAchievements()
-        achievementsLoaded.value = true
       }
     })
+
     return {
       user,
       hotPosts,
