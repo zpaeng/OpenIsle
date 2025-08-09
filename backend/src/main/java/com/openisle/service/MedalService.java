@@ -96,6 +96,22 @@ public class MedalService {
         return medals;
     }
 
+    public void ensureDisplayMedal(User user) {
+        if (user == null || user.getDisplayMedal() != null) {
+            return;
+        }
+        if (commentRepository.countByAuthor_Id(user.getId()) >= COMMENT_TARGET) {
+            user.setDisplayMedal(MedalType.COMMENT);
+        } else if (postRepository.countByAuthor_Id(user.getId()) >= POST_TARGET) {
+            user.setDisplayMedal(MedalType.POST);
+        } else if (user.getCreatedAt().isBefore(SEED_USER_DEADLINE)) {
+            user.setDisplayMedal(MedalType.SEED);
+        }
+        if (user.getDisplayMedal() != null) {
+            userRepository.save(user);
+        }
+    }
+
     public void selectMedal(String username, MedalType type) {
         User user = userRepository.findByUsername(username).orElseThrow();
         boolean completed = getMedals(user.getId()).stream()
