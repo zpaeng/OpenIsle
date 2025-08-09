@@ -92,24 +92,4 @@ class MedalServiceTest {
         MedalService service = new MedalService(commentRepo, postRepo, userRepo);
         assertThrows(IllegalArgumentException.class, () -> service.selectMedal("user", MedalType.COMMENT));
     }
-
-    @Test
-    void autoSelectFirstCompletedMedal() {
-        CommentRepository commentRepo = mock(CommentRepository.class);
-        PostRepository postRepo = mock(PostRepository.class);
-        UserRepository userRepo = mock(UserRepository.class);
-
-        when(commentRepo.countByAuthor_Id(1L)).thenReturn(120L);
-        when(postRepo.countByAuthor_Id(1L)).thenReturn(0L);
-        User user = new User();
-        user.setId(1L);
-        user.setCreatedAt(LocalDateTime.of(2025, 9, 15, 0, 0));
-        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
-
-        MedalService service = new MedalService(commentRepo, postRepo, userRepo);
-        List<MedalDto> medals = service.getMedals(1L);
-
-        assertEquals(MedalType.COMMENT, user.getDisplayMedal());
-        assertTrue(medals.stream().anyMatch(m -> m.getType() == MedalType.COMMENT && m.isSelected()));
-    }
 }

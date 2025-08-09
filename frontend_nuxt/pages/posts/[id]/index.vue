@@ -43,11 +43,7 @@
           <div v-if="isMobile" class="info-content-header">
             <div class="user-name">
               {{ author.username }}
-              <span
-                v-if="author.displayMedal"
-                class="user-medal"
-                @click="gotoProfileMedals"
-              >{{ getMedalTitle(author.displayMedal) }}</span>
+              <span v-if="author.displayMedal" class="user-medal">{{ getMedalTitle(author.displayMedal) }}</span>
             </div>
             <div class="post-time">{{ postTime }}</div>
           </div>
@@ -57,11 +53,7 @@
           <div v-if="!isMobile" class="info-content-header">
             <div class="user-name">
               {{ author.username }}
-              <span
-                v-if="author.displayMedal"
-                class="user-medal"
-                @click="gotoProfileMedals"
-              >{{ getMedalTitle(author.displayMedal) }}</span>
+              <span v-if="author.displayMedal" class="user-medal">{{ getMedalTitle(author.displayMedal) }}</span>
             </div>
             <div class="post-time">{{ postTime }}</div>
           </div>
@@ -243,7 +235,6 @@ export default {
     const mapComment = (c, parentUserName = '', level = 0) => ({
       id: c.id,
       userName: c.author.username,
-      userId: c.author.id,
       medal: c.author.displayMedal,
       time: TimeManager.format(c.createdAt),
       avatar: c.author.avatar,
@@ -607,10 +598,6 @@ export default {
       router.push(`/users/${author.value.id}`)
     }
 
-    const gotoProfileMedals = () => {
-      router.push(`/users/${author.value.id}?tab=achievements`)
-    }
-
     await fetchPost()
 
     onMounted(async () => {
@@ -648,7 +635,6 @@ export default {
       isWaitingFetchingPost,
       isWaitingPostingComment,
       gotoProfile,
-      gotoProfileMedals,
       subscribed,
       loggedIn,
       isAuthor,
@@ -954,7 +940,6 @@ export default {
   font-size: 12px;
   margin-left: 4px;
   opacity: 0.6;
-  cursor: pointer;
 }
 
 .post-time {
@@ -1023,7 +1008,6 @@ export default {
 
   .user-medal {
     font-size: 12px;
-    cursor: pointer;
   }
 
   .post-time {
