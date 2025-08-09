@@ -20,17 +20,10 @@
             <i class="fas fa-user-minus"></i>
             取消关注
           </div>
-          <LevelProgress
-            :exp="levelInfo.exp"
-            :current-level="levelInfo.currentLevel"
-            :next-exp="levelInfo.nextExp"
-          />
+          <LevelProgress :exp="levelInfo.exp" :current-level="levelInfo.currentLevel" :next-exp="levelInfo.nextExp" />
           <div class="profile-level-target">
             目标 Lv.{{ levelInfo.currentLevel + 1 }}
-            <i
-              class="fas fa-info-circle profile-exp-info"
-              title="经验值可通过发帖、评论等操作获得，达到目标后即可提升等级，解锁更多功能。"
-            ></i>
+            <i class="fas fa-info-circle profile-exp-info" title="经验值可通过发帖、评论等操作获得，达到目标后即可提升等级，解锁更多功能。"></i>
           </div>
         </div>
       </div>
@@ -46,7 +39,9 @@
         </div>
         <div class="profile-info-item">
           <div class="profile-info-item-label">最后评论时间:</div>
-          <div class="profile-info-item-value">{{ user.lastCommentTime!=null?formatDate(user.lastCommentTime):"暂无评论" }}</div>
+          <div class="profile-info-item-value">{{ user.lastCommentTime != null ? formatDate(user.lastCommentTime) :
+            "暂无评论" }}
+          </div>
         </div>
         <div class="profile-info-item">
           <div class="profile-info-item-label">浏览量:</div>
@@ -67,6 +62,11 @@
           @click="selectedTab = 'following'">
           <i class="fas fa-user-plus"></i>
           <div class="profile-tabs-item-label">关注</div>
+        </div>
+        <div :class="['profile-tabs-item', { selected: selectedTab === 'achievements' }]"
+          @click="selectedTab = 'achievements'">
+          <i class="fas fa-medal"></i>
+          <div class="profile-tabs-item-label">勋章与成就</div>
         </div>
       </div>
 
@@ -228,13 +228,13 @@
           </BaseTimeline>
         </div>
 
-        <div v-else class="follow-container">
+        <div v-else-if="selectedTab === 'following'" class="follow-container">
           <div class="follow-tabs">
-            <div :class="['follow-tab-item', { selected: followTab === 'followers' }]"
-              @click="followTab = 'followers'">关注者
+            <div :class="['follow-tab-item', { selected: followTab === 'followers' }]" @click="followTab = 'followers'">
+              关注者
             </div>
-            <div :class="['follow-tab-item', { selected: followTab === 'following' }]"
-              @click="followTab = 'following'">正在关注
+            <div :class="['follow-tab-item', { selected: followTab === 'following' }]" @click="followTab = 'following'">
+              正在关注
             </div>
           </div>
           <div class="follow-list">
@@ -243,6 +243,9 @@
           </div>
         </div>
 
+        <div v-else-if="selectedTab === 'achievements'" class="achievements-container">
+          <AchievementList />
+        </div>
       </template>
     </div>
   </div>
@@ -260,6 +263,7 @@ import LevelProgress from '../components/LevelProgress.vue'
 import { stripMarkdown, stripMarkdownLength } from '../utils/markdown'
 import TimeManager from '../utils/time'
 import { prevLevelExp } from '../utils/level'
+import AchievementList from '../components/AchievementList.vue'
 
 definePageMeta({
   alias: ['/users/:id/']
@@ -267,7 +271,7 @@ definePageMeta({
 
 export default {
   name: 'ProfileView',
-  components: { BaseTimeline, UserList, BasePlaceholder, LevelProgress },
+  components: { BaseTimeline, UserList, BasePlaceholder, LevelProgress, AchievementList },
   setup() {
     const route = useRoute()
     const router = useRouter()
@@ -612,7 +616,7 @@ export default {
   gap: 20px;
   border-top: 1px solid var(--normal-border-color);
   border-bottom: 1px solid var(--normal-border-color);
-  scrollbar-width: none; 
+  scrollbar-width: none;
   overflow-x: auto;
 }
 
@@ -622,7 +626,7 @@ export default {
   gap: 5px;
   align-items: center;
   padding: 10px 0;
-  white-space: nowrap; 
+  white-space: nowrap;
 }
 
 .profile-info-item-label {
@@ -643,9 +647,9 @@ export default {
   flex-direction: row;
   padding: 0 20px;
   border-bottom: 1px solid var(--normal-border-color);
-  scrollbar-width: none; 
+  scrollbar-width: none;
   overflow-x: auto;
- }
+}
 
 .profile-tabs-item {
   display: flex;
@@ -657,7 +661,7 @@ export default {
   padding: 10px 0;
   width: 200px;
   cursor: pointer;
-  white-space: nowrap; 
+  white-space: nowrap;
 }
 
 .profile-tabs-item.selected {
