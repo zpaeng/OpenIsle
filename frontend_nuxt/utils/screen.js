@@ -1,5 +1,5 @@
 import { ref, computed, onUnmounted } from 'vue'
-import { useRequestHeaders } from 'nuxt/app'
+import { useRequestHeaders, useRequestEvent } from 'nuxt/app'
 
 export const useIsMobile = () => {
   const width = ref(0)
@@ -7,12 +7,15 @@ export const useIsMobile = () => {
 
   const isMobileUserAgent = () => {
     let userAgent = ''
+    let mobileHint = ''
 
     if (typeof navigator !== 'undefined') {
       userAgent = navigator.userAgent.toLowerCase()
     } else {
-      const headers = useRequestHeaders(['user-agent'])
+      const event = useRequestEvent()
+      const headers = event?.node?.req?.headers || useRequestHeaders()
       userAgent = (headers['user-agent'] || '').toLowerCase()
+      mobileHint = (headers['sec-ch-ua-mobile'] || '').toLowerCase()
     }
 
     const mobileKeywords = [
@@ -20,7 +23,7 @@ export const useIsMobile = () => {
       'mobile', 'tablet', 'opera mini', 'iemobile'
     ]
 
-    return mobileKeywords.some(keyword => userAgent.includes(keyword))
+    return mobileHint.includes('?1') || mobileKeywords.some(keyword => userAgent.includes(keyword))
   }
 
   if (typeof window !== 'undefined') {
