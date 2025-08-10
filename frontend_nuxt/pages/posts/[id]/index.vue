@@ -77,67 +77,35 @@
         </div>
       </div>
 
-      <div class="prize-container">
+      <div v-if="lottery" class="prize-container">
         <div class="prize-content">
           <div class="prize-info">
             <div class="prize-info-left">
               <div class="prize-icon">
-                <img v-if="prizeIcon" :src="prizeIcon" alt="prize" />
+                <img v-if="lottery.prizeIcon" :src="lottery.prizeIcon" alt="prize" />
                 <i v-else class="fa-solid fa-gift default-prize-icon"></i>
               </div>
-              <div class="prize-name">ChatGPT Plus For 1 month</div>
-              <div class="prize-count">x 12</div>
+              <div class="prize-name">{{ lottery.prizeDescription }}</div>
+              <div class="prize-count">x {{ lottery.prizeCount }}</div>
             </div>
             <div class="prize-end-time prize-info-right">
               <div class="prize-end-time-title">离结束还有</div>
-              <div class="prize-end-time-value">12:00:00</div>
-
-              <div class="join-prize-button">
+              <div class="prize-end-time-value">{{ countdown }}</div>
+              <div v-if="loggedIn && !hasJoined && !lotteryEnded" class="join-prize-button" @click="joinLottery">
                 <div class="join-prize-button-text">参与抽奖</div>
+              </div>
+              <div v-else-if="hasJoined" class="join-prize-button">
+                <div class="join-prize-button-text">已参与</div>
               </div>
             </div>
           </div>
         </div>
         <div class="prize-member-container">
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
-
-          <div class="prize-member-winner">
+          <img v-for="p in lotteryParticipants" :key="p.id" class="prize-member-avatar" :src="p.avatar" alt="avatar" @click="gotoUser(p.id)" />
+          <div v-if="lotteryEnded && lotteryWinners.length" class="prize-member-winner">
             <i class="fas fa-medal medal-icon"></i>
             <span class="prize-member-winner-name">获奖者: </span>
-            <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+            <img v-for="w in lotteryWinners" :key="w.id" class="prize-member-avatar" :src="w.avatar" alt="avatar" @click="gotoUser(w.id)" />
           </div>
         </div>
       </div>
@@ -258,6 +226,7 @@ export default {
         document.title = defaultTitle
         if (metaDescriptionEl) metaDescriptionEl.setAttribute('content', defaultDescription)
         window.removeEventListener('scroll', updateCurrentIndex)
+        if (countdownTimer) clearInterval(countdownTimer)
       })
     }
 
@@ -267,6 +236,45 @@ export default {
     const loggedIn = computed(() => authState.loggedIn)
     const isAdmin = computed(() => authState.role === 'ADMIN')
     const isAuthor = computed(() => authState.username === author.value.username)
+    const lottery = ref(null)
+    const countdown = ref('00:00:00')
+    let countdownTimer = null
+    const lotteryParticipants = computed(() => lottery.value?.participants || [])
+    const lotteryWinners = computed(() => lottery.value?.winners || [])
+    const lotteryEnded = computed(() => {
+      if (!lottery.value || !lottery.value.endTime) return false
+      return new Date(lottery.value.endTime).getTime() <= Date.now()
+    })
+    const hasJoined = computed(() => {
+      if (!loggedIn.value) return false
+      return lotteryParticipants.value.some(p => p.id === Number(authState.userId))
+    })
+    const updateCountdown = () => {
+      if (!lottery.value || !lottery.value.endTime) {
+        countdown.value = '00:00:00'
+        return
+      }
+      const diff = new Date(lottery.value.endTime).getTime() - Date.now()
+      if (diff <= 0) {
+        countdown.value = '00:00:00'
+        if (countdownTimer) {
+          clearInterval(countdownTimer)
+          countdownTimer = null
+        }
+        return
+      }
+      const h = String(Math.floor(diff / 3600000)).padStart(2, '0')
+      const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0')
+      const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0')
+      countdown.value = `${h}:${m}:${s}`
+    }
+    const startCountdown = () => {
+      if (!process.client) return
+      if (countdownTimer) clearInterval(countdownTimer)
+      updateCountdown()
+      countdownTimer = setInterval(updateCountdown, 1000)
+    }
+    const gotoUser = id => router.push(`/users/${id}`)
     const articleMenuItems = computed(() => {
       const items = []
       if (isAuthor.value || isAdmin.value) {
@@ -401,6 +409,8 @@ export default {
         status.value = data.status
         pinnedAt.value = data.pinnedAt
         postTime.value = TimeManager.format(data.createdAt)
+        lottery.value = data.lottery || null
+        if (lottery.value && lottery.value.endTime) startCountdown()
         await nextTick()
       } catch (e) {
         console.error(e)
@@ -617,6 +627,24 @@ export default {
       }
     }
 
+    const joinLottery = async () => {
+      const token = getToken()
+      if (!token) {
+        toast.error('请先登录')
+        return
+      }
+      const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/lottery/join`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.ok) {
+        toast.success('已参与抽奖')
+        await fetchPost()
+      } else {
+        toast.error('操作失败')
+      }
+    }
+
     const fetchCommentSorts = () => {
       return Promise.resolve([
         { id: 'NEWEST', name: '最新', icon: 'fas fa-clock' },
@@ -704,10 +732,12 @@ export default {
       copyPostLink,
       subscribePost,
       unsubscribePost,
+      joinLottery,
       renderMarkdown,
       isWaitingFetchingPost,
       isWaitingPostingComment,
       gotoProfile,
+      gotoUser,
       subscribed,
       loggedIn,
       isAuthor,
@@ -728,9 +758,14 @@ export default {
       pinnedAt,
       commentSort,
       fetchCommentSorts,
-      isFetchingComments
-      ,
-      getMedalTitle
+      isFetchingComments,
+      getMedalTitle,
+      lottery,
+      countdown,
+      lotteryParticipants,
+      lotteryWinners,
+      lotteryEnded,
+      hasJoined
     }
   }
 }
