@@ -8,6 +8,7 @@
       </div>
       <div class="post-options">
         <div class="post-options-left">
+          <PostTypeSelect v-model="postType" />
           <CategorySelect v-model="selectedCategory" />
           <TagSelect v-model="selectedTags" creatable />
         </div>
@@ -32,6 +33,25 @@
           <div v-else class="post-submit-loading"> <i class="fa-solid fa-spinner fa-spin"></i> 发布中...</div>
         </div>
       </div>
+      <div v-if="postType === 'LOTTERY'" class="lottery-options">
+        <div class="lottery-field">
+          <label>奖品图片</label>
+          <input type="file" accept="image/*" @change="uploadPrizeIcon" />
+          <img v-if="prizeIcon" :src="prizeIcon" class="prize-preview" />
+        </div>
+        <div class="lottery-field">
+          <label>奖品数量</label>
+          <div class="prize-count-input">
+            <button type="button" @click="decreasePrizeCount">-</button>
+            <input type="number" v-model.number="prizeCount" min="1" />
+            <button type="button" @click="increasePrizeCount">+</button>
+          </div>
+        </div>
+        <div class="lottery-field">
+          <label>抽奖结束时间</label>
+          <input type="datetime-local" v-model="endTime" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -40,6 +60,7 @@
 import { ref, onMounted, computed } from 'vue'
 import PostEditor from '../components/PostEditor.vue'
 import CategorySelect from '../components/CategorySelect.vue'
+import PostTypeSelect from '../components/PostTypeSelect.vue'
 import TagSelect from '../components/TagSelect.vue'
 import { API_BASE_URL, toast } from '../main'
 import { getToken, authState } from '../utils/auth'
@@ -47,12 +68,16 @@ import LoginOverlay from '../components/LoginOverlay.vue'
 
 export default {
   name: 'NewPostPageView',
-  components: { PostEditor, CategorySelect, TagSelect, LoginOverlay },
+  components: { PostEditor, CategorySelect, PostTypeSelect, TagSelect, LoginOverlay },
   setup() {
     const title = ref('')
     const content = ref('')
     const selectedCategory = ref('')
     const selectedTags = ref([])
+    const postType = ref('NORMAL')
+    const prizeIcon = ref('')
+    const prizeCount = ref(1)
+    const endTime = ref('')
     const isWaitingPosting = ref(false)
     const isAiLoading = ref(false)
     const isLogin = computed(() => authState.loggedIn)
@@ -85,6 +110,10 @@ export default {
       content.value = ''
       selectedCategory.value = ''
       selectedTags.value = []
+      postType.value = 'NORMAL'
+      prizeIcon.value = ''
+      prizeCount.value = 1
+      endTime.value = ''
 
       // 删除草稿
       const token = getToken()
@@ -164,6 +193,39 @@ export default {
       }
     }
 
+    const uploadPrizeIcon = async (e) => {
+      const file = e.target.files[0]
+      if (!file) return
+      try {
+        const token = getToken()
+        const res = await fetch(`${API_BASE_URL}/api/upload/presign?filename=${encodeURIComponent(file.name)}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        if (!res.ok) {
+          toast.error('获取上传地址失败')
+          return
+        }
+        const info = await res.json()
+        const put = await fetch(info.uploadUrl, { method: 'PUT', body: file })
+        if (!put.ok) {
+          toast.error('上传失败')
+          return
+        }
+        prizeIcon.value = info.fileUrl
+        toast.success('上传成功')
+      } catch (err) {
+        toast.error('上传失败')
+      }
+    }
+
+    const increasePrizeCount = () => {
+      prizeCount.value++
+    }
+
+    const decreasePrizeCount = () => {
+      if (prizeCount.value > 1) prizeCount.value--
+    }
+
     const aiGenerate = async () => {
       if (!content.value.trim()) {
         toast.error('内容为空，无法优化')
@@ -213,6 +275,20 @@ export default {
         toast.error('请选择标签')
         return
       }
+      if (postType.value === 'LOTTERY') {
+        if (!prizeIcon.value) {
+          toast.error('请上传奖品图片')
+          return
+        }
+        if (!prizeCount.value || prizeCount.value <= 0) {
+          toast.error('奖品数量必须大于0')
+          return
+        }
+        if (!endTime.value) {
+          toast.error('请选择抽奖结束时间')
+          return
+        }
+      }
       try {
         const token = getToken()
         await ensureTags(token)
@@ -227,7 +303,13 @@ export default {
             title: title.value,
             content: content.value,
             categoryId: selectedCategory.value,
-            tagIds: selectedTags.value
+            tagIds: selectedTags.value,
+            type: postType.value,
+            prizeIcon: postType.value === 'LOTTERY' ? prizeIcon.value : null,
+            prizeCount: postType.value === 'LOTTERY' ? prizeCount.value : null,
+            startTime: postType.value === 'LOTTERY' ? new Date().toISOString() : null,
+            endTime: postType.value === 'LOTTERY' ? new Date(endTime.value).toISOString() : null,
+            prizeDescription: postType.value === 'LOTTERY' ? '' : null
           })
         })
         const data = await res.json()
@@ -251,7 +333,26 @@ export default {
         isWaitingPosting.value = false
       }
     }
-    return { title, content, selectedCategory, selectedTags, submitPost, saveDraft, clearPost, isWaitingPosting, aiGenerate, isAiLoading, isLogin }
+    return {
+      title,
+      content,
+      selectedCategory,
+      selectedTags,
+      postType,
+      prizeIcon,
+      prizeCount,
+      endTime,
+      submitPost,
+      saveDraft,
+      clearPost,
+      isWaitingPosting,
+      aiGenerate,
+      isAiLoading,
+      isLogin,
+      uploadPrizeIcon,
+      increasePrizeCount,
+      decreasePrizeCount
+    }
   }
 }
 </script>
@@ -364,6 +465,40 @@ export default {
   flex-wrap: wrap;
   margin-top: 20px;
   padding-bottom: 50px;
+}
+
+.lottery-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.lottery-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.prize-preview {
+  max-width: 200px;
+  margin-top: 5px;
+}
+
+.prize-count-input {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.prize-count-input input {
+  width: 60px;
+  text-align: center;
+}
+
+.prize-count-input button {
+  width: 30px;
+  height: 30px;
 }
 
 @media (max-width: 768px) {
