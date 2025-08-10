@@ -10,6 +10,7 @@
         <div class="post-options-left">
           <CategorySelect v-model="selectedCategory" />
           <TagSelect v-model="selectedTags" creatable />
+          <PostTypeSelect v-model="postType" />
         </div>
         <div class="post-options-right">
           <div class="post-clear" @click="clearPost">
@@ -32,30 +33,100 @@
           <div v-else class="post-submit-loading"> <i class="fa-solid fa-spinner fa-spin"></i> 发布中...</div>
         </div>
       </div>
+      <div v-if="postType === 'LOTTERY'" class="lottery-section">
+        <AvatarCropper
+          :src="tempPrizeIcon"
+          :show="showPrizeCropper"
+          @close="showPrizeCropper = false"
+          @crop="onPrizeCropped"
+        />
+        <div class="prize-row">
+          <label class="prize-container">
+            <img v-if="prizeIcon" :src="prizeIcon" class="prize-preview" alt="prize" />
+            <div class="prize-overlay">上传奖品图片</div>
+            <input type="file" class="prize-input" accept="image/*" @change="onPrizeIconChange" />
+          </label>
+        </div>
+        <div class="prize-count-row">
+          <span>奖品数量</span>
+          <div class="prize-count-input">
+            <button type="button" @click="decPrizeCount">-</button>
+            <input type="number" v-model.number="prizeCount" min="1" />
+            <button type="button" @click="incPrizeCount">+</button>
+          </div>
+        </div>
+        <div class="prize-time-row">
+          <span>抽奖结束时间</span>
+          <client-only>
+            <flat-pickr v-model="endTime" :config="dateConfig" class="time-picker" />
+          </client-only>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import PostEditor from '../components/PostEditor.vue'
 import CategorySelect from '../components/CategorySelect.vue'
 import TagSelect from '../components/TagSelect.vue'
+import PostTypeSelect from '../components/PostTypeSelect.vue'
+import AvatarCropper from '../components/AvatarCropper.vue'
+import FlatPickr from 'vue-flatpickr-component'
+import 'flatpickr/dist/flatpickr.css'
 import { API_BASE_URL, toast } from '../main'
 import { getToken, authState } from '../utils/auth'
 import LoginOverlay from '../components/LoginOverlay.vue'
 
 export default {
   name: 'NewPostPageView',
-  components: { PostEditor, CategorySelect, TagSelect, LoginOverlay },
+  components: { PostEditor, CategorySelect, TagSelect, LoginOverlay, PostTypeSelect, AvatarCropper, FlatPickr },
   setup() {
     const title = ref('')
     const content = ref('')
     const selectedCategory = ref('')
     const selectedTags = ref([])
+    const postType = ref('NORMAL')
+    const prizeIcon = ref('')
+    const prizeIconFile = ref(null)
+    const tempPrizeIcon = ref('')
+    const showPrizeCropper = ref(false)
+    const prizeCount = ref(1)
+    const endTime = ref(null)
+    const dateConfig = { enableTime: true, time_24hr: true, dateFormat: 'Y-m-d H:i' }
     const isWaitingPosting = ref(false)
     const isAiLoading = ref(false)
     const isLogin = computed(() => authState.loggedIn)
+
+    const onPrizeIconChange = e => {
+      const file = e.target.files[0]
+      if (file) {
+        const reader = new FileReader()
+        reader.onload = () => {
+          tempPrizeIcon.value = reader.result
+          showPrizeCropper.value = true
+        }
+        reader.readAsDataURL(file)
+      }
+    }
+
+    const onPrizeCropped = ({ file, url }) => {
+      prizeIconFile.value = file
+      prizeIcon.value = url
+    }
+
+    const incPrizeCount = () => {
+      prizeCount.value++
+    }
+
+    const decPrizeCount = () => {
+      if (prizeCount.value > 1) prizeCount.value--
+    }
+
+    watch(prizeCount, val => {
+      if (!val || val < 1) prizeCount.value = 1
+    })
 
     const loadDraft = async () => {
       const token = getToken()
@@ -85,6 +156,13 @@ export default {
       content.value = ''
       selectedCategory.value = ''
       selectedTags.value = []
+      postType.value = 'NORMAL'
+      prizeIcon.value = ''
+      prizeIconFile.value = null
+      tempPrizeIcon.value = ''
+      showPrizeCropper.value = false
+      prizeCount.value = 1
+      endTime.value = null
 
       // 删除草稿
       const token = getToken()
@@ -213,10 +291,40 @@ export default {
         toast.error('请选择标签')
         return
       }
+      if (postType.value === 'LOTTERY') {
+        if (!prizeIcon.value) {
+          toast.error('请上传奖品图片')
+          return
+        }
+        if (!prizeCount.value || prizeCount.value < 1) {
+          toast.error('奖品数量必须大于0')
+          return
+        }
+        if (!endTime.value) {
+          toast.error('请选择抽奖结束时间')
+          return
+        }
+      }
       try {
         const token = getToken()
         await ensureTags(token)
         isWaitingPosting.value = true
+        let prizeIconUrl = prizeIcon.value
+        if (postType.value === 'LOTTERY' && prizeIconFile.value) {
+          const form = new FormData()
+          form.append('file', prizeIconFile.value)
+          const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` },
+            body: form
+          })
+          const uploadData = await uploadRes.json()
+          if (!uploadRes.ok || uploadData.code !== 0) {
+            toast.error('奖品图片上传失败')
+            return
+          }
+          prizeIconUrl = uploadData.data.url
+        }
         const res = await fetch(`${API_BASE_URL}/api/posts`, {
           method: 'POST',
           headers: {
@@ -227,7 +335,11 @@ export default {
             title: title.value,
             content: content.value,
             categoryId: selectedCategory.value,
-            tagIds: selectedTags.value
+            tagIds: selectedTags.value,
+            type: postType.value,
+            prizeIcon: postType.value === 'LOTTERY' ? prizeIconUrl : undefined,
+            prizeCount: postType.value === 'LOTTERY' ? prizeCount.value : undefined,
+            endTime: postType.value === 'LOTTERY' ? new Date(endTime.value).toISOString() : undefined
           })
         })
         const data = await res.json()
@@ -251,7 +363,7 @@ export default {
         isWaitingPosting.value = false
       }
     }
-    return { title, content, selectedCategory, selectedTags, submitPost, saveDraft, clearPost, isWaitingPosting, aiGenerate, isAiLoading, isLogin }
+    return { title, content, selectedCategory, selectedTags, postType, prizeIcon, prizeCount, endTime, submitPost, saveDraft, clearPost, isWaitingPosting, aiGenerate, isAiLoading, isLogin, onPrizeIconChange, onPrizeCropped, incPrizeCount, decPrizeCount, showPrizeCropper, tempPrizeIcon, dateConfig }
   }
 }
 </script>
@@ -364,6 +476,77 @@ export default {
   flex-wrap: wrap;
   margin-top: 20px;
   padding-bottom: 50px;
+}
+
+.lottery-section {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.prize-row {
+  display: flex;
+}
+
+.prize-container {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.prize-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.prize-input {
+  display: none;
+}
+
+.prize-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.prize-container:hover .prize-overlay {
+  opacity: 1;
+}
+
+.prize-count-row,
+.prize-time-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.prize-count-input {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.prize-count-input button {
+  width: 24px;
+  height: 24px;
+}
+
+.time-picker {
+  max-width: 200px;
 }
 
 @media (max-width: 768px) {
