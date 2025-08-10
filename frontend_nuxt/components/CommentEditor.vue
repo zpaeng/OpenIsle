@@ -47,6 +47,10 @@ export default {
     showLoginOverlay: {
       type: Boolean,
       default: false
+    },
+    parentUserName: {
+      type: String,
+      default: ''
     }
   },
   components: { LoginOverlay },
@@ -71,7 +75,7 @@ export default {
       if (!vditorInstance.value || isDisabled.value) return
       const value = vditorInstance.value.getValue()
       console.debug('CommentEditor submit', value)
-      emit('submit', value, () => {
+      emit('submit', props.parentUserName, value, () => {
         if (!vditorInstance.value) return
         vditorInstance.value.setValue('')
         text.value = ''
