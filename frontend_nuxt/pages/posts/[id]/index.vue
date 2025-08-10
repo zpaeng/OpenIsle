@@ -78,7 +78,7 @@
       </div>
 
       <CommentEditor @submit="postComment" :loading="isWaitingPostingComment" :disabled="!loggedIn"
-        :show-login-overlay="!loggedIn" />
+        :show-login-overlay="!loggedIn" :parent-user-name="author.username" />
 
       <div class="comment-config-container">
         <div class="comment-sort-container">
@@ -387,7 +387,7 @@ export default {
       }
     }
 
-    const postComment = async (text, clear) => {
+    const postComment = async (parentUserName, text, clear) => {
       if (!text.trim()) return
       console.debug('Posting comment', { postId, text })
       isWaitingPostingComment.value = true

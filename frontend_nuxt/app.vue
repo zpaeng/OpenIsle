@@ -24,13 +24,10 @@ import GlobalPopups from '~/components/GlobalPopups.vue'
 export default {
   name: 'App',
   components: { HeaderComponent, MenuComponent, GlobalPopups },
-  data() {
-    return {
-      menuVisible: true
-    }
-  },
-  computed: {
-    hideMenu() {
+  setup() {
+    const isMobile = useIsMobile()
+    const menuVisible = ref(!isMobile.value)
+    const hideMenu = computed(() => {
       return [
         '/login',
         '/signup', 
@@ -41,15 +38,17 @@ export default {
         '/discord-callback',
         '/forgot-password',
         '/google-callback'
-      ].includes(this.$route.path)
-    }
+      ].includes(useRoute().path)
+    })
+
+    onMounted(() => {
+      if (typeof window !== 'undefined') {
+        menuVisible.value = window.innerWidth > 768
+      }
+    })
+
+    return { menuVisible, hideMenu }
   },
-  async mounted() {
-    if (typeof window !== 'undefined') {
-      this.menuVisible = window.innerWidth > 768
-    }
-  },
-  methods: {}
 }
 </script>
 <style src="~/assets/global.css"></style>
