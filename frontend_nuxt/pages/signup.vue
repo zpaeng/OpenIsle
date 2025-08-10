@@ -187,7 +187,6 @@ export default {
             username: this.username
           })
         })
-        this.isWaitingForEmailVerified = false
         const data = await res.json()
         if (res.ok) {
           if (this.registerMode === 'WHITELIST') {
@@ -201,6 +200,8 @@ export default {
         }
       } catch (e) {
         toast.error('注册失败')
+      } finally {
+        this.isWaitingForEmailVerified = false
       }
     },
     signupWithGithub() {

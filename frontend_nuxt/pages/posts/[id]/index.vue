@@ -44,11 +44,8 @@
             <div class="user-name">
               {{ author.username }}
               <i class="fas fa-medal medal-icon"></i>
-              <router-link
-                v-if="author.displayMedal"
-                class="user-medal"
-                :to="`/users/${author.id}?tab=achievements`"
-              >{{ getMedalTitle(author.displayMedal) }}</router-link>
+              <router-link v-if="author.displayMedal" class="user-medal" :to="`/users/${author.id}?tab=achievements`">{{
+                getMedalTitle(author.displayMedal) }}</router-link>
             </div>
             <div class="post-time">{{ postTime }}</div>
           </div>
@@ -59,11 +56,8 @@
             <div class="user-name">
               {{ author.username }}
               <i class="fas fa-medal medal-icon"></i>
-              <router-link
-                v-if="author.displayMedal"
-                class="user-medal"
-                :to="`/users/${author.id}?tab=achievements`"
-              >{{ getMedalTitle(author.displayMedal) }}</router-link>
+              <router-link v-if="author.displayMedal" class="user-medal" :to="`/users/${author.id}?tab=achievements`">{{
+                getMedalTitle(author.displayMedal) }}</router-link>
             </div>
             <div class="post-time">{{ postTime }}</div>
           </div>
@@ -93,7 +87,7 @@
         <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
       </div>
       <div v-else class="comments-container">
-        <BaseTimeline :items="comments"> 
+        <BaseTimeline :items="comments">
           <template #item="{ item }">
             <CommentItem :key="item.id" :comment="item" :level="0" :default-show-replies="item.openReplies"
               @deleted="onCommentDeleted" />
@@ -197,7 +191,7 @@ export default {
         window.removeEventListener('scroll', updateCurrentIndex)
       })
     }
-      
+
     const lightboxVisible = ref(false)
     const lightboxIndex = ref(0)
     const lightboxImgs = ref([])
@@ -334,7 +328,6 @@ export default {
         category.value = data.category
         tags.value = data.tags || []
         postReactions.value = data.reactions || []
-        await fetchComments()
         subscribed.value = !!data.subscribed
         status.value = data.status
         pinnedAt.value = data.pinnedAt
@@ -498,7 +491,7 @@ export default {
         toast.error('操作失败')
       }
     }
-    
+
     const editPost = () => {
       router.push(`/posts/${postId}/edit`)
     }
@@ -593,7 +586,6 @@ export default {
       const hash = location.hash
       if (hash.startsWith('#comment-')) {
         const id = hash.substring('#comment-'.length)
-        // 不清楚啥原因，先wait一下子不然会定不准 😅
         await new Promise(resolve => setTimeout(resolve, 500))
         const el = document.getElementById('comment-' + id)
         if (el) {
@@ -609,16 +601,17 @@ export default {
       router.push(`/users/${author.value.id}`)
     }
 
-    await fetchPost()
-
     onMounted(async () => {
+      await fetchComments()
       const hash = location.hash
       const id = hash.startsWith('#comment-') ? hash.substring('#comment-'.length) : null
       if (id) expandCommentPath(id)
       updateCurrentIndex()
       window.addEventListener('scroll', updateCurrentIndex)
-      await jumpToHashComment()
+      jumpToHashComment()
     })
+
+    await fetchPost()
 
     return {
       postContent,
