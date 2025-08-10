@@ -153,11 +153,6 @@ export default {
       isLoadingTag.value = false
     }
 
-    onMounted(() => {
-      // fetchCategoryData()
-      // fetchTagData()
-    })
-
     const iconClass = computed(() => {
       switch (themeState.mode) {
         case ThemeMode.DARK:

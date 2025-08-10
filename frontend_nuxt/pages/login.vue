@@ -82,7 +82,6 @@ export default {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username: this.username, password: this.password })
         })
-        this.isWaitingForLogin = false
         const data = await res.json()
         if (res.ok && data.token) {
           setToken(data.token)
@@ -103,6 +102,8 @@ export default {
         }
       } catch (e) {
         toast.error('登录失败')
+      } finally {
+        this.isWaitingForLogin = false
       }
     },
 

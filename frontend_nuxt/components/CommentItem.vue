@@ -42,9 +42,9 @@
           </div>
         </ReactionsGroup>
       </div>
-      <div class="comment-editor-wrapper">
+      <div class="comment-editor-wrapper" ref="editorWrapper">
         <CommentEditor v-if="showEditor" @submit="submitReply" :loading="isWaitingForReply" :disabled="!loggedIn"
-          :show-login-overlay="!loggedIn" />
+          :show-login-overlay="!loggedIn" :parent-user-name="comment.userName" />
       </div>
       <div v-if="replyCount && level < 2" class="reply-toggle" @click="toggleReplies">
         <i v-if="showReplies" class="fas fa-chevron-up reply-toggle-icon"></i>
@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, nextTick } from 'vue'
 import VueEasyLightbox from 'vue-easy-lightbox'
 import { useRouter } from 'vue-router'
 import CommentEditor from './CommentEditor.vue'
@@ -106,6 +106,7 @@ const CommentItem = {
       }
     )
     const showEditor = ref(false)
+    const editorWrapper = ref(null)
     const isWaitingForReply = ref(false)
     const lightboxVisible = ref(false)
     const lightboxIndex = ref(0)
@@ -118,6 +119,11 @@ const CommentItem = {
     }
     const toggleEditor = () => {
       showEditor.value = !showEditor.value
+      if (showEditor.value) {
+        setTimeout(() => {
+          editorWrapper.value?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        }, 100)
+      }
     }
 
     // 合并所有子回复为一个扁平数组
@@ -164,7 +170,7 @@ const CommentItem = {
         toast.error('操作失败')
       }
     }
-    const submitReply = async (text, clear) => {
+    const submitReply = async (parentUserName, text, clear) => {
       if (!text.trim()) return
       isWaitingForReply.value = true
       const token = getToken()
@@ -190,7 +196,9 @@ const CommentItem = {
             userName: data.author.username,
             time: TimeManager.format(data.createdAt),
             avatar: data.author.avatar,
+            medal: data.author.displayMedal,
             text: data.content,
+            parentUserName: parentUserName,
             reactions: [],
             reply: (data.replies || []).map(r => ({
               id: r.id,
@@ -239,7 +247,7 @@ const CommentItem = {
         lightboxVisible.value = true
       }
     }
-    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply, commentMenuItems, deleteComment, lightboxVisible, lightboxIndex, lightboxImgs, handleContentClick, loggedIn, replyCount, replyList, getMedalTitle }
+    return { showReplies, toggleReplies, showEditor, toggleEditor, submitReply, copyCommentLink, renderMarkdown, isWaitingForReply, commentMenuItems, deleteComment, lightboxVisible, lightboxIndex, lightboxImgs, handleContentClick, loggedIn, replyCount, replyList, getMedalTitle, editorWrapper }
   }
 }
 
