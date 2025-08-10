@@ -21,11 +21,15 @@
           </div>
           <div v-if="loggedIn && !isAuthor && !subscribed" class="article-subscribe-button" @click="subscribePost">
             <i class="fas fa-user-plus"></i>
-            <div class="article-subscribe-button-text">订阅文章</div>
+            <div class="article-subscribe-button-text">
+              {{ isMobile ? '订阅' : '订阅文章' }}
+            </div>
           </div>
           <div v-if="loggedIn && !isAuthor && subscribed" class="article-unsubscribe-button" @click="unsubscribePost">
             <i class="fas fa-user-minus"></i>
-            <div class="article-unsubscribe-button-text">取消订阅</div>
+            <div class="article-unsubscribe-button-text">
+              {{ isMobile ? '退订' : '取消订阅' }}
+            </div>
           </div>
           <DropdownMenu v-if="articleMenuItems.length > 0" :items="articleMenuItems">
             <template #trigger>

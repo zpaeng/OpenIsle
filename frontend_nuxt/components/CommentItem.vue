@@ -44,7 +44,7 @@
       </div>
       <div class="comment-editor-wrapper">
         <CommentEditor v-if="showEditor" @submit="submitReply" :loading="isWaitingForReply" :disabled="!loggedIn"
-          :show-login-overlay="!loggedIn" />
+          :show-login-overlay="!loggedIn" :parent-user-name="comment.userName" />
       </div>
       <div v-if="replyCount && level < 2" class="reply-toggle" @click="toggleReplies">
         <i v-if="showReplies" class="fas fa-chevron-up reply-toggle-icon"></i>
@@ -164,7 +164,7 @@ const CommentItem = {
         toast.error('操作失败')
       }
     }
-    const submitReply = async (text, clear) => {
+    const submitReply = async (parentUserName, text, clear) => {
       if (!text.trim()) return
       isWaitingForReply.value = true
       const token = getToken()
@@ -190,7 +190,9 @@ const CommentItem = {
             userName: data.author.username,
             time: TimeManager.format(data.createdAt),
             avatar: data.author.avatar,
+            medal: data.author.displayMedal,
             text: data.content,
+            parentUserName: parentUserName,
             reactions: [],
             reply: (data.replies || []).map(r => ({
               id: r.id,
