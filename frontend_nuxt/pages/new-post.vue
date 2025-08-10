@@ -10,10 +10,6 @@
         <div class="post-options-left">
           <CategorySelect v-model="selectedCategory" />
           <TagSelect v-model="selectedTags" creatable />
-          <select class="post-type-select" v-model="postType">
-            <option value="NORMAL">普通贴</option>
-            <option value="LOTTERY">抽奖贴</option>
-          </select>
         </div>
         <div class="post-options-right">
           <div class="post-clear" @click="clearPost">
@@ -34,21 +30,6 @@
             @click="submitPost"
           >发布</div>
           <div v-else class="post-submit-loading"> <i class="fa-solid fa-spinner fa-spin"></i> 发布中...</div>
-        </div>
-      </div>
-
-      <div v-if="postType === 'LOTTERY'" class="lottery-options">
-        <div class="prize-image">
-          <input type="file" accept="image/*" @change="handlePrizeImage" />
-          <img v-if="prizeIcon" :src="prizeIcon" class="prize-preview" />
-        </div>
-        <div class="prize-count">
-          <button @click="decPrizeCount">-</button>
-          <input type="number" min="1" v-model.number="prizeCount" />
-          <button @click="incPrizeCount">+</button>
-        </div>
-        <div class="lottery-end-time">
-          <input type="datetime-local" v-model="lotteryEndTime" />
         </div>
       </div>
     </div>
@@ -75,10 +56,6 @@ export default {
     const isWaitingPosting = ref(false)
     const isAiLoading = ref(false)
     const isLogin = computed(() => authState.loggedIn)
-    const postType = ref('NORMAL')
-    const prizeIcon = ref('')
-    const prizeCount = ref(1)
-    const lotteryEndTime = ref('')
 
     const loadDraft = async () => {
       const token = getToken()
@@ -108,10 +85,6 @@ export default {
       content.value = ''
       selectedCategory.value = ''
       selectedTags.value = []
-      postType.value = 'NORMAL'
-      prizeIcon.value = ''
-      prizeCount.value = 1
-      lotteryEndTime.value = ''
 
       // 删除草稿
       const token = getToken()
@@ -240,20 +213,6 @@ export default {
         toast.error('请选择标签')
         return
       }
-      if (postType.value === 'LOTTERY') {
-        if (!prizeIcon.value) {
-          toast.error('请上传奖品图片')
-          return
-        }
-        if (!prizeCount.value || prizeCount.value <= 0) {
-          toast.error('奖品数量必须大于0')
-          return
-        }
-        if (!lotteryEndTime.value) {
-          toast.error('请选择抽奖结束时间')
-          return
-        }
-      }
       try {
         const token = getToken()
         await ensureTags(token)
@@ -268,14 +227,7 @@ export default {
             title: title.value,
             content: content.value,
             categoryId: selectedCategory.value,
-            tagIds: selectedTags.value,
-            type: postType.value,
-            prizeIcon: postType.value === 'LOTTERY' ? prizeIcon.value : undefined,
-            prizeCount: postType.value === 'LOTTERY' ? prizeCount.value : undefined,
-            endTime:
-              postType.value === 'LOTTERY' && lotteryEndTime.value
-                ? new Date(lotteryEndTime.value).toISOString()
-                : undefined
+            tagIds: selectedTags.value
           })
         })
         const data = await res.json()
@@ -299,55 +251,7 @@ export default {
         isWaitingPosting.value = false
       }
     }
-    const incPrizeCount = () => {
-      prizeCount.value += 1
-    }
-    const decPrizeCount = () => {
-      if (prizeCount.value > 1) prizeCount.value -= 1
-    }
-    const handlePrizeImage = async (e) => {
-      const file = e.target.files[0]
-      if (!file) return
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/upload/presign?filename=${encodeURIComponent(file.name)}`, {
-          headers: { Authorization: `Bearer ${getToken()}` }
-        })
-        if (!res.ok) {
-          toast.error('获取上传地址失败')
-          return
-        }
-        const info = await res.json()
-        const put = await fetch(info.uploadUrl, { method: 'PUT', body: file })
-        if (!put.ok) {
-          toast.error('上传失败')
-          return
-        }
-        prizeIcon.value = info.fileUrl
-        toast.success('上传成功')
-      } catch (e) {
-        toast.error('上传失败')
-      }
-    }
-    return {
-      title,
-      content,
-      selectedCategory,
-      selectedTags,
-      submitPost,
-      saveDraft,
-      clearPost,
-      isWaitingPosting,
-      aiGenerate,
-      isAiLoading,
-      isLogin,
-      postType,
-      prizeIcon,
-      prizeCount,
-      lotteryEndTime,
-      incPrizeCount,
-      decPrizeCount,
-      handlePrizeImage
-    }
+    return { title, content, selectedCategory, selectedTags, submitPost, saveDraft, clearPost, isWaitingPosting, aiGenerate, isAiLoading, isLogin }
   }
 }
 </script>
@@ -460,42 +364,6 @@ export default {
   flex-wrap: wrap;
   margin-top: 20px;
   padding-bottom: 50px;
-}
-
-.post-type-select {
-  padding: 5px;
-  border-radius: 5px;
-}
-
-.lottery-options {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.prize-image input {
-  display: block;
-}
-
-.prize-preview {
-  margin-top: 10px;
-  max-width: 200px;
-}
-
-.prize-count {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.prize-count button {
-  padding: 5px 10px;
-}
-
-.lottery-end-time input {
-  padding: 5px;
-  border-radius: 5px;
 }
 
 @media (max-width: 768px) {
