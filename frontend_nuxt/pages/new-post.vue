@@ -43,16 +43,19 @@
         <div class="prize-row">
           <label class="prize-container">
             <img v-if="prizeIcon" :src="prizeIcon" class="prize-preview" alt="prize" />
+            <i v-else class="fa-solid fa-image default-prize-icon"></i>
             <div class="prize-overlay">上传奖品图片</div>
             <input type="file" class="prize-input" accept="image/*" @change="onPrizeIconChange" />
           </label>
         </div>
+        <div class="prize-name-row">
+          <span>奖品名称</span>
+          <input class="prize-name-input" v-model="prizeName" placeholder="奖品名称" />
+        </div>
         <div class="prize-count-row">
           <span>奖品数量</span>
           <div class="prize-count-input">
-            <button type="button" @click="decPrizeCount">-</button>
-            <input type="number" v-model.number="prizeCount" min="1" />
-            <button type="button" @click="incPrizeCount">+</button>
+            <input class="prize-count-input-field" type="number" v-model.number="prizeCount" min="1" />
           </div>
         </div>
         <div class="prize-time-row">
@@ -78,6 +81,7 @@ import 'flatpickr/dist/flatpickr.css'
 import { API_BASE_URL, toast } from '../main'
 import { getToken, authState } from '../utils/auth'
 import LoginOverlay from '../components/LoginOverlay.vue'
+import BaseInput from '../components/BaseInput.vue'
 
 export default {
   name: 'NewPostPageView',
@@ -92,6 +96,7 @@ export default {
     const prizeIconFile = ref(null)
     const tempPrizeIcon = ref('')
     const showPrizeCropper = ref(false)
+    const prizeName = ref('')
     const prizeCount = ref(1)
     const endTime = ref(null)
     const dateConfig = { enableTime: true, time_24hr: true, dateFormat: 'Y-m-d H:i' }
@@ -114,14 +119,6 @@ export default {
     const onPrizeCropped = ({ file, url }) => {
       prizeIconFile.value = file
       prizeIcon.value = url
-    }
-
-    const incPrizeCount = () => {
-      prizeCount.value++
-    }
-
-    const decPrizeCount = () => {
-      if (prizeCount.value > 1) prizeCount.value--
     }
 
     watch(prizeCount, val => {
@@ -300,6 +297,10 @@ export default {
           toast.error('奖品数量必须大于0')
           return
         }
+        if (!prizeName.value) {
+          toast.error('请输入奖品名称')
+          return
+        }
         if (!endTime.value) {
           toast.error('请选择抽奖结束时间')
           return
@@ -338,6 +339,7 @@ export default {
             tagIds: selectedTags.value,
             type: postType.value,
             prizeIcon: postType.value === 'LOTTERY' ? prizeIconUrl : undefined,
+            prizeName: postType.value === 'LOTTERY' ? prizeName.value : undefined,
             prizeCount: postType.value === 'LOTTERY' ? prizeCount.value : undefined,
             endTime: postType.value === 'LOTTERY' ? new Date(endTime.value).toISOString() : undefined
           })
@@ -363,7 +365,7 @@ export default {
         isWaitingPosting.value = false
       }
     }
-    return { title, content, selectedCategory, selectedTags, postType, prizeIcon, prizeCount, endTime, submitPost, saveDraft, clearPost, isWaitingPosting, aiGenerate, isAiLoading, isLogin, onPrizeIconChange, onPrizeCropped, incPrizeCount, decPrizeCount, showPrizeCropper, tempPrizeIcon, dateConfig }
+    return { title, content, selectedCategory, selectedTags, postType, prizeIcon, prizeCount, endTime, submitPost, saveDraft, clearPost, isWaitingPosting, aiGenerate, isAiLoading, isLogin, onPrizeIconChange, onPrizeCropped, showPrizeCropper, tempPrizeIcon, dateConfig, prizeName }
   }
 }
 </script>
@@ -498,6 +500,12 @@ export default {
   cursor: pointer;
 }
 
+.default-prize-icon {
+  font-size: 100px;
+  opacity: 0.5;
+  color: var(--text-color);
+}
+
 .prize-preview {
   width: 100%;
   height: 100%;
@@ -537,16 +545,31 @@ export default {
 .prize-count-input {
   display: flex;
   align-items: center;
-  gap: 5px;
 }
 
-.prize-count-input button {
-  width: 24px;
-  height: 24px;
+.prize-name-input {
+  height: 30px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  padding: 0 10px;
+  margin-left: 10px;
+  font-size: 16px;
+  color: var(--text-color);
+}
+
+.prize-count-input-field {
+  width: 50px;
+  height: 30px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  padding: 0 10px;
+  font-size: 16px;
+  color: var(--text-color);
 }
 
 .time-picker {
   max-width: 200px;
+  height: 30px;
 }
 
 @media (max-width: 768px) {

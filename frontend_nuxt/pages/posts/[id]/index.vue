@@ -77,6 +77,71 @@
         </div>
       </div>
 
+      <div class="prize-container">
+        <div class="prize-content">
+          <div class="prize-info">
+            <div class="prize-info-left">
+              <div class="prize-icon">
+                <img v-if="prizeIcon" :src="prizeIcon" alt="prize" />
+                <i v-else class="fa-solid fa-gift default-prize-icon"></i>
+              </div>
+              <div class="prize-name">ChatGPT Plus For 1 month</div>
+              <div class="prize-count">x 12</div>
+            </div>
+            <div class="prize-end-time prize-info-right">
+              <div class="prize-end-time-title">离结束还有</div>
+              <div class="prize-end-time-value">12:00:00</div>
+
+              <div class="join-prize-button">
+                <div class="join-prize-button-text">参与抽奖</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="prize-member-container">
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+
+          <div class="prize-member-winner">
+            <i class="fas fa-medal medal-icon"></i>
+            <span class="prize-member-winner-name">获奖者: </span>
+            <img class="prize-member-avatar" src="https://avatars.githubusercontent.com/u/135014430?s=400&u=1a3db99cc7376462f1d47856091cb0c06220e367&v=4"alt="avatar" />
+          </div>
+        </div>
+      </div>
+
       <CommentEditor @submit="postComment" :loading="isWaitingPostingComment" :disabled="!loggedIn"
         :show-login-overlay="!loggedIn" :parent-user-name="author.username" />
 
@@ -1009,6 +1074,111 @@ export default {
 
 .comment-editor-wrapper {
   position: relative;
+}
+
+.prize-container {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: var(--normal-background-color);
+  padding: 10px;
+}
+
+.prize-info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.prize-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.default-prize-icon {
+  font-size: 24px;
+  opacity: 0.5;
+}
+
+.prize-name {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-left: 10px;
+}
+
+.prize-count {
+  font-size: 13px;
+  font-weight: bold;
+  opacity: 0.7;
+  margin-left: 10px;
+  color: var(--primary-color);
+}
+
+.prize-end-time {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 13px;
+  opacity: 0.7;
+  margin-left: 10px;
+}
+
+.prize-end-time-title {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-right: 5px;
+}
+
+.prize-end-time-value {
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.prize-info-left,
+.prize-info-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.join-prize-button {
+  margin-left: 10px;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.join-prize-button:hover {
+  background-color: var(--primary-color-hover);
+}
+
+.prize-member-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.prize-member-winner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.medal-icon {
+  font-size: 16px;
+  color: var(--primary-color);
+}
+
+.prize-member-winner-name {
+  font-size: 13px;
+  opacity: 0.7;
 }
 
 @media (max-width: 768px) {
