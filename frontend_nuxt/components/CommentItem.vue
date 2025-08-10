@@ -120,9 +120,9 @@ const CommentItem = {
     const toggleEditor = () => {
       showEditor.value = !showEditor.value
       if (showEditor.value) {
-        nextTick(() => {
+        setTimeout(() => {
           editorWrapper.value?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-        })
+        }, 100)
       }
     }
 
