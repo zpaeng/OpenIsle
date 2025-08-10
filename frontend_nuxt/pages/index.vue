@@ -71,7 +71,7 @@
           <div class="article-member-avatars-container">
             <NuxtLink
               v-for="member in article.members"
-              :key="member.id"
+              :key="`${article.id}-${member.id}`"
               class="article-member-avatar-item"
               :to="`/users/${member.id}`"
             >
