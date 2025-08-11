@@ -50,11 +50,12 @@
 
 <script>
 import { authState, clearToken, loadCurrentUser } from '~/utils/auth'
-import { watch, nextTick } from 'vue'
+import { watch, nextTick, ref, computed } from 'vue'
 import { fetchUnreadCount, notificationState } from '~/utils/notification'
 import DropdownMenu from '~/components/DropdownMenu.vue'
 import SearchDropdown from '~/components/SearchDropdown.vue'
 import { useIsMobile } from '~/utils/screen'
+import { useRouter } from 'vue-router'
 import { ClientOnly } from '#components'
 
 export default {
@@ -66,18 +67,14 @@ export default {
       default: true,
     },
   },
-  data() {
-    return {
-      avatar: '',
-      showSearch: false,
-      searchDropdown: null,
-    }
-  },
   setup() {
     const isLogin = computed(() => authState.loggedIn)
     const isMobile = useIsMobile()
     const unreadCount = computed(() => notificationState.unreadCount)
     const router = useRouter()
+    const avatar = ref('')
+    const showSearch = ref(false)
+    const searchDropdown = ref(null)
 
     const goToHome = () => {
       router.push('/').then(() => {
@@ -144,6 +141,8 @@ export default {
       goToProfile,
       goToSignup,
       goToLogout,
+      showSearch,
+      searchDropdown,
     }
   },
 
