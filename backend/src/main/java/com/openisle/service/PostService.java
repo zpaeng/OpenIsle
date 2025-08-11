@@ -43,8 +43,8 @@ import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledFuture;
-
-import jakarta.annotation.PostConstruct;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 
 @Slf4j
 @Service
@@ -108,8 +108,8 @@ public class PostService {
         this.publishMode = publishMode;
     }
 
-    @PostConstruct
-    private void rescheduleLotteries() {
+    @EventListener(ApplicationReadyEvent.class)
+    public void rescheduleLotteries() {
         LocalDateTime now = LocalDateTime.now();
         for (LotteryPost lp : lotteryPostRepository.findByEndTimeAfterAndWinnersIsEmpty(now)) {
             ScheduledFuture<?> future = taskScheduler.schedule(
