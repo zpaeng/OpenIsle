@@ -19,6 +19,7 @@
 <script>
 import HeaderComponent from '~/components/HeaderComponent.vue'
 import MenuComponent from '~/components/MenuComponent.vue'
+
 import GlobalPopups from '~/components/GlobalPopups.vue'
 
 export default {
@@ -30,14 +31,14 @@ export default {
     const hideMenu = computed(() => {
       return [
         '/login',
-        '/signup', 
+        '/signup',
         '/404',
         '/signup-reason',
         '/github-callback',
         '/twitter-callback',
         '/discord-callback',
         '/forgot-password',
-        '/google-callback'
+        '/google-callback',
       ].includes(useRoute().path)
     })
 
@@ -61,7 +62,8 @@ export default {
   z-index: 1000;
 }
 
-.menu-container {}
+.menu-container {
+}
 
 .content {
   /* height: calc(100vh - var(--header-height)); */
@@ -70,7 +72,7 @@ export default {
   max-width: 100%;
   transition: max-width 0.3s ease;
   background-color: var(--background-color);
-  min-height: calc(100vh - var(--header-height)); 
+  min-height: calc(100vh - var(--header-height));
 }
 
 .content.menu-open {
@@ -85,7 +87,6 @@ export default {
 }
 
 @media (max-width: 768px) {
-
   .content,
   .content.menu-open {
     max-width: 100% !important;
