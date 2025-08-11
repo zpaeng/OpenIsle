@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.scheduling.TaskScheduler;
 import com.openisle.service.EmailSender;
 
+import java.time.ZoneOffset;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -113,7 +114,7 @@ public class PostService {
         for (LotteryPost lp : lotteryPostRepository.findByEndTimeAfterAndWinnersIsEmpty(now)) {
             ScheduledFuture<?> future = taskScheduler.schedule(
                     () -> applicationContext.getBean(PostService.class).finalizeLottery(lp.getId()),
-                    java.util.Date.from(java.sql.Timestamp.valueOf(lp.getEndTime()).atZone(java.time.ZoneOffset.UTC).toInstant()));
+                    java.util.Date.from(lp.getEndTime().atZone(java.time.ZoneOffset.UTC).toInstant()));
             scheduledFinalizations.put(lp.getId(), future);
         }
         for (LotteryPost lp : lotteryPostRepository.findByEndTimeBeforeAndWinnersIsEmpty(now)) {
@@ -213,7 +214,7 @@ public class PostService {
         if (post instanceof LotteryPost lp && lp.getEndTime() != null) {
             ScheduledFuture<?> future = taskScheduler.schedule(
                     () -> applicationContext.getBean(PostService.class).finalizeLottery(lp.getId()),
-                    java.util.Date.from(java.sql.Timestamp.valueOf(lp.getEndTime()).atZone(java.time.ZoneOffset.UTC).toInstant()));
+                    java.util.Date.from(lp.getEndTime().toInstant(ZoneOffset.UTC)));
             scheduledFinalizations.put(lp.getId(), future);
         }
         return post;
