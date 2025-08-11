@@ -5,6 +5,7 @@ import com.openisle.repository.*;
 import com.openisle.exception.RateLimitException;
 import org.junit.jupiter.api.Test;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.context.ApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,11 +33,13 @@ class PostServiceTest {
         ImageUploader imageUploader = mock(ImageUploader.class);
         TaskScheduler taskScheduler = mock(TaskScheduler.class);
         EmailSender emailSender = mock(EmailSender.class);
+        ApplicationContext context = mock(ApplicationContext.class);
 
         PostService service = new PostService(postRepo, userRepo, catRepo, tagRepo, lotteryRepo,
                 notifService, subService, commentService, commentRepo,
                 reactionRepo, subRepo, notificationRepo, postReadService,
-                imageUploader, taskScheduler, emailSender, PublishMode.DIRECT);
+                imageUploader, taskScheduler, emailSender, context, PublishMode.DIRECT);
+        when(context.getBean(PostService.class)).thenReturn(service);
 
         Post post = new Post();
         post.setId(1L);
@@ -76,11 +79,13 @@ class PostServiceTest {
         ImageUploader imageUploader = mock(ImageUploader.class);
         TaskScheduler taskScheduler = mock(TaskScheduler.class);
         EmailSender emailSender = mock(EmailSender.class);
+        ApplicationContext context = mock(ApplicationContext.class);
 
         PostService service = new PostService(postRepo, userRepo, catRepo, tagRepo, lotteryRepo,
                 notifService, subService, commentService, commentRepo,
                 reactionRepo, subRepo, notificationRepo, postReadService,
-                imageUploader, taskScheduler, emailSender, PublishMode.DIRECT);
+                imageUploader, taskScheduler, emailSender, context, PublishMode.DIRECT);
+        when(context.getBean(PostService.class)).thenReturn(service);
 
         when(postRepo.countByAuthorAfter(eq("alice"), any())).thenReturn(1L);
 
