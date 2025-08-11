@@ -23,6 +23,19 @@ export default defineNuxtConfig({
       ],
       link: [
         {
+          rel: 'icon',
+          type: 'image/x-icon',
+          href: '/favicon.ico',
+        },
+        {
+          rel: 'apple-touch-icon',
+          href: '/apple-touch-icon.png',
+        },
+        {
+          rel: 'manifest',
+          href: '/manifest.webmanifest',
+        },
+        {
           rel: 'stylesheet',
           href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css',
           referrerpolicy: 'no-referrer',
