@@ -38,6 +38,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ScheduledFuture;
 
 @Service
 public class PostService {
@@ -58,6 +61,7 @@ public class PostService {
     private final ImageUploader imageUploader;
     private final TaskScheduler taskScheduler;
     private final EmailSender emailSender;
+    private final ConcurrentMap<Long, ScheduledFuture<?>> scheduledFinalizations = new ConcurrentHashMap<>();
 
     @org.springframework.beans.factory.annotation.Autowired
     public PostService(PostRepository postRepository,
@@ -186,8 +190,10 @@ public class PostService {
         notificationService.notifyMentions(content, author, post, null);
 
         if (post instanceof LotteryPost lp && lp.getEndTime() != null) {
-            taskScheduler.schedule(() -> finalizeLottery(lp.getId()),
+            ScheduledFuture<?> future = taskScheduler.schedule(
+                    () -> finalizeLottery(lp.getId()),
                     java.util.Date.from(lp.getEndTime().atZone(ZoneId.systemDefault()).toInstant()));
+            scheduledFinalizations.put(lp.getId(), future);
         }
         return post;
     }
@@ -202,6 +208,7 @@ public class PostService {
     }
 
     private void finalizeLottery(Long postId) {
+        scheduledFinalizations.remove(postId);
         lotteryPostRepository.findById(postId).ifPresent(lp -> {
             List<User> participants = new ArrayList<>(lp.getParticipants());
             if (participants.isEmpty()) {
@@ -506,6 +513,12 @@ public class PostService {
         notificationRepository.deleteAll(notificationRepository.findByPost(post));
         postReadService.deleteByPost(post);
         imageUploader.removeReferences(imageUploader.extractUrls(post.getContent()));
+        if (post instanceof LotteryPost lp) {
+            ScheduledFuture<?> future = scheduledFinalizations.remove(lp.getId());
+            if (future != null) {
+                future.cancel(false);
+            }
+        }
         postRepository.delete(post);
     }
 
