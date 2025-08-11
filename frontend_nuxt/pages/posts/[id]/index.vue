@@ -149,13 +149,15 @@
         </div>
       </div>
 
-      <CommentEditor
-        @submit="postComment"
-        :loading="isWaitingPostingComment"
-        :disabled="!loggedIn"
-        :show-login-overlay="!loggedIn"
-        :parent-user-name="author.username"
-      />
+      <ClientOnly>
+        <CommentEditor
+          @submit="postComment"
+          :loading="isWaitingPostingComment"
+          :disabled="!loggedIn"
+          :show-login-overlay="!loggedIn"
+          :parent-user-name="author.username"
+        />
+      </ClientOnly>
 
       <div class="comment-config-container">
         <div class="comment-sort-container">
