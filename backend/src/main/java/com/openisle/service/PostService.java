@@ -42,6 +42,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledFuture;
 
+import jakarta.annotation.PostConstruct;
+
 @Service
 public class PostService {
     private final PostRepository postRepository;
@@ -98,6 +100,20 @@ public class PostService {
         this.taskScheduler = taskScheduler;
         this.emailSender = emailSender;
         this.publishMode = publishMode;
+    }
+
+    @PostConstruct
+    private void rescheduleLotteries() {
+        LocalDateTime now = LocalDateTime.now();
+        for (LotteryPost lp : lotteryPostRepository.findByEndTimeAfterAndWinnersIsEmpty(now)) {
+            ScheduledFuture<?> future = taskScheduler.schedule(
+                    () -> finalizeLottery(lp.getId()),
+                    java.util.Date.from(lp.getEndTime().atZone(ZoneId.systemDefault()).toInstant()));
+            scheduledFinalizations.put(lp.getId(), future);
+        }
+        for (LotteryPost lp : lotteryPostRepository.findByEndTimeBeforeAndWinnersIsEmpty(now)) {
+            finalizeLottery(lp.getId());
+        }
     }
 
     public PublishMode getPublishMode() {
