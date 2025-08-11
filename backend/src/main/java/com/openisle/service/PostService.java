@@ -24,7 +24,7 @@ import com.openisle.model.Role;
 import com.openisle.exception.RateLimitException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.scheduling.TaskScheduler;
 import com.openisle.service.EmailSender;
@@ -66,7 +66,7 @@ public class PostService {
     private final ImageUploader imageUploader;
     private final TaskScheduler taskScheduler;
     private final EmailSender emailSender;
-    private final ApplicationContext applicationContext;
+    private final PostService self;
     private final ConcurrentMap<Long, ScheduledFuture<?>> scheduledFinalizations = new ConcurrentHashMap<>();
 
     @org.springframework.beans.factory.annotation.Autowired
@@ -86,7 +86,7 @@ public class PostService {
                        ImageUploader imageUploader,
                        TaskScheduler taskScheduler,
                        EmailSender emailSender,
-                       ApplicationContext applicationContext,
+                       @Lazy PostService self,
                        @Value("${app.post.publish-mode:DIRECT}") PublishMode publishMode) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
@@ -104,7 +104,7 @@ public class PostService {
         this.imageUploader = imageUploader;
         this.taskScheduler = taskScheduler;
         this.emailSender = emailSender;
-        this.applicationContext = applicationContext;
+        this.self = self;
         this.publishMode = publishMode;
     }
 
@@ -113,12 +113,12 @@ public class PostService {
         LocalDateTime now = LocalDateTime.now();
         for (LotteryPost lp : lotteryPostRepository.findByEndTimeAfterAndWinnersIsEmpty(now)) {
             ScheduledFuture<?> future = taskScheduler.schedule(
-                    () -> applicationContext.getBean(PostService.class).finalizeLottery(lp.getId()),
+                    () -> self.finalizeLottery(lp.getId()),
                     java.util.Date.from(lp.getEndTime().atZone(java.time.ZoneOffset.UTC).toInstant()));
             scheduledFinalizations.put(lp.getId(), future);
         }
         for (LotteryPost lp : lotteryPostRepository.findByEndTimeBeforeAndWinnersIsEmpty(now)) {
-            applicationContext.getBean(PostService.class).finalizeLottery(lp.getId());
+            self.finalizeLottery(lp.getId());
         }
     }
 
@@ -213,7 +213,7 @@ public class PostService {
 
         if (post instanceof LotteryPost lp && lp.getEndTime() != null) {
             ScheduledFuture<?> future = taskScheduler.schedule(
-                    () -> applicationContext.getBean(PostService.class).finalizeLottery(lp.getId()),
+                    () -> self.finalizeLottery(lp.getId()),
                     java.util.Date.from(lp.getEndTime().toInstant(ZoneOffset.UTC)));
             scheduledFinalizations.put(lp.getId(), future);
         }
