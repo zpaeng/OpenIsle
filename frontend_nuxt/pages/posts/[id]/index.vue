@@ -110,18 +110,33 @@
               <div class="prize-count">x {{ lottery.prizeCount }}</div>
             </div>
             <div class="prize-end-time prize-info-right">
-              <div class="prize-end-time-title">离结束还有</div>
+              <div v-if="!isMobile" class="prize-end-time-title">离结束还有</div>
               <div class="prize-end-time-value">{{ countdown }}</div>
-              <div
-                v-if="loggedIn && !hasJoined && !lotteryEnded"
-                class="join-prize-button"
-                @click="joinLottery"
-              >
-                <div class="join-prize-button-text">参与抽奖</div>
+              <div v-if="!isMobile" class="join-prize-button-container-desktop">
+                <div
+                  v-if="loggedIn && !hasJoined && !lotteryEnded"
+                  class="join-prize-button"
+                  @click="joinLottery"
+                >
+                  <div class="join-prize-button-text">参与抽奖</div>
+                </div>
+                <div v-else-if="hasJoined" class="join-prize-button-disabled">
+                  <div class="join-prize-button-text">已参与</div>
+                </div>
               </div>
-              <div v-else-if="hasJoined" class="join-prize-button-disabled">
-                <div class="join-prize-button-text">已参与</div>
-              </div>
+            </div>
+          </div>
+
+          <div v-if="isMobile" class="join-prize-button-container-mobile">
+            <div
+              v-if="loggedIn && !hasJoined && !lotteryEnded"
+              class="join-prize-button"
+              @click="joinLottery"
+            >
+              <div class="join-prize-button-text">参与抽奖</div>
+            </div>
+            <div v-else-if="hasJoined" class="join-prize-button-disabled">
+              <div class="join-prize-button-text">已参与</div>
             </div>
           </div>
         </div>
@@ -145,6 +160,9 @@
               alt="avatar"
               @click="gotoUser(w.id)"
             />
+            <div v-if="lotteryWinners.length === 1" class="prize-member-winner-name">
+              {{ lotteryWinners[0].username }}
+            </div>
           </div>
         </div>
       </div>
@@ -1181,7 +1199,8 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background-color: var(--normal-background-color);
+  background-color: var(--lottery-background-color);
+  border-radius: 10px;
   padding: 10px;
 }
 
@@ -1190,6 +1209,12 @@ export default {
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
+  align-items: center;
+}
+
+.join-prize-button-container-mobile {
+  margin-top: 15px;
+  margin-bottom: 10px;
 }
 
 .prize-icon {
@@ -1256,6 +1281,7 @@ export default {
   padding: 5px 10px;
   border-radius: 8px;
   cursor: pointer;
+  text-align: center;
 }
 
 .join-prize-button:hover {
@@ -1263,6 +1289,7 @@ export default {
 }
 
 .join-prize-button-disabled {
+  text-align: center;
   margin-left: 10px;
   background-color: var(--primary-color);
   color: white;
@@ -1278,6 +1305,8 @@ export default {
   height: 30px;
   margin-left: 3px;
   border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
 }
 
 .prize-member-winner {
@@ -1347,6 +1376,11 @@ export default {
 
   .loading-container {
     width: 100%;
+  }
+
+  .join-prize-button,
+  .join-prize-button-disabled {
+    margin-left: 0;
   }
 }
 </style>

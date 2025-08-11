@@ -43,6 +43,7 @@
           @crop="onPrizeCropped"
         />
         <div class="prize-row">
+          <span class="prize-row-title">奖品图片</span>
           <label class="prize-container">
             <img v-if="prizeIcon" :src="prizeIcon" class="prize-preview" alt="prize" />
             <i v-else class="fa-solid fa-image default-prize-icon"></i>
@@ -51,11 +52,11 @@
           </label>
         </div>
         <div class="prize-name-row">
-          <span>奖品描述</span>
-          <input class="prize-name-input" v-model="prizeDescription" placeholder="奖品描述" />
+          <span class="prize-row-title">奖品描述</span>
+          <BaseInput v-model="prizeDescription" placeholder="奖品描述" />
         </div>
         <div class="prize-count-row">
-          <span>奖品数量</span>
+          <span class="prize-row-title">奖品数量</span>
           <div class="prize-count-input">
             <input
               class="prize-count-input-field"
@@ -66,7 +67,7 @@
           </div>
         </div>
         <div class="prize-time-row">
-          <span>抽奖结束时间</span>
+          <span class="prize-row-title">抽奖结束时间</span>
           <client-only>
             <flat-pickr v-model="endTime" :config="dateConfig" class="time-picker" />
           </client-only>
@@ -490,6 +491,7 @@ export default {
 .post-submit:hover {
   background-color: var(--primary-color-hover);
 }
+
 .post-submit.disabled:hover {
   background-color: var(--primary-color-disabled);
 }
@@ -534,8 +536,21 @@ export default {
   gap: 20px;
 }
 
+.prize-row-title {
+  font-size: 16px;
+  color: var(--text-color);
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
 .prize-row {
   display: flex;
+  flex-direction: column;
+}
+
+.prize-name-row {
+  display: flex;
+  flex-direction: column;
 }
 
 .prize-container {
@@ -545,11 +560,15 @@ export default {
   border-radius: 10px;
   overflow: hidden;
   cursor: pointer;
+  background-color: var(--lottery-background-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .default-prize-icon {
-  font-size: 100px;
-  opacity: 0.5;
+  font-size: 30px;
+  opacity: 0.1;
   color: var(--text-color);
 }
 
@@ -585,8 +604,7 @@ export default {
 .prize-count-row,
 .prize-time-row {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
 }
 
 .prize-count-input {
@@ -612,11 +630,18 @@ export default {
   padding: 0 10px;
   font-size: 16px;
   color: var(--text-color);
+  background-color: var(--lottery-background-color);
 }
 
 .time-picker {
   max-width: 200px;
   height: 30px;
+  background-color: var(--lottery-background-color);
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  padding: 0 10px;
+  font-size: 16px;
+  color: var(--text-color);
 }
 
 @media (max-width: 768px) {
