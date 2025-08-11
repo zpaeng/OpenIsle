@@ -110,7 +110,7 @@ public class PostService {
         for (LotteryPost lp : lotteryPostRepository.findByEndTimeAfterAndWinnersIsEmpty(now)) {
             ScheduledFuture<?> future = taskScheduler.schedule(
                     () -> finalizeLottery(lp.getId()),
-                    java.util.Date.from(lp.getEndTime().atZone(ZoneId.systemDefault()).toInstant()));
+                    java.util.Date.from(java.sql.Timestamp.valueOf(lp.getEndTime()).toInstant()));
             scheduledFinalizations.put(lp.getId(), future);
         }
         for (LotteryPost lp : lotteryPostRepository.findByEndTimeBeforeAndWinnersIsEmpty(now)) {
@@ -210,7 +210,7 @@ public class PostService {
         if (post instanceof LotteryPost lp && lp.getEndTime() != null) {
             ScheduledFuture<?> future = taskScheduler.schedule(
                     () -> finalizeLottery(lp.getId()),
-                    java.util.Date.from(lp.getEndTime().atZone(ZoneId.systemDefault()).toInstant()));
+                    java.util.Date.from(java.sql.Timestamp.valueOf(lp.getEndTime()).toInstant()));
             scheduledFinalizations.put(lp.getId(), future);
         }
         return post;
