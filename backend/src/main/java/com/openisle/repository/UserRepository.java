@@ -2,6 +2,7 @@ package com.openisle.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.openisle.model.User;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -10,4 +11,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     java.util.List<User> findByUsernameContainingIgnoreCase(String keyword);
     java.util.List<User> findByRole(com.openisle.model.Role role);
     long countByExperienceGreaterThanEqual(int experience);
+    long countByCreatedAtBefore(LocalDateTime createdAt);
 }

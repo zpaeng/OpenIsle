@@ -27,7 +27,7 @@ class MedalServiceTest {
 
         List<MedalDto> medals = service.getMedals(null);
         medals.forEach(m -> assertFalse(m.isCompleted()));
-        assertEquals(4, medals.size());
+        assertEquals(5, medals.size());
     }
 
     @Test
@@ -40,6 +40,7 @@ class MedalServiceTest {
         when(commentRepo.countByAuthor_Id(1L)).thenReturn(120L);
         when(postRepo.countByAuthor_Id(1L)).thenReturn(80L);
         when(contributorService.getContributionLines(anyString())).thenReturn(0L);
+        when(userRepo.countByCreatedAtBefore(any())).thenReturn(50L);
         User user = new User();
         user.setId(1L);
         user.setCreatedAt(LocalDateTime.of(2025, 9, 15, 0, 0));
@@ -56,6 +57,8 @@ class MedalServiceTest {
         assertFalse(medals.stream().filter(m -> m.getType() == MedalType.POST).findFirst().orElseThrow().isSelected());
         assertTrue(medals.stream().filter(m -> m.getType() == MedalType.SEED).findFirst().orElseThrow().isCompleted());
         assertFalse(medals.stream().filter(m -> m.getType() == MedalType.SEED).findFirst().orElseThrow().isSelected());
+        assertTrue(medals.stream().filter(m -> m.getType() == MedalType.PIONEER).findFirst().orElseThrow().isCompleted());
+        assertFalse(medals.stream().filter(m -> m.getType() == MedalType.PIONEER).findFirst().orElseThrow().isSelected());
         verify(userRepo).save(user);
     }
 
@@ -69,6 +72,7 @@ class MedalServiceTest {
         when(commentRepo.countByAuthor_Id(1L)).thenReturn(120L);
         when(postRepo.countByAuthor_Id(1L)).thenReturn(0L);
         when(contributorService.getContributionLines(anyString())).thenReturn(0L);
+        when(userRepo.countByCreatedAtBefore(any())).thenReturn(0L);
         User user = new User();
         user.setId(1L);
         user.setCreatedAt(LocalDateTime.of(2025, 9, 15, 0, 0));
@@ -90,6 +94,7 @@ class MedalServiceTest {
         when(commentRepo.countByAuthor_Id(1L)).thenReturn(10L);
         when(postRepo.countByAuthor_Id(1L)).thenReturn(0L);
         when(contributorService.getContributionLines(anyString())).thenReturn(0L);
+        when(userRepo.countByCreatedAtBefore(any())).thenReturn(0L);
         User user = new User();
         user.setId(1L);
         user.setCreatedAt(LocalDateTime.of(2025, 9, 15, 0, 0));
