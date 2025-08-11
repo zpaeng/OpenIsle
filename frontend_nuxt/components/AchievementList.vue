@@ -130,6 +130,7 @@ const selectMedal = async (medal) => {
 .achievements-list-item-description {
   font-size: 14px;
   color: #666;
+  text-align: center;
 }
 
 .not_completed {
@@ -162,7 +163,10 @@ const selectMedal = async (medal) => {
   }
 
   .achievements-list-item {
-    min-width: calc(50% - 30px);
+    width: calc(50% - 27px);
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
   }
 }
 </style>
