@@ -1,7 +1,7 @@
 <template>
   <div class="site-stats-page">
     <ClientOnly>
-      <VChart v-if="option" :option="option" :autoresize="true" style="height:400px" />
+      <VChart v-if="option" :option="option" :autoresize="true" style="height: 400px" />
     </ClientOnly>
   </div>
 </template>
@@ -11,7 +11,12 @@ import { ref, onMounted } from 'vue'
 import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
 import { LineChart } from 'echarts/charts'
-import { TitleComponent, TooltipComponent, GridComponent, DataZoomComponent } from 'echarts/components'
+import {
+  TitleComponent,
+  TooltipComponent,
+  GridComponent,
+  DataZoomComponent,
+} from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
 import { API_BASE_URL } from '../main'
 import { getToken } from '../utils/auth'
@@ -23,20 +28,20 @@ const option = ref(null)
 async function loadData() {
   const token = getToken()
   const res = await fetch(`${API_BASE_URL}/api/stats/dau-range?days=30`, {
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   })
   if (res.ok) {
     const data = await res.json()
     data.sort((a, b) => new Date(a.date) - new Date(b.date))
-    const dates = data.map(d => d.date)
-    const values = data.map(d => d.value)
+    const dates = data.map((d) => d.date)
+    const values = data.map((d) => d.value)
     option.value = {
       title: { text: '站点 DAU' },
       tooltip: { trigger: 'axis' },
       xAxis: { type: 'category', data: dates },
       yAxis: { type: 'value' },
       dataZoom: [{ type: 'slider', start: 80 }, { type: 'inside' }],
-      series: [{ type: 'line', areaStyle: {}, smooth: true, data: values }]
+      series: [{ type: 'line', areaStyle: {}, smooth: true, data: values }],
     }
   }
 }

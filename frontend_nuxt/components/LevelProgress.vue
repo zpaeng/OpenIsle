@@ -18,16 +18,16 @@ export default {
   props: {
     exp: { type: Number, default: 0 },
     currentLevel: { type: Number, default: 0 },
-    nextExp: { type: Number, default: 0 }
+    nextExp: { type: Number, default: 0 },
   },
   computed: {
-    max () {
+    max() {
       return this.nextExp - prevLevelExp(this.currentLevel)
     },
-    value () {
+    value() {
       return this.exp - prevLevelExp(this.currentLevel)
-    }
-  }
+    },
+  },
 }
 </script>
 

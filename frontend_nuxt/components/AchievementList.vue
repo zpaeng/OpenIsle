@@ -3,7 +3,10 @@
     <div
       v-for="medal in sortedMedals"
       :key="medal.type"
-      :class="['achievements-list-item', { select: medal.selected && canSelect, clickable: canSelect }]"
+      :class="[
+        'achievements-list-item',
+        { select: medal.selected && canSelect, clickable: canSelect },
+      ]"
       @click="selectMedal(medal)"
     >
       <img
@@ -11,7 +14,9 @@
         :alt="medal.title"
         :class="['achievements-list-item-icon', { not_completed: !medal.completed }]"
       />
-      <div v-if="medal.selected && canSelect" class="achievements-list-item-top-right-label">展示</div>
+      <div v-if="medal.selected && canSelect" class="achievements-list-item-top-right-label">
+        展示
+      </div>
       <div class="achievements-list-item-title">{{ medal.title }}</div>
       <div class="achievements-list-item-description">
         {{ medal.description }}
@@ -38,12 +43,12 @@ const props = defineProps({
   medals: {
     type: Array,
     required: true,
-    default: () => []
+    default: () => [],
   },
   canSelect: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 const sortedMedals = computed(() => {
@@ -64,12 +69,14 @@ const selectMedal = async (medal) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${getToken()}`
+        Authorization: `Bearer ${getToken()}`,
       },
-      body: JSON.stringify({ type: medal.type })
+      body: JSON.stringify({ type: medal.type }),
     })
     if (res.ok) {
-      props.medals.forEach(m => { m.selected = m.type === medal.type })
+      props.medals.forEach((m) => {
+        m.selected = m.type === medal.type
+      })
       toast('展示勋章已更新')
     } else {
       toast('选择勋章失败')
@@ -78,7 +85,6 @@ const selectMedal = async (medal) => {
     toast('选择勋章失败')
   }
 }
-
 </script>
 
 <style scoped>
@@ -158,6 +164,4 @@ const selectMedal = async (medal) => {
     min-width: calc(50% - 30px);
   }
 }
-
 </style>
-

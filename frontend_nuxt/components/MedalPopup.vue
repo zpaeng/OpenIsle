@@ -26,10 +26,10 @@ export default {
   components: { BasePopup },
   props: {
     visible: { type: Boolean, default: false },
-    medals: { type: Array, default: () => [] }
+    medals: { type: Array, default: () => [] },
   },
   emits: ['close'],
-  setup (props, { emit }) {
+  setup(props, { emit }) {
     const router = useRouter()
     const gotoMedals = () => {
       emit('close')
@@ -41,7 +41,7 @@ export default {
     }
     const close = () => emit('close')
     return { gotoMedals, close }
-  }
+  },
 }
 </script>
 
@@ -110,4 +110,3 @@ export default {
   text-decoration: underline;
 }
 </style>
-

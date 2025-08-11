@@ -2,12 +2,7 @@
   <transition name="slide">
     <nav v-if="visible" class="menu">
       <div class="menu-item-container">
-        <NuxtLink
-          class="menu-item"
-          exact-active-class="selected"
-          to="/"
-          @click="handleHomeClick"
-        >
+        <NuxtLink class="menu-item" exact-active-class="selected" to="/" @click="handleHomeClick">
           <i class="menu-item-icon fas fa-hashtag"></i>
           <span class="menu-item-text">话题</span>
         </NuxtLink>
@@ -71,9 +66,20 @@
           <div v-if="isLoadingCategory" class="menu-loading-container">
             <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
           </div>
-          <div v-else v-for="c in categoryData" :key="c.id" class="section-item" @click="gotoCategory(c)">
+          <div
+            v-else
+            v-for="c in categoryData"
+            :key="c.id"
+            class="section-item"
+            @click="gotoCategory(c)"
+          >
             <template v-if="c.smallIcon || c.icon">
-              <img v-if="isImageIcon(c.smallIcon || c.icon)" :src="c.smallIcon || c.icon" class="section-item-icon" :alt="c.name" />
+              <img
+                v-if="isImageIcon(c.smallIcon || c.icon)"
+                :src="c.smallIcon || c.icon"
+                class="section-item-icon"
+                :alt="c.name"
+              />
               <i v-else :class="['section-item-icon', c.smallIcon || c.icon]"></i>
             </template>
             <span class="section-item-text">
@@ -94,10 +100,16 @@
             <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
           </div>
           <div v-else v-for="t in tagData" :key="t.id" class="section-item" @click="gotoTag(t)">
-            <img v-if="isImageIcon(t.smallIcon || t.icon)" :src="t.smallIcon || t.icon" class="section-item-icon" :alt="t.name" />
+            <img
+              v-if="isImageIcon(t.smallIcon || t.icon)"
+              :src="t.smallIcon || t.icon"
+              class="section-item-icon"
+              :alt="t.name"
+            />
             <i v-else class="section-item-icon fas fa-hashtag"></i>
-            <span class="section-item-text">{{ t.name }} <span class="section-item-text-count">x {{ t.count
-                }}</span></span>
+            <span class="section-item-text"
+              >{{ t.name }} <span class="section-item-text-count">x {{ t.count }}</span></span
+            >
           </div>
         </div>
       </div>
@@ -123,8 +135,8 @@ export default {
   props: {
     visible: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   async setup(props, { emit }) {
     const router = useRouter()
@@ -165,9 +177,7 @@ export default {
     })
 
     const unreadCount = computed(() => notificationState.unreadCount)
-    const showUnreadCount = computed(() =>
-      unreadCount.value > 99 ? '99+' : unreadCount.value
-    )
+    const showUnreadCount = computed(() => (unreadCount.value > 99 ? '99+' : unreadCount.value))
     const shouldShowStats = computed(() => authState.role === 'ADMIN')
 
     const updateCount = async () => {
@@ -200,19 +210,17 @@ export default {
 
     const gotoCategory = (c) => {
       const value = encodeURIComponent(c.id ?? c.name)
-      router
-        .push({ path: '/', query: { category: value } }).then(() => {
-          window.location.reload()
-        })
+      router.push({ path: '/', query: { category: value } }).then(() => {
+        window.location.reload()
+      })
       handleItemClick()
     }
 
     const gotoTag = (t) => {
       const value = encodeURIComponent(t.id ?? t.name)
-      router
-        .push({ path: '/', query: { tags: value } }).then(() => {
-          window.location.reload()
-        })
+      router.push({ path: '/', query: { tags: value } }).then(() => {
+        window.location.reload()
+      })
       handleItemClick()
     }
 
@@ -234,9 +242,9 @@ export default {
       handleItemClick,
       isImageIcon,
       gotoCategory,
-      gotoTag
+      gotoTag,
     }
-  }
+  },
 }
 </script>
 
@@ -379,7 +387,6 @@ export default {
   justify-content: center;
   padding: 10px;
 }
-
 
 @media (max-width: 768px) {
   .menu {

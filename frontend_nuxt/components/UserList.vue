@@ -18,13 +18,13 @@ export default {
   name: 'UserList',
   components: { BasePlaceholder },
   props: {
-    users: { type: Array, default: () => [] }
+    users: { type: Array, default: () => [] },
   },
   methods: {
     handleUserClick(user) {
       this.$router.push(`/users/${user.id}`)
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -59,5 +59,4 @@ export default {
   font-size: 14px;
   opacity: 0.7;
 }
-
 </style>

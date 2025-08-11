@@ -13,9 +13,7 @@
           <PostTypeSelect v-model="postType" />
         </div>
         <div class="post-options-right">
-          <div class="post-clear" @click="clearPost">
-            <i class="fa-solid fa-eraser"></i> 清空
-          </div>
+          <div class="post-clear" @click="clearPost"><i class="fa-solid fa-eraser"></i> 清空</div>
           <div class="ai-generate" @click="aiGenerate">
             <i class="fa-solid fa-robot"></i>
             md格式优化
@@ -29,8 +27,12 @@
             class="post-submit"
             :class="{ disabled: !isLogin }"
             @click="submitPost"
-          >发布</div>
-          <div v-else class="post-submit-loading"> <i class="fa-solid fa-spinner fa-spin"></i> 发布中...</div>
+          >
+            发布
+          </div>
+          <div v-else class="post-submit-loading">
+            <i class="fa-solid fa-spinner fa-spin"></i> 发布中...
+          </div>
         </div>
       </div>
       <div v-if="postType === 'LOTTERY'" class="lottery-section">
@@ -55,7 +57,12 @@
         <div class="prize-count-row">
           <span>奖品数量</span>
           <div class="prize-count-input">
-            <input class="prize-count-input-field" type="number" v-model.number="prizeCount" min="1" />
+            <input
+              class="prize-count-input-field"
+              type="number"
+              v-model.number="prizeCount"
+              min="1"
+            />
           </div>
         </div>
         <div class="prize-time-row">
@@ -85,7 +92,15 @@ import BaseInput from '../components/BaseInput.vue'
 
 export default {
   name: 'NewPostPageView',
-  components: { PostEditor, CategorySelect, TagSelect, LoginOverlay, PostTypeSelect, AvatarCropper, FlatPickr },
+  components: {
+    PostEditor,
+    CategorySelect,
+    TagSelect,
+    LoginOverlay,
+    PostTypeSelect,
+    AvatarCropper,
+    FlatPickr,
+  },
   setup() {
     const title = ref('')
     const content = ref('')
@@ -106,7 +121,7 @@ export default {
     const isAiLoading = ref(false)
     const isLogin = computed(() => authState.loggedIn)
 
-    const onPrizeIconChange = e => {
+    const onPrizeIconChange = (e) => {
       const file = e.target.files[0]
       if (file) {
         const reader = new FileReader()
@@ -123,7 +138,7 @@ export default {
       prizeIcon.value = url
     }
 
-    watch(prizeCount, val => {
+    watch(prizeCount, (val) => {
       if (!val || val < 1) prizeCount.value = 1
     })
 
@@ -132,7 +147,7 @@ export default {
       if (!token) return
       try {
         const res = await fetch(`${API_BASE_URL}/api/drafts/me`, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         })
         if (res.ok && res.status !== 204) {
           const data = await res.json()
@@ -171,8 +186,8 @@ export default {
         const res = await fetch(`${API_BASE_URL}/api/drafts/me`, {
           method: 'DELETE',
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         })
         if (res.ok) {
           toast.success('草稿已清空')
@@ -189,19 +204,19 @@ export default {
         return
       }
       try {
-        const tagIds = selectedTags.value.filter(t => typeof t === 'number')
+        const tagIds = selectedTags.value.filter((t) => typeof t === 'number')
         const res = await fetch(`${API_BASE_URL}/api/drafts`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             title: title.value,
             content: content.value,
             categoryId: selectedCategory.value || null,
-            tagIds
-          })
+            tagIds,
+          }),
         })
         if (res.ok) {
           toast.success('草稿已保存')
@@ -221,9 +236,9 @@ export default {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`
+              Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ name, description: '' })
+            body: JSON.stringify({ name, description: '' }),
           })
           if (res.ok) {
             const data = await res.json()
@@ -256,9 +271,9 @@ export default {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ text: content.value })
+          body: JSON.stringify({ text: content.value }),
         })
         if (res.ok) {
           const data = await res.json()
@@ -321,7 +336,7 @@ export default {
           const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
             method: 'POST',
             headers: { Authorization: `Bearer ${token}` },
-            body: form
+            body: form,
           })
           const uploadData = await uploadRes.json()
           if (!uploadRes.ok || uploadData.code !== 0) {
@@ -334,7 +349,7 @@ export default {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             title: title.value,
@@ -346,10 +361,14 @@ export default {
             prizeName: postType.value === 'LOTTERY' ? prizeName.value : undefined,
             prizeCount: postType.value === 'LOTTERY' ? prizeCount.value : undefined,
             prizeDescription: postType.value === 'LOTTERY' ? prizeDescription.value : undefined,
-            startTime: postType.value === 'LOTTERY' ? new Date(startTime.value).toISOString() : undefined,
+            startTime:
+              postType.value === 'LOTTERY' ? new Date(startTime.value).toISOString() : undefined,
             // 将时间转换为 UTC+8.5 时区 todo: 需要优化
-            endTime: postType.value === 'LOTTERY' ? new Date(new Date(endTime.value).getTime() + 8.02 * 60 * 60 * 1000).toISOString() : undefined
-          })
+            endTime:
+              postType.value === 'LOTTERY'
+                ? new Date(new Date(endTime.value).getTime() + 8.02 * 60 * 60 * 1000).toISOString()
+                : undefined,
+          }),
         })
         const data = await res.json()
         if (res.ok) {
@@ -372,8 +391,31 @@ export default {
         isWaitingPosting.value = false
       }
     }
-    return { title, content, selectedCategory, selectedTags, postType, prizeIcon, prizeCount, endTime, submitPost, saveDraft, clearPost, isWaitingPosting, aiGenerate, isAiLoading, isLogin, onPrizeIconChange, onPrizeCropped, showPrizeCropper, tempPrizeIcon, dateConfig, prizeName, prizeDescription }
-  }
+    return {
+      title,
+      content,
+      selectedCategory,
+      selectedTags,
+      postType,
+      prizeIcon,
+      prizeCount,
+      endTime,
+      submitPost,
+      saveDraft,
+      clearPost,
+      isWaitingPosting,
+      aiGenerate,
+      isAiLoading,
+      isLogin,
+      onPrizeIconChange,
+      onPrizeCropped,
+      showPrizeCropper,
+      tempPrizeIcon,
+      dateConfig,
+      prizeName,
+      prizeDescription,
+    }
+  },
 }
 </script>
 
@@ -420,8 +462,6 @@ export default {
 .ai-generate:hover {
   text-decoration: underline;
 }
-
-
 
 .post-clear {
   color: var(--primary-color);

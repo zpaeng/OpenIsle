@@ -2,10 +2,11 @@
   <div class="home-page">
     <div v-if="!isMobile" class="search-container">
       <div class="search-title">一切可能，从此刻启航</div>
-      <div class="search-subtitle">愿你在此遇见灵感与共鸣。若有疑惑，欢迎发问，亦可在知识的海洋中搜寻答案。</div>
+      <div class="search-subtitle">
+        愿你在此遇见灵感与共鸣。若有疑惑，欢迎发问，亦可在知识的海洋中搜寻答案。
+      </div>
       <SearchDropdown />
     </div>
-
 
     <div class="topic-container">
       <div class="topic-item-container">
@@ -26,7 +27,11 @@
     </div>
 
     <div class="article-container">
-      <template v-if="selectedTopic === '最新' || selectedTopic === '排行榜' || selectedTopic === '最新回复'">
+      <template
+        v-if="
+          selectedTopic === '最新' || selectedTopic === '排行榜' || selectedTopic === '最新回复'
+        "
+      >
         <div class="article-header-container">
           <div class="header-item main-item">
             <div class="header-item-text">话题</div>
@@ -62,7 +67,9 @@
               <i v-if="article.type === 'LOTTERY'" class="fa-solid fa-gift lottery-icon"></i>
               {{ article.title }}
             </NuxtLink>
-            <div class="article-item-description main-item">{{ sanitizeDescription(article.description) }}</div>
+            <div class="article-item-description main-item">
+              {{ sanitizeDescription(article.description) }}
+            </div>
             <div class="article-info-container main-item">
               <ArticleCategory :category="article.category" />
               <ArticleTags :tags="article.tags" />
@@ -96,14 +103,11 @@
       <div v-else-if="selectedTopic === '热门'" class="placeholder-container">
         热门帖子功能开发中，敬请期待。
       </div>
-      <div v-else class="placeholder-container">
-        分类浏览功能开发中，敬请期待。
-      </div>
+      <div v-else class="placeholder-container">分类浏览功能开发中，敬请期待。</div>
       <div v-if="isLoadingPosts && articles.length > 0" class="loading-container bottom-loading">
         <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -130,7 +134,10 @@ export default {
     ArticleTags,
     ArticleCategory,
     SearchDropdown,
-    ClientOnly: () => import('vue').then(m => m.defineAsyncComponent(() => import('vue').then(() => ({ template: '<slot />' }))))
+    ClientOnly: () =>
+      import('vue').then((m) =>
+        m.defineAsyncComponent(() => import('vue').then(() => ({ template: '<slot />' }))),
+      ),
   },
   async setup() {
     const route = useRoute()
@@ -144,9 +151,9 @@ export default {
       const t = Array.isArray(route.query.tags) ? route.query.tags.join(',') : route.query.tags
       selectedTags.value = t
         .split(',')
-        .filter(v => v)
-        .map(v => decodeURIComponent(v))
-        .map(v => (isNaN(v) ? v : Number(v)))
+        .filter((v) => v)
+        .map((v) => decodeURIComponent(v))
+        .map((v) => (isNaN(v) ? v : Number(v)))
     }
 
     const tagOptions = ref([])
@@ -158,7 +165,7 @@ export default {
         ? '排行榜'
         : route.query.view === 'latest'
           ? '最新'
-          : '最新回复'
+          : '最新回复',
     )
 
     const articles = ref([])
@@ -174,7 +181,9 @@ export default {
           if (res.ok) {
             categoryOptions.value = [await res.json()]
           }
-        } catch (e) { /* ignore */ }
+        } catch (e) {
+          /* ignore */
+        }
       }
 
       if (selectedTags.value.length) {
@@ -184,7 +193,9 @@ export default {
             try {
               const r = await fetch(`${API_BASE_URL}/api/tags/${t}`)
               if (r.ok) arr.push(await r.json())
-            } catch (e) { /* ignore */ }
+            } catch (e) {
+              /* ignore */
+            }
           }
         }
         tagOptions.value = arr
@@ -197,7 +208,7 @@ export default {
         url += `&categoryId=${selectedCategory.value}`
       }
       if (selectedTags.value.length) {
-        selectedTags.value.forEach(t => {
+        selectedTags.value.forEach((t) => {
           url += `&tagIds=${t}`
         })
       }
@@ -210,7 +221,7 @@ export default {
         url += `&categoryId=${selectedCategory.value}`
       }
       if (selectedTags.value.length) {
-        selectedTags.value.forEach(t => {
+        selectedTags.value.forEach((t) => {
           url += `&tagIds=${t}`
         })
       }
@@ -223,7 +234,7 @@ export default {
         url += `&categoryId=${selectedCategory.value}`
       }
       if (selectedTags.value.length) {
-        selectedTags.value.forEach(t => {
+        selectedTags.value.forEach((t) => {
           url += `&tagIds=${t}`
         })
       }
@@ -242,26 +253,26 @@ export default {
         const token = getToken()
         const res = await fetch(buildUrl(), {
           headers: {
-            Authorization: token ? `Bearer ${token}` : ''
-          }
+            Authorization: token ? `Bearer ${token}` : '',
+          },
         })
         isLoadingPosts.value = false
         if (!res.ok) return
         const data = await res.json()
         articles.value.push(
-          ...data.map(p => ({
+          ...data.map((p) => ({
             id: p.id,
             title: p.title,
             description: p.content,
             category: p.category,
             tags: p.tags || [],
-            members: (p.participants || []).map(m => ({ id: m.id, avatar: m.avatar })),
+            members: (p.participants || []).map((m) => ({ id: m.id, avatar: m.avatar })),
             comments: p.commentCount,
             views: p.views,
             time: TimeManager.format(p.createdAt),
             pinned: !!p.pinnedAt,
-            type: p.type
-          }))
+            type: p.type,
+          })),
         )
         if (data.length < pageSize) {
           allLoaded.value = true
@@ -285,26 +296,26 @@ export default {
         const token = getToken()
         const res = await fetch(buildRankUrl(), {
           headers: {
-            Authorization: token ? `Bearer ${token}` : ''
-          }
+            Authorization: token ? `Bearer ${token}` : '',
+          },
         })
         isLoadingPosts.value = false
         if (!res.ok) return
         const data = await res.json()
         articles.value.push(
-          ...data.map(p => ({
+          ...data.map((p) => ({
             id: p.id,
             title: p.title,
             description: p.content,
             category: p.category,
             tags: p.tags || [],
-            members: (p.participants || []).map(m => ({ id: m.id, avatar: m.avatar })),
+            members: (p.participants || []).map((m) => ({ id: m.id, avatar: m.avatar })),
             comments: p.commentCount,
             views: p.views,
             time: TimeManager.format(p.createdAt),
             pinned: !!p.pinnedAt,
-            type: p.type
-          }))
+            type: p.type,
+          })),
         )
         if (data.length < pageSize) {
           allLoaded.value = true
@@ -328,26 +339,26 @@ export default {
         const token = getToken()
         const res = await fetch(buildReplyUrl(), {
           headers: {
-            Authorization: token ? `Bearer ${token}` : ''
-          }
+            Authorization: token ? `Bearer ${token}` : '',
+          },
         })
         isLoadingPosts.value = false
         if (!res.ok) return
         const data = await res.json()
         articles.value.push(
-          ...data.map(p => ({
+          ...data.map((p) => ({
             id: p.id,
             title: p.title,
             description: p.content,
             category: p.category,
             tags: p.tags || [],
-            members: (p.participants || []).map(m => ({ id: m.id, avatar: m.avatar })),
+            members: (p.participants || []).map((m) => ({ id: m.id, avatar: m.avatar })),
             comments: p.commentCount,
             views: p.views,
             time: TimeManager.format(p.lastReplyAt || p.createdAt),
             pinned: !!p.pinnedAt,
-            type: p.type
-          }))
+            type: p.type,
+          })),
         )
         if (data.length < pageSize) {
           allLoaded.value = true
@@ -379,7 +390,7 @@ export default {
       fetchContent(true)
     })
 
-    const sanitizeDescription = text => stripMarkdown(text)
+    const sanitizeDescription = (text) => stripMarkdown(text)
 
     await Promise.all([loadOptions(), fetchContent()])
 
@@ -393,9 +404,9 @@ export default {
       selectedTags,
       tagOptions,
       categoryOptions,
-      isMobile
+      isMobile,
     }
-  }
+  },
 }
 </script>
 
@@ -426,7 +437,6 @@ export default {
 .search-subtitle {
   font-size: 16px;
 }
-
 
 .loading-container {
   display: flex;
@@ -516,7 +526,6 @@ export default {
   width: 100%;
   border-bottom: 1px solid var(--normal-border-color);
 }
-
 
 .article-main-container,
 .header-item.main-item {
@@ -657,27 +666,27 @@ export default {
     width: calc(70% - 20px);
     padding-left: 20px;
   }
-  
+
   .article-member-avatars-container,
   .header-item.avatars {
     width: 10%;
   }
-  
+
   .article-comments,
   .header-item.comments {
     width: 5%;
   }
-  
+
   .article-views,
   .header-item.views {
     width: 5%;
   }
-  
+
   .article-time,
   .header-item.activity {
     width: 10%;
   }
-  .article-member-avatar-item:nth-child(n+4) {
+  .article-member-avatar-item:nth-child(n + 4) {
     display: none;
   }
 }
@@ -688,22 +697,22 @@ export default {
     width: calc(70% - 20px);
     padding-left: 20px;
   }
-  
+
   .article-member-avatars-container,
   .header-item.avatars {
     width: 10%;
   }
-  
+
   .article-comments,
   .header-item.comments {
     display: none;
   }
-  
+
   .article-views,
   .header-item.views {
     display: none;
   }
-  
+
   .article-time,
   .header-item.activity {
     width: 10%;
@@ -714,10 +723,10 @@ export default {
     display: none;
   }
 
-  .article-member-avatar-item:nth-child(n+2) {
+  .article-member-avatar-item:nth-child(n + 2) {
     display: none;
   }
-  
+
   .header-item-text {
     font-size: 12px;
   }
@@ -742,5 +751,4 @@ export default {
     position: initial;
   }
 }
-
 </style>

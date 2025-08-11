@@ -13,19 +13,23 @@
           </div>
         </div>
         <div class="article-title-container-right">
-          <div v-if="status === 'PENDING'" class="article-pending-button">
-            审核中
-          </div>
-          <div v-if="status === 'REJECTED'" class="article-block-button">
-            已拒绝
-          </div>
-          <div v-if="loggedIn && !isAuthor && !subscribed" class="article-subscribe-button" @click="subscribePost">
+          <div v-if="status === 'PENDING'" class="article-pending-button">审核中</div>
+          <div v-if="status === 'REJECTED'" class="article-block-button">已拒绝</div>
+          <div
+            v-if="loggedIn && !isAuthor && !subscribed"
+            class="article-subscribe-button"
+            @click="subscribePost"
+          >
             <i class="fas fa-user-plus"></i>
             <div class="article-subscribe-button-text">
               {{ isMobile ? '订阅' : '订阅文章' }}
             </div>
           </div>
-          <div v-if="loggedIn && !isAuthor && subscribed" class="article-unsubscribe-button" @click="unsubscribePost">
+          <div
+            v-if="loggedIn && !isAuthor && subscribed"
+            class="article-unsubscribe-button"
+            @click="unsubscribePost"
+          >
             <i class="fas fa-user-minus"></i>
             <div class="article-unsubscribe-button-text">
               {{ isMobile ? '退订' : '取消订阅' }}
@@ -42,14 +46,18 @@
       <div class="info-content-container author-info-container">
         <div class="user-avatar-container" @click="gotoProfile">
           <div class="user-avatar-item">
-            <img class="user-avatar-item-img" :src="author.avatar" alt="avatar">
+            <img class="user-avatar-item-img" :src="author.avatar" alt="avatar" />
           </div>
           <div v-if="isMobile" class="info-content-header">
             <div class="user-name">
               {{ author.username }}
               <i class="fas fa-medal medal-icon"></i>
-              <router-link v-if="author.displayMedal" class="user-medal" :to="`/users/${author.id}?tab=achievements`">{{
-                getMedalTitle(author.displayMedal) }}</router-link>
+              <router-link
+                v-if="author.displayMedal"
+                class="user-medal"
+                :to="`/users/${author.id}?tab=achievements`"
+                >{{ getMedalTitle(author.displayMedal) }}</router-link
+              >
             </div>
             <div class="post-time">{{ postTime }}</div>
           </div>
@@ -60,12 +68,20 @@
             <div class="user-name">
               {{ author.username }}
               <i class="fas fa-medal medal-icon"></i>
-              <router-link v-if="author.displayMedal" class="user-medal" :to="`/users/${author.id}?tab=achievements`">{{
-                getMedalTitle(author.displayMedal) }}</router-link>
+              <router-link
+                v-if="author.displayMedal"
+                class="user-medal"
+                :to="`/users/${author.id}?tab=achievements`"
+                >{{ getMedalTitle(author.displayMedal) }}</router-link
+              >
             </div>
             <div class="post-time">{{ postTime }}</div>
           </div>
-          <div class="info-content-text" v-html="renderMarkdown(postContent)" @click="handleContentClick"></div>
+          <div
+            class="info-content-text"
+            v-html="renderMarkdown(postContent)"
+            @click="handleContentClick"
+          ></div>
 
           <div class="article-footer-container">
             <ReactionsGroup v-model="postReactions" content-type="post" :content-id="postId">
@@ -82,7 +98,12 @@
           <div class="prize-info">
             <div class="prize-info-left">
               <div class="prize-icon">
-                <img class="prize-icon-img" v-if="lottery.prizeIcon" :src="lottery.prizeIcon" alt="prize" />
+                <img
+                  class="prize-icon-img"
+                  v-if="lottery.prizeIcon"
+                  :src="lottery.prizeIcon"
+                  alt="prize"
+                />
                 <i v-else class="fa-solid fa-gift default-prize-icon"></i>
               </div>
               <div class="prize-name">{{ lottery.prizeDescription }}</div>
@@ -91,7 +112,11 @@
             <div class="prize-end-time prize-info-right">
               <div class="prize-end-time-title">离结束还有</div>
               <div class="prize-end-time-value">{{ countdown }}</div>
-              <div v-if="loggedIn && !hasJoined && !lotteryEnded" class="join-prize-button" @click="joinLottery">
+              <div
+                v-if="loggedIn && !hasJoined && !lotteryEnded"
+                class="join-prize-button"
+                @click="joinLottery"
+              >
                 <div class="join-prize-button-text">参与抽奖</div>
               </div>
               <div v-else-if="hasJoined" class="join-prize-button-disabled">
@@ -101,21 +126,40 @@
           </div>
         </div>
         <div class="prize-member-container">
-          <img v-for="p in lotteryParticipants" :key="p.id" class="prize-member-avatar" :src="p.avatar" alt="avatar" @click="gotoUser(p.id)" />
+          <img
+            v-for="p in lotteryParticipants"
+            :key="p.id"
+            class="prize-member-avatar"
+            :src="p.avatar"
+            alt="avatar"
+            @click="gotoUser(p.id)"
+          />
           <div v-if="lotteryEnded && lotteryWinners.length" class="prize-member-winner">
             <i class="fas fa-medal medal-icon"></i>
             <span class="prize-member-winner-name">获奖者: </span>
-            <img v-for="w in lotteryWinners" :key="w.id" class="prize-member-avatar" :src="w.avatar" alt="avatar" @click="gotoUser(w.id)" />
+            <img
+              v-for="w in lotteryWinners"
+              :key="w.id"
+              class="prize-member-avatar"
+              :src="w.avatar"
+              alt="avatar"
+              @click="gotoUser(w.id)"
+            />
           </div>
         </div>
       </div>
 
-      <CommentEditor @submit="postComment" :loading="isWaitingPostingComment" :disabled="!loggedIn"
-        :show-login-overlay="!loggedIn" :parent-user-name="author.username" />
+      <CommentEditor
+        @submit="postComment"
+        :loading="isWaitingPostingComment"
+        :disabled="!loggedIn"
+        :show-login-overlay="!loggedIn"
+        :parent-user-name="author.username"
+      />
 
       <div class="comment-config-container">
         <div class="comment-sort-container">
-          <div class="comment-sort-title">Sort by: </div>
+          <div class="comment-sort-title">Sort by:</div>
           <Dropdown v-model="commentSort" :fetch-options="fetchCommentSorts" />
         </div>
       </div>
@@ -126,8 +170,13 @@
       <div v-else class="comments-container">
         <BaseTimeline :items="comments">
           <template #item="{ item }">
-            <CommentItem :key="item.id" :comment="item" :level="0" :default-show-replies="item.openReplies"
-              @deleted="onCommentDeleted" />
+            <CommentItem
+              :key="item.id"
+              :comment="item"
+              :level="0"
+              :default-show-replies="item.openReplies"
+              @deleted="onCommentDeleted"
+            />
           </template>
         </BaseTimeline>
       </div>
@@ -138,16 +187,26 @@
         <div v-if="isWaitingFetchingPost" class="scroller-time">loading...</div>
         <div v-else class="scroller-time">{{ scrollerTopTime }}</div>
         <div class="scroller-middle">
-          <input type="range" class="scroller-range" :max="totalPosts" :min="1" v-model.number="currentIndex"
-            @input="onSliderInput" />
+          <input
+            type="range"
+            class="scroller-range"
+            :max="totalPosts"
+            :min="1"
+            v-model.number="currentIndex"
+            @input="onSliderInput"
+          />
           <div class="scroller-index">{{ currentIndex }}/{{ totalPosts }}</div>
         </div>
         <div v-if="isWaitingFetchingPost" class="scroller-time">loading...</div>
         <div v-else class="scroller-time">{{ lastReplyTime }}</div>
       </div>
     </div>
-    <vue-easy-lightbox :visible="lightboxVisible" :index="lightboxIndex" :imgs="lightboxImgs"
-      @hide="lightboxVisible = false" />
+    <vue-easy-lightbox
+      :visible="lightboxVisible"
+      :index="lightboxIndex"
+      :imgs="lightboxImgs"
+      @hide="lightboxVisible = false"
+    />
   </div>
 </template>
 
@@ -173,7 +232,17 @@ import Dropdown from '../../../components/Dropdown.vue'
 
 export default {
   name: 'PostPageView',
-  components: { CommentItem, CommentEditor, BaseTimeline, ArticleTags, ArticleCategory, ReactionsGroup, DropdownMenu, VueEasyLightbox, Dropdown },
+  components: {
+    CommentItem,
+    CommentEditor,
+    BaseTimeline,
+    ArticleTags,
+    ArticleCategory,
+    ReactionsGroup,
+    DropdownMenu,
+    VueEasyLightbox,
+    Dropdown,
+  },
   async setup() {
     const route = useRoute()
     const postId = route.params.id
@@ -188,8 +257,8 @@ export default {
     const comments = ref([])
     const status = ref('PUBLISHED')
     const pinnedAt = ref(null)
-    const isWaitingFetchingPost = ref(false);
-    const isWaitingPostingComment = ref(false);
+    const isWaitingFetchingPost = ref(false)
+    const isWaitingPostingComment = ref(false)
     const postTime = ref('')
     const postItems = ref([])
     const mainContainer = ref(null)
@@ -204,19 +273,20 @@ export default {
     const metaDescriptionEl = process.client
       ? document.querySelector('meta[name="description"]')
       : null
-    const defaultDescription = process.client && metaDescriptionEl
-      ? metaDescriptionEl.getAttribute('content')
-      : ''
+    const defaultDescription =
+      process.client && metaDescriptionEl ? metaDescriptionEl.getAttribute('content') : ''
     const headerHeight = process.client
-      ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0
+      ? parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue('--header-height'),
+        ) || 0
       : 0
 
     if (process.client) {
-      watch(title, t => {
+      watch(title, (t) => {
         document.title = `OpenIsle - ${t}`
       })
 
-      watch(postContent, c => {
+      watch(postContent, (c) => {
         if (metaDescriptionEl) {
           metaDescriptionEl.setAttribute('content', stripMarkdownLength(c, 400))
         }
@@ -247,7 +317,7 @@ export default {
     })
     const hasJoined = computed(() => {
       if (!loggedIn.value) return false
-      return lotteryParticipants.value.some(p => p.id === Number(authState.userId))
+      return lotteryParticipants.value.some((p) => p.id === Number(authState.userId))
     })
     const updateCountdown = () => {
       if (!lottery.value || !lottery.value.endTime) {
@@ -274,7 +344,7 @@ export default {
       updateCountdown()
       countdownTimer = setInterval(updateCountdown, 1000)
     }
-    const gotoUser = id => router.push(`/users/${id}`)
+    const gotoUser = (id) => router.push(`/users/${id}`)
     const articleMenuItems = computed(() => {
       const items = []
       if (isAuthor.value || isAdmin.value) {
@@ -309,7 +379,7 @@ export default {
         }
         // 根据 top 排序，防止评论异步插入后顺序错乱
         items.sort((a, b) => a.top - b.top)
-        postItems.value = items.map(i => i.el)
+        postItems.value = items.map((i) => i.el)
       }
     }
 
@@ -322,11 +392,11 @@ export default {
       avatar: c.author.avatar,
       text: c.content,
       reactions: c.reactions || [],
-      reply: (c.replies || []).map(r => mapComment(r, c.author.username, level + 1)),
+      reply: (c.replies || []).map((r) => mapComment(r, c.author.username, level + 1)),
       openReplies: level === 0,
       src: c.author.avatar,
       iconClick: () => router.push(`/users/${c.author.id}`),
-      parentUserName: parentUserName
+      parentUserName: parentUserName,
     })
 
     const getTop = (el) => {
@@ -368,11 +438,11 @@ export default {
       return false
     }
 
-    const handleContentClick = e => {
+    const handleContentClick = (e) => {
       handleMarkdownClick(e)
       if (e.target.tagName === 'IMG') {
         const container = e.target.parentNode
-        const imgs = [...container.querySelectorAll('img')].map(i => i.src)
+        const imgs = [...container.querySelectorAll('img')].map((i) => i.src)
         lightboxImgs.value = imgs
         lightboxIndex.value = imgs.indexOf(e.target.src)
         lightboxVisible.value = true
@@ -386,12 +456,12 @@ export default {
 
     const fetchPost = async () => {
       try {
-        isWaitingFetchingPost.value = true;
+        isWaitingFetchingPost.value = true
         const token = getToken()
         const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
-          headers: { Authorization: token ? `Bearer ${token}` : '' }
+          headers: { Authorization: token ? `Bearer ${token}` : '' },
         })
-        isWaitingFetchingPost.value = false;
+        isWaitingFetchingPost.value = false
         if (!res.ok) {
           if (res.status === 404 && process.client) {
             router.replace('/404')
@@ -419,13 +489,13 @@ export default {
 
     const totalPosts = computed(() => comments.value.length + 1)
     const lastReplyTime = computed(() =>
-      comments.value.length ? comments.value[comments.value.length - 1].time : postTime.value
+      comments.value.length ? comments.value[comments.value.length - 1].time : postTime.value,
     )
     const firstReplyTime = computed(() =>
-      comments.value.length ? comments.value[0].time : postTime.value
+      comments.value.length ? comments.value[0].time : postTime.value,
     )
     const scrollerTopTime = computed(() =>
-      commentSort.value === 'OLDEST' ? postTime.value : firstReplyTime.value
+      commentSort.value === 'OLDEST' ? postTime.value : firstReplyTime.value,
     )
 
     watch(
@@ -434,7 +504,7 @@ export default {
         await nextTick()
         gatherPostItems()
         updateCurrentIndex()
-      }
+      },
     )
 
     const updateCurrentIndex = () => {
@@ -476,7 +546,7 @@ export default {
         const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/comments`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ content: text })
+          body: JSON.stringify({ content: text }),
         })
         console.debug('Post comment response status', res.status)
         if (res.ok) {
@@ -516,7 +586,7 @@ export default {
       }
       const res = await fetch(`${API_BASE_URL}/api/subscriptions/posts/${postId}`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       })
       if (res.ok) {
         subscribed.value = true
@@ -531,7 +601,7 @@ export default {
       if (!token) return
       const res = await fetch(`${API_BASE_URL}/api/admin/posts/${postId}/approve`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       })
       if (res.ok) {
         status.value = 'PUBLISHED'
@@ -546,7 +616,7 @@ export default {
       if (!token) return
       const res = await fetch(`${API_BASE_URL}/api/admin/posts/${postId}/pin`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       })
       if (res.ok) {
         pinnedAt.value = new Date().toISOString()
@@ -561,7 +631,7 @@ export default {
       if (!token) return
       const res = await fetch(`${API_BASE_URL}/api/admin/posts/${postId}/unpin`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       })
       if (res.ok) {
         pinnedAt.value = null
@@ -583,7 +653,7 @@ export default {
       }
       const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       })
       if (res.ok) {
         toast.success('已删除')
@@ -598,7 +668,7 @@ export default {
       if (!token) return
       const res = await fetch(`${API_BASE_URL}/api/admin/posts/${postId}/reject`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       })
       if (res.ok) {
         status.value = 'REJECTED'
@@ -614,10 +684,9 @@ export default {
         return
       }
 
-
       const res = await fetch(`${API_BASE_URL}/api/subscriptions/posts/${postId}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       })
       if (res.ok) {
         subscribed.value = false
@@ -635,7 +704,7 @@ export default {
       }
       const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/lottery/join`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       })
       if (res.ok) {
         toast.success('已参与抽奖')
@@ -658,9 +727,12 @@ export default {
       console.debug('Fetching comments', { postId, sort: commentSort.value })
       try {
         const token = getToken()
-        const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/comments?sort=${commentSort.value}`, {
-          headers: { Authorization: token ? `Bearer ${token}` : '' }
-        })
+        const res = await fetch(
+          `${API_BASE_URL}/api/posts/${postId}/comments?sort=${commentSort.value}`,
+          {
+            headers: { Authorization: token ? `Bearer ${token}` : '' },
+          },
+        )
         console.debug('Fetch comments response status', res.status)
         if (res.ok) {
           const data = await res.json()
@@ -683,7 +755,7 @@ export default {
       const hash = location.hash
       if (hash.startsWith('#comment-')) {
         const id = hash.substring('#comment-'.length)
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise((resolve) => setTimeout(resolve, 500))
         const el = document.getElementById('comment-' + id)
         if (el) {
           const top = el.getBoundingClientRect().top + window.scrollY - headerHeight - 20 // 20 for beauty
@@ -765,9 +837,9 @@ export default {
       lotteryParticipants,
       lotteryWinners,
       lotteryEnded,
-      hasJoined
+      hasJoined,
     }
-  }
+  },
 }
 </script>
 <style>

@@ -10,7 +10,9 @@
         <div class="char-count">{{ reason.length }}/20</div>
       </div>
       <div v-if="error" class="error-message">{{ error }}</div>
-      <div v-if="!isWaitingForRegister" class="signup-page-button-primary" @click="submit">提交</div>
+      <div v-if="!isWaitingForRegister" class="signup-page-button-primary" @click="submit">
+        提交
+      </div>
       <div v-else class="signup-page-button-primary disabled">提交中...</div>
     </div>
   </div>
@@ -18,11 +20,11 @@
 
 <script>
 import BaseInput from '../components/BaseInput.vue'
-import {API_BASE_URL, toast} from '../main'
+import { API_BASE_URL, toast } from '../main'
 
 export default {
   name: 'SignupReasonPageView',
-  components: {BaseInput},
+  components: { BaseInput },
   data() {
     return {
       reason: '',
@@ -53,8 +55,8 @@ export default {
           },
           body: JSON.stringify({
             token: this.token,
-            reason: this.reason
-          })
+            reason: this.reason,
+          }),
         })
         this.isWaitingForRegister = false
         const data = await res.json()
@@ -71,8 +73,8 @@ export default {
         this.isWaitingForRegister = false
         toast.error('提交失败')
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

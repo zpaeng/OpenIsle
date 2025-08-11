@@ -38,10 +38,10 @@ export default {
   name: 'ActivityListPageView',
   components: { MilkTeaActivityComponent },
   data() {
-    return { 
-      activities: [], 
-      TimeManager, 
-      isLoadingActivities: false 
+    return {
+      activities: [],
+      TimeManager,
+      isLoadingActivities: false,
     }
   },
   async mounted() {
@@ -79,7 +79,7 @@ export default {
   padding: 10px;
   width: calc(100% - 20px);
   gap: 10px;
-  background-color: var(--activity-card-background-color);  
+  background-color: var(--activity-card-background-color);
   border-radius: 20px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
 }
@@ -111,7 +111,7 @@ export default {
 }
 
 .activity-list-page-card-content {
-  font-size: 1.0rem;
+  font-size: 1rem;
   margin-top: 10px;
   opacity: 0.8;
 }
@@ -163,5 +163,4 @@ export default {
     opacity: 0.7;
   }
 }
-
 </style>

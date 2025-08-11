@@ -13,7 +13,12 @@
     <div class="about-loading" v-if="isFetching">
       <l-hatch-spinner size="100" stroke="10" speed="1" color="var(--primary-color)" />
     </div>
-    <div v-else class="about-content" v-html="renderMarkdown(content)" @click="handleContentClick"></div>
+    <div
+      v-else
+      class="about-content"
+      v-html="renderMarkdown(content)"
+      @click="handleContentClick"
+    ></div>
   </div>
 </template>
 
@@ -26,10 +31,26 @@ export default {
   setup() {
     const isFetching = ref(false)
     const tabs = [
-      { name: 'about', label: '关于', file: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/about/about.md' },
-      { name: 'agreement', label: '用户协议', file: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/about/agreement.md' },
-      { name: 'guideline', label: '创作准则', file: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/about/guideline.md' },
-      { name: 'privacy', label: '隐私政策', file: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/about/privacy.md' },
+      {
+        name: 'about',
+        label: '关于',
+        file: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/about/about.md',
+      },
+      {
+        name: 'agreement',
+        label: '用户协议',
+        file: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/about/agreement.md',
+      },
+      {
+        name: 'guideline',
+        label: '创作准则',
+        file: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/about/guideline.md',
+      },
+      {
+        name: 'privacy',
+        label: '隐私政策',
+        file: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/about/privacy.md',
+      },
     ]
     const selectedTab = ref(tabs[0].name)
     const content = ref('')
@@ -52,7 +73,7 @@ export default {
 
     const selectTab = (name) => {
       selectedTab.value = name
-      const tab = tabs.find(t => t.name === name)
+      const tab = tabs.find((t) => t.name === name)
       if (tab) loadContent(tab.file)
     }
 
@@ -60,12 +81,12 @@ export default {
       loadContent(tabs[0].file)
     })
 
-    const handleContentClick = e => {
+    const handleContentClick = (e) => {
       handleMarkdownClick(e)
     }
 
     return { tabs, selectedTab, content, renderMarkdown, selectTab, isFetching, handleContentClick }
-  }
+  },
 }
 </script>
 
@@ -117,5 +138,4 @@ export default {
     width: 100vw;
   }
 }
-
 </style>

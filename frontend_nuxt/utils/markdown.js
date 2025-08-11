@@ -16,7 +16,7 @@ function mentionPlugin(md) {
       tokenOpen.attrs = [
         ['href', `/users/${match[1]}`],
         ['target', '_blank'],
-        ['class', 'mention-link']
+        ['class', 'mention-link'],
       ]
       const text = state.push('text', '', 0)
       text.content = `@${match[1]}`
@@ -62,7 +62,7 @@ const md = new MarkdownIt({
       code = hljs.highlightAuto(str).value
     }
     return `<pre class="code-block"><button class="copy-code-btn">Copy</button><code class="hljs language-${lang || ''}">${code}</code></pre>`
-  }
+  },
 })
 
 md.use(mentionPlugin)
@@ -89,7 +89,10 @@ export function stripMarkdown(text) {
   // SSR 环境下没有 document
   if (typeof window === 'undefined') {
     // 用正则去除 HTML 标签
-    return html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
+    return html
+      .replace(/<[^>]+>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
   } else {
     const el = document.createElement('div')
     el.innerHTML = html

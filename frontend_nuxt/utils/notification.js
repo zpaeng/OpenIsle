@@ -3,7 +3,7 @@ import { getToken } from './auth'
 import { reactive } from 'vue'
 
 export const notificationState = reactive({
-  unreadCount: 0
+  unreadCount: 0,
 })
 
 export async function fetchUnreadCount() {
@@ -14,7 +14,7 @@ export async function fetchUnreadCount() {
       return 0
     }
     const res = await fetch(`${API_BASE_URL}/api/notifications/unread-count`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     })
     if (!res.ok) {
       notificationState.unreadCount = 0
@@ -37,9 +37,9 @@ export async function markNotificationsRead(ids) {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ ids })
+      body: JSON.stringify({ ids }),
     })
     return res.ok
   } catch (e) {

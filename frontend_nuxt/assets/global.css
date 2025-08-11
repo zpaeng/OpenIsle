@@ -184,7 +184,7 @@ body {
   margin: 1.2em 0;
   font-size: 14px;
   line-height: 1.45;
-  overflow-x: auto;                  /* 小屏可横向滚动 */
+  overflow-x: auto; /* 小屏可横向滚动 */
 }
 
 .info-content-text thead th {
@@ -196,11 +196,11 @@ body {
 }
 
 [data-theme='dark'] .info-content-text thead th {
-  background-color: var(--primary-color-hover);  /* 暗色稍暗一点 */
+  background-color: var(--primary-color-hover); /* 暗色稍暗一点 */
 }
 
 .info-content-text tbody tr:nth-child(even) {
-  background-color: rgba(208, 250, 255, 0.25);   /* 斑马纹 */
+  background-color: rgba(208, 250, 255, 0.25); /* 斑马纹 */
 }
 
 [data-theme='dark'] .info-content-text tbody tr:nth-child(even) {
@@ -232,7 +232,7 @@ body {
 @media (max-width: 768px) {
   .vditor {
     min-height: 100px;
-  } 
+  }
 
   .vditor-toolbar {
     overflow-x: auto;
@@ -254,7 +254,6 @@ body {
     margin-top: 3px;
     margin-bottom: 3px;
   }
-
 
   .vditor-toolbar--pin {
     top: 0 !important;
@@ -296,7 +295,9 @@ body {
   right: 0;
   width: 100px;
   height: 100%;
-  box-shadow: 0 0 10px var(--primary-color), 0 0 5px var(--primary-color);
+  box-shadow:
+    0 0 10px var(--primary-color),
+    0 0 5px var(--primary-color);
   opacity: 1;
   transform: rotate(3deg) translate(0px, -4px);
 }

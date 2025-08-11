@@ -6,11 +6,7 @@
       text="建站送奶茶活动火热进行中，快来参与吧！"
       @close="closeMilkTeaPopup"
     />
-    <MedalPopup
-      :visible="showMedalPopup"
-      :medals="newMedals"
-      @close="closeMedalPopup"
-    />
+    <MedalPopup :visible="showMedalPopup" :medals="newMedals" @close="closeMedalPopup" />
   </div>
 </template>
 
@@ -23,29 +19,29 @@ import { authState } from '~/utils/auth'
 export default {
   name: 'GlobalPopups',
   components: { ActivityPopup, MedalPopup },
-  data () {
+  data() {
     return {
       showMilkTeaPopup: false,
       milkTeaIcon: '',
       showMedalPopup: false,
-      newMedals: []
+      newMedals: [],
     }
   },
-  async mounted () {
+  async mounted() {
     await this.checkMilkTeaActivity()
     if (!this.showMilkTeaPopup) {
       await this.checkNewMedals()
     }
   },
   methods: {
-    async checkMilkTeaActivity () {
+    async checkMilkTeaActivity() {
       if (!process.client) return
       if (localStorage.getItem('milkTeaActivityPopupShown')) return
       try {
         const res = await fetch(`${API_BASE_URL}/api/activities`)
         if (res.ok) {
           const list = await res.json()
-          const a = list.find(i => i.type === 'MILK_TEA' && !i.ended)
+          const a = list.find((i) => i.type === 'MILK_TEA' && !i.ended)
           if (a) {
             this.milkTeaIcon = a.icon
             this.showMilkTeaPopup = true
@@ -55,13 +51,13 @@ export default {
         // ignore network errors
       }
     },
-    closeMilkTeaPopup () {
+    closeMilkTeaPopup() {
       if (!process.client) return
       localStorage.setItem('milkTeaActivityPopupShown', 'true')
       this.showMilkTeaPopup = false
       this.checkNewMedals()
     },
-    async checkNewMedals () {
+    async checkNewMedals() {
       if (!process.client) return
       if (!authState.loggedIn || !authState.userId) return
       try {
@@ -69,7 +65,7 @@ export default {
         if (res.ok) {
           const medals = await res.json()
           const seen = JSON.parse(localStorage.getItem('seenMedals') || '[]')
-          const m = medals.filter(i => i.completed && !seen.includes(i.type))
+          const m = medals.filter((i) => i.completed && !seen.includes(i.type))
           if (m.length > 0) {
             this.newMedals = m
             this.showMedalPopup = true
@@ -79,14 +75,13 @@ export default {
         // ignore errors
       }
     },
-    closeMedalPopup () {
+    closeMedalPopup() {
       if (!process.client) return
       const seen = new Set(JSON.parse(localStorage.getItem('seenMedals') || '[]'))
-      this.newMedals.forEach(m => seen.add(m.type))
+      this.newMedals.forEach((m) => seen.add(m.type))
       localStorage.setItem('seenMedals', JSON.stringify([...seen]))
       this.showMedalPopup = false
-    }
-  }
+    },
+  },
 }
 </script>
-

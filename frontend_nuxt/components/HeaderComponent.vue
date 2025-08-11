@@ -9,8 +9,12 @@
           <span v-if="isMobile && unreadCount > 0" class="menu-unread-dot"></span>
         </div>
         <div class="logo-container" @click="goToHome">
-          <img alt="OpenIsle" src="https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/image.png"
-            width="60" height="60">
+          <img
+            alt="OpenIsle"
+            src="https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/image.png"
+            width="60"
+            height="60"
+          />
           <div class="logo-text">OpenIsle</div>
         </div>
       </div>
@@ -23,7 +27,7 @@
           <DropdownMenu ref="userMenu" :items="headerMenuItems">
             <template #trigger>
               <div class="avatar-container">
-                <img class="avatar-img" :src="avatar" alt="avatar">
+                <img class="avatar-img" :src="avatar" alt="avatar" />
                 <i class="fas fa-caret-down dropdown-icon"></i>
               </div>
             </template>
@@ -38,7 +42,7 @@
           <div class="header-content-item-secondary" @click="goToSignup">注册</div>
         </div>
       </ClientOnly>
-      
+
       <SearchDropdown ref="searchDropdown" v-if="isMobile && showSearch" @close="closeSearch" />
     </div>
   </header>
@@ -59,14 +63,14 @@ export default {
   props: {
     showMenuBtn: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   data() {
     return {
       avatar: '',
       showSearch: false,
-      searchDropdown: null
+      searchDropdown: null,
     }
   },
   setup() {
@@ -124,7 +128,7 @@ export default {
     const headerMenuItems = computed(() => [
       { text: '设置', onClick: goToSettings },
       { text: '个人主页', onClick: goToProfile },
-      { text: '退出', onClick: goToLogout }
+      { text: '退出', onClick: goToLogout },
     ])
 
     return {
@@ -139,7 +143,7 @@ export default {
       goToSettings,
       goToProfile,
       goToSignup,
-      goToLogout
+      goToLogout,
     }
   },
 
@@ -163,15 +167,21 @@ export default {
     await updateAvatar()
     await updateUnread()
 
-    watch(() => authState.loggedIn, async () => {
-      await updateAvatar()
-      await updateUnread()
-    })
+    watch(
+      () => authState.loggedIn,
+      async () => {
+        await updateAvatar()
+        await updateUnread()
+      },
+    )
 
-    watch(() => this.$route.fullPath, () => {
-      if (this.$refs.userMenu) this.$refs.userMenu.close()
-      this.showSearch = false
-    })
+    watch(
+      () => this.$route.fullPath,
+      () => {
+        if (this.$refs.userMenu) this.$refs.userMenu.close()
+        this.showSearch = false
+      },
+    )
   },
 }
 </script>
@@ -257,7 +267,6 @@ export default {
   cursor: pointer;
 }
 
-
 .header-content-item-main:hover {
   background-color: var(--primary-color-hover);
 }
@@ -318,5 +327,4 @@ export default {
     display: none;
   }
 }
-
 </style>
