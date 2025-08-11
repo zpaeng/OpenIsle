@@ -268,33 +268,24 @@ export default {
     const isFetchingComments = ref(false)
     const isMobile = useIsMobile()
 
-    // record default metadata from the main document (client only)
-    const defaultTitle = process.client ? document.title : ''
-    const metaDescriptionEl = process.client
-      ? document.querySelector('meta[name="description"]')
-      : null
-    const defaultDescription =
-      process.client && metaDescriptionEl ? metaDescriptionEl.getAttribute('content') : ''
     const headerHeight = process.client
       ? parseFloat(
           getComputedStyle(document.documentElement).getPropertyValue('--header-height'),
         ) || 0
       : 0
 
+    useHead(() => ({
+      title: title.value ? `OpenIsle - ${title.value}` : 'OpenIsle',
+      meta: [
+        {
+          name: 'description',
+          content: stripMarkdownLength(postContent.value, 400),
+        },
+      ],
+    }))
+
     if (process.client) {
-      watch(title, (t) => {
-        document.title = `OpenIsle - ${t}`
-      })
-
-      watch(postContent, (c) => {
-        if (metaDescriptionEl) {
-          metaDescriptionEl.setAttribute('content', stripMarkdownLength(c, 400))
-        }
-      })
-
       onBeforeUnmount(() => {
-        document.title = defaultTitle
-        if (metaDescriptionEl) metaDescriptionEl.setAttribute('content', defaultDescription)
         window.removeEventListener('scroll', updateCurrentIndex)
         if (countdownTimer) clearInterval(countdownTimer)
       })

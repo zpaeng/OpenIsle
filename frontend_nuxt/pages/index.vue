@@ -140,6 +140,16 @@ export default {
       ),
   },
   async setup() {
+    useHead({
+      title: 'OpenIsle - 全面开源的自由社区',
+      meta: [
+        {
+          name: 'description',
+          content:
+            'OpenIsle 是一个开放的技术与交流社区，致力于为开发者、技术爱好者和创作者们提供一个自由、友好、包容的讨论与协作环境。我们鼓励用户在这里分享知识、交流经验、提出问题、展示作品，并共同推动技术进步与社区成长。',
+        },
+      ],
+    })
     const route = useRoute()
     const selectedCategory = ref('')
     if (route.query.category) {
