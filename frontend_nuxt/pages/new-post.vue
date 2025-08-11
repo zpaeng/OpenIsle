@@ -49,8 +49,8 @@
           </label>
         </div>
         <div class="prize-name-row">
-          <span>奖品名称</span>
-          <input class="prize-name-input" v-model="prizeName" placeholder="奖品名称" />
+          <span>奖品描述</span>
+          <input class="prize-name-input" v-model="prizeDescription" placeholder="奖品描述" />
         </div>
         <div class="prize-count-row">
           <span>奖品数量</span>
@@ -98,7 +98,9 @@ export default {
     const showPrizeCropper = ref(false)
     const prizeName = ref('')
     const prizeCount = ref(1)
+    const prizeDescription = ref('')
     const endTime = ref(null)
+    const startTime = ref(null)
     const dateConfig = { enableTime: true, time_24hr: true, dateFormat: 'Y-m-d H:i' }
     const isWaitingPosting = ref(false)
     const isAiLoading = ref(false)
@@ -158,8 +160,10 @@ export default {
       prizeIconFile.value = null
       tempPrizeIcon.value = ''
       showPrizeCropper.value = false
+      prizeDescription.value = ''
       prizeCount.value = 1
       endTime.value = null
+      startTime.value = null
 
       // 删除草稿
       const token = getToken()
@@ -297,8 +301,8 @@ export default {
           toast.error('奖品数量必须大于0')
           return
         }
-        if (!prizeName.value) {
-          toast.error('请输入奖品名称')
+        if (!prizeDescription.value) {
+          toast.error('请输入奖品描述')
           return
         }
         if (!endTime.value) {
@@ -341,7 +345,10 @@ export default {
             prizeIcon: postType.value === 'LOTTERY' ? prizeIconUrl : undefined,
             prizeName: postType.value === 'LOTTERY' ? prizeName.value : undefined,
             prizeCount: postType.value === 'LOTTERY' ? prizeCount.value : undefined,
-            endTime: postType.value === 'LOTTERY' ? new Date(endTime.value).toISOString() : undefined
+            prizeDescription: postType.value === 'LOTTERY' ? prizeDescription.value : undefined,
+            startTime: postType.value === 'LOTTERY' ? new Date(startTime.value).toISOString() : undefined,
+            // 将时间转换为 UTC+8.5 时区 todo: 需要优化
+            endTime: postType.value === 'LOTTERY' ? new Date(new Date(endTime.value).getTime() + 8.02 * 60 * 60 * 1000).toISOString() : undefined
           })
         })
         const data = await res.json()
@@ -365,7 +372,7 @@ export default {
         isWaitingPosting.value = false
       }
     }
-    return { title, content, selectedCategory, selectedTags, postType, prizeIcon, prizeCount, endTime, submitPost, saveDraft, clearPost, isWaitingPosting, aiGenerate, isAiLoading, isLogin, onPrizeIconChange, onPrizeCropped, showPrizeCropper, tempPrizeIcon, dateConfig, prizeName }
+    return { title, content, selectedCategory, selectedTags, postType, prizeIcon, prizeCount, endTime, submitPost, saveDraft, clearPost, isWaitingPosting, aiGenerate, isAiLoading, isLogin, onPrizeIconChange, onPrizeCropped, showPrizeCropper, tempPrizeIcon, dateConfig, prizeName, prizeDescription }
   }
 }
 </script>

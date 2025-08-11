@@ -82,7 +82,7 @@
           <div class="prize-info">
             <div class="prize-info-left">
               <div class="prize-icon">
-                <img v-if="lottery.prizeIcon" :src="lottery.prizeIcon" alt="prize" />
+                <img class="prize-icon-img" v-if="lottery.prizeIcon" :src="lottery.prizeIcon" alt="prize" />
                 <i v-else class="fa-solid fa-gift default-prize-icon"></i>
               </div>
               <div class="prize-name">{{ lottery.prizeDescription }}</div>
@@ -94,7 +94,7 @@
               <div v-if="loggedIn && !hasJoined && !lotteryEnded" class="join-prize-button" @click="joinLottery">
                 <div class="join-prize-button-text">参与抽奖</div>
               </div>
-              <div v-else-if="hasJoined" class="join-prize-button">
+              <div v-else-if="hasJoined" class="join-prize-button disabled">
                 <div class="join-prize-button-text">已参与</div>
               </div>
             </div>
@@ -1137,6 +1137,11 @@ export default {
   opacity: 0.5;
 }
 
+.prize-icon-img {
+  width: 100%;
+  height: 100%;
+}
+
 .prize-name {
   font-size: 13px;
   opacity: 0.7;
@@ -1192,9 +1197,20 @@ export default {
   background-color: var(--primary-color-hover);
 }
 
+.join-prize-button.disabled {
+  background-color: var(--background-color-disabled);
+  cursor: not-allowed;
+}
+
+.join-prize-button.disabled:hover {
+  background-color: var(--background-color-disabled);
+  cursor: not-allowed;
+} 
+
 .prize-member-avatar {
   width: 30px;
   height: 30px;
+  margin-left: 3px;
   border-radius: 50%;
 }
 
