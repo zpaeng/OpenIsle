@@ -29,6 +29,7 @@
         <template v-else-if="medal.type === 'CONTRIBUTOR'">
           {{ medal.currentContributionLines }}/{{ medal.targetContributionLines }}
         </template>
+        <template v-else-if="medal.type === 'PIONEER'"> 第{{ medal.rank }}位 </template>
       </div>
     </div>
   </div>

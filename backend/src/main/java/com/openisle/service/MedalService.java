@@ -5,6 +5,7 @@ import com.openisle.dto.ContributorMedalDto;
 import com.openisle.dto.MedalDto;
 import com.openisle.dto.PostMedalDto;
 import com.openisle.dto.SeedUserMedalDto;
+import com.openisle.dto.PioneerMedalDto;
 import com.openisle.model.MedalType;
 import com.openisle.model.User;
 import com.openisle.repository.CommentRepository;
@@ -24,6 +25,7 @@ public class MedalService {
     private static final long POST_TARGET = 100;
     private static final LocalDateTime SEED_USER_DEADLINE = LocalDateTime.of(2025, 9, 16, 0, 0);
     private static final long CONTRIBUTION_TARGET = 1;
+    private static final long PIONEER_LIMIT = 1000;
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
@@ -102,6 +104,21 @@ public class MedalService {
         }
         seedUserMedal.setSelected(selected == MedalType.SEED);
         medals.add(seedUserMedal);
+
+        PioneerMedalDto pioneerMedal = new PioneerMedalDto();
+        pioneerMedal.setIcon("https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/icons/achi_pioneer.png");
+        pioneerMedal.setTitle("开山鼻祖");
+        pioneerMedal.setDescription("前1000位加入的用户");
+        pioneerMedal.setType(MedalType.PIONEER);
+        if (user != null) {
+            long rank = userRepository.countByCreatedAtBefore(user.getCreatedAt()) + 1;
+            pioneerMedal.setRank(rank);
+            pioneerMedal.setCompleted(rank <= PIONEER_LIMIT);
+        } else {
+            pioneerMedal.setCompleted(false);
+        }
+        pioneerMedal.setSelected(selected == MedalType.PIONEER);
+        medals.add(pioneerMedal);
         if (user != null && selected == null) {
             for (MedalDto medal : medals) {
                 if (medal.isCompleted()) {
@@ -126,6 +143,8 @@ public class MedalService {
             user.setDisplayMedal(MedalType.POST);
         } else if (contributorService.getContributionLines(user.getUsername()) >= CONTRIBUTION_TARGET) {
             user.setDisplayMedal(MedalType.CONTRIBUTOR);
+        } else if (userRepository.countByCreatedAtBefore(user.getCreatedAt()) < PIONEER_LIMIT) {
+            user.setDisplayMedal(MedalType.PIONEER);
         } else if (user.getCreatedAt().isBefore(SEED_USER_DEADLINE)) {
             user.setDisplayMedal(MedalType.SEED);
         }

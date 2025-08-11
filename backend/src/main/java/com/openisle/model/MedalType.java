@@ -4,5 +4,6 @@ public enum MedalType {
     COMMENT,
     POST,
     CONTRIBUTOR,
-    SEED
+    SEED,
+    PIONEER
 }
