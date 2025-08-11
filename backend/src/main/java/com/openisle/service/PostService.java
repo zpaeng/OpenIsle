@@ -214,7 +214,7 @@ public class PostService {
         if (post instanceof LotteryPost lp && lp.getEndTime() != null) {
             ScheduledFuture<?> future = taskScheduler.schedule(
                     () -> applicationContext.getBean(PostService.class).finalizeLottery(lp.getId()),
-                    java.util.Date.from(lp.getEndTime().toInstant(ZoneOffset.UTC)));
+                    java.util.Date.from(lp.getEndTime().atZone(java.time.ZoneOffset.UTC).toInstant()));
             scheduledFinalizations.put(lp.getId(), future);
         }
         return post;
