@@ -22,6 +22,7 @@ import com.openisle.repository.PostSubscriptionRepository;
 import com.openisle.repository.NotificationRepository;
 import com.openisle.model.Role;
 import com.openisle.exception.RateLimitException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.scheduling.TaskScheduler;
@@ -44,6 +45,7 @@ import java.util.concurrent.ScheduledFuture;
 
 import jakarta.annotation.PostConstruct;
 
+@Slf4j
 @Service
 public class PostService {
     private final PostRepository postRepository;
@@ -224,6 +226,7 @@ public class PostService {
     }
 
     private void finalizeLottery(Long postId) {
+        log.info("start to finalizeLottery for {}", postId);
         scheduledFinalizations.remove(postId);
         lotteryPostRepository.findById(postId).ifPresent(lp -> {
             List<User> participants = new ArrayList<>(lp.getParticipants());
@@ -233,6 +236,7 @@ public class PostService {
             Collections.shuffle(participants);
             int winnersCount = Math.min(lp.getPrizeCount(), participants.size());
             java.util.Set<User> winners = new java.util.HashSet<>(participants.subList(0, winnersCount));
+            log.info("winner count {}", winnersCount);
             lp.setWinners(winners);
             lotteryPostRepository.save(lp);
             for (User w : winners) {

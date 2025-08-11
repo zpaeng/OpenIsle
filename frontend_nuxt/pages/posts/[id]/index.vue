@@ -94,7 +94,7 @@
               <div v-if="loggedIn && !hasJoined && !lotteryEnded" class="join-prize-button" @click="joinLottery">
                 <div class="join-prize-button-text">参与抽奖</div>
               </div>
-              <div v-else-if="hasJoined" class="join-prize-button disabled">
+              <div v-else-if="hasJoined" class="join-prize-button-disabled">
                 <div class="join-prize-button-text">已参与</div>
               </div>
             </div>
@@ -1197,15 +1197,16 @@ export default {
   background-color: var(--primary-color-hover);
 }
 
-.join-prize-button.disabled {
-  background-color: var(--background-color-disabled);
+.join-prize-button-disabled {
+  margin-left: 10px;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background-color: var(--primary-color-disabled);
+  opacity: 0.5;
   cursor: not-allowed;
 }
-
-.join-prize-button.disabled:hover {
-  background-color: var(--background-color-disabled);
-  cursor: not-allowed;
-} 
 
 .prize-member-avatar {
   width: 30px;
