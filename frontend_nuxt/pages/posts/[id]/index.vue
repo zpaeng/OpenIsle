@@ -77,6 +77,39 @@
         </div>
       </div>
 
+      <div v-if="lottery" class="prize-container">
+        <div class="prize-content">
+          <div class="prize-info">
+            <div class="prize-info-left">
+              <div class="prize-icon">
+                <img class="prize-icon-img" v-if="lottery.prizeIcon" :src="lottery.prizeIcon" alt="prize" />
+                <i v-else class="fa-solid fa-gift default-prize-icon"></i>
+              </div>
+              <div class="prize-name">{{ lottery.prizeDescription }}</div>
+              <div class="prize-count">x {{ lottery.prizeCount }}</div>
+            </div>
+            <div class="prize-end-time prize-info-right">
+              <div class="prize-end-time-title">离结束还有</div>
+              <div class="prize-end-time-value">{{ countdown }}</div>
+              <div v-if="loggedIn && !hasJoined && !lotteryEnded" class="join-prize-button" @click="joinLottery">
+                <div class="join-prize-button-text">参与抽奖</div>
+              </div>
+              <div v-else-if="hasJoined" class="join-prize-button disabled">
+                <div class="join-prize-button-text">已参与</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="prize-member-container">
+          <img v-for="p in lotteryParticipants" :key="p.id" class="prize-member-avatar" :src="p.avatar" alt="avatar" @click="gotoUser(p.id)" />
+          <div v-if="lotteryEnded && lotteryWinners.length" class="prize-member-winner">
+            <i class="fas fa-medal medal-icon"></i>
+            <span class="prize-member-winner-name">获奖者: </span>
+            <img v-for="w in lotteryWinners" :key="w.id" class="prize-member-avatar" :src="w.avatar" alt="avatar" @click="gotoUser(w.id)" />
+          </div>
+        </div>
+      </div>
+
       <CommentEditor @submit="postComment" :loading="isWaitingPostingComment" :disabled="!loggedIn"
         :show-login-overlay="!loggedIn" :parent-user-name="author.username" />
 
@@ -193,6 +226,7 @@ export default {
         document.title = defaultTitle
         if (metaDescriptionEl) metaDescriptionEl.setAttribute('content', defaultDescription)
         window.removeEventListener('scroll', updateCurrentIndex)
+        if (countdownTimer) clearInterval(countdownTimer)
       })
     }
 
@@ -202,6 +236,45 @@ export default {
     const loggedIn = computed(() => authState.loggedIn)
     const isAdmin = computed(() => authState.role === 'ADMIN')
     const isAuthor = computed(() => authState.username === author.value.username)
+    const lottery = ref(null)
+    const countdown = ref('00:00:00')
+    let countdownTimer = null
+    const lotteryParticipants = computed(() => lottery.value?.participants || [])
+    const lotteryWinners = computed(() => lottery.value?.winners || [])
+    const lotteryEnded = computed(() => {
+      if (!lottery.value || !lottery.value.endTime) return false
+      return new Date(lottery.value.endTime).getTime() <= Date.now()
+    })
+    const hasJoined = computed(() => {
+      if (!loggedIn.value) return false
+      return lotteryParticipants.value.some(p => p.id === Number(authState.userId))
+    })
+    const updateCountdown = () => {
+      if (!lottery.value || !lottery.value.endTime) {
+        countdown.value = '00:00:00'
+        return
+      }
+      const diff = new Date(lottery.value.endTime).getTime() - Date.now()
+      if (diff <= 0) {
+        countdown.value = '00:00:00'
+        if (countdownTimer) {
+          clearInterval(countdownTimer)
+          countdownTimer = null
+        }
+        return
+      }
+      const h = String(Math.floor(diff / 3600000)).padStart(2, '0')
+      const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0')
+      const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0')
+      countdown.value = `${h}:${m}:${s}`
+    }
+    const startCountdown = () => {
+      if (!process.client) return
+      if (countdownTimer) clearInterval(countdownTimer)
+      updateCountdown()
+      countdownTimer = setInterval(updateCountdown, 1000)
+    }
+    const gotoUser = id => router.push(`/users/${id}`)
     const articleMenuItems = computed(() => {
       const items = []
       if (isAuthor.value || isAdmin.value) {
@@ -336,6 +409,8 @@ export default {
         status.value = data.status
         pinnedAt.value = data.pinnedAt
         postTime.value = TimeManager.format(data.createdAt)
+        lottery.value = data.lottery || null
+        if (lottery.value && lottery.value.endTime) startCountdown()
         await nextTick()
       } catch (e) {
         console.error(e)
@@ -552,6 +627,24 @@ export default {
       }
     }
 
+    const joinLottery = async () => {
+      const token = getToken()
+      if (!token) {
+        toast.error('请先登录')
+        return
+      }
+      const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/lottery/join`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.ok) {
+        toast.success('已参与抽奖')
+        await fetchPost()
+      } else {
+        toast.error('操作失败')
+      }
+    }
+
     const fetchCommentSorts = () => {
       return Promise.resolve([
         { id: 'NEWEST', name: '最新', icon: 'fas fa-clock' },
@@ -639,10 +732,12 @@ export default {
       copyPostLink,
       subscribePost,
       unsubscribePost,
+      joinLottery,
       renderMarkdown,
       isWaitingFetchingPost,
       isWaitingPostingComment,
       gotoProfile,
+      gotoUser,
       subscribed,
       loggedIn,
       isAuthor,
@@ -663,9 +758,14 @@ export default {
       pinnedAt,
       commentSort,
       fetchCommentSorts,
-      isFetchingComments
-      ,
-      getMedalTitle
+      isFetchingComments,
+      getMedalTitle,
+      lottery,
+      countdown,
+      lotteryParticipants,
+      lotteryWinners,
+      lotteryEnded,
+      hasJoined
     }
   }
 }
@@ -1009,6 +1109,127 @@ export default {
 
 .comment-editor-wrapper {
   position: relative;
+}
+
+.prize-container {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: var(--normal-background-color);
+  padding: 10px;
+}
+
+.prize-info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.prize-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.default-prize-icon {
+  font-size: 24px;
+  opacity: 0.5;
+}
+
+.prize-icon-img {
+  width: 100%;
+  height: 100%;
+}
+
+.prize-name {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-left: 10px;
+}
+
+.prize-count {
+  font-size: 13px;
+  font-weight: bold;
+  opacity: 0.7;
+  margin-left: 10px;
+  color: var(--primary-color);
+}
+
+.prize-end-time {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 13px;
+  opacity: 0.7;
+  margin-left: 10px;
+}
+
+.prize-end-time-title {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-right: 5px;
+}
+
+.prize-end-time-value {
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.prize-info-left,
+.prize-info-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.join-prize-button {
+  margin-left: 10px;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.join-prize-button:hover {
+  background-color: var(--primary-color-hover);
+}
+
+.join-prize-button.disabled {
+  background-color: var(--background-color-disabled);
+  cursor: not-allowed;
+}
+
+.join-prize-button.disabled:hover {
+  background-color: var(--background-color-disabled);
+  cursor: not-allowed;
+} 
+
+.prize-member-avatar {
+  width: 30px;
+  height: 30px;
+  margin-left: 3px;
+  border-radius: 50%;
+}
+
+.prize-member-winner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.medal-icon {
+  font-size: 16px;
+  color: var(--primary-color);
+}
+
+.prize-member-winner-name {
+  font-size: 13px;
+  opacity: 0.7;
 }
 
 @media (max-width: 768px) {
