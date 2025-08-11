@@ -59,6 +59,7 @@
           <div class="article-main-container">
             <NuxtLink class="article-item-title main-item" :to="`/posts/${article.id}`">
               <i v-if="article.pinned" class="fas fa-thumbtack pinned-icon"></i>
+              <i v-if="article.type === 'LOTTERY'" class="fa-solid fa-gift lottery-icon"></i>
               {{ article.title }}
             </NuxtLink>
             <div class="article-item-description main-item">{{ sanitizeDescription(article.description) }}</div>
@@ -258,7 +259,8 @@ export default {
             comments: p.commentCount,
             views: p.views,
             time: TimeManager.format(p.createdAt),
-            pinned: !!p.pinnedAt
+            pinned: !!p.pinnedAt,
+            type: p.type
           }))
         )
         if (data.length < pageSize) {
@@ -300,7 +302,8 @@ export default {
             comments: p.commentCount,
             views: p.views,
             time: TimeManager.format(p.createdAt),
-            pinned: !!p.pinnedAt
+            pinned: !!p.pinnedAt,
+            type: p.type
           }))
         )
         if (data.length < pageSize) {
@@ -342,7 +345,8 @@ export default {
             comments: p.commentCount,
             views: p.views,
             time: TimeManager.format(p.lastReplyAt || p.createdAt),
-            pinned: !!p.pinnedAt
+            pinned: !!p.pinnedAt,
+            type: p.type
           }))
         )
         if (data.length < pageSize) {
@@ -567,7 +571,8 @@ export default {
   text-decoration: underline;
 }
 
-.pinned-icon {
+.pinned-icon,
+.lottery-icon {
   margin-right: 4px;
   color: var(--primary-color);
 }
