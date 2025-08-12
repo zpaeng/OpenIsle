@@ -7,7 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -68,10 +68,7 @@ public class User {
     @CollectionTable(name = "user_disabled_notification_types", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "notification_type")
     @Enumerated(EnumType.STRING)
-    private Set<NotificationType> disabledNotificationTypes = EnumSet.of(
-            NotificationType.POST_VIEWED,
-            NotificationType.USER_ACTIVITY
-    );
+    private Set<NotificationType> disabledNotificationTypes = new HashSet<>();
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false,
