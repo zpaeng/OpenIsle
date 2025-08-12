@@ -43,4 +43,9 @@ export default defineNuxtConfig({
       ],
     },
   },
+  vue: {
+    compilerOptions: {
+      isCustomElement: (tag) => ['l-hatch', 'l-hatch-spinner'].includes(tag),
+    },
+  },
 })

@@ -113,18 +113,17 @@
 
 <script>
 import { ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import { useScrollLoadMore } from '~/utils/loadMore'
-import { stripMarkdown } from '~/utils/markdown'
+import ArticleCategory from '~/components/ArticleCategory.vue'
+import ArticleTags from '~/components/ArticleTags.vue'
+import CategorySelect from '~/components/CategorySelect.vue'
+import SearchDropdown from '~/components/SearchDropdown.vue'
+import TagSelect from '~/components/TagSelect.vue'
 import { API_BASE_URL } from '~/main'
 import { getToken } from '~/utils/auth'
-import TimeManager from '~/utils/time'
-import CategorySelect from '~/components/CategorySelect.vue'
-import TagSelect from '~/components/TagSelect.vue'
-import ArticleTags from '~/components/ArticleTags.vue'
-import ArticleCategory from '~/components/ArticleCategory.vue'
-import SearchDropdown from '~/components/SearchDropdown.vue'
+import { useScrollLoadMore } from '~/utils/loadMore'
+import { stripMarkdown } from '~/utils/markdown'
 import { useIsMobile } from '~/utils/screen'
+import TimeManager from '~/utils/time'
 
 export default {
   name: 'HomePageView',
@@ -150,22 +149,9 @@ export default {
         },
       ],
     })
-    const route = useRoute()
     const selectedCategory = ref('')
-    if (route.query.category) {
-      const c = decodeURIComponent(route.query.category)
-      selectedCategory.value = isNaN(c) ? c : Number(c)
-    }
     const selectedTags = ref([])
-    if (route.query.tags) {
-      const t = Array.isArray(route.query.tags) ? route.query.tags.join(',') : route.query.tags
-      selectedTags.value = t
-        .split(',')
-        .filter((v) => v)
-        .map((v) => decodeURIComponent(v))
-        .map((v) => (isNaN(v) ? v : Number(v)))
-    }
-
+    const route = useRoute()
     const tagOptions = ref([])
     const categoryOptions = ref([])
     const isLoadingPosts = ref(false)
@@ -177,12 +163,49 @@ export default {
           ? '最新'
           : '最新回复',
     )
-
     const articles = ref([])
     const page = ref(0)
     const pageSize = 10
     const isMobile = useIsMobile()
     const allLoaded = ref(false)
+
+    const selectedCategorySet = (category) => {
+      const c = decodeURIComponent(category)
+      selectedCategory.value = isNaN(c) ? c : Number(c)
+    }
+
+    const selectedTagsSet = (tags) => {
+      const t = Array.isArray(tags) ? tags.join(',') : tags
+      selectedTags.value = t
+        .split(',')
+        .filter((v) => v)
+        .map((v) => decodeURIComponent(v))
+        .map((v) => (isNaN(v) ? v : Number(v)))
+    }
+
+    onMounted(() => {
+      const query = route.query
+      const category = query.category
+      const tags = query.tags
+
+      if (category) {
+        selectedCategorySet(category)
+      }
+      if (tags) {
+        selectedTagsSet(tags)
+      }
+    })
+
+    watch(
+      () => route.query,
+      () => {
+        const query = route.query
+        const category = query.category
+        const tags = query.tags
+        category && selectedCategorySet(category)
+        tags && selectedTagsSet(tags)
+      },
+    )
 
     const loadOptions = async () => {
       if (selectedCategory.value && !isNaN(selectedCategory.value)) {
@@ -696,6 +719,7 @@ export default {
   .header-item.activity {
     width: 10%;
   }
+
   .article-member-avatar-item:nth-child(n + 4) {
     display: none;
   }

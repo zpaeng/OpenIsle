@@ -249,6 +249,7 @@ import TimeManager from '~/utils/time'
 import { useRouter } from 'vue-router'
 import { useIsMobile } from '~/utils/screen'
 import Dropdown from '~/components/Dropdown.vue'
+import { ClientOnly } from '#components'
 
 export default {
   name: 'PostPageView',
@@ -262,6 +263,7 @@ export default {
     DropdownMenu,
     VueEasyLightbox,
     Dropdown,
+    ClientOnly,
   },
   async setup() {
     const route = useRoute()
