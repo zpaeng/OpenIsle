@@ -27,23 +27,28 @@ const nodeList = new Map()
 // 检查是否在客户端环境，以避免在SSR（服务器端渲染）时执行
 const isClient = typeof window !== 'undefined'
 
-// 在客户端环境中，只设置一次全局的 mousedown 和 mouseup 监听器
+// 在客户端环境中，只设置一次全局的 mousedown / mouseup 和 touchstart / touchend 监听器
 if (isClient) {
   let startClick
 
-  document.addEventListener('mousedown', (e) => (startClick = e))
-
-  document.addEventListener('mouseup', (e) => {
+  const handleStart = (e) => (startClick = e)
+  const handleEnd = (e) => {
     // 遍历所有注册的元素和它们的处理器
     for (const handlers of nodeList.values()) {
       for (const { documentHandler } of handlers) {
-        // 调用每个处理器，传入 mouseup 和 mousedown 事件
+        // 调用每个处理器，传入结束和开始事件
         documentHandler(e, startClick)
       }
     }
     // 完成后重置 startClick
     startClick = undefined
-  })
+  }
+
+  document.addEventListener('mousedown', handleStart)
+  document.addEventListener('touchstart', handleStart)
+
+  document.addEventListener('mouseup', handleEnd)
+  document.addEventListener('touchend', handleEnd)
 }
 
 /**

@@ -5,7 +5,7 @@
     </div>
 
     <div class="main-container">
-      <div class="menu-container">
+      <div class="menu-container" v-click-outside="handleMenuOutside">
         <MenuComponent :visible="!hideMenu && menuVisible" @item-click="menuVisible = false" />
       </div>
       <div class="content" :class="{ 'menu-open': menuVisible && !hideMenu }">
@@ -48,7 +48,11 @@ export default {
       }
     })
 
-    return { menuVisible, hideMenu }
+    const handleMenuOutside = () => {
+      if (isMobile.value) menuVisible.value = false
+    }
+
+    return { menuVisible, hideMenu, handleMenuOutside }
   },
 }
 </script>
