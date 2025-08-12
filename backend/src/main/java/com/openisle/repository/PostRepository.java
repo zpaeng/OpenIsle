@@ -95,4 +95,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     long countDistinctByTags_Id(Long tagId);
 
     long countByAuthor_Id(Long userId);
+
+    @Query("SELECT FUNCTION('date', p.createdAt) AS d, COUNT(p) AS c FROM Post p " +
+           "WHERE p.createdAt >= :start AND p.createdAt < :end GROUP BY d ORDER BY d")
+    java.util.List<Object[]> countDailyRange(@Param("start") LocalDateTime start,
+                                             @Param("end") LocalDateTime end);
 }
