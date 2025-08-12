@@ -3,8 +3,8 @@
 </template>
 
 <script>
-import CallbackPage from '../components/CallbackPage.vue'
-import { twitterExchange } from '../utils/twitter'
+import CallbackPage from '~/components/CallbackPage.vue'
+import { twitterExchange } from '~/utils/twitter'
 
 export default {
   name: 'TwitterCallbackPageView',

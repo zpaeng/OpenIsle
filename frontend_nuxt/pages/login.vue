@@ -52,14 +52,14 @@
 </template>
 
 <script>
-import { API_BASE_URL, toast } from '../main'
-import { setToken, loadCurrentUser } from '../utils/auth'
-import { googleAuthorize } from '../utils/google'
-import { githubAuthorize } from '../utils/github'
-import { discordAuthorize } from '../utils/discord'
-import { twitterAuthorize } from '../utils/twitter'
-import BaseInput from '../components/BaseInput.vue'
-import { registerPush } from '../utils/push'
+import { API_BASE_URL, toast } from '~/main'
+import { setToken, loadCurrentUser } from '~/utils/auth'
+import { googleAuthorize } from '~/utils/google'
+import { githubAuthorize } from '~/utils/github'
+import { discordAuthorize } from '~/utils/discord'
+import { twitterAuthorize } from '~/utils/twitter'
+import BaseInput from '~/components/BaseInput.vue'
+import { registerPush } from '~/utils/push'
 export default {
   name: 'LoginPageView',
   components: { BaseInput },

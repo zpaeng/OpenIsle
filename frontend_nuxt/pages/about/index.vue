@@ -23,8 +23,8 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
-import { renderMarkdown, handleMarkdownClick } from '../utils/markdown'
+import { onMounted, ref } from 'vue'
+import { handleMarkdownClick, renderMarkdown } from '~/utils/markdown'
 
 export default {
   name: 'AboutPageView',

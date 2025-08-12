@@ -10,8 +10,8 @@
 </template>
 
 <script>
-import ProgressBar from './ProgressBar.vue'
-import { prevLevelExp } from '../utils/level'
+import { prevLevelExp } from '~/utils/level'
+import ProgressBar from '~/components/ProgressBar.vue'
 export default {
   name: 'LevelProgress',
   components: { ProgressBar },

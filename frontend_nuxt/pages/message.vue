@@ -480,23 +480,17 @@
 
 <script>
 import { ref, onMounted, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { API_BASE_URL } from '../main'
-import BaseTimeline from '../components/BaseTimeline.vue'
-import BasePlaceholder from '../components/BasePlaceholder.vue'
-import NotificationContainer from '../components/NotificationContainer.vue'
-import { getToken, authState } from '../utils/auth'
-import {
-  markNotificationsRead,
-  fetchUnreadCount,
-  notificationState,
-  fetchNotificationPreferences,
-  updateNotificationPreference,
-} from '../utils/notification'
-import { toast } from '../main'
-import { stripMarkdownLength } from '../utils/markdown'
-import TimeManager from '../utils/time'
-import { reactionEmojiMap } from '../utils/reactions'
+import { useRouter } from 'vue-router'
+import { API_BASE_URL } from '~/main'
+import BaseTimeline from '~/components/BaseTimeline.vue'
+import BasePlaceholder from '~/components/BasePlaceholder.vue'
+import NotificationContainer from '~/components/NotificationContainer.vue'
+import { getToken, authState } from '~/utils/auth'
+import { markNotificationsRead, fetchUnreadCount, notificationState } from '~/utils/notification'
+import { toast } from '~/main'
+import { stripMarkdownLength } from '~/utils/markdown'
+import TimeManager from '~/utils/time'
+import { reactionEmojiMap } from '~/utils/reactions'
 
 export default {
   name: 'MessagePageView',
