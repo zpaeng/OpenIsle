@@ -47,10 +47,10 @@
 </template>
 
 <script>
-import { ref, computed, watch, onMounted } from 'vue'
-import { API_BASE_URL, toast } from '../main'
-import { getToken, authState } from '../utils/auth'
-import { reactionEmojiMap } from '../utils/reactions'
+import { computed, onMounted, ref, watch } from 'vue'
+import { API_BASE_URL, toast } from '~/main'
+import { authState, getToken } from '~/utils/auth'
+import { reactionEmojiMap } from '~/utils/reactions'
 
 let cachedTypes = null
 const fetchTypes = async () => {

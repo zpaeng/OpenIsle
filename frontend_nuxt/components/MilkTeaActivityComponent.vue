@@ -58,12 +58,12 @@
 </template>
 
 <script>
-import ProgressBar from './ProgressBar.vue'
-import LevelProgress from './LevelProgress.vue'
-import BaseInput from './BaseInput.vue'
-import BasePopup from './BasePopup.vue'
-import { API_BASE_URL, toast } from '../main'
-import { getToken, fetchCurrentUser } from '../utils/auth'
+import { API_BASE_URL, toast } from '~/main'
+import { fetchCurrentUser, getToken } from '~/utils/auth'
+import BaseInput from '~/components/BaseInput.vue'
+import BasePopup from '~/components/BasePopup.vue'
+import LevelProgress from '~/components/LevelProgress.vue'
+import ProgressBar from '~/components/ProgressBar.vue'
 
 export default {
   name: 'MilkTeaActivityComponent',
@@ -218,24 +218,30 @@ export default {
   border-radius: 10px;
   cursor: pointer;
 }
+
 .redeem-submit-button:disabled {
   background-color: var(--primary-color-disabled);
   cursor: not-allowed;
 }
+
 .redeem-submit-button:hover {
   background-color: var(--primary-color-hover);
 }
+
 .redeem-submit-button:disabled:hover {
   background-color: var(--primary-color-disabled);
 }
+
 .redeem-cancel-button {
   color: var(--primary-color);
   border-radius: 10px;
   cursor: pointer;
 }
+
 .redeem-cancel-button:hover {
   text-decoration: underline;
 }
+
 .user-level-text {
   opacity: 0.8;
   font-size: 12px;

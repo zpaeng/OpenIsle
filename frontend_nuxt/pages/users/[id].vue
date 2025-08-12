@@ -299,16 +299,16 @@
 <script>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { API_BASE_URL, toast } from '../main'
-import { getToken, authState } from '../../utils/auth'
-import BaseTimeline from '../components/BaseTimeline.vue'
-import UserList from '../components/UserList.vue'
-import BasePlaceholder from '../components/BasePlaceholder.vue'
-import LevelProgress from '../components/LevelProgress.vue'
-import { stripMarkdown, stripMarkdownLength } from '../utils/markdown'
-import TimeManager from '../utils/time'
-import { prevLevelExp } from '../utils/level'
-import AchievementList from '../components/AchievementList.vue'
+import { API_BASE_URL, toast } from '~/main'
+import { getToken, authState } from '~/utils/auth'
+import BaseTimeline from '~/components/BaseTimeline.vue'
+import UserList from '~/components/UserList.vue'
+import BasePlaceholder from '~/components/BasePlaceholder.vue'
+import LevelProgress from '~/components/LevelProgress.vue'
+import { stripMarkdown, stripMarkdownLength } from '~/utils/markdown'
+import TimeManager from '~/utils/time'
+import { prevLevelExp } from '~/utils/level'
+import AchievementList from '~/components/AchievementList.vue'
 
 definePageMeta({
   alias: ['/users/:id/'],

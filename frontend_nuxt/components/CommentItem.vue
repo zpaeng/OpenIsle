@@ -89,19 +89,19 @@
 </template>
 
 <script>
-import { ref, watch, computed, nextTick } from 'vue'
+import { computed, ref, watch } from 'vue'
 import VueEasyLightbox from 'vue-easy-lightbox'
 import { useRouter } from 'vue-router'
-import CommentEditor from './CommentEditor.vue'
-import { renderMarkdown, handleMarkdownClick } from '../utils/markdown'
-import { getMedalTitle } from '../utils/medal'
-import TimeManager from '../utils/time'
-import BaseTimeline from './BaseTimeline.vue'
-import { API_BASE_URL, toast } from '../main'
-import { getToken, authState } from '../utils/auth'
-import ReactionsGroup from './ReactionsGroup.vue'
-import DropdownMenu from './DropdownMenu.vue'
-import LoginOverlay from './LoginOverlay.vue'
+import { API_BASE_URL, toast } from '~/main'
+import { authState, getToken } from '~/utils/auth'
+import { handleMarkdownClick, renderMarkdown } from '~/utils/markdown'
+import { getMedalTitle } from '~/utils/medal'
+import TimeManager from '~/utils/time'
+import BaseTimeline from '~/components/BaseTimeline.vue'
+import CommentEditor from '~/components/CommentEditor.vue'
+import DropdownMenu from '~/components/DropdownMenu.vue'
+import LoginOverlay from '~/components/LoginOverlay.vue'
+import ReactionsGroup from '~/components/ReactionsGroup.vue'
 
 const CommentItem = {
   name: 'CommentItem',

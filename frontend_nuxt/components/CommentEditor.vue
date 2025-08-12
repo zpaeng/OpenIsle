@@ -14,15 +14,15 @@
 </template>
 
 <script>
-import { ref, onMounted, computed, watch, onUnmounted, useId } from 'vue'
-import { themeState } from '../utils/theme'
+import { computed, onMounted, onUnmounted, ref, useId, watch } from 'vue'
+import { clearVditorStorage } from '~/utils/clearVditorStorage'
+import { themeState } from '~/utils/theme'
 import {
   createVditor,
   getEditorTheme as getEditorThemeUtil,
   getPreviewTheme as getPreviewThemeUtil,
-} from '../utils/vditor'
-import LoginOverlay from './LoginOverlay.vue'
-import { clearVditorStorage } from '../utils/clearVditorStorage'
+} from '~/utils/vditor'
+import LoginOverlay from '~/components/LoginOverlay.vue'
 
 export default {
   name: 'CommentEditor',

@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import BasePlaceholder from './BasePlaceholder.vue'
+import BasePlaceholder from '~/components/BasePlaceholder.vue'
 
 export default {
   name: 'UserList',
