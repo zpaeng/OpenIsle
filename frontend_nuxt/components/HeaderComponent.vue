@@ -75,6 +75,7 @@ export default {
     const avatar = ref('')
     const showSearch = ref(false)
     const searchDropdown = ref(null)
+    const userMenu = ref(null)
 
     const goToHome = () => {
       router.push('/').then(() => {
@@ -128,6 +129,43 @@ export default {
       { text: '退出', onClick: goToLogout },
     ])
 
+    onMounted(async () => {
+      const updateAvatar = async () => {
+        if (authState.loggedIn) {
+          const user = await loadCurrentUser()
+          if (user && user.avatar) {
+            avatar.value = user.avatar
+          }
+        }
+      }
+      const updateUnread = async () => {
+        if (authState.loggedIn) {
+          await fetchUnreadCount()
+        } else {
+          notificationState.unreadCount = 0
+        }
+      }
+
+      await updateAvatar()
+      await updateUnread()
+
+      watch(
+        () => authState.loggedIn,
+        async () => {
+          await updateAvatar()
+          await updateUnread()
+        },
+      )
+
+      watch(
+        () => router.currentRoute.value.fullPath,
+        () => {
+          if (userMenu.value) userMenu.value.close()
+          showSearch.value = false
+        },
+      )
+    })
+
     return {
       isLogin,
       isMobile,
@@ -143,44 +181,9 @@ export default {
       goToLogout,
       showSearch,
       searchDropdown,
+      userMenu,
+      avatar,
     }
-  },
-
-  async mounted() {
-    const updateAvatar = async () => {
-      if (authState.loggedIn) {
-        const user = await loadCurrentUser()
-        if (user && user.avatar) {
-          this.avatar = user.avatar
-        }
-      }
-    }
-    const updateUnread = async () => {
-      if (authState.loggedIn) {
-        await fetchUnreadCount()
-      } else {
-        notificationState.unreadCount = 0
-      }
-    }
-
-    await updateAvatar()
-    await updateUnread()
-
-    watch(
-      () => authState.loggedIn,
-      async () => {
-        await updateAvatar()
-        await updateUnread()
-      },
-    )
-
-    watch(
-      () => this.$route.fullPath,
-      () => {
-        if (this.$refs.userMenu) this.$refs.userMenu.close()
-        this.showSearch = false
-      },
-    )
   },
 }
 </script>
