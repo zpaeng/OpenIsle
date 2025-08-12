@@ -30,19 +30,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import VChart from 'vue-echarts'
-import { use } from 'echarts/core'
 import { LineChart } from 'echarts/charts'
 import {
+  DataZoomComponent,
+  GridComponent,
   TitleComponent,
   TooltipComponent,
-  GridComponent,
-  DataZoomComponent,
 } from 'echarts/components'
+import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { API_BASE_URL } from '../main'
-import { getToken } from '../utils/auth'
+import { onMounted, ref } from 'vue'
+import VChart from 'vue-echarts'
+import { API_BASE_URL } from '~/main'
+import { getToken } from '~/utils/auth'
 
 use([LineChart, TitleComponent, TooltipComponent, GridComponent, DataZoomComponent, CanvasRenderer])
 

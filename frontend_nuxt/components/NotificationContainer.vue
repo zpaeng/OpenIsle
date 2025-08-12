@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { useIsMobile } from '../utils/screen'
+import { useIsMobile } from '~/utils/screen'
 export default {
   name: 'NotificationContainer',
   props: {

@@ -78,18 +78,18 @@
 </template>
 
 <script>
-import { ref, onMounted, computed, watch } from 'vue'
-import PostEditor from '../components/PostEditor.vue'
-import CategorySelect from '../components/CategorySelect.vue'
-import TagSelect from '../components/TagSelect.vue'
-import PostTypeSelect from '../components/PostTypeSelect.vue'
-import AvatarCropper from '../components/AvatarCropper.vue'
-import FlatPickr from 'vue-flatpickr-component'
 import 'flatpickr/dist/flatpickr.css'
-import { API_BASE_URL, toast } from '../main'
-import { getToken, authState } from '../utils/auth'
-import LoginOverlay from '../components/LoginOverlay.vue'
-import BaseInput from '../components/BaseInput.vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import FlatPickr from 'vue-flatpickr-component'
+import AvatarCropper from '~/components/AvatarCropper.vue'
+import BaseInput from '~/components/BaseInput.vue'
+import CategorySelect from '~/components/CategorySelect.vue'
+import LoginOverlay from '~/components/LoginOverlay.vue'
+import PostEditor from '~/components/PostEditor.vue'
+import PostTypeSelect from '~/components/PostTypeSelect.vue'
+import TagSelect from '~/components/TagSelect.vue'
+import { API_BASE_URL, toast } from '~/main'
+import { authState, getToken } from '~/utils/auth'
 
 export default {
   name: 'NewPostPageView',

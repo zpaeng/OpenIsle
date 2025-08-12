@@ -8,14 +8,14 @@
 </template>
 
 <script>
-import { ref, onMounted, watch, onUnmounted, useId } from 'vue'
-import { themeState } from '../utils/theme'
+import { onMounted, onUnmounted, ref, useId, watch } from 'vue'
+import { clearVditorStorage } from '~/utils/clearVditorStorage'
+import { themeState } from '~/utils/theme'
 import {
   createVditor,
   getEditorTheme as getEditorThemeUtil,
   getPreviewTheme as getPreviewThemeUtil,
-} from '../utils/vditor'
-import { clearVditorStorage } from '../utils/clearVditorStorage'
+} from '~/utils/vditor'
 
 export default {
   name: 'PostEditor',

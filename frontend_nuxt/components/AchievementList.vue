@@ -37,8 +37,8 @@
 
 <script setup>
 import { computed } from 'vue'
-import { API_BASE_URL, toast } from '../main'
-import { getToken } from '../utils/auth'
+import { API_BASE_URL, toast } from '~/main'
+import { getToken } from '~/utils/auth'
 
 const props = defineProps({
   medals: {
