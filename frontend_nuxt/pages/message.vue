@@ -34,11 +34,15 @@
       <div class="message-control-container">
         <div class="message-control-title">通知设置</div>
         <div class="message-control-push-item-container">
-          <div class="message-control-push-item">已读通知</div>
-          <div class="message-control-push-item select">订阅者发帖通知</div>
-          <div class="message-control-push-item">订阅者回复通知</div>
-          <div class="message-control-push-item">关注者发帖通知</div>
-          <div class="message-control-push-item">评论回复通知</div>
+          <div
+            v-for="pref in notificationPrefs"
+            :key="pref.type"
+            class="message-control-push-item"
+            :class="{ select: pref.enabled }"
+            @click="togglePref(pref)"
+          >
+            {{ formatType(pref.type) }}
+          </div>
         </div>
       </div>
     </div>
@@ -482,7 +486,13 @@ import BaseTimeline from '../components/BaseTimeline.vue'
 import BasePlaceholder from '../components/BasePlaceholder.vue'
 import NotificationContainer from '../components/NotificationContainer.vue'
 import { getToken, authState } from '../utils/auth'
-import { markNotificationsRead, fetchUnreadCount, notificationState } from '../utils/notification'
+import {
+  markNotificationsRead,
+  fetchUnreadCount,
+  notificationState,
+  fetchNotificationPreferences,
+  updateNotificationPreference,
+} from '../utils/notification'
 import { toast } from '../main'
 import { stripMarkdownLength } from '../utils/markdown'
 import TimeManager from '../utils/time'
@@ -496,6 +506,7 @@ export default {
     const notifications = ref([])
     const isLoadingMessage = ref(false)
     const selectedTab = ref('unread')
+    const notificationPrefs = ref([])
     const filteredNotifications = computed(() =>
       selectedTab.value === 'all'
         ? notifications.value
@@ -568,6 +579,7 @@ export default {
           return
         }
         isLoadingMessage.value = true
+        notifications.value = []
         const res = await fetch(`${API_BASE_URL}/api/notifications`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -705,6 +717,21 @@ export default {
       }
     }
 
+    const fetchPrefs = async () => {
+      notificationPrefs.value = await fetchNotificationPreferences()
+    }
+
+    const togglePref = async (pref) => {
+      const ok = await updateNotificationPreference(pref.type, !pref.enabled)
+      if (ok) {
+        pref.enabled = !pref.enabled
+        await fetchNotifications()
+        await fetchUnreadCount()
+      } else {
+        toast.error('操作失败')
+      }
+    }
+
     const approve = async (id, nid) => {
       const token = getToken()
       if (!token) return
@@ -768,7 +795,10 @@ export default {
       }
     }
 
-    onMounted(fetchNotifications)
+    onMounted(() => {
+      fetchNotifications()
+      fetchPrefs()
+    })
 
     return {
       notifications,
@@ -783,6 +813,8 @@ export default {
       filteredNotifications,
       markAllRead,
       authState,
+      notificationPrefs,
+      togglePref,
     }
   },
 }

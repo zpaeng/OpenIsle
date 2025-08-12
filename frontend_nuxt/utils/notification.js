@@ -46,3 +46,35 @@ export async function markNotificationsRead(ids) {
     return false
   }
 }
+
+export async function fetchNotificationPreferences() {
+  try {
+    const token = getToken()
+    if (!token) return []
+    const res = await fetch(`${API_BASE_URL}/api/notifications/prefs`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!res.ok) return []
+    return await res.json()
+  } catch (e) {
+    return []
+  }
+}
+
+export async function updateNotificationPreference(type, enabled) {
+  try {
+    const token = getToken()
+    if (!token) return false
+    const res = await fetch(`${API_BASE_URL}/api/notifications/prefs`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ type, enabled }),
+    })
+    return res.ok
+  } catch (e) {
+    return false
+  }
+}
