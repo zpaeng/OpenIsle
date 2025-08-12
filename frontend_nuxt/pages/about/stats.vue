@@ -103,6 +103,5 @@ onMounted(loadData)
   max-width: var(--page-max-width);
   background-color: var(--background-color);
   margin: 0 auto;
-  height: 100%;
 }
 </style>
