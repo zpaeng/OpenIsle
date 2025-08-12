@@ -480,7 +480,7 @@
 
 <script>
 import { ref, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { API_BASE_URL } from '../main'
 import BaseTimeline from '../components/BaseTimeline.vue'
 import BasePlaceholder from '../components/BasePlaceholder.vue'
@@ -503,9 +503,12 @@ export default {
   components: { BaseTimeline, BasePlaceholder, NotificationContainer },
   setup() {
     const router = useRouter()
+    const route = useRoute()
     const notifications = ref([])
     const isLoadingMessage = ref(false)
-    const selectedTab = ref('unread')
+    const selectedTab = ref(
+      ['all', 'unread', 'control'].includes(route.query.tab) ? route.query.tab : 'unread',
+    )
     const notificationPrefs = ref([])
     const filteredNotifications = computed(() =>
       selectedTab.value === 'all'
