@@ -121,6 +121,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.POST, "/api/tags/**").authenticated()
                     .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasAuthority("ADMIN")
                     .requestMatchers(HttpMethod.DELETE, "/api/tags/**").hasAuthority("ADMIN")
+                    .requestMatchers(HttpMethod.GET, "/api/stats/**").hasAuthority("ADMIN")
                     .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                     .anyRequest().authenticated()
             )

@@ -20,7 +20,15 @@ public class StatService {
     private Map<LocalDate, Long> toDateMap(LocalDate start, LocalDate end, java.util.List<Object[]> list) {
         Map<LocalDate, Long> result = new LinkedHashMap<>();
         for (var obj : list) {
-            LocalDate d = (LocalDate) obj[0];
+            Object dateObj = obj[0];
+            LocalDate d;
+            if (dateObj instanceof java.sql.Date sqlDate) {
+                d = sqlDate.toLocalDate();
+            } else if (dateObj instanceof LocalDate localDate) {
+                d = localDate;
+            } else {
+                d = LocalDate.parse(dateObj.toString());
+            }
             Long c = ((Number) obj[1]).longValue();
             result.put(d, c);
         }
