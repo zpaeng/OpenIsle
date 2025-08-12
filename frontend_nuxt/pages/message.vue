@@ -790,6 +790,10 @@ export default {
           return '关注的用户有新动态'
         case 'MENTION':
           return '有人提到了你'
+        case 'REGISTER_REQUEST':
+          return '有人申请注册'
+        case 'ACTIVITY_REDEEM':
+          return '有人申请兑换奶茶'
         default:
           return t
       }
