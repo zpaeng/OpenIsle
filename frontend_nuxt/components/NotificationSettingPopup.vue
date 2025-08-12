@@ -1,8 +1,8 @@
 <template>
   <BasePopup :visible="visible" @close="close">
     <div class="notification-popup">
-      <div class="notification-popup-title">通知设置上线啦</div>
-      <div class="notification-popup-text">现在可以调整通知类型</div>
+      <div class="notification-popup-title">🎉 通知设置上线啦</div>
+      <div class="notification-popup-text">现在可以在消息 -> 消息设置中调整通知类型</div>
       <div class="notification-popup-actions">
         <div class="notification-popup-close" @click="close">知道了</div>
         <div class="notification-popup-button" @click="gotoSetting">去看看</div>
@@ -47,6 +47,7 @@ export default {
 .notification-popup-title {
   font-size: 18px;
   font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .notification-popup-actions {

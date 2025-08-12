@@ -32,12 +32,12 @@ export default {
   },
   async mounted() {
     await this.checkMilkTeaActivity()
-    if (!this.showMilkTeaPopup) {
-      await this.checkNotificationSetting()
-      if (!this.showNotificationPopup) {
-        await this.checkNewMedals()
-      }
-    }
+    if (this.showMilkTeaPopup) return
+
+    await this.checkNotificationSetting()
+    if (this.showNotificationPopup) return
+
+    await this.checkNewMedals()
   },
   methods: {
     async checkMilkTeaActivity() {
