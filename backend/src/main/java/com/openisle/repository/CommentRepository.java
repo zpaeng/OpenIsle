@@ -32,4 +32,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     long countByAuthor_Id(Long userId);
 
+    @org.springframework.data.jpa.repository.Query("SELECT FUNCTION('date', c.createdAt) AS d, COUNT(c) AS c FROM Comment c " +
+            "WHERE c.createdAt >= :start AND c.createdAt < :end GROUP BY d ORDER BY d")
+    java.util.List<Object[]> countDailyRange(@org.springframework.data.repository.query.Param("start") java.time.LocalDateTime start,
+                                             @org.springframework.data.repository.query.Param("end") java.time.LocalDateTime end);
 }
