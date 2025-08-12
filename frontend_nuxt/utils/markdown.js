@@ -1,6 +1,6 @@
-import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github.css'
+import MarkdownIt from 'markdown-it'
 import { toast } from '../main'
 import { tiebaEmoji } from './tiebaEmoji'
 
@@ -86,18 +86,19 @@ export function handleMarkdownClick(e) {
 
 export function stripMarkdown(text) {
   const html = md.render(text || '')
-  // SSR 环境下没有 document
-  if (typeof window === 'undefined') {
-    // 用正则去除 HTML 标签
-    return html
-      .replace(/<[^>]+>/g, '')
-      .replace(/\s+/g, ' ')
-      .trim()
-  } else {
-    const el = document.createElement('div')
-    el.innerHTML = html
-    return el.textContent || el.innerText || ''
-  }
+
+  // 统一使用正则表达式方法，确保服务端和客户端行为一致
+  let plainText = html.replace(/<[^>]+>/g, '')
+
+  // 标准化空白字符处理
+  plainText = plainText
+    .replace(/\r\n/g, '\n') // Windows换行符转为Unix格式
+    .replace(/\r/g, '\n') // 旧Mac换行符转为Unix格式
+    .replace(/[ \t]+/g, ' ') // 合并空格和制表符为单个空格
+    .replace(/\n{3,}/g, '\n\n') // 最多保留两个连续换行（一个空行）
+    .trim()
+
+  return plainText
 }
 
 export function stripMarkdownLength(text, length) {

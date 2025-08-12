@@ -1,4 +1,4 @@
-import { defineNuxtPlugin } from '#app'
+import { defineNuxtPlugin } from 'nuxt/app'
 import 'vue-toastification/dist/index.css'
 import '~/assets/toast.css'
 

@@ -48,8 +48,16 @@ export default {
       }
     })
 
-    const handleMenuOutside = () => {
-      if (isMobile.value) menuVisible.value = false
+    const handleMenuOutside = (event) => {
+      // 检查点击事件是否来自菜单按钮
+      const menuBtn = document.querySelector('.menu-btn')
+      if (menuBtn && (menuBtn === event.target || menuBtn.contains(event.target))) {
+        return // 如果是菜单按钮的点击，不处理关闭
+      }
+
+      if (isMobile.value) {
+        menuVisible.value = false
+      }
     }
 
     return { menuVisible, hideMenu, handleMenuOutside }
