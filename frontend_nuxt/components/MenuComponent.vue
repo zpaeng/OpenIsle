@@ -210,17 +210,13 @@ export default {
 
     const gotoCategory = (c) => {
       const value = encodeURIComponent(c.id ?? c.name)
-      router.push({ path: '/', query: { category: value } }).then(() => {
-        window.location.reload()
-      })
+      router.push({ path: '/', query: { category: value } })
       handleItemClick()
     }
 
     const gotoTag = (t) => {
       const value = encodeURIComponent(t.id ?? t.name)
-      router.push({ path: '/', query: { tags: value } }).then(() => {
-        window.location.reload()
-      })
+      router.push({ path: '/', query: { tags: value } })
       handleItemClick()
     }
 

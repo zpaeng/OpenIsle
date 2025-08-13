@@ -1,7 +1,11 @@
 <template>
   <div id="app">
     <div class="header-container">
-      <HeaderComponent @toggle-menu="menuVisible = !menuVisible" :show-menu-btn="!hideMenu" />
+      <HeaderComponent
+        ref="header"
+        @toggle-menu="menuVisible = !menuVisible"
+        :show-menu-btn="!hideMenu"
+      />
     </div>
 
     <div class="main-container">
@@ -42,17 +46,26 @@ export default {
       ].includes(useRoute().path)
     })
 
+    const header = useTemplateRef('header')
+
     onMounted(() => {
       if (typeof window !== 'undefined') {
         menuVisible.value = window.innerWidth > 768
       }
     })
 
-    const handleMenuOutside = () => {
-      if (isMobile.value) menuVisible.value = false
+    const handleMenuOutside = (event) => {
+      const btn = header.value.$refs.menuBtn
+      if (btn && (btn === event.target || btn.contains(event.target))) {
+        return // 如果是菜单按钮的点击，不处理关闭
+      }
+
+      if (isMobile.value) {
+        menuVisible.value = false
+      }
     }
 
-    return { menuVisible, hideMenu, handleMenuOutside }
+    return { menuVisible, hideMenu, handleMenuOutside, header }
   },
 }
 </script>

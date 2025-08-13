@@ -297,27 +297,26 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { API_BASE_URL, toast } from '~/main'
-import { getToken, authState } from '~/utils/auth'
-import BaseTimeline from '~/components/BaseTimeline.vue'
-import UserList from '~/components/UserList.vue'
+import AchievementList from '~/components/AchievementList.vue'
 import BasePlaceholder from '~/components/BasePlaceholder.vue'
+import BaseTimeline from '~/components/BaseTimeline.vue'
 import LevelProgress from '~/components/LevelProgress.vue'
+import UserList from '~/components/UserList.vue'
+import { API_BASE_URL, toast } from '~/main'
+import { authState, getToken } from '~/utils/auth'
+import { prevLevelExp } from '~/utils/level'
 import { stripMarkdown, stripMarkdownLength } from '~/utils/markdown'
 import TimeManager from '~/utils/time'
-import { prevLevelExp } from '~/utils/level'
-import AchievementList from '~/components/AchievementList.vue'
-
-definePageMeta({
-  alias: ['/users/:id/'],
-})
 
 export default {
   name: 'ProfileView',
   components: { BaseTimeline, UserList, BasePlaceholder, LevelProgress, AchievementList },
   setup() {
+    definePageMeta({
+      alias: ['/users/:id/'],
+    })
     const route = useRoute()
     const router = useRouter()
     const username = route.params.id

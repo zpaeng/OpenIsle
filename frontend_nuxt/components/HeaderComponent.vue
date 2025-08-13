@@ -3,7 +3,7 @@
     <div class="header-content">
       <div class="header-content-left">
         <div v-if="showMenuBtn" class="menu-btn-wrapper">
-          <button class="menu-btn" @click="$emit('toggle-menu')">
+          <button class="menu-btn" ref="menuBtn" @click="$emit('toggle-menu')">
             <i class="fas fa-bars"></i>
           </button>
           <span v-if="isMobile && unreadCount > 0" class="menu-unread-dot"></span>
@@ -49,14 +49,14 @@
 </template>
 
 <script>
-import { authState, clearToken, loadCurrentUser } from '~/utils/auth'
-import { watch, nextTick, ref, computed } from 'vue'
-import { fetchUnreadCount, notificationState } from '~/utils/notification'
+import { ClientOnly } from '#components'
+import { computed, nextTick, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import DropdownMenu from '~/components/DropdownMenu.vue'
 import SearchDropdown from '~/components/SearchDropdown.vue'
+import { authState, clearToken, loadCurrentUser } from '~/utils/auth'
+import { fetchUnreadCount, notificationState } from '~/utils/notification'
 import { useIsMobile } from '~/utils/screen'
-import { useRouter } from 'vue-router'
-import { ClientOnly } from '#components'
 
 export default {
   name: 'HeaderComponent',
@@ -67,7 +67,7 @@ export default {
       default: true,
     },
   },
-  setup() {
+  setup(props, { expose }) {
     const isLogin = computed(() => authState.loggedIn)
     const isMobile = useIsMobile()
     const unreadCount = computed(() => notificationState.unreadCount)
@@ -76,6 +76,11 @@ export default {
     const showSearch = ref(false)
     const searchDropdown = ref(null)
     const userMenu = ref(null)
+    const menuBtn = ref(null)
+
+    expose({
+      menuBtn,
+    })
 
     const goToHome = () => {
       router.push('/').then(() => {
@@ -183,6 +188,7 @@ export default {
       searchDropdown,
       userMenu,
       avatar,
+      menuBtn,
     }
   },
 }
