@@ -1,4 +1,4 @@
-import { API_BASE_URL, GITHUB_CLIENT_ID, toast } from '../main'
+import { GITHUB_CLIENT_ID, toast } from '../main'
 import { setToken, loadCurrentUser } from './auth'
 import { WEBSITE_BASE_URL } from '../constants'
 import { registerPush } from './push'
@@ -15,6 +15,8 @@ export function githubAuthorize(state = '') {
 
 export async function githubExchange(code, state, reason) {
   try {
+    const config = useRuntimeConfig()
+    const API_BASE_URL = config.public.apiBaseUrl
     const res = await fetch(`${API_BASE_URL}/api/auth/github`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

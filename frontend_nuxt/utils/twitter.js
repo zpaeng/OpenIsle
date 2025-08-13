@@ -1,4 +1,4 @@
-import { API_BASE_URL, TWITTER_CLIENT_ID, toast } from '../main'
+import { TWITTER_CLIENT_ID, toast } from '../main'
 import { WEBSITE_BASE_URL } from '../constants'
 import { setToken, loadCurrentUser } from './auth'
 import { registerPush } from './push'
@@ -42,6 +42,8 @@ export async function twitterAuthorize(state = '') {
 
 export async function twitterExchange(code, state, reason) {
   try {
+    const config = useRuntimeConfig()
+    const API_BASE_URL = config.public.apiBaseUrl
     const codeVerifier = sessionStorage.getItem('twitter_code_verifier')
     sessionStorage.removeItem('twitter_code_verifier')
     const res = await fetch(`${API_BASE_URL}/api/auth/twitter`, {

@@ -1,5 +1,4 @@
 import Vditor from 'vditor'
-import { API_BASE_URL } from '../main'
 import { getToken, authState } from './auth'
 import { searchUsers, fetchFollowings, fetchAdmins } from './user'
 import { tiebaEmoji } from './tiebaEmoji'
@@ -14,6 +13,8 @@ export function getPreviewTheme() {
 
 export function createVditor(editorId, options = {}) {
   const { placeholder = '', preview = {}, input, after } = options
+  const config = useRuntimeConfig()
+  const API_BASE_URL = config.public.apiBaseUrl
 
   const fetchMentions = async (value) => {
     if (!value) {

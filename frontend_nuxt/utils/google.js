@@ -1,4 +1,4 @@
-import { API_BASE_URL, GOOGLE_CLIENT_ID, toast } from '../main'
+import { GOOGLE_CLIENT_ID, toast } from '../main'
 import { setToken, loadCurrentUser } from './auth'
 import { registerPush } from './push'
 import { WEBSITE_BASE_URL } from '../constants'
@@ -32,6 +32,8 @@ export function googleAuthorize() {
 
 export async function googleAuthWithToken(idToken, redirect_success, redirect_not_approved) {
   try {
+    const config = useRuntimeConfig()
+    const API_BASE_URL = config.public.apiBaseUrl
     const res = await fetch(`${API_BASE_URL}/api/auth/google`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

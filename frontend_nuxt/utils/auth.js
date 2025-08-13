@@ -1,4 +1,3 @@
-import { API_BASE_URL } from '~/main'
 import { reactive } from 'vue'
 
 const TOKEN_KEY = 'token'
@@ -65,6 +64,8 @@ export function clearUserInfo() {
 }
 
 export async function fetchCurrentUser() {
+  const config = useRuntimeConfig()
+  const API_BASE_URL = config.public.apiBaseUrl
   const token = getToken()
   if (!token) return null
   try {
@@ -91,6 +92,8 @@ export function isLogin() {
 }
 
 export async function checkToken() {
+  const config = useRuntimeConfig()
+  const API_BASE_URL = config.public.apiBaseUrl
   const token = getToken()
   if (!token) return false
   try {
