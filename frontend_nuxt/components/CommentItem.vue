@@ -22,6 +22,7 @@
             :to="`/users/${comment.userId}?tab=achievements`"
             >{{ getMedalTitle(comment.medal) }}</router-link
           >
+          <i v-if="comment.pinned" class="fas fa-thumbtack pin-icon"></i>
           <span v-if="level >= 2">
             <i class="fas fa-reply reply-icon"></i>
             <span class="user-name reply-user-name">{{ comment.parentUserName }}</span>
@@ -74,6 +75,7 @@
               :comment="item"
               :level="level + 1"
               :default-show-replies="item.openReplies"
+              :post-author-id="postAuthorId"
             />
           </template>
         </BaseTimeline>
@@ -118,6 +120,10 @@ const CommentItem = {
     defaultShowReplies: {
       type: Boolean,
       default: false,
+    },
+    postAuthorId: {
+      type: [Number, String],
+      required: true,
     },
   },
   setup(props, { emit }) {
@@ -171,12 +177,22 @@ const CommentItem = {
     })
 
     const isAuthor = computed(() => authState.username === props.comment.userName)
+    const isPostAuthor = computed(() => Number(authState.userId) === Number(props.postAuthorId))
     const isAdmin = computed(() => authState.role === 'ADMIN')
-    const commentMenuItems = computed(() =>
-      isAuthor.value || isAdmin.value
-        ? [{ text: '删除评论', color: 'red', onClick: () => deleteComment() }]
-        : [],
-    )
+    const commentMenuItems = computed(() => {
+      const items = []
+      if (isAuthor.value || isAdmin.value) {
+        items.push({ text: '删除评论', color: 'red', onClick: () => deleteComment() })
+      }
+      if (isAdmin.value || isPostAuthor.value) {
+        if (props.comment.pinned) {
+          items.push({ text: '取消置顶', onClick: () => unpinComment() })
+        } else {
+          items.push({ text: '置顶', onClick: () => pinComment() })
+        }
+      }
+      return items
+    })
     const deleteComment = async () => {
       const token = getToken()
       if (!token) {
@@ -192,6 +208,46 @@ const CommentItem = {
       if (res.ok) {
         toast.success('已删除')
         emit('deleted', props.comment.id)
+      } else {
+        toast.error('操作失败')
+      }
+    }
+    const pinComment = async () => {
+      const token = getToken()
+      if (!token) {
+        toast.error('请先登录')
+        return
+      }
+      const url = isAdmin.value
+        ? `${API_BASE_URL}/api/admin/comments/${props.comment.id}/pin`
+        : `${API_BASE_URL}/api/comments/${props.comment.id}/pin`
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (res.ok) {
+        props.comment.pinned = true
+        toast.success('已置顶')
+      } else {
+        toast.error('操作失败')
+      }
+    }
+    const unpinComment = async () => {
+      const token = getToken()
+      if (!token) {
+        toast.error('请先登录')
+        return
+      }
+      const url = isAdmin.value
+        ? `${API_BASE_URL}/api/admin/comments/${props.comment.id}/unpin`
+        : `${API_BASE_URL}/api/comments/${props.comment.id}/unpin`
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (res.ok) {
+        props.comment.pinned = false
+        toast.success('已取消置顶')
       } else {
         toast.error('操作失败')
       }
@@ -284,6 +340,9 @@ const CommentItem = {
       isWaitingForReply,
       commentMenuItems,
       deleteComment,
+      pinComment,
+      unpinComment,
+      isPostAuthor,
       lightboxVisible,
       lightboxIndex,
       lightboxImgs,
@@ -368,6 +427,12 @@ export default CommentItem
   cursor: pointer;
   text-decoration: none;
   margin-left: 10px;
+}
+
+.pin-icon {
+  font-size: 12px;
+  margin-left: 10px;
+  opacity: 0.6;
 }
 
 @keyframes highlight {

@@ -85,4 +85,16 @@ public class CommentController {
         commentService.deleteComment(auth.getName(), id);
         log.debug("deleteComment completed for comment {}", id);
     }
+
+    @PostMapping("/comments/{id}/pin")
+    public CommentDto pinComment(@PathVariable Long id, Authentication auth) {
+        log.debug("pinComment called by user {} for comment {}", auth.getName(), id);
+        return commentMapper.toDto(commentService.pinComment(auth.getName(), id));
+    }
+
+    @PostMapping("/comments/{id}/unpin")
+    public CommentDto unpinComment(@PathVariable Long id, Authentication auth) {
+        log.debug("unpinComment called by user {} for comment {}", auth.getName(), id);
+        return commentMapper.toDto(commentService.unpinComment(auth.getName(), id));
+    }
 }
