@@ -34,6 +34,8 @@ public enum NotificationType {
     ACTIVITY_REDEEM,
     /** You won a lottery post */
     LOTTERY_WIN,
+    /** Your lottery post was drawn */
+    LOTTERY_DRAW,
     /** You were mentioned in a post or comment */
     MENTION
 }

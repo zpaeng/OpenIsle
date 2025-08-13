@@ -93,4 +93,50 @@ class PostServiceTest {
                 () -> service.createPost("alice", 1L, "t", "c", List.of(1L),
                         null, null, null, null, null, null));
     }
+
+    @Test
+    void finalizeLotteryNotifiesAuthor() {
+        PostRepository postRepo = mock(PostRepository.class);
+        UserRepository userRepo = mock(UserRepository.class);
+        CategoryRepository catRepo = mock(CategoryRepository.class);
+        TagRepository tagRepo = mock(TagRepository.class);
+        LotteryPostRepository lotteryRepo = mock(LotteryPostRepository.class);
+        NotificationService notifService = mock(NotificationService.class);
+        SubscriptionService subService = mock(SubscriptionService.class);
+        CommentService commentService = mock(CommentService.class);
+        CommentRepository commentRepo = mock(CommentRepository.class);
+        ReactionRepository reactionRepo = mock(ReactionRepository.class);
+        PostSubscriptionRepository subRepo = mock(PostSubscriptionRepository.class);
+        NotificationRepository notificationRepo = mock(NotificationRepository.class);
+        PostReadService postReadService = mock(PostReadService.class);
+        ImageUploader imageUploader = mock(ImageUploader.class);
+        TaskScheduler taskScheduler = mock(TaskScheduler.class);
+        EmailSender emailSender = mock(EmailSender.class);
+        ApplicationContext context = mock(ApplicationContext.class);
+
+        PostService service = new PostService(postRepo, userRepo, catRepo, tagRepo, lotteryRepo,
+                notifService, subService, commentService, commentRepo,
+                reactionRepo, subRepo, notificationRepo, postReadService,
+                imageUploader, taskScheduler, emailSender, context, PublishMode.DIRECT);
+        when(context.getBean(PostService.class)).thenReturn(service);
+
+        User author = new User();
+        author.setId(1L);
+        User winner = new User();
+        winner.setId(2L);
+
+        LotteryPost lp = new LotteryPost();
+        lp.setId(1L);
+        lp.setAuthor(author);
+        lp.setTitle("L");
+        lp.setPrizeCount(1);
+        lp.getParticipants().add(winner);
+
+        when(lotteryRepo.findById(1L)).thenReturn(Optional.of(lp));
+
+        service.finalizeLottery(1L);
+
+        verify(notifService).createNotification(eq(winner), eq(NotificationType.LOTTERY_WIN), eq(lp), isNull(), isNull(), eq(author), isNull(), isNull());
+        verify(notifService).createNotification(eq(author), eq(NotificationType.LOTTERY_DRAW), eq(lp), isNull(), isNull(), isNull(), isNull(), isNull());
+    }
 }

@@ -198,6 +198,19 @@
                     中获奖
                   </NotificationContainer>
                 </template>
+                <template v-else-if="item.type === 'LOTTERY_DRAW'">
+                  <NotificationContainer :item="item" :markRead="markRead">
+                    您的抽奖贴
+                    <router-link
+                      class="notif-content-text"
+                      @click="markRead(item.id)"
+                      :to="`/posts/${item.post.id}`"
+                    >
+                      {{ stripMarkdownLength(item.post.title, 100) }}
+                    </router-link>
+                    已开奖
+                  </NotificationContainer>
+                </template>
                 <template v-else-if="item.type === 'POST_UPDATED'">
                   <NotificationContainer :item="item" :markRead="markRead">
                     您关注的帖子
@@ -579,6 +592,7 @@ export default {
       REGISTER_REQUEST: 'fas fa-user-clock',
       ACTIVITY_REDEEM: 'fas fa-coffee',
       LOTTERY_WIN: 'fas fa-trophy',
+      LOTTERY_DRAW: 'fas fa-bullhorn',
       MENTION: 'fas fa-at',
     }
 
@@ -637,6 +651,17 @@ export default {
               },
             })
           } else if (n.type === 'LOTTERY_WIN') {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+              iconClick: () => {
+                if (n.post) {
+                  markRead(n.id)
+                  router.push(`/posts/${n.post.id}`)
+                }
+              },
+            })
+          } else if (n.type === 'LOTTERY_DRAW') {
             notifications.value.push({
               ...n,
               icon: iconMap[n.type],
@@ -818,6 +843,8 @@ export default {
           return '有人申请兑换奶茶'
         case 'LOTTERY_WIN':
           return '抽奖中奖了'
+        case 'LOTTERY_DRAW':
+          return '抽奖已开奖'
         default:
           return t
       }
