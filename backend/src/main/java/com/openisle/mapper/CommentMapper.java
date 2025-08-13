@@ -24,6 +24,7 @@ public class CommentMapper {
         dto.setId(comment.getId());
         dto.setContent(comment.getContent());
         dto.setCreatedAt(comment.getCreatedAt());
+        dto.setPinnedAt(comment.getPinnedAt());
         dto.setAuthor(userMapper.toAuthorDto(comment.getAuthor()));
         dto.setReward(0);
         return dto;

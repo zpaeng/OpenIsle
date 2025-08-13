@@ -38,4 +38,7 @@ public class Comment {
     @JoinColumn(name = "parent_id")
     private Comment parent;
 
+    @Column
+    private LocalDateTime pinnedAt;
+
 }

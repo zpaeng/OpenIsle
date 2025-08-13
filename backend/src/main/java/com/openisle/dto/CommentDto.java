@@ -13,6 +13,7 @@ public class CommentDto {
     private Long id;
     private String content;
     private LocalDateTime createdAt;
+    private LocalDateTime pinnedAt;
     private AuthorDto author;
     private List<CommentDto> replies;
     private List<ReactionDto> reactions;

@@ -23,6 +23,7 @@ import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -129,13 +130,26 @@ public class CommentService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
         List<Comment> list = commentRepository.findByPostAndParentIsNullOrderByCreatedAtAsc(post);
-        if (sort == CommentSort.NEWEST) {
-            list.sort(java.util.Comparator.comparing(Comment::getCreatedAt).reversed());
-        } else if (sort == CommentSort.MOST_INTERACTIONS) {
-            list.sort((a, b) -> Integer.compare(interactionCount(b), interactionCount(a)));
+        java.util.List<Comment> pinned = new java.util.ArrayList<>();
+        java.util.List<Comment> others = new java.util.ArrayList<>();
+        for (Comment c : list) {
+            if (c.getPinnedAt() != null) {
+                pinned.add(c);
+            } else {
+                others.add(c);
+            }
         }
-        log.debug("getCommentsForPost returning {} comments", list.size());
-        return list;
+        pinned.sort(java.util.Comparator.comparing(Comment::getPinnedAt).reversed());
+        if (sort == CommentSort.NEWEST) {
+            others.sort(java.util.Comparator.comparing(Comment::getCreatedAt).reversed());
+        } else if (sort == CommentSort.MOST_INTERACTIONS) {
+            others.sort((a, b) -> Integer.compare(interactionCount(b), interactionCount(a)));
+        }
+        java.util.List<Comment> result = new java.util.ArrayList<>();
+        result.addAll(pinned);
+        result.addAll(others);
+        log.debug("getCommentsForPost returning {} comments", result.size());
+        return result;
     }
 
     public List<Comment> getReplies(Long parentId) {
@@ -221,6 +235,32 @@ public class CommentService {
         imageUploader.removeReferences(imageUploader.extractUrls(comment.getContent()));
         commentRepository.delete(comment);
         log.debug("deleteCommentCascade removed comment {}", comment.getId());
+    }
+
+    @Transactional
+    public Comment pinComment(String username, Long id) {
+        Comment c = commentRepository.findById(id)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Comment not found"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
+        if (!user.getId().equals(c.getPost().getAuthor().getId()) && user.getRole() != Role.ADMIN) {
+            throw new IllegalArgumentException("Unauthorized");
+        }
+        c.setPinnedAt(LocalDateTime.now());
+        return commentRepository.save(c);
+    }
+
+    @Transactional
+    public Comment unpinComment(String username, Long id) {
+        Comment c = commentRepository.findById(id)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Comment not found"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
+        if (!user.getId().equals(c.getPost().getAuthor().getId()) && user.getRole() != Role.ADMIN) {
+            throw new IllegalArgumentException("Unauthorized");
+        }
+        c.setPinnedAt(null);
+        return commentRepository.save(c);
     }
 
     private int interactionCount(Comment comment) {
