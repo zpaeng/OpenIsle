@@ -23,105 +23,99 @@
   </div>
 </template>
 
-<script>
-import { API_BASE_URL, toast } from '~/main'
+<script setup>
+import { toast } from '~/main'
 import BaseInput from '~/components/BaseInput.vue'
-export default {
-  name: 'ForgotPasswordPageView',
-  components: { BaseInput },
-  data() {
-    return {
-      step: 0,
-      email: '',
-      code: '',
-      password: '',
-      token: '',
-      emailError: '',
-      passwordError: '',
-      isSending: false,
-      isVerifying: false,
-      isResetting: false,
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
+
+const step = ref(0)
+const email = ref('')
+const code = ref('')
+const password = ref('')
+const token = ref('')
+const emailError = ref('')
+const passwordError = ref('')
+const isSending = ref(false)
+const isVerifying = ref(false)
+const isResetting = ref(false)
+
+onMounted(() => {
+  if (route.query.email) {
+    email.value = decodeURIComponent(route.query.email)
+  }
+})
+const sendCode = async () => {
+  if (!email.value) {
+    emailError.value = '邮箱不能为空'
+    return
+  }
+  try {
+    isSending.value = true
+    const res = await fetch(`${API_BASE_URL}/api/auth/forgot/send`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email.value }),
+    })
+    isSending.value = false
+    if (res.ok) {
+      toast.success('验证码已发送')
+      step.value = 1
+    } else {
+      toast.error('请填写已注册邮箱')
     }
-  },
-  mounted() {
-    if (this.$route.query.email) {
-      this.email = decodeURIComponent(this.$route.query.email)
+  } catch (e) {
+    isSending.value = false
+    toast.error('发送失败')
+  }
+}
+const verifyCode = async () => {
+  try {
+    isVerifying.value = true
+    const res = await fetch(`${API_BASE_URL}/api/auth/forgot/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email.value, code: code.value }),
+    })
+    isVerifying.value = false
+    const data = await res.json()
+    if (res.ok) {
+      token.value = data.token
+      step.value = 2
+    } else {
+      toast.error(data.error || '验证失败')
     }
-  },
-  methods: {
-    async sendCode() {
-      if (!this.email) {
-        this.emailError = '邮箱不能为空'
-        return
-      }
-      try {
-        this.isSending = true
-        const res = await fetch(`${API_BASE_URL}/api/auth/forgot/send`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: this.email }),
-        })
-        this.isSending = false
-        if (res.ok) {
-          toast.success('验证码已发送')
-          this.step = 1
-        } else {
-          toast.error('请填写已注册邮箱')
-        }
-      } catch (e) {
-        this.isSending = false
-        toast.error('发送失败')
-      }
-    },
-    async verifyCode() {
-      try {
-        this.isVerifying = true
-        const res = await fetch(`${API_BASE_URL}/api/auth/forgot/verify`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: this.email, code: this.code }),
-        })
-        this.isVerifying = false
-        const data = await res.json()
-        if (res.ok) {
-          this.token = data.token
-          this.step = 2
-        } else {
-          toast.error(data.error || '验证失败')
-        }
-      } catch (e) {
-        this.isVerifying = false
-        toast.error('验证失败')
-      }
-    },
-    async resetPassword() {
-      if (!this.password) {
-        this.passwordError = '密码不能为空'
-        return
-      }
-      try {
-        this.isResetting = true
-        const res = await fetch(`${API_BASE_URL}/api/auth/forgot/reset`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: this.token, password: this.password }),
-        })
-        this.isResetting = false
-        const data = await res.json()
-        if (res.ok) {
-          toast.success('密码已重置')
-          this.$router.push('/login')
-        } else if (data.field === 'password') {
-          this.passwordError = data.error
-        } else {
-          toast.error(data.error || '重置失败')
-        }
-      } catch (e) {
-        this.isResetting = false
-        toast.error('重置失败')
-      }
-    },
-  },
+  } catch (e) {
+    isVerifying.value = false
+    toast.error('验证失败')
+  }
+}
+const resetPassword = async () => {
+  if (!password.value) {
+    passwordError.value = '密码不能为空'
+    return
+  }
+  try {
+    isResetting.value = true
+    const res = await fetch(`${API_BASE_URL}/api/auth/forgot/reset`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: token.value, password: password.value }),
+    })
+    isResetting.value = false
+    const data = await res.json()
+    if (res.ok) {
+      toast.success('密码已重置')
+      router.push('/login')
+    } else if (data.field === 'password') {
+      passwordError.value = data.error
+    } else {
+      toast.error(data.error || '重置失败')
+    }
+  } catch (e) {
+    isResetting.value = false
+    toast.error('重置失败')
+  }
 }
 </script>
 

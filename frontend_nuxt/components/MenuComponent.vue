@@ -123,125 +123,103 @@
   </transition>
 </template>
 
-<script>
+<script setup>
 import { themeState, cycleTheme, ThemeMode } from '~/utils/theme'
 import { authState } from '~/utils/auth'
 import { fetchUnreadCount, notificationState } from '~/utils/notification'
 import { ref, computed, watch, onMounted } from 'vue'
-import { API_BASE_URL } from '~/main'
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
 
-export default {
-  name: 'MenuComponent',
-  props: {
-    visible: {
-      type: Boolean,
-      default: true,
-    },
+const props = defineProps({
+  visible: {
+    type: Boolean,
+    default: true,
   },
-  async setup(props, { emit }) {
-    const router = useRouter()
-    const categories = ref([])
-    const tags = ref([])
-    const categoryOpen = ref(true)
-    const tagOpen = ref(true)
-    const isLoadingCategory = ref(false)
-    const isLoadingTag = ref(false)
-    const categoryData = ref([])
-    const tagData = ref([])
+})
 
-    const fetchCategoryData = async () => {
-      isLoadingCategory.value = true
-      const res = await fetch(`${API_BASE_URL}/api/categories`)
-      const data = await res.json()
-      categoryData.value = data
-      isLoadingCategory.value = false
-    }
+const emit = defineEmits(['item-click'])
 
-    const fetchTagData = async () => {
-      isLoadingTag.value = true
-      const res = await fetch(`${API_BASE_URL}/api/tags?limit=10`)
-      const data = await res.json()
-      tagData.value = data
-      isLoadingTag.value = false
-    }
+const router = useRouter()
+const categoryOpen = ref(true)
+const tagOpen = ref(true)
+const isLoadingCategory = ref(false)
+const isLoadingTag = ref(false)
+const categoryData = ref([])
+const tagData = ref([])
 
-    const iconClass = computed(() => {
-      switch (themeState.mode) {
-        case ThemeMode.DARK:
-          return 'fas fa-moon'
-        case ThemeMode.LIGHT:
-          return 'fas fa-sun'
-        default:
-          return 'fas fa-desktop'
-      }
-    })
-
-    const unreadCount = computed(() => notificationState.unreadCount)
-    const showUnreadCount = computed(() => (unreadCount.value > 99 ? '99+' : unreadCount.value))
-    const shouldShowStats = computed(() => authState.role === 'ADMIN')
-
-    const updateCount = async () => {
-      if (authState.loggedIn) {
-        await fetchUnreadCount()
-      } else {
-        notificationState.unreadCount = 0
-      }
-    }
-
-    onMounted(async () => {
-      await updateCount()
-      watch(() => authState.loggedIn, updateCount)
-    })
-
-    const handleHomeClick = () => {
-      router.push('/').then(() => {
-        window.location.reload()
-      })
-    }
-
-    const handleItemClick = () => {
-      if (window.innerWidth <= 768) emit('item-click')
-    }
-
-    const isImageIcon = (icon) => {
-      if (!icon) return false
-      return /^https?:\/\//.test(icon) || icon.startsWith('/')
-    }
-
-    const gotoCategory = (c) => {
-      const value = encodeURIComponent(c.id ?? c.name)
-      router.push({ path: '/', query: { category: value } })
-      handleItemClick()
-    }
-
-    const gotoTag = (t) => {
-      const value = encodeURIComponent(t.id ?? t.name)
-      router.push({ path: '/', query: { tags: value } })
-      handleItemClick()
-    }
-
-    await Promise.all([fetchCategoryData(), fetchTagData()])
-
-    return {
-      categoryData,
-      tagData,
-      categoryOpen,
-      tagOpen,
-      isLoadingCategory,
-      isLoadingTag,
-      iconClass,
-      unreadCount,
-      showUnreadCount,
-      shouldShowStats,
-      cycleTheme,
-      handleHomeClick,
-      handleItemClick,
-      isImageIcon,
-      gotoCategory,
-      gotoTag,
-    }
-  },
+const fetchCategoryData = async () => {
+  isLoadingCategory.value = true
+  const res = await fetch(`${API_BASE_URL}/api/categories`)
+  const data = await res.json()
+  categoryData.value = data
+  isLoadingCategory.value = false
 }
+
+const fetchTagData = async () => {
+  isLoadingTag.value = true
+  const res = await fetch(`${API_BASE_URL}/api/tags?limit=10`)
+  const data = await res.json()
+  tagData.value = data
+  isLoadingTag.value = false
+}
+
+const iconClass = computed(() => {
+  switch (themeState.mode) {
+    case ThemeMode.DARK:
+      return 'fas fa-moon'
+    case ThemeMode.LIGHT:
+      return 'fas fa-sun'
+    default:
+      return 'fas fa-desktop'
+  }
+})
+
+const unreadCount = computed(() => notificationState.unreadCount)
+const showUnreadCount = computed(() => (unreadCount.value > 99 ? '99+' : unreadCount.value))
+const shouldShowStats = computed(() => authState.role === 'ADMIN')
+
+const updateCount = async () => {
+  if (authState.loggedIn) {
+    await fetchUnreadCount()
+  } else {
+    notificationState.unreadCount = 0
+  }
+}
+
+onMounted(async () => {
+  await updateCount()
+  watch(() => authState.loggedIn, updateCount)
+})
+
+const handleHomeClick = () => {
+  router.push('/').then(() => {
+    window.location.reload()
+  })
+}
+
+const handleItemClick = () => {
+  if (window.innerWidth <= 768) emit('item-click')
+}
+
+const isImageIcon = (icon) => {
+  if (!icon) return false
+  return /^https?:\/\//.test(icon) || icon.startsWith('/')
+}
+
+const gotoCategory = (c) => {
+  const value = encodeURIComponent(c.id ?? c.name)
+  router.push({ path: '/', query: { category: value } })
+  handleItemClick()
+}
+
+const gotoTag = (t) => {
+  const value = encodeURIComponent(t.id ?? t.name)
+  router.push({ path: '/', query: { tags: value } })
+  handleItemClick()
+}
+
+await Promise.all([fetchCategoryData(), fetchTagData()])
 </script>
 
 <style scoped>

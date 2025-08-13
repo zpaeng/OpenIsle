@@ -41,8 +41,9 @@ import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { onMounted, ref } from 'vue'
 import VChart from 'vue-echarts'
-import { API_BASE_URL } from '~/main'
 import { getToken } from '~/utils/auth'
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
 
 use([LineChart, TitleComponent, TooltipComponent, GridComponent, DataZoomComponent, CanvasRenderer])
 

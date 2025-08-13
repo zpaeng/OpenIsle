@@ -57,73 +57,66 @@
   </div>
 </template>
 
-<script>
-import { API_BASE_URL, toast } from '~/main'
+<script setup>
+import { toast } from '~/main'
 import { fetchCurrentUser, getToken } from '~/utils/auth'
 import BaseInput from '~/components/BaseInput.vue'
 import BasePopup from '~/components/BasePopup.vue'
 import LevelProgress from '~/components/LevelProgress.vue'
 import ProgressBar from '~/components/ProgressBar.vue'
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
 
-export default {
-  name: 'MilkTeaActivityComponent',
-  components: { ProgressBar, LevelProgress, BaseInput, BasePopup },
-  data() {
-    return {
-      info: { redeemCount: 0, ended: false },
-      user: null,
-      dialogVisible: false,
-      contact: '',
-      loading: false,
-      isLoadingUser: true,
+const info = ref({ redeemCount: 0, ended: false })
+const user = ref(null)
+const dialogVisible = ref(false)
+const contact = ref('')
+const loading = ref(false)
+const isLoadingUser = ref(true)
+
+onMounted(async () => {
+  await loadInfo()
+  isLoadingUser.value = true
+  user.value = await fetchCurrentUser()
+  isLoadingUser.value = false
+})
+const loadInfo = async () => {
+  const res = await fetch(`${API_BASE_URL}/api/activities/milk-tea`)
+  if (res.ok) {
+    info.value = await res.json()
+  }
+}
+const openDialog = () => {
+  dialogVisible.value = true
+}
+const closeDialog = () => {
+  dialogVisible.value = false
+}
+const submitRedeem = async () => {
+  if (!contact.value) return
+  loading.value = true
+  const token = getToken()
+  const res = await fetch(`${API_BASE_URL}/api/activities/milk-tea/redeem`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ contact: contact.value }),
+  })
+  if (res.ok) {
+    const data = await res.json()
+    if (data.message === 'updated') {
+      toast.success('您已提交过兑换，本次更新兑换信息')
+    } else {
+      toast.success('兑换成功！')
     }
-  },
-  async mounted() {
-    await this.loadInfo()
-    this.isLoadingUser = true
-    this.user = await fetchCurrentUser()
-    this.isLoadingUser = false
-  },
-  methods: {
-    async loadInfo() {
-      const res = await fetch(`${API_BASE_URL}/api/activities/milk-tea`)
-      if (res.ok) {
-        this.info = await res.json()
-      }
-    },
-    openDialog() {
-      this.dialogVisible = true
-    },
-    closeDialog() {
-      this.dialogVisible = false
-    },
-    async submitRedeem() {
-      if (!this.contact) return
-      this.loading = true
-      const token = getToken()
-      const res = await fetch(`${API_BASE_URL}/api/activities/milk-tea/redeem`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ contact: this.contact }),
-      })
-      if (res.ok) {
-        const data = await res.json()
-        if (data.message === 'updated') {
-          toast.success('您已提交过兑换，本次更新兑换信息')
-        } else {
-          toast.success('兑换成功！')
-        }
-        this.dialogVisible = false
-        await this.loadInfo()
-      } else {
-        toast.error('兑换失败')
-      }
-      this.loading = false
-    },
-  },
+    dialogVisible.value = false
+    await loadInfo()
+  } else {
+    toast.error('兑换失败')
+  }
+  loading.value = false
 }
 </script>
 

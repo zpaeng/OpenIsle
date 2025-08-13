@@ -18,63 +18,57 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import BaseInput from '~/components/BaseInput.vue'
-import { API_BASE_URL, toast } from '~/main'
+import { toast } from '~/main'
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
 
-export default {
-  name: 'SignupReasonPageView',
-  components: { BaseInput },
-  data() {
-    return {
-      reason: '',
-      error: '',
-      isWaitingForRegister: false,
-      token: '',
-    }
-  },
-  mounted() {
-    this.token = this.$route.query.token || ''
-    if (!this.token) {
-      this.$router.push('/signup')
-    }
-  },
-  methods: {
-    async submit() {
-      if (!this.reason || this.reason.trim().length < 20) {
-        this.error = '请至少输入20个字'
-        return
-      }
+const reason = ref('')
+const error = ref('')
+const isWaitingForRegister = ref(false)
+const token = ref('')
 
-      try {
-        this.isWaitingForRegister = true
-        const res = await fetch(`${API_BASE_URL}/api/auth/reason`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            token: this.token,
-            reason: this.reason,
-          }),
-        })
-        this.isWaitingForRegister = false
-        const data = await res.json()
-        if (res.ok) {
-          toast.success('注册理由已提交,请等待审核')
-          this.$router.push('/')
-        } else if (data.reason_code === 'INVALID_CREDENTIALS') {
-          toast.error('登录已过期,请重新登录')
-          this.$router.push('/login')
-        } else {
-          toast.error(data.error || '提交失败')
-        }
-      } catch (e) {
-        this.isWaitingForRegister = false
-        toast.error('提交失败')
-      }
-    },
-  },
+onMounted(() => {
+  token.value = route.query.token || ''
+  if (!token.value) {
+    router.push('/signup')
+  }
+})
+
+const submit = async () => {
+  if (!reason.value || reason.value.trim().length < 20) {
+    error.value = '请至少输入20个字'
+    return
+  }
+
+  try {
+    isWaitingForRegister.value = true
+    const res = await fetch(`${API_BASE_URL}/api/auth/reason`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token: this.token,
+        reason: this.reason,
+      }),
+    })
+    isWaitingForRegister.value = false
+    const data = await res.json()
+    if (res.ok) {
+      toast.success('注册理由已提交,请等待审核')
+      router.push('/')
+    } else if (data.reason_code === 'INVALID_CREDENTIALS') {
+      toast.error('登录已过期,请重新登录')
+      router.push('/login')
+    } else {
+      toast.error(data.error || '提交失败')
+    }
+  } catch (e) {
+    isWaitingForRegister.value = false
+    toast.error('提交失败')
+  }
 }
 </script>
 

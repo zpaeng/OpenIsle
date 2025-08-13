@@ -478,10 +478,9 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { API_BASE_URL } from '~/main'
 import BaseTimeline from '~/components/BaseTimeline.vue'
 import BasePlaceholder from '~/components/BasePlaceholder.vue'
 import NotificationContainer from '~/components/NotificationContainer.vue'
@@ -491,334 +490,310 @@ import { toast } from '~/main'
 import { stripMarkdownLength } from '~/utils/markdown'
 import TimeManager from '~/utils/time'
 import { reactionEmojiMap } from '~/utils/reactions'
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
+const router = useRouter()
+const route = useRoute()
+const notifications = ref([])
+const isLoadingMessage = ref(false)
+const selectedTab = ref(
+  ['all', 'unread', 'control'].includes(route.query.tab) ? route.query.tab : 'unread',
+)
+const notificationPrefs = ref([])
+const filteredNotifications = computed(() =>
+  selectedTab.value === 'all' ? notifications.value : notifications.value.filter((n) => !n.read),
+)
 
-export default {
-  name: 'MessagePageView',
-  components: { BaseTimeline, BasePlaceholder, NotificationContainer },
-  setup() {
-    const router = useRouter()
-    const route = useRoute()
-    const notifications = ref([])
-    const isLoadingMessage = ref(false)
-    const selectedTab = ref(
-      ['all', 'unread', 'control'].includes(route.query.tab) ? route.query.tab : 'unread',
-    )
-    const notificationPrefs = ref([])
-    const filteredNotifications = computed(() =>
-      selectedTab.value === 'all'
-        ? notifications.value
-        : notifications.value.filter((n) => !n.read),
-    )
+const markRead = async (id) => {
+  if (!id) return
+  const n = notifications.value.find((n) => n.id === id)
+  if (!n || n.read) return
+  n.read = true
+  if (notificationState.unreadCount > 0) notificationState.unreadCount--
+  const ok = await markNotificationsRead([id])
+  if (!ok) {
+    n.read = false
+    notificationState.unreadCount++
+  } else {
+    fetchUnreadCount()
+  }
+}
 
-    const markRead = async (id) => {
-      if (!id) return
-      const n = notifications.value.find((n) => n.id === id)
-      if (!n || n.read) return
-      n.read = true
-      if (notificationState.unreadCount > 0) notificationState.unreadCount--
-      const ok = await markNotificationsRead([id])
-      if (!ok) {
-        n.read = false
-        notificationState.unreadCount++
-      } else {
-        fetchUnreadCount()
-      }
+const markAllRead = async () => {
+  // 除了 REGISTER_REQUEST 类型消息
+  const idsToMark = notifications.value
+    .filter((n) => n.type !== 'REGISTER_REQUEST' && !n.read)
+    .map((n) => n.id)
+  if (idsToMark.length === 0) return
+  notifications.value.forEach((n) => {
+    if (n.type !== 'REGISTER_REQUEST') n.read = true
+  })
+  notificationState.unreadCount = notifications.value.filter((n) => !n.read).length
+  const ok = await markNotificationsRead(idsToMark)
+  if (!ok) {
+    notifications.value.forEach((n) => {
+      if (idsToMark.includes(n.id)) n.read = false
+    })
+    await fetchUnreadCount()
+    return
+  }
+  fetchUnreadCount()
+  if (authState.role === 'ADMIN') {
+    toast.success('已读所有消息（注册请求除外）')
+  } else {
+    toast.success('已读所有消息')
+  }
+}
+
+const iconMap = {
+  POST_VIEWED: 'fas fa-eye',
+  COMMENT_REPLY: 'fas fa-reply',
+  POST_REVIEWED: 'fas fa-shield-alt',
+  POST_REVIEW_REQUEST: 'fas fa-gavel',
+  POST_UPDATED: 'fas fa-comment-dots',
+  USER_ACTIVITY: 'fas fa-user',
+  FOLLOWED_POST: 'fas fa-feather-alt',
+  USER_FOLLOWED: 'fas fa-user-plus',
+  USER_UNFOLLOWED: 'fas fa-user-minus',
+  POST_SUBSCRIBED: 'fas fa-bookmark',
+  POST_UNSUBSCRIBED: 'fas fa-bookmark',
+  REGISTER_REQUEST: 'fas fa-user-clock',
+  ACTIVITY_REDEEM: 'fas fa-coffee',
+  MENTION: 'fas fa-at',
+}
+
+const fetchNotifications = async () => {
+  try {
+    const token = getToken()
+    if (!token) {
+      toast.error('请先登录')
+      return
     }
-
-    const markAllRead = async () => {
-      // 除了 REGISTER_REQUEST 类型消息
-      const idsToMark = notifications.value
-        .filter((n) => n.type !== 'REGISTER_REQUEST' && !n.read)
-        .map((n) => n.id)
-      if (idsToMark.length === 0) return
-      notifications.value.forEach((n) => {
-        if (n.type !== 'REGISTER_REQUEST') n.read = true
-      })
-      notificationState.unreadCount = notifications.value.filter((n) => !n.read).length
-      const ok = await markNotificationsRead(idsToMark)
-      if (!ok) {
-        notifications.value.forEach((n) => {
-          if (idsToMark.includes(n.id)) n.read = false
-        })
-        await fetchUnreadCount()
-        return
-      }
-      fetchUnreadCount()
-      if (authState.role === 'ADMIN') {
-        toast.success('已读所有消息（注册请求除外）')
-      } else {
-        toast.success('已读所有消息')
-      }
+    isLoadingMessage.value = true
+    notifications.value = []
+    const res = await fetch(`${API_BASE_URL}/api/notifications`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    isLoadingMessage.value = false
+    if (!res.ok) {
+      toast.error('获取通知失败')
+      return
     }
+    const data = await res.json()
 
-    const iconMap = {
-      POST_VIEWED: 'fas fa-eye',
-      COMMENT_REPLY: 'fas fa-reply',
-      POST_REVIEWED: 'fas fa-shield-alt',
-      POST_REVIEW_REQUEST: 'fas fa-gavel',
-      POST_UPDATED: 'fas fa-comment-dots',
-      USER_ACTIVITY: 'fas fa-user',
-      FOLLOWED_POST: 'fas fa-feather-alt',
-      USER_FOLLOWED: 'fas fa-user-plus',
-      USER_UNFOLLOWED: 'fas fa-user-minus',
-      POST_SUBSCRIBED: 'fas fa-bookmark',
-      POST_UNSUBSCRIBED: 'fas fa-bookmark',
-      REGISTER_REQUEST: 'fas fa-user-clock',
-      ACTIVITY_REDEEM: 'fas fa-coffee',
-      MENTION: 'fas fa-at',
-    }
-
-    const fetchNotifications = async () => {
-      try {
-        const token = getToken()
-        if (!token) {
-          toast.error('请先登录')
-          return
-        }
-        isLoadingMessage.value = true
-        notifications.value = []
-        const res = await fetch(`${API_BASE_URL}/api/notifications`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
+    for (const n of data) {
+      if (n.type === 'COMMENT_REPLY') {
+        notifications.value.push({
+          ...n,
+          src: n.comment.author.avatar,
+          iconClick: () => {
+            markRead(n.id)
+            router.push(`/users/${n.comment.author.id}`)
           },
         })
-        isLoadingMessage.value = false
-        if (!res.ok) {
-          toast.error('获取通知失败')
-          return
-        }
-        const data = await res.json()
-
-        for (const n of data) {
-          if (n.type === 'COMMENT_REPLY') {
-            notifications.value.push({
-              ...n,
-              src: n.comment.author.avatar,
-              iconClick: () => {
-                markRead(n.id)
-                router.push(`/users/${n.comment.author.id}`)
-              },
-            })
-          } else if (n.type === 'REACTION') {
-            notifications.value.push({
-              ...n,
-              emoji: reactionEmojiMap[n.reactionType],
-              iconClick: () => {
-                if (n.fromUser) {
-                  markRead(n.id)
-                  router.push(`/users/${n.fromUser.id}`)
-                }
-              },
-            })
-          } else if (n.type === 'POST_VIEWED') {
-            notifications.value.push({
-              ...n,
-              src: n.fromUser ? n.fromUser.avatar : null,
-              icon: n.fromUser ? undefined : iconMap[n.type],
-              iconClick: () => {
-                if (n.fromUser) {
-                  markRead(n.id)
-                  router.push(`/users/${n.fromUser.id}`)
-                }
-              },
-            })
-          } else if (n.type === 'POST_UPDATED') {
-            notifications.value.push({
-              ...n,
-              src: n.comment.author.avatar,
-              iconClick: () => {
-                markRead(n.id)
-                router.push(`/users/${n.comment.author.id}`)
-              },
-            })
-          } else if (n.type === 'USER_ACTIVITY') {
-            notifications.value.push({
-              ...n,
-              src: n.comment.author.avatar,
-              iconClick: () => {
-                markRead(n.id)
-                router.push(`/users/${n.comment.author.id}`)
-              },
-            })
-          } else if (n.type === 'MENTION') {
-            notifications.value.push({
-              ...n,
-              icon: iconMap[n.type],
-              iconClick: () => {
-                if (n.fromUser) {
-                  markRead(n.id)
-                  router.push(`/users/${n.fromUser.id}`)
-                }
-              },
-            })
-          } else if (n.type === 'USER_FOLLOWED' || n.type === 'USER_UNFOLLOWED') {
-            notifications.value.push({
-              ...n,
-              icon: iconMap[n.type],
-              iconClick: () => {
-                if (n.fromUser) {
-                  markRead(n.id)
-                  router.push(`/users/${n.fromUser.id}`)
-                }
-              },
-            })
-          } else if (n.type === 'FOLLOWED_POST') {
-            notifications.value.push({
-              ...n,
-              icon: iconMap[n.type],
-              iconClick: () => {
-                if (n.post) {
-                  markRead(n.id)
-                  router.push(`/posts/${n.post.id}`)
-                }
-              },
-            })
-          } else if (n.type === 'POST_SUBSCRIBED' || n.type === 'POST_UNSUBSCRIBED') {
-            notifications.value.push({
-              ...n,
-              icon: iconMap[n.type],
-              iconClick: () => {
-                if (n.post) {
-                  markRead(n.id)
-                  router.push(`/posts/${n.post.id}`)
-                }
-              },
-            })
-          } else if (n.type === 'POST_REVIEW_REQUEST') {
-            notifications.value.push({
-              ...n,
-              src: n.fromUser ? n.fromUser.avatar : null,
-              icon: n.fromUser ? undefined : iconMap[n.type],
-              iconClick: () => {
-                if (n.post) {
-                  markRead(n.id)
-                  router.push(`/posts/${n.post.id}`)
-                }
-              },
-            })
-          } else if (n.type === 'REGISTER_REQUEST') {
-            notifications.value.push({
-              ...n,
-              icon: iconMap[n.type],
-              iconClick: () => {},
-            })
-          } else {
-            notifications.value.push({
-              ...n,
-              icon: iconMap[n.type],
-            })
-          }
-        }
-      } catch (e) {
-        console.error(e)
-      }
-    }
-
-    const fetchPrefs = async () => {
-      notificationPrefs.value = await fetchNotificationPreferences()
-    }
-
-    const togglePref = async (pref) => {
-      const ok = await updateNotificationPreference(pref.type, !pref.enabled)
-      if (ok) {
-        pref.enabled = !pref.enabled
-        await fetchNotifications()
-        await fetchUnreadCount()
+      } else if (n.type === 'REACTION') {
+        notifications.value.push({
+          ...n,
+          emoji: reactionEmojiMap[n.reactionType],
+          iconClick: () => {
+            if (n.fromUser) {
+              markRead(n.id)
+              router.push(`/users/${n.fromUser.id}`)
+            }
+          },
+        })
+      } else if (n.type === 'POST_VIEWED') {
+        notifications.value.push({
+          ...n,
+          src: n.fromUser ? n.fromUser.avatar : null,
+          icon: n.fromUser ? undefined : iconMap[n.type],
+          iconClick: () => {
+            if (n.fromUser) {
+              markRead(n.id)
+              router.push(`/users/${n.fromUser.id}`)
+            }
+          },
+        })
+      } else if (n.type === 'POST_UPDATED') {
+        notifications.value.push({
+          ...n,
+          src: n.comment.author.avatar,
+          iconClick: () => {
+            markRead(n.id)
+            router.push(`/users/${n.comment.author.id}`)
+          },
+        })
+      } else if (n.type === 'USER_ACTIVITY') {
+        notifications.value.push({
+          ...n,
+          src: n.comment.author.avatar,
+          iconClick: () => {
+            markRead(n.id)
+            router.push(`/users/${n.comment.author.id}`)
+          },
+        })
+      } else if (n.type === 'MENTION') {
+        notifications.value.push({
+          ...n,
+          icon: iconMap[n.type],
+          iconClick: () => {
+            if (n.fromUser) {
+              markRead(n.id)
+              router.push(`/users/${n.fromUser.id}`)
+            }
+          },
+        })
+      } else if (n.type === 'USER_FOLLOWED' || n.type === 'USER_UNFOLLOWED') {
+        notifications.value.push({
+          ...n,
+          icon: iconMap[n.type],
+          iconClick: () => {
+            if (n.fromUser) {
+              markRead(n.id)
+              router.push(`/users/${n.fromUser.id}`)
+            }
+          },
+        })
+      } else if (n.type === 'FOLLOWED_POST') {
+        notifications.value.push({
+          ...n,
+          icon: iconMap[n.type],
+          iconClick: () => {
+            if (n.post) {
+              markRead(n.id)
+              router.push(`/posts/${n.post.id}`)
+            }
+          },
+        })
+      } else if (n.type === 'POST_SUBSCRIBED' || n.type === 'POST_UNSUBSCRIBED') {
+        notifications.value.push({
+          ...n,
+          icon: iconMap[n.type],
+          iconClick: () => {
+            if (n.post) {
+              markRead(n.id)
+              router.push(`/posts/${n.post.id}`)
+            }
+          },
+        })
+      } else if (n.type === 'POST_REVIEW_REQUEST') {
+        notifications.value.push({
+          ...n,
+          src: n.fromUser ? n.fromUser.avatar : null,
+          icon: n.fromUser ? undefined : iconMap[n.type],
+          iconClick: () => {
+            if (n.post) {
+              markRead(n.id)
+              router.push(`/posts/${n.post.id}`)
+            }
+          },
+        })
+      } else if (n.type === 'REGISTER_REQUEST') {
+        notifications.value.push({
+          ...n,
+          icon: iconMap[n.type],
+          iconClick: () => {},
+        })
       } else {
-        toast.error('操作失败')
+        notifications.value.push({
+          ...n,
+          icon: iconMap[n.type],
+        })
       }
     }
-
-    const approve = async (id, nid) => {
-      const token = getToken()
-      if (!token) return
-      const res = await fetch(`${API_BASE_URL}/api/admin/users/${id}/approve`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (res.ok) {
-        markRead(nid)
-        toast.success('已同意')
-      } else {
-        toast.error('操作失败')
-      }
-    }
-
-    const reject = async (id, nid) => {
-      const token = getToken()
-      if (!token) return
-      const res = await fetch(`${API_BASE_URL}/api/admin/users/${id}/reject`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (res.ok) {
-        markRead(nid)
-        toast.success('已拒绝')
-      } else {
-        toast.error('操作失败')
-      }
-    }
-
-    const formatType = (t) => {
-      switch (t) {
-        case 'POST_VIEWED':
-          return '帖子被查看'
-        case 'COMMENT_REPLY':
-          return '有人回复了你'
-        case 'REACTION':
-          return '有人点赞'
-        case 'POST_REVIEW_REQUEST':
-          return '帖子待审核'
-        case 'POST_REVIEWED':
-          return '帖子审核结果'
-        case 'POST_UPDATED':
-          return '关注的帖子有新评论'
-        case 'FOLLOWED_POST':
-          return '关注的用户发布了新文章'
-        case 'POST_SUBSCRIBED':
-          return '有人订阅了你的文章'
-        case 'POST_UNSUBSCRIBED':
-          return '有人取消订阅你的文章'
-        case 'USER_FOLLOWED':
-          return '有人关注了你'
-        case 'USER_UNFOLLOWED':
-          return '有人取消关注你'
-        case 'USER_ACTIVITY':
-          return '关注的用户有新动态'
-        case 'MENTION':
-          return '有人提到了你'
-        case 'REGISTER_REQUEST':
-          return '有人申请注册'
-        case 'ACTIVITY_REDEEM':
-          return '有人申请兑换奶茶'
-        default:
-          return t
-      }
-    }
-
-    onMounted(() => {
-      fetchNotifications()
-      fetchPrefs()
-    })
-
-    return {
-      notifications,
-      formatType,
-      isLoadingMessage,
-      stripMarkdownLength,
-      markRead,
-      approve,
-      reject,
-      TimeManager,
-      selectedTab,
-      filteredNotifications,
-      markAllRead,
-      authState,
-      notificationPrefs,
-      togglePref,
-    }
-  },
+  } catch (e) {
+    console.error(e)
+  }
 }
+
+const fetchPrefs = async () => {
+  notificationPrefs.value = await fetchNotificationPreferences()
+}
+
+const togglePref = async (pref) => {
+  const ok = await updateNotificationPreference(pref.type, !pref.enabled)
+  if (ok) {
+    pref.enabled = !pref.enabled
+    await fetchNotifications()
+    await fetchUnreadCount()
+  } else {
+    toast.error('操作失败')
+  }
+}
+
+const approve = async (id, nid) => {
+  const token = getToken()
+  if (!token) return
+  const res = await fetch(`${API_BASE_URL}/api/admin/users/${id}/approve`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (res.ok) {
+    markRead(nid)
+    toast.success('已同意')
+  } else {
+    toast.error('操作失败')
+  }
+}
+
+const reject = async (id, nid) => {
+  const token = getToken()
+  if (!token) return
+  const res = await fetch(`${API_BASE_URL}/api/admin/users/${id}/reject`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (res.ok) {
+    markRead(nid)
+    toast.success('已拒绝')
+  } else {
+    toast.error('操作失败')
+  }
+}
+
+const formatType = (t) => {
+  switch (t) {
+    case 'POST_VIEWED':
+      return '帖子被查看'
+    case 'COMMENT_REPLY':
+      return '有人回复了你'
+    case 'REACTION':
+      return '有人点赞'
+    case 'POST_REVIEW_REQUEST':
+      return '帖子待审核'
+    case 'POST_REVIEWED':
+      return '帖子审核结果'
+    case 'POST_UPDATED':
+      return '关注的帖子有新评论'
+    case 'FOLLOWED_POST':
+      return '关注的用户发布了新文章'
+    case 'POST_SUBSCRIBED':
+      return '有人订阅了你的文章'
+    case 'POST_UNSUBSCRIBED':
+      return '有人取消订阅你的文章'
+    case 'USER_FOLLOWED':
+      return '有人关注了你'
+    case 'USER_UNFOLLOWED':
+      return '有人取消关注你'
+    case 'USER_ACTIVITY':
+      return '关注的用户有新动态'
+    case 'MENTION':
+      return '有人提到了你'
+    case 'REGISTER_REQUEST':
+      return '有人申请注册'
+    case 'ACTIVITY_REDEEM':
+      return '有人申请兑换奶茶'
+    default:
+      return t
+  }
+}
+
+onMounted(() => {
+  fetchNotifications()
+  fetchPrefs()
+})
 </script>
 
 <style scoped>

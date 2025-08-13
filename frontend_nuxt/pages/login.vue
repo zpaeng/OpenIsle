@@ -51,8 +51,8 @@
   </div>
 </template>
 
-<script>
-import { API_BASE_URL, toast } from '~/main'
+<script setup>
+import { toast } from '~/main'
 import { setToken, loadCurrentUser } from '~/utils/auth'
 import { googleAuthorize } from '~/utils/google'
 import { githubAuthorize } from '~/utils/github'
@@ -60,63 +60,54 @@ import { discordAuthorize } from '~/utils/discord'
 import { twitterAuthorize } from '~/utils/twitter'
 import BaseInput from '~/components/BaseInput.vue'
 import { registerPush } from '~/utils/push'
-export default {
-  name: 'LoginPageView',
-  components: { BaseInput },
-  setup() {
-    return { googleAuthorize }
-  },
-  data() {
-    return {
-      username: '',
-      password: '',
-      isWaitingForLogin: false,
-    }
-  },
-  methods: {
-    async submitLogin() {
-      try {
-        this.isWaitingForLogin = true
-        const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: this.username, password: this.password }),
-        })
-        const data = await res.json()
-        if (res.ok && data.token) {
-          setToken(data.token)
-          await loadCurrentUser()
-          toast.success('登录成功')
-          registerPush()
-          this.$router.push('/')
-        } else if (data.reason_code === 'NOT_VERIFIED') {
-          toast.info('当前邮箱未验证，已经为您重新发送验证码')
-          this.$router.push({ path: '/signup', query: { verify: 1, u: this.username } })
-        } else if (data.reason_code === 'IS_APPROVING') {
-          toast.info('您的注册正在审批中, 请留意邮件')
-          this.$router.push('/')
-        } else if (data.reason_code === 'NOT_APPROVED') {
-          this.$router.push('/signup-reason?token=' + data.token)
-        } else {
-          toast.error(data.error || '登录失败')
-        }
-      } catch (e) {
-        toast.error('登录失败')
-      } finally {
-        this.isWaitingForLogin = false
-      }
-    },
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
 
-    loginWithGithub() {
-      githubAuthorize()
-    },
-    loginWithDiscord() {
-      discordAuthorize()
-    },
-    loginWithTwitter() {
-      twitterAuthorize()
-    },
-  },
+const username = ref('')
+const password = ref('')
+const isWaitingForLogin = ref(false)
+
+const submitLogin = async () => {
+  try {
+    isWaitingForLogin.value = true
+    const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: username.value, password: password.value }),
+    })
+    const data = await res.json()
+    if (res.ok && data.token) {
+      setToken(data.token)
+      await loadCurrentUser()
+      toast.success('登录成功')
+      registerPush()
+      router.push('/')
+    } else if (data.reason_code === 'NOT_VERIFIED') {
+      toast.info('当前邮箱未验证，已经为您重新发送验证码')
+      router.push({ path: '/signup', query: { verify: 1, u: username.value } })
+    } else if (data.reason_code === 'IS_APPROVING') {
+      toast.info('您的注册正在审批中, 请留意邮件')
+      router.push('/')
+    } else if (data.reason_code === 'NOT_APPROVED') {
+      router.push('/signup-reason?token=' + data.token)
+    } else {
+      toast.error(data.error || '登录失败')
+    }
+  } catch (e) {
+    toast.error('登录失败')
+  } finally {
+    isWaitingForLogin.value = false
+  }
+}
+
+const loginWithGithub = () => {
+  githubAuthorize()
+}
+const loginWithDiscord = () => {
+  discordAuthorize()
+}
+const loginWithTwitter = () => {
+  twitterAuthorize()
 }
 </script>
 

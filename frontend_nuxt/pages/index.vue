@@ -111,336 +111,305 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref, watch } from 'vue'
 import ArticleCategory from '~/components/ArticleCategory.vue'
 import ArticleTags from '~/components/ArticleTags.vue'
 import CategorySelect from '~/components/CategorySelect.vue'
 import SearchDropdown from '~/components/SearchDropdown.vue'
 import TagSelect from '~/components/TagSelect.vue'
-import { API_BASE_URL } from '~/main'
 import { getToken } from '~/utils/auth'
 import { useScrollLoadMore } from '~/utils/loadMore'
 import { stripMarkdown } from '~/utils/markdown'
 import { useIsMobile } from '~/utils/screen'
 import TimeManager from '~/utils/time'
 
-export default {
-  name: 'HomePageView',
-  components: {
-    CategorySelect,
-    TagSelect,
-    ArticleTags,
-    ArticleCategory,
-    SearchDropdown,
-    ClientOnly: () =>
-      import('vue').then((m) =>
-        m.defineAsyncComponent(() => import('vue').then(() => ({ template: '<slot />' }))),
-      ),
+useHead({
+  title: 'OpenIsle - 全面开源的自由社区',
+  meta: [
+    {
+      name: 'description',
+      content:
+        'OpenIsle 是一个开放的技术与交流社区，致力于为开发者、技术爱好者和创作者们提供一个自由、友好、包容的讨论与协作环境。我们鼓励用户在这里分享知识、交流经验、提出问题、展示作品，并共同推动技术进步与社区成长。',
+    },
+  ],
+})
+
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
+const selectedCategory = ref('')
+const selectedTags = ref([])
+const route = useRoute()
+const tagOptions = ref([])
+const categoryOptions = ref([])
+const isLoadingPosts = ref(false)
+const topics = ref(['最新回复', '最新', '排行榜' /*, '热门', '类别'*/])
+const selectedTopic = ref(
+  route.query.view === 'ranking' ? '排行榜' : route.query.view === 'latest' ? '最新' : '最新回复',
+)
+const articles = ref([])
+const page = ref(0)
+const pageSize = 10
+const isMobile = useIsMobile()
+const allLoaded = ref(false)
+
+const selectedCategorySet = (category) => {
+  const c = decodeURIComponent(category)
+  selectedCategory.value = isNaN(c) ? c : Number(c)
+}
+
+const selectedTagsSet = (tags) => {
+  const t = Array.isArray(tags) ? tags.join(',') : tags
+  selectedTags.value = t
+    .split(',')
+    .filter((v) => v)
+    .map((v) => decodeURIComponent(v))
+    .map((v) => (isNaN(v) ? v : Number(v)))
+}
+
+onMounted(() => {
+  const query = route.query
+  const category = query.category
+  const tags = query.tags
+
+  if (category) {
+    selectedCategorySet(category)
+  }
+  if (tags) {
+    selectedTagsSet(tags)
+  }
+})
+
+watch(
+  () => route.query,
+  () => {
+    const query = route.query
+    const category = query.category
+    const tags = query.tags
+    category && selectedCategorySet(category)
+    tags && selectedTagsSet(tags)
   },
-  async setup() {
-    useHead({
-      title: 'OpenIsle - 全面开源的自由社区',
-      meta: [
-        {
-          name: 'description',
-          content:
-            'OpenIsle 是一个开放的技术与交流社区，致力于为开发者、技术爱好者和创作者们提供一个自由、友好、包容的讨论与协作环境。我们鼓励用户在这里分享知识、交流经验、提出问题、展示作品，并共同推动技术进步与社区成长。',
-        },
-      ],
-    })
-    const selectedCategory = ref('')
-    const selectedTags = ref([])
-    const route = useRoute()
-    const tagOptions = ref([])
-    const categoryOptions = ref([])
-    const isLoadingPosts = ref(false)
-    const topics = ref(['最新回复', '最新', '排行榜' /*, '热门', '类别'*/])
-    const selectedTopic = ref(
-      route.query.view === 'ranking'
-        ? '排行榜'
-        : route.query.view === 'latest'
-          ? '最新'
-          : '最新回复',
-    )
-    const articles = ref([])
-    const page = ref(0)
-    const pageSize = 10
-    const isMobile = useIsMobile()
-    const allLoaded = ref(false)
+)
 
-    const selectedCategorySet = (category) => {
-      const c = decodeURIComponent(category)
-      selectedCategory.value = isNaN(c) ? c : Number(c)
-    }
-
-    const selectedTagsSet = (tags) => {
-      const t = Array.isArray(tags) ? tags.join(',') : tags
-      selectedTags.value = t
-        .split(',')
-        .filter((v) => v)
-        .map((v) => decodeURIComponent(v))
-        .map((v) => (isNaN(v) ? v : Number(v)))
-    }
-
-    onMounted(() => {
-      const query = route.query
-      const category = query.category
-      const tags = query.tags
-
-      if (category) {
-        selectedCategorySet(category)
+const loadOptions = async () => {
+  if (selectedCategory.value && !isNaN(selectedCategory.value)) {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/categories/${selectedCategory.value}`)
+      if (res.ok) {
+        categoryOptions.value = [await res.json()]
       }
-      if (tags) {
-        selectedTagsSet(tags)
-      }
-    })
+    } catch (e) {
+      /* ignore */
+    }
+  }
 
-    watch(
-      () => route.query,
-      () => {
-        const query = route.query
-        const category = query.category
-        const tags = query.tags
-        category && selectedCategorySet(category)
-        tags && selectedTagsSet(tags)
-      },
-    )
-
-    const loadOptions = async () => {
-      if (selectedCategory.value && !isNaN(selectedCategory.value)) {
+  if (selectedTags.value.length) {
+    const arr = []
+    for (const t of selectedTags.value) {
+      if (!isNaN(t)) {
         try {
-          const res = await fetch(`${API_BASE_URL}/api/categories/${selectedCategory.value}`)
-          if (res.ok) {
-            categoryOptions.value = [await res.json()]
-          }
+          const r = await fetch(`${API_BASE_URL}/api/tags/${t}`)
+          if (r.ok) arr.push(await r.json())
         } catch (e) {
           /* ignore */
         }
       }
-
-      if (selectedTags.value.length) {
-        const arr = []
-        for (const t of selectedTags.value) {
-          if (!isNaN(t)) {
-            try {
-              const r = await fetch(`${API_BASE_URL}/api/tags/${t}`)
-              if (r.ok) arr.push(await r.json())
-            } catch (e) {
-              /* ignore */
-            }
-          }
-        }
-        tagOptions.value = arr
-      }
     }
-
-    const buildUrl = () => {
-      let url = `${API_BASE_URL}/api/posts?page=${page.value}&pageSize=${pageSize}`
-      if (selectedCategory.value) {
-        url += `&categoryId=${selectedCategory.value}`
-      }
-      if (selectedTags.value.length) {
-        selectedTags.value.forEach((t) => {
-          url += `&tagIds=${t}`
-        })
-      }
-      return url
-    }
-
-    const buildRankUrl = () => {
-      let url = `${API_BASE_URL}/api/posts/ranking?page=${page.value}&pageSize=${pageSize}`
-      if (selectedCategory.value) {
-        url += `&categoryId=${selectedCategory.value}`
-      }
-      if (selectedTags.value.length) {
-        selectedTags.value.forEach((t) => {
-          url += `&tagIds=${t}`
-        })
-      }
-      return url
-    }
-
-    const buildReplyUrl = () => {
-      let url = `${API_BASE_URL}/api/posts/latest-reply?page=${page.value}&pageSize=${pageSize}`
-      if (selectedCategory.value) {
-        url += `&categoryId=${selectedCategory.value}`
-      }
-      if (selectedTags.value.length) {
-        selectedTags.value.forEach((t) => {
-          url += `&tagIds=${t}`
-        })
-      }
-      return url
-    }
-
-    const fetchPosts = async (reset = false) => {
-      if (reset) {
-        page.value = 0
-        allLoaded.value = false
-        articles.value = []
-      }
-      if (isLoadingPosts.value || allLoaded.value) return
-      try {
-        isLoadingPosts.value = true
-        const token = getToken()
-        const res = await fetch(buildUrl(), {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : '',
-          },
-        })
-        isLoadingPosts.value = false
-        if (!res.ok) return
-        const data = await res.json()
-        articles.value.push(
-          ...data.map((p) => ({
-            id: p.id,
-            title: p.title,
-            description: p.content,
-            category: p.category,
-            tags: p.tags || [],
-            members: (p.participants || []).map((m) => ({ id: m.id, avatar: m.avatar })),
-            comments: p.commentCount,
-            views: p.views,
-            time: TimeManager.format(p.createdAt),
-            pinned: !!p.pinnedAt,
-            type: p.type,
-          })),
-        )
-        if (data.length < pageSize) {
-          allLoaded.value = true
-        } else {
-          page.value += 1
-        }
-      } catch (e) {
-        console.error(e)
-      }
-    }
-
-    const fetchRanking = async (reset = false) => {
-      if (reset) {
-        page.value = 0
-        allLoaded.value = false
-        articles.value = []
-      }
-      if (isLoadingPosts.value || allLoaded.value) return
-      try {
-        isLoadingPosts.value = true
-        const token = getToken()
-        const res = await fetch(buildRankUrl(), {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : '',
-          },
-        })
-        isLoadingPosts.value = false
-        if (!res.ok) return
-        const data = await res.json()
-        articles.value.push(
-          ...data.map((p) => ({
-            id: p.id,
-            title: p.title,
-            description: p.content,
-            category: p.category,
-            tags: p.tags || [],
-            members: (p.participants || []).map((m) => ({ id: m.id, avatar: m.avatar })),
-            comments: p.commentCount,
-            views: p.views,
-            time: TimeManager.format(p.createdAt),
-            pinned: !!p.pinnedAt,
-            type: p.type,
-          })),
-        )
-        if (data.length < pageSize) {
-          allLoaded.value = true
-        } else {
-          page.value += 1
-        }
-      } catch (e) {
-        console.error(e)
-      }
-    }
-
-    const fetchLatestReply = async (reset = false) => {
-      if (reset) {
-        page.value = 0
-        allLoaded.value = false
-        articles.value = []
-      }
-      if (isLoadingPosts.value || allLoaded.value) return
-      try {
-        isLoadingPosts.value = true
-        const token = getToken()
-        const res = await fetch(buildReplyUrl(), {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : '',
-          },
-        })
-        isLoadingPosts.value = false
-        if (!res.ok) return
-        const data = await res.json()
-        articles.value.push(
-          ...data.map((p) => ({
-            id: p.id,
-            title: p.title,
-            description: p.content,
-            category: p.category,
-            tags: p.tags || [],
-            members: (p.participants || []).map((m) => ({ id: m.id, avatar: m.avatar })),
-            comments: p.commentCount,
-            views: p.views,
-            time: TimeManager.format(p.lastReplyAt || p.createdAt),
-            pinned: !!p.pinnedAt,
-            type: p.type,
-          })),
-        )
-        if (data.length < pageSize) {
-          allLoaded.value = true
-        } else {
-          page.value += 1
-        }
-      } catch (e) {
-        console.error(e)
-      }
-    }
-
-    const fetchContent = async (reset = false) => {
-      if (selectedTopic.value === '排行榜') {
-        await fetchRanking(reset)
-      } else if (selectedTopic.value === '最新回复') {
-        await fetchLatestReply(reset)
-      } else {
-        await fetchPosts(reset)
-      }
-    }
-
-    useScrollLoadMore(fetchContent)
-
-    watch([selectedCategory, selectedTags], () => {
-      fetchContent(true)
-    })
-
-    watch(selectedTopic, () => {
-      fetchContent(true)
-    })
-
-    const sanitizeDescription = (text) => stripMarkdown(text)
-
-    await Promise.all([loadOptions(), fetchContent()])
-
-    return {
-      topics,
-      selectedTopic,
-      articles,
-      sanitizeDescription,
-      isLoadingPosts,
-      selectedCategory,
-      selectedTags,
-      tagOptions,
-      categoryOptions,
-      isMobile,
-    }
-  },
+    tagOptions.value = arr
+  }
 }
+
+const buildUrl = () => {
+  let url = `${API_BASE_URL}/api/posts?page=${page.value}&pageSize=${pageSize}`
+  if (selectedCategory.value) {
+    url += `&categoryId=${selectedCategory.value}`
+  }
+  if (selectedTags.value.length) {
+    selectedTags.value.forEach((t) => {
+      url += `&tagIds=${t}`
+    })
+  }
+  return url
+}
+
+const buildRankUrl = () => {
+  let url = `${API_BASE_URL}/api/posts/ranking?page=${page.value}&pageSize=${pageSize}`
+  if (selectedCategory.value) {
+    url += `&categoryId=${selectedCategory.value}`
+  }
+  if (selectedTags.value.length) {
+    selectedTags.value.forEach((t) => {
+      url += `&tagIds=${t}`
+    })
+  }
+  return url
+}
+
+const buildReplyUrl = () => {
+  let url = `${API_BASE_URL}/api/posts/latest-reply?page=${page.value}&pageSize=${pageSize}`
+  if (selectedCategory.value) {
+    url += `&categoryId=${selectedCategory.value}`
+  }
+  if (selectedTags.value.length) {
+    selectedTags.value.forEach((t) => {
+      url += `&tagIds=${t}`
+    })
+  }
+  return url
+}
+
+const fetchPosts = async (reset = false) => {
+  if (reset) {
+    page.value = 0
+    allLoaded.value = false
+    articles.value = []
+  }
+  if (isLoadingPosts.value || allLoaded.value) return
+  try {
+    isLoadingPosts.value = true
+    const token = getToken()
+    const res = await fetch(buildUrl(), {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    })
+    isLoadingPosts.value = false
+    if (!res.ok) return
+    const data = await res.json()
+    articles.value.push(
+      ...data.map((p) => ({
+        id: p.id,
+        title: p.title,
+        description: p.content,
+        category: p.category,
+        tags: p.tags || [],
+        members: (p.participants || []).map((m) => ({ id: m.id, avatar: m.avatar })),
+        comments: p.commentCount,
+        views: p.views,
+        time: TimeManager.format(p.createdAt),
+        pinned: !!p.pinnedAt,
+        type: p.type,
+      })),
+    )
+    if (data.length < pageSize) {
+      allLoaded.value = true
+    } else {
+      page.value += 1
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const fetchRanking = async (reset = false) => {
+  if (reset) {
+    page.value = 0
+    allLoaded.value = false
+    articles.value = []
+  }
+  if (isLoadingPosts.value || allLoaded.value) return
+  try {
+    isLoadingPosts.value = true
+    const token = getToken()
+    const res = await fetch(buildRankUrl(), {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    })
+    isLoadingPosts.value = false
+    if (!res.ok) return
+    const data = await res.json()
+    articles.value.push(
+      ...data.map((p) => ({
+        id: p.id,
+        title: p.title,
+        description: p.content,
+        category: p.category,
+        tags: p.tags || [],
+        members: (p.participants || []).map((m) => ({ id: m.id, avatar: m.avatar })),
+        comments: p.commentCount,
+        views: p.views,
+        time: TimeManager.format(p.createdAt),
+        pinned: !!p.pinnedAt,
+        type: p.type,
+      })),
+    )
+    if (data.length < pageSize) {
+      allLoaded.value = true
+    } else {
+      page.value += 1
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const fetchLatestReply = async (reset = false) => {
+  if (reset) {
+    page.value = 0
+    allLoaded.value = false
+    articles.value = []
+  }
+  if (isLoadingPosts.value || allLoaded.value) return
+  try {
+    isLoadingPosts.value = true
+    const token = getToken()
+    const res = await fetch(buildReplyUrl(), {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    })
+    isLoadingPosts.value = false
+    if (!res.ok) return
+    const data = await res.json()
+    articles.value.push(
+      ...data.map((p) => ({
+        id: p.id,
+        title: p.title,
+        description: p.content,
+        category: p.category,
+        tags: p.tags || [],
+        members: (p.participants || []).map((m) => ({ id: m.id, avatar: m.avatar })),
+        comments: p.commentCount,
+        views: p.views,
+        time: TimeManager.format(p.lastReplyAt || p.createdAt),
+        pinned: !!p.pinnedAt,
+        type: p.type,
+      })),
+    )
+    if (data.length < pageSize) {
+      allLoaded.value = true
+    } else {
+      page.value += 1
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const fetchContent = async (reset = false) => {
+  if (selectedTopic.value === '排行榜') {
+    await fetchRanking(reset)
+  } else if (selectedTopic.value === '最新回复') {
+    await fetchLatestReply(reset)
+  } else {
+    await fetchPosts(reset)
+  }
+}
+
+useScrollLoadMore(fetchContent)
+
+watch([selectedCategory, selectedTags], () => {
+  fetchContent(true)
+})
+
+watch(selectedTopic, () => {
+  fetchContent(true)
+})
+
+const sanitizeDescription = (text) => stripMarkdown(text)
+
+await Promise.all([loadOptions(), fetchContent()])
 </script>
 
 <style scoped>

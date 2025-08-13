@@ -35,186 +35,169 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import PostEditor from '~/components/PostEditor.vue'
 import CategorySelect from '~/components/CategorySelect.vue'
 import TagSelect from '~/components/TagSelect.vue'
-import { API_BASE_URL, toast } from '~/main'
+import { toast } from '~/main'
 import { getToken, authState } from '~/utils/auth'
 import LoginOverlay from '~/components/LoginOverlay.vue'
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
 
-export default {
-  name: 'EditPostPageView',
-  components: { PostEditor, CategorySelect, TagSelect, LoginOverlay },
-  setup() {
-    const title = ref('')
-    const content = ref('')
-    const selectedCategory = ref('')
-    const selectedTags = ref([])
-    const isWaitingPosting = ref(false)
-    const isAiLoading = ref(false)
-    const isLogin = computed(() => authState.loggedIn)
+const title = ref('')
+const content = ref('')
+const selectedCategory = ref('')
+const selectedTags = ref([])
+const isWaitingPosting = ref(false)
+const isAiLoading = ref(false)
+const isLogin = computed(() => authState.loggedIn)
 
-    const route = useRoute()
-    const router = useRouter()
-    const postId = route.params.id
+const route = useRoute()
+const router = useRouter()
+const postId = route.params.id
 
-    const loadPost = async () => {
-      try {
-        const token = getToken()
-        const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        })
-        if (res.ok) {
-          const data = await res.json()
-          title.value = data.title || ''
-          content.value = data.content || ''
-          selectedCategory.value = data.category.id || ''
-          selectedTags.value = (data.tags || []).map((t) => t.id)
-        }
-      } catch (e) {
-        toast.error('加载失败')
-      }
+const loadPost = async () => {
+  try {
+    const token = getToken()
+    const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    if (res.ok) {
+      const data = await res.json()
+      title.value = data.title || ''
+      content.value = data.content || ''
+      selectedCategory.value = data.category.id || ''
+      selectedTags.value = (data.tags || []).map((t) => t.id)
     }
+  } catch (e) {
+    toast.error('加载失败')
+  }
+}
 
-    onMounted(loadPost)
+onMounted(loadPost)
 
-    const clearPost = () => {
-      title.value = ''
-      content.value = ''
-      selectedCategory.value = ''
-      selectedTags.value = []
-    }
+const clearPost = () => {
+  title.value = ''
+  content.value = ''
+  selectedCategory.value = ''
+  selectedTags.value = []
+}
 
-    const ensureTags = async (token) => {
-      for (let i = 0; i < selectedTags.value.length; i++) {
-        const t = selectedTags.value[i]
-        if (typeof t === 'string' && t.startsWith('__new__:')) {
-          const name = t.slice(8)
-          const res = await fetch(`${API_BASE_URL}/api/tags`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ name, description: '' }),
-          })
-          if (res.ok) {
-            const data = await res.json()
-            selectedTags.value[i] = data.id
-            // update local TagSelect options handled by component
-          } else {
-            let data
-            try {
-              data = await res.json()
-            } catch (e) {
-              data = null
-            }
-            toast.error((data && data.error) || '创建标签失败')
-            throw new Error('create tag failed')
-          }
-        }
-      }
-    }
-
-    const aiGenerate = async () => {
-      if (!content.value.trim()) {
-        toast.error('内容为空，无法优化')
-        return
-      }
-      isAiLoading.value = true
-      try {
-        toast.info('AI 优化中...')
-        const token = getToken()
-        const res = await fetch(`${API_BASE_URL}/api/ai/format`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ text: content.value }),
-        })
-        if (res.ok) {
-          const data = await res.json()
-          content.value = data.content || ''
-        } else if (res.status === 429) {
-          toast.error('今日AI优化次数已用尽')
-        } else {
-          toast.error('AI 优化失败')
-        }
-      } catch (e) {
-        toast.error('AI 优化失败')
-      } finally {
-        isAiLoading.value = false
-      }
-    }
-
-    const submitPost = async () => {
-      if (!title.value.trim()) {
-        toast.error('标题不能为空')
-        return
-      }
-      if (!content.value.trim()) {
-        toast.error('内容不能为空')
-        return
-      }
-      if (!selectedCategory.value) {
-        toast.error('请选择分类')
-        return
-      }
-      if (selectedTags.value.length === 0) {
-        toast.error('请选择标签')
-        return
-      }
-      try {
-        const token = getToken()
-        await ensureTags(token)
-        isWaitingPosting.value = true
-        const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            title: title.value,
-            content: content.value,
-            categoryId: selectedCategory.value,
-            tagIds: selectedTags.value,
-          }),
-        })
+const ensureTags = async (token) => {
+  for (let i = 0; i < selectedTags.value.length; i++) {
+    const t = selectedTags.value[i]
+    if (typeof t === 'string' && t.startsWith('__new__:')) {
+      const name = t.slice(8)
+      const res = await fetch(`${API_BASE_URL}/api/tags`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name, description: '' }),
+      })
+      if (res.ok) {
         const data = await res.json()
-        if (res.ok) {
-          toast.success('更新成功')
-          window.location.href = `/posts/${postId}`
-        } else {
-          toast.error(data.error || '更新失败')
+        selectedTags.value[i] = data.id
+        // update local TagSelect options handled by component
+      } else {
+        let data
+        try {
+          data = await res.json()
+        } catch (e) {
+          data = null
         }
-      } catch (e) {
-        toast.error('更新失败')
-      } finally {
-        isWaitingPosting.value = false
+        toast.error((data && data.error) || '创建标签失败')
+        throw new Error('create tag failed')
       }
     }
-    const cancelEdit = () => {
-      router.push(`/posts/${postId}`)
+  }
+}
+
+const aiGenerate = async () => {
+  if (!content.value.trim()) {
+    toast.error('内容为空，无法优化')
+    return
+  }
+  isAiLoading.value = true
+  try {
+    toast.info('AI 优化中...')
+    const token = getToken()
+    const res = await fetch(`${API_BASE_URL}/api/ai/format`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ text: content.value }),
+    })
+    if (res.ok) {
+      const data = await res.json()
+      content.value = data.content || ''
+    } else if (res.status === 429) {
+      toast.error('今日AI优化次数已用尽')
+    } else {
+      toast.error('AI 优化失败')
     }
-    return {
-      title,
-      content,
-      selectedCategory,
-      selectedTags,
-      submitPost,
-      clearPost,
-      cancelEdit,
-      isWaitingPosting,
-      aiGenerate,
-      isAiLoading,
-      isLogin,
+  } catch (e) {
+    toast.error('AI 优化失败')
+  } finally {
+    isAiLoading.value = false
+  }
+}
+
+const submitPost = async () => {
+  if (!title.value.trim()) {
+    toast.error('标题不能为空')
+    return
+  }
+  if (!content.value.trim()) {
+    toast.error('内容不能为空')
+    return
+  }
+  if (!selectedCategory.value) {
+    toast.error('请选择分类')
+    return
+  }
+  if (selectedTags.value.length === 0) {
+    toast.error('请选择标签')
+    return
+  }
+  try {
+    const token = getToken()
+    await ensureTags(token)
+    isWaitingPosting.value = true
+    const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        title: title.value,
+        content: content.value,
+        categoryId: selectedCategory.value,
+        tagIds: selectedTags.value,
+      }),
+    })
+    const data = await res.json()
+    if (res.ok) {
+      toast.success('更新成功')
+      window.location.href = `/posts/${postId}`
+    } else {
+      toast.error(data.error || '更新失败')
     }
-  },
+  } catch (e) {
+    toast.error('更新失败')
+  } finally {
+    isWaitingPosting.value = false
+  }
+}
+const cancelEdit = () => {
+  router.push(`/posts/${postId}`)
 }
 </script>
 
