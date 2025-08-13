@@ -254,6 +254,13 @@ public class PostService {
                 notificationService.createNotification(w, NotificationType.LOTTERY_WIN, lp, null, null, lp.getAuthor(), null, null);
                 notificationService.sendCustomPush(w, "你中奖了", String.format("%s/posts/%d", websiteUrl, lp.getId()));
             }
+            if (lp.getAuthor() != null) {
+                if (lp.getAuthor().getEmail() != null) {
+                    emailSender.sendEmail(lp.getAuthor().getEmail(), "抽奖已开奖", "您的抽奖贴 \"" + lp.getTitle() + "\" 已开奖");
+                }
+                notificationService.createNotification(lp.getAuthor(), NotificationType.LOTTERY_DRAW, lp, null, null, null, null, null);
+                notificationService.sendCustomPush(lp.getAuthor(), "抽奖已开奖", String.format("%s/posts/%d", websiteUrl, lp.getId()));
+            }
         });
     }
 
