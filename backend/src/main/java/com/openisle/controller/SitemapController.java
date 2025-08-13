@@ -22,7 +22,7 @@ import java.util.List;
 public class SitemapController {
     private final PostRepository postRepository;
 
-    @Value("${app.website-url:https://www.open-isle.com}")
+    @Value("${app.website-url}")
     private String websiteUrl;
 
     @GetMapping(value = "/sitemap.xml", produces = MediaType.APPLICATION_XML_VALUE)

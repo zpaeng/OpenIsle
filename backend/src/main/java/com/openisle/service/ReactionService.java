@@ -27,7 +27,7 @@ public class ReactionService {
     private final NotificationService notificationService;
     private final EmailSender emailSender;
 
-    @Value("${app.website-url:https://www.open-isle.com}")
+    @Value("${app.website-url}")
     private String websiteUrl;
 
     @Transactional
