@@ -2,6 +2,15 @@ import { defineNuxtConfig } from 'nuxt/config'
 
 export default defineNuxtConfig({
   ssr: true,
+  runtimeConfig: {
+    public: {
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || '',
+      googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID || '',
+      githubClientId: process.env.NUXT_PUBLIC_GITHUB_CLIENT_ID || '',
+      discordClientId: process.env.NUXT_PUBLIC_DISCORD_CLIENT_ID || '',
+      twitterClientId: process.env.NUXT_PUBLIC_TWITTER_CLIENT_ID || '',
+    },
+  },
   // Ensure Vditor styles load before our overrides in global.css
   css: ['vditor/dist/index.css', '~/assets/global.css'],
   app: {
