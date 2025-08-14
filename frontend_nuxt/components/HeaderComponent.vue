@@ -8,7 +8,7 @@
           </button>
           <span v-if="isMobile && unreadCount > 0" class="menu-unread-dot"></span>
         </div>
-        <NuxtLink class="logo-container" to="/" @click.prevent="goToHome">
+        <NuxtLink class="logo-container" to="/" replace @click="handleLogoClick">
           <img
             alt="OpenIsle"
             src="https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/image.png"
@@ -74,11 +74,10 @@ const searchDropdown = ref(null)
 const userMenu = ref(null)
 const menuBtn = ref(null)
 
-const goToHome = async () => {
+const handleLogoClick = (event) => {
   if (router.currentRoute.value.fullPath === '/') {
+    event.preventDefault()
     window.dispatchEvent(new Event('refresh-home'))
-  } else {
-    await navigateTo('/', { replace: true })
   }
 }
 const search = () => {
