@@ -8,7 +8,7 @@
           </button>
           <span v-if="isMobile && unreadCount > 0" class="menu-unread-dot"></span>
         </div>
-        <NuxtLink class="logo-container" :to="homePath">
+        <NuxtLink class="logo-container" :to="`/`">
           <img
             alt="OpenIsle"
             src="https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/image.png"
@@ -56,10 +56,6 @@ import SearchDropdown from '~/components/SearchDropdown.vue'
 import { authState, clearToken, loadCurrentUser } from '~/utils/auth'
 import { fetchUnreadCount, notificationState } from '~/utils/notification'
 import { useIsMobile } from '~/utils/screen'
-import { withBase } from 'ufo'
-
-const homePath = computed(() => withBase('/'))
-
 const props = defineProps({
   showMenuBtn: {
     type: Boolean,
