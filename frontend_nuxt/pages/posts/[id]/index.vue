@@ -232,7 +232,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch, watchEffect } from 'vue'
 import VueEasyLightbox from 'vue-easy-lightbox'
 import { useRoute } from 'vue-router'
 import CommentItem from '~/components/CommentItem.vue'
@@ -268,7 +268,6 @@ const postReactions = ref([])
 const comments = ref([])
 const status = ref('PUBLISHED')
 const pinnedAt = ref(null)
-const isWaitingFetchingPost = ref(false)
 const isWaitingPostingComment = ref(false)
 const postTime = ref('')
 const postItems = ref([])
@@ -455,38 +454,41 @@ const onCommentDeleted = (id) => {
   fetchComments()
 }
 
-const fetchPost = async () => {
-  try {
-    isWaitingFetchingPost.value = true
-    const token = getToken()
-    const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
-      headers: { Authorization: token ? `Bearer ${token}` : '' },
-    })
-    isWaitingFetchingPost.value = false
-    if (!res.ok) {
-      if (res.status === 404 && process.client) {
-        router.replace('/404')
-      }
-      return
-    }
-    const data = await res.json()
-    postContent.value = data.content
-    author.value = data.author
-    title.value = data.title
-    category.value = data.category
-    tags.value = data.tags || []
-    postReactions.value = data.reactions || []
-    subscribed.value = !!data.subscribed
-    status.value = data.status
-    pinnedAt.value = data.pinnedAt
-    postTime.value = TimeManager.format(data.createdAt)
-    lottery.value = data.lottery || null
-    if (lottery.value && lottery.value.endTime) startCountdown()
-    await nextTick()
-  } catch (e) {
-    console.error(e)
-  }
-}
+const {
+  data: postData,
+  pending: pendingPost,
+  error: postError,
+  refresh: refreshPost,
+} = await useAsyncData(`post-${postId}`, () => $fetch(`${API_BASE_URL}/api/posts/${postId}`), {
+  server: true,
+  lazy: false,
+})
+
+// 用 pendingPost 驱动现有 UI（替代 isWaitingFetchingPost 手控）
+const isWaitingFetchingPost = computed(() => pendingPost.value)
+
+// 同步到现有的响应式字段
+watchEffect(() => {
+  const data = postData.value
+  if (!data) return
+  postContent.value = data.content
+  author.value = data.author
+  title.value = data.title
+  category.value = data.category
+  tags.value = data.tags || []
+  postReactions.value = data.reactions || []
+  subscribed.value = !!data.subscribed
+  status.value = data.status
+  pinnedAt.value = data.pinnedAt
+  postTime.value = TimeManager.format(data.createdAt)
+  lottery.value = data.lottery || null
+  if (lottery.value && lottery.value.endTime) startCountdown()
+})
+
+// 404 客户端跳转
+// if (postError.value?.statusCode === 404 && process.client) {
+//   router.replace('/404')
+// }
 
 const totalPosts = computed(() => comments.value.length + 1)
 const lastReplyTime = computed(() =>
@@ -607,6 +609,7 @@ const approvePost = async () => {
   if (res.ok) {
     status.value = 'PUBLISHED'
     toast.success('已通过审核')
+    await refreshPost()
   } else {
     toast.error('操作失败')
   }
@@ -620,8 +623,8 @@ const pinPost = async () => {
     headers: { Authorization: `Bearer ${token}` },
   })
   if (res.ok) {
-    pinnedAt.value = new Date().toISOString()
     toast.success('已置顶')
+    await refreshPost()
   } else {
     toast.error('操作失败')
   }
@@ -635,8 +638,8 @@ const unpinPost = async () => {
     headers: { Authorization: `Bearer ${token}` },
   })
   if (res.ok) {
-    pinnedAt.value = null
     toast.success('已取消置顶')
+    await refreshPost()
   } else {
     toast.error('操作失败')
   }
@@ -674,6 +677,7 @@ const rejectPost = async () => {
   if (res.ok) {
     status.value = 'REJECTED'
     toast.success('已驳回')
+    await refreshPost()
   } else {
     toast.error('操作失败')
   }
@@ -709,7 +713,7 @@ const joinLottery = async () => {
   })
   if (res.ok) {
     toast.success('已参与抽奖')
-    await fetchPost()
+    await refreshPost()
   } else {
     toast.error('操作失败')
   }
@@ -780,9 +784,8 @@ onMounted(async () => {
   window.addEventListener('scroll', updateCurrentIndex)
   jumpToHashComment()
 })
-
-await fetchPost()
 </script>
+
 <style>
 .post-page-container {
   background-color: var(--background-color);

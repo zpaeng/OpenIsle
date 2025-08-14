@@ -2,6 +2,7 @@ import Vditor from 'vditor'
 import { getToken, authState } from './auth'
 import { searchUsers, fetchFollowings, fetchAdmins } from './user'
 import { tiebaEmoji } from './tiebaEmoji'
+import { useIsMobile } from './screen'
 
 export function getEditorTheme() {
   return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'classic'
@@ -33,7 +34,8 @@ export function createVditor(editorId, options = {}) {
     return searchUsers(value)
   }
 
-  const isMobile = window.innerWidth <= 768
+  const isMobile = useIsMobile()
+
   const toolbar = isMobile
     ? ['emoji', 'upload']
     : [
@@ -164,7 +166,7 @@ export function createVditor(editorId, options = {}) {
     //     }
     //   }
     // },
-    toolbarConfig: { pin: true },
+    toolbarConfig: { pin: isMobile ? false : true },
     cache: { enable: false },
     input,
     after,
