@@ -24,6 +24,7 @@ export async function googleGetIdToken() {
 export function googleAuthorize() {
   const config = useRuntimeConfig()
   const GOOGLE_CLIENT_ID = config.public.googleClientId
+  const WEBSITE_BASE_URL = config.public.websiteBaseUrl
   if (!GOOGLE_CLIENT_ID) {
     toast.error('Google 登录不可用, 请检查网络设置与VPN')
     return
