@@ -52,6 +52,8 @@ export default defineNuxtConfig({
         },
       ],
     },
+    baseURL: '/',
+    buildAssetsDir: '/_nuxt/',
   },
   vue: {
     compilerOptions: {
