@@ -112,7 +112,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import ArticleCategory from '~/components/ArticleCategory.vue'
 import ArticleTags from '~/components/ArticleTags.vue'
 import CategorySelect from '~/components/CategorySelect.vue'
@@ -396,6 +396,18 @@ const fetchContent = async (reset = false) => {
     await fetchPosts(reset)
   }
 }
+
+const refreshHome = () => {
+  fetchContent(true)
+}
+
+onMounted(() => {
+  window.addEventListener('refresh-home', refreshHome)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('refresh-home', refreshHome)
+})
 
 useScrollLoadMore(fetchContent)
 
