@@ -124,10 +124,10 @@
 </template>
 
 <script setup>
+import { ref, computed, watch, onMounted } from 'vue'
 import { themeState, cycleTheme, ThemeMode } from '~/utils/theme'
 import { authState } from '~/utils/auth'
 import { fetchUnreadCount, notificationState } from '~/utils/notification'
-import { ref, computed, watch, onMounted } from 'vue'
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
 
@@ -140,7 +140,6 @@ const props = defineProps({
 
 const emit = defineEmits(['item-click'])
 
-const router = useRouter()
 const categoryOpen = ref(true)
 const tagOpen = ref(true)
 const isLoadingCategory = ref(false)
@@ -193,9 +192,7 @@ onMounted(async () => {
 })
 
 const handleHomeClick = () => {
-  router.push('/').then(() => {
-    window.location.reload()
-  })
+  navigateTo('/', { replace: true })
 }
 
 const handleItemClick = () => {
@@ -209,13 +206,13 @@ const isImageIcon = (icon) => {
 
 const gotoCategory = (c) => {
   const value = encodeURIComponent(c.id ?? c.name)
-  router.push({ path: '/', query: { category: value } })
+  navigateTo({ path: '/', query: { category: value } }, { replace: true })
   handleItemClick()
 }
 
 const gotoTag = (t) => {
   const value = encodeURIComponent(t.id ?? t.name)
-  router.push({ path: '/', query: { tags: value } })
+  navigateTo({ path: '/', query: { tags: value } }, { replace: true })
   handleItemClick()
 }
 

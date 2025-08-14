@@ -106,7 +106,7 @@ const resetPassword = async () => {
     const data = await res.json()
     if (res.ok) {
       toast.success('密码已重置')
-      router.push('/login')
+      navigateTo('/login', { replace: true })
     } else if (data.field === 'password') {
       passwordError.value = data.error
     } else {

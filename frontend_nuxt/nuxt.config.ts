@@ -5,6 +5,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || '',
+      websiteBaseUrl: process.env.NUXT_PUBLIC_WEBSITE_BASE_URL || '',
       googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID || '',
       githubClientId: process.env.NUXT_PUBLIC_GITHUB_CLIENT_ID || '',
       discordClientId: process.env.NUXT_PUBLIC_DISCORD_CLIENT_ID || '',

@@ -1,9 +1,11 @@
-import { GOOGLE_CLIENT_ID, toast } from '../main'
+import { toast } from '../main'
 import { setToken, loadCurrentUser } from './auth'
 import { registerPush } from './push'
-import { WEBSITE_BASE_URL } from '../constants'
 
 export async function googleGetIdToken() {
+  const config = useRuntimeConfig()
+  const GOOGLE_CLIENT_ID = config.public.googleClientId
+
   return new Promise((resolve, reject) => {
     if (!window.google || !GOOGLE_CLIENT_ID) {
       toast.error('Google 登录不可用, 请检查网络设置与VPN')
@@ -20,6 +22,8 @@ export async function googleGetIdToken() {
 }
 
 export function googleAuthorize() {
+  const config = useRuntimeConfig()
+  const GOOGLE_CLIENT_ID = config.public.googleClientId
   if (!GOOGLE_CLIENT_ID) {
     toast.error('Google 登录不可用, 请检查网络设置与VPN')
     return
@@ -67,15 +71,13 @@ export async function googleSignIn(redirect_success, redirect_not_approved) {
   }
 }
 
-import router from '../router'
-
 export function loginWithGoogle() {
   googleSignIn(
     () => {
-      router.push('/')
+      navigateTo('/', { replace: true })
     },
     (token) => {
-      router.push('/signup-reason?token=' + token)
+      navigateTo(`/signup-reason?token=${token}`, { replace: true })
     },
   )
 }

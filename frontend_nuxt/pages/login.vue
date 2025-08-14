@@ -62,7 +62,6 @@ import BaseInput from '~/components/BaseInput.vue'
 import { registerPush } from '~/utils/push'
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
-
 const username = ref('')
 const password = ref('')
 const isWaitingForLogin = ref(false)
@@ -81,15 +80,18 @@ const submitLogin = async () => {
       await loadCurrentUser()
       toast.success('登录成功')
       registerPush()
-      router.push('/')
+      await navigateTo('/', { replace: true })
     } else if (data.reason_code === 'NOT_VERIFIED') {
       toast.info('当前邮箱未验证，已经为您重新发送验证码')
-      router.push({ path: '/signup', query: { verify: 1, u: username.value } })
+      await navigateTo(
+        { path: '/signup', query: { verify: '1', u: username.value } },
+        { replace: true },
+      )
     } else if (data.reason_code === 'IS_APPROVING') {
       toast.info('您的注册正在审批中, 请留意邮件')
-      router.push('/')
+      await navigateTo('/', { replace: true })
     } else if (data.reason_code === 'NOT_APPROVED') {
-      router.push('/signup-reason?token=' + data.token)
+      await navigateTo({ path: '/signup-reason', query: { token: data.token } }, { replace: true })
     } else {
       toast.error(data.error || '登录失败')
     }

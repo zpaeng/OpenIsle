@@ -29,10 +29,10 @@ const error = ref('')
 const isWaitingForRegister = ref(false)
 const token = ref('')
 
-onMounted(() => {
+onMounted(async () => {
   token.value = route.query.token || ''
   if (!token.value) {
-    router.push('/signup')
+    await navigateTo({ path: '/signup' }, { replace: true })
   }
 })
 
@@ -58,10 +58,10 @@ const submit = async () => {
     const data = await res.json()
     if (res.ok) {
       toast.success('注册理由已提交,请等待审核')
-      router.push('/')
+      await navigateTo('/', { replace: true })
     } else if (data.reason_code === 'INVALID_CREDENTIALS') {
       toast.error('登录已过期,请重新登录')
-      router.push('/login')
+      await navigateTo('/login', { replace: true })
     } else {
       toast.error(data.error || '提交失败')
     }

@@ -15,8 +15,10 @@
 import ActivityPopup from '~/components/ActivityPopup.vue'
 import MedalPopup from '~/components/MedalPopup.vue'
 import NotificationSettingPopup from '~/components/NotificationSettingPopup.vue'
-import { API_BASE_URL } from '~/main'
 import { authState } from '~/utils/auth'
+
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
 
 const showMilkTeaPopup = ref(false)
 const milkTeaIcon = ref('')

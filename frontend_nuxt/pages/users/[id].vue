@@ -506,7 +506,7 @@ const unsubscribeUser = async () => {
 
 const gotoTag = (tag) => {
   const value = encodeURIComponent(tag.id ?? tag.name)
-  router.push({ path: '/', query: { tags: value } })
+  navigateTo({ path: '/', query: { tags: value } }, { replace: true })
 }
 
 const init = async () => {

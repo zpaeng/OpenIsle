@@ -11,20 +11,15 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import BasePlaceholder from '~/components/BasePlaceholder.vue'
 
-export default {
-  name: 'UserList',
-  components: { BasePlaceholder },
-  props: {
-    users: { type: Array, default: () => [] },
-  },
-  methods: {
-    handleUserClick(user) {
-      this.$router.push(`/users/${user.id}`)
-    },
-  },
+defineProps({
+  users: { type: Array, default: () => [] },
+})
+
+const handleUserClick = (user) => {
+  navigateTo(`/users/${user.id}`, { replace: true })
 }
 </script>
 

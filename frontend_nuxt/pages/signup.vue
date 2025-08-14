@@ -189,10 +189,10 @@ const verifyCode = async () => {
     const data = await res.json()
     if (res.ok) {
       if (registerMode.value === 'WHITELIST') {
-        router.push('/signup-reason?token=' + data.token)
+        navigateTo(`/signup-reason?token=${data.token}`, { replace: true })
       } else {
         toast.success('注册成功，请登录')
-        router.push('/login')
+        navigateTo('/login', { replace: true })
       }
     } else {
       toast.error(data.error || '注册失败')

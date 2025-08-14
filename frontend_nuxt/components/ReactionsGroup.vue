@@ -54,6 +54,17 @@ import { reactionEmojiMap } from '~/utils/reactions'
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
 const emit = defineEmits(['update:modelValue'])
+const props = defineProps({
+  modelValue: { type: Array, default: () => [] },
+  contentType: { type: String, required: true },
+  contentId: { type: [Number, String], required: true },
+})
+
+watch(
+  () => props.modelValue,
+  (v) => (reactions.value = v),
+)
+
 const reactions = ref(props.modelValue)
 const reactionTypes = ref([])
 
@@ -75,17 +86,6 @@ const fetchTypes = async () => {
   }
   return cachedTypes
 }
-
-const props = defineProps({
-  modelValue: { type: Array, default: () => [] },
-  contentType: { type: String, required: true },
-  contentId: { type: [Number, String], required: true },
-})
-
-watch(
-  () => props.modelValue,
-  (v) => (reactions.value = v),
-)
 
 onMounted(async () => {
   reactionTypes.value = await fetchTypes()

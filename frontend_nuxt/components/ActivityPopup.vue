@@ -11,29 +11,20 @@
   </BasePopup>
 </template>
 
-<script>
+<script setup>
 import BasePopup from '~/components/BasePopup.vue'
-import { useRouter } from 'vue-router'
 
-export default {
-  name: 'ActivityPopup',
-  components: { BasePopup },
-  props: {
-    visible: { type: Boolean, default: false },
-    icon: String,
-    text: String,
-  },
-  emits: ['close'],
-  setup(props, { emit }) {
-    const router = useRouter()
-    const gotoActivity = () => {
-      emit('close')
-      router.push('/activities')
-    }
-    const close = () => emit('close')
-    return { gotoActivity, close }
-  },
+const props = defineProps({
+  visible: { type: Boolean, default: false },
+  icon: String,
+  text: String,
+})
+const emit = defineEmits(['close'])
+const gotoActivity = async () => {
+  emit('close')
+  await navigateTo('/activities', { replace: true })
 }
+const close = () => emit('close')
 </script>
 
 <style scoped>

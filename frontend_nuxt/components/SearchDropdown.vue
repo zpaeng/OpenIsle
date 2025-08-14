@@ -37,17 +37,15 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
 import { useIsMobile } from '~/utils/screen'
-import { useRouter } from 'vue-router'
 import Dropdown from '~/components/Dropdown.vue'
 import { stripMarkdown } from '~/utils/markdown'
+import { ref, watch } from 'vue'
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
 
 const emit = defineEmits(['close'])
 
-const router = useRouter()
 const keyword = ref('')
 const selected = ref(null)
 const results = ref([])
@@ -97,17 +95,17 @@ watch(selected, (val) => {
   const opt = results.value.find((r) => r.id === val)
   if (!opt) return
   if (opt.type === 'post' || opt.type === 'post_title') {
-    router.push(`/posts/${opt.id}`)
+    navigateTo(`/posts/${opt.id}`, { replace: true })
   } else if (opt.type === 'user') {
-    router.push(`/users/${opt.id}`)
+    navigateTo(`/users/${opt.id}`, { replace: true })
   } else if (opt.type === 'comment') {
     if (opt.postId) {
-      router.push(`/posts/${opt.postId}#comment-${opt.id}`)
+      navigateTo(`/posts/${opt.postId}#comment-${opt.id}`, { replace: true })
     }
   } else if (opt.type === 'category') {
-    router.push({ path: '/', query: { category: opt.id } })
+    navigateTo({ path: '/', query: { category: opt.id } }, { replace: true })
   } else if (opt.type === 'tag') {
-    router.push({ path: '/', query: { tags: opt.id } })
+    navigateTo({ path: '/', query: { tags: opt.id } }, { replace: true })
   }
   selected.value = null
   keyword.value = ''

@@ -37,7 +37,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import PostEditor from '~/components/PostEditor.vue'
 import CategorySelect from '~/components/CategorySelect.vue'
 import TagSelect from '~/components/TagSelect.vue'
@@ -56,7 +56,6 @@ const isAiLoading = ref(false)
 const isLogin = computed(() => authState.loggedIn)
 
 const route = useRoute()
-const router = useRouter()
 const postId = route.params.id
 
 const loadPost = async () => {
@@ -197,7 +196,7 @@ const submitPost = async () => {
   }
 }
 const cancelEdit = () => {
-  router.push(`/posts/${postId}`)
+  navigateTo(`/posts/${postId}`, { replace: true })
 }
 </script>
 

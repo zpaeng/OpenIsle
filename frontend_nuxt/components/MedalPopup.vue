@@ -16,33 +16,25 @@
   </BasePopup>
 </template>
 
-<script>
+<script setup>
 import BasePopup from '~/components/BasePopup.vue'
-import { useRouter } from 'vue-router'
 import { authState } from '~/utils/auth'
 
-export default {
-  name: 'MedalPopup',
-  components: { BasePopup },
-  props: {
-    visible: { type: Boolean, default: false },
-    medals: { type: Array, default: () => [] },
-  },
-  emits: ['close'],
-  setup(props, { emit }) {
-    const router = useRouter()
-    const gotoMedals = () => {
-      emit('close')
-      if (authState.username) {
-        router.push(`/users/${authState.username}?tab=achievements`)
-      } else {
-        router.push('/')
-      }
-    }
-    const close = () => emit('close')
-    return { gotoMedals, close }
-  },
+defineProps({
+  visible: { type: Boolean, default: false },
+  medals: { type: Array, default: () => [] },
+})
+const emit = defineEmits(['close'])
+
+const gotoMedals = () => {
+  emit('close')
+  if (authState.username) {
+    navigateTo(`/users/${authState.username}?tab=achievements`, { replace: true })
+  } else {
+    navigateTo('/', { replace: true })
+  }
 }
+const close = () => emit('close')
 </script>
 
 <style scoped>

@@ -1,9 +1,11 @@
-import { GITHUB_CLIENT_ID, toast } from '../main'
+import { toast } from '../main'
 import { setToken, loadCurrentUser } from './auth'
-import { WEBSITE_BASE_URL } from '../constants'
 import { registerPush } from './push'
 
 export function githubAuthorize(state = '') {
+  const config = useRuntimeConfig()
+  const WEBSITE_BASE_URL = config.public.websiteBaseUrl
+  const GITHUB_CLIENT_ID = config.public.githubClientId
   if (!GITHUB_CLIENT_ID) {
     toast.error('GitHub 登录不可用')
     return

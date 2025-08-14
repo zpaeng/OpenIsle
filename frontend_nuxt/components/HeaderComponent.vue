@@ -48,7 +48,7 @@
   </header>
 </template>
 
-<script>
+<script setup>
 import { ClientOnly } from '#components'
 import { computed, nextTick, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -57,141 +57,109 @@ import SearchDropdown from '~/components/SearchDropdown.vue'
 import { authState, clearToken, loadCurrentUser } from '~/utils/auth'
 import { fetchUnreadCount, notificationState } from '~/utils/notification'
 import { useIsMobile } from '~/utils/screen'
-
-export default {
-  name: 'HeaderComponent',
-  components: { DropdownMenu, SearchDropdown },
-  props: {
-    showMenuBtn: {
-      type: Boolean,
-      default: true,
-    },
+const props = defineProps({
+  showMenuBtn: {
+    type: Boolean,
+    default: true,
   },
-  setup(props, { expose }) {
-    const isLogin = computed(() => authState.loggedIn)
-    const isMobile = useIsMobile()
-    const unreadCount = computed(() => notificationState.unreadCount)
-    const router = useRouter()
-    const avatar = ref('')
-    const showSearch = ref(false)
-    const searchDropdown = ref(null)
-    const userMenu = ref(null)
-    const menuBtn = ref(null)
+})
 
-    expose({
-      menuBtn,
-    })
+const isLogin = computed(() => authState.loggedIn)
+const isMobile = useIsMobile()
+const unreadCount = computed(() => notificationState.unreadCount)
+const router = useRouter()
+const avatar = ref('')
+const showSearch = ref(false)
+const searchDropdown = ref(null)
+const userMenu = ref(null)
+const menuBtn = ref(null)
 
-    const goToHome = () => {
-      router.push('/').then(() => {
-        window.location.reload()
-      })
+const goToHome = async () => {
+  await navigateTo('/', { replace: true })
+}
+const search = () => {
+  showSearch.value = true
+  nextTick(() => {
+    searchDropdown.value.toggle()
+  })
+}
+const closeSearch = () => {
+  nextTick(() => {
+    showSearch.value = false
+  })
+}
+const goToLogin = () => {
+  navigateTo('/login', { replace: true })
+}
+const goToSettings = () => {
+  navigateTo('/settings', { replace: true })
+}
+const goToProfile = async () => {
+  if (!authState.loggedIn) {
+    navigateTo('/login', { replace: true })
+    return
+  }
+  let id = authState.username || authState.userId
+  if (!id) {
+    const user = await loadCurrentUser()
+    if (user) {
+      id = user.username || user.id
     }
-    const search = () => {
-      showSearch.value = true
-      nextTick(() => {
-        searchDropdown.value.toggle()
-      })
-    }
-    const closeSearch = () => {
-      nextTick(() => {
-        showSearch.value = false
-      })
-    }
-    const goToLogin = () => {
-      router.push('/login')
-    }
-    const goToSettings = () => {
-      router.push('/settings')
-    }
-    const goToProfile = async () => {
-      if (!authState.loggedIn) {
-        router.push('/login')
-        return
-      }
-      let id = authState.username || authState.userId
-      if (!id) {
-        const user = await loadCurrentUser()
-        if (user) {
-          id = user.username || user.id
-        }
-      }
-      if (id) {
-        router.push(`/users/${id}`)
-      }
-    }
-    const goToSignup = () => {
-      router.push('/signup')
-    }
-    const goToLogout = () => {
-      clearToken()
-      this.$router.push('/login')
-    }
+  }
+  if (id) {
+    navigateTo(`/users/${id}`, { replace: true })
+  }
+}
+const goToSignup = () => {
+  navigateTo('/signup', { replace: true })
+}
+const goToLogout = () => {
+  clearToken()
+  navigateTo('/login', { replace: true })
+}
 
-    const headerMenuItems = computed(() => [
-      { text: '设置', onClick: goToSettings },
-      { text: '个人主页', onClick: goToProfile },
-      { text: '退出', onClick: goToLogout },
-    ])
+const headerMenuItems = computed(() => [
+  { text: '设置', onClick: goToSettings },
+  { text: '个人主页', onClick: goToProfile },
+  { text: '退出', onClick: goToLogout },
+])
 
-    onMounted(async () => {
-      const updateAvatar = async () => {
-        if (authState.loggedIn) {
-          const user = await loadCurrentUser()
-          if (user && user.avatar) {
-            avatar.value = user.avatar
-          }
-        }
+onMounted(async () => {
+  const updateAvatar = async () => {
+    if (authState.loggedIn) {
+      const user = await loadCurrentUser()
+      if (user && user.avatar) {
+        avatar.value = user.avatar
       }
-      const updateUnread = async () => {
-        if (authState.loggedIn) {
-          await fetchUnreadCount()
-        } else {
-          notificationState.unreadCount = 0
-        }
-      }
+    }
+  }
+  const updateUnread = async () => {
+    if (authState.loggedIn) {
+      await fetchUnreadCount()
+    } else {
+      notificationState.unreadCount = 0
+    }
+  }
 
+  await updateAvatar()
+  await updateUnread()
+
+  watch(
+    () => authState.loggedIn,
+    async () => {
       await updateAvatar()
       await updateUnread()
+    },
+  )
 
-      watch(
-        () => authState.loggedIn,
-        async () => {
-          await updateAvatar()
-          await updateUnread()
-        },
-      )
-
-      watch(
-        () => router.currentRoute.value.fullPath,
-        () => {
-          if (userMenu.value) userMenu.value.close()
-          showSearch.value = false
-        },
-      )
-    })
-
-    return {
-      isLogin,
-      isMobile,
-      headerMenuItems,
-      unreadCount,
-      goToHome,
-      search,
-      closeSearch,
-      goToLogin,
-      goToSettings,
-      goToProfile,
-      goToSignup,
-      goToLogout,
-      showSearch,
-      searchDropdown,
-      userMenu,
-      avatar,
-      menuBtn,
-    }
-  },
-}
+  watch(
+    () => router.currentRoute.value.fullPath,
+    () => {
+      if (userMenu.value) userMenu.value.close()
+      showSearch.value = false
+    },
+  )
+})
 </script>
 
 <style scoped>

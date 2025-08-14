@@ -480,7 +480,6 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
 import BaseTimeline from '~/components/BaseTimeline.vue'
 import BasePlaceholder from '~/components/BasePlaceholder.vue'
 import NotificationContainer from '~/components/NotificationContainer.vue'
@@ -492,7 +491,6 @@ import TimeManager from '~/utils/time'
 import { reactionEmojiMap } from '~/utils/reactions'
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
-const router = useRouter()
 const route = useRoute()
 const notifications = ref([])
 const isLoadingMessage = ref(false)
@@ -590,7 +588,7 @@ const fetchNotifications = async () => {
           src: n.comment.author.avatar,
           iconClick: () => {
             markRead(n.id)
-            router.push(`/users/${n.comment.author.id}`)
+            navigateTo(`/users/${n.comment.author.id}`, { replace: true })
           },
         })
       } else if (n.type === 'REACTION') {
@@ -600,7 +598,7 @@ const fetchNotifications = async () => {
           iconClick: () => {
             if (n.fromUser) {
               markRead(n.id)
-              router.push(`/users/${n.fromUser.id}`)
+              navigateTo(`/users/${n.fromUser.id}`, { replace: true })
             }
           },
         })
@@ -612,7 +610,7 @@ const fetchNotifications = async () => {
           iconClick: () => {
             if (n.fromUser) {
               markRead(n.id)
-              router.push(`/users/${n.fromUser.id}`)
+              navigateTo(`/users/${n.fromUser.id}`, { replace: true })
             }
           },
         })
@@ -622,7 +620,7 @@ const fetchNotifications = async () => {
           src: n.comment.author.avatar,
           iconClick: () => {
             markRead(n.id)
-            router.push(`/users/${n.comment.author.id}`)
+            navigateTo(`/users/${n.comment.author.id}`, { replace: true })
           },
         })
       } else if (n.type === 'USER_ACTIVITY') {
@@ -631,7 +629,7 @@ const fetchNotifications = async () => {
           src: n.comment.author.avatar,
           iconClick: () => {
             markRead(n.id)
-            router.push(`/users/${n.comment.author.id}`)
+            navigateTo(`/users/${n.comment.author.id}`, { replace: true })
           },
         })
       } else if (n.type === 'MENTION') {
@@ -641,7 +639,7 @@ const fetchNotifications = async () => {
           iconClick: () => {
             if (n.fromUser) {
               markRead(n.id)
-              router.push(`/users/${n.fromUser.id}`)
+              navigateTo(`/users/${n.fromUser.id}`, { replace: true })
             }
           },
         })
@@ -652,7 +650,7 @@ const fetchNotifications = async () => {
           iconClick: () => {
             if (n.fromUser) {
               markRead(n.id)
-              router.push(`/users/${n.fromUser.id}`)
+              navigateTo(`/users/${n.fromUser.id}`, { replace: true })
             }
           },
         })
@@ -663,7 +661,7 @@ const fetchNotifications = async () => {
           iconClick: () => {
             if (n.post) {
               markRead(n.id)
-              router.push(`/posts/${n.post.id}`)
+              navigateTo(`/posts/${n.post.id}`, { replace: true })
             }
           },
         })
@@ -674,7 +672,7 @@ const fetchNotifications = async () => {
           iconClick: () => {
             if (n.post) {
               markRead(n.id)
-              router.push(`/posts/${n.post.id}`)
+              navigateTo(`/posts/${n.post.id}`, { replace: true })
             }
           },
         })
@@ -686,7 +684,7 @@ const fetchNotifications = async () => {
           iconClick: () => {
             if (n.post) {
               markRead(n.id)
-              router.push(`/posts/${n.post.id}`)
+              navigateTo(`/posts/${n.post.id}`, { replace: true })
             }
           },
         })

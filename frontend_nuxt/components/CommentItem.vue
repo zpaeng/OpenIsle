@@ -91,7 +91,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import VueEasyLightbox from 'vue-easy-lightbox'
-import { useRouter } from 'vue-router'
 import { toast } from '~/main'
 import { authState, getToken } from '~/utils/auth'
 import { handleMarkdownClick, renderMarkdown } from '~/utils/markdown'
@@ -121,7 +120,6 @@ const props = defineProps({
 
 const emit = defineEmits(['deleted'])
 
-const router = useRouter()
 const showReplies = ref(props.level === 0 ? true : props.defaultShowReplies)
 watch(
   () => props.defaultShowReplies,
@@ -237,11 +235,11 @@ const submitReply = async (parentUserName, text, clear) => {
           reply: [],
           openReplies: false,
           src: r.author.avatar,
-          iconClick: () => router.push(`/users/${r.author.id}`),
+          iconClick: () => navigateTo(`/users/${r.author.id}`),
         })),
         openReplies: false,
         src: data.author.avatar,
-        iconClick: () => router.push(`/users/${data.author.id}`),
+        iconClick: () => navigateTo(`/users/${data.author.id}`),
       })
       clear()
       showEditor.value = false

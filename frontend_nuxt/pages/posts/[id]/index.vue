@@ -343,7 +343,7 @@ const startCountdown = () => {
   updateCountdown()
   countdownTimer = setInterval(updateCountdown, 1000)
 }
-const gotoUser = (id) => router.push(`/users/${id}`)
+const gotoUser = (id) => navigateTo(`/users/${id}`, { replace: true })
 const articleMenuItems = computed(() => {
   const items = []
   if (isAuthor.value || isAdmin.value) {
@@ -394,7 +394,7 @@ const mapComment = (c, parentUserName = '', level = 0) => ({
   reply: (c.replies || []).map((r) => mapComment(r, c.author.username, level + 1)),
   openReplies: level === 0,
   src: c.author.avatar,
-  iconClick: () => router.push(`/users/${c.author.id}`),
+  iconClick: () => navigateTo(`/users/${c.author.id}`, { replace: true }),
   parentUserName: parentUserName,
 })
 
@@ -641,7 +641,7 @@ const unpinPost = async () => {
 }
 
 const editPost = () => {
-  router.push(`/posts/${postId}/edit`)
+  navigateTo(`/posts/${postId}/edit`, { replace: true })
 }
 
 const deletePost = async () => {
@@ -656,7 +656,7 @@ const deletePost = async () => {
   })
   if (res.ok) {
     toast.success('已删除')
-    router.push('/')
+    navigateTo('/', { replace: true })
   } else {
     toast.error('操作失败')
   }
@@ -766,7 +766,7 @@ const jumpToHashComment = async () => {
 }
 
 const gotoProfile = () => {
-  router.push(`/users/${author.value.id}`)
+  navigateTo(`/users/${author.value.id}`, { replace: true })
 }
 
 onMounted(async () => {

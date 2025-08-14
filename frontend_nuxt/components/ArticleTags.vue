@@ -17,24 +17,14 @@
   </div>
 </template>
 
-<script>
-import { useRouter } from 'vue-router'
+<script setup>
+defineProps({
+  tags: { type: Array, default: () => [] },
+})
 
-export default {
-  name: 'ArticleTags',
-  props: {
-    tags: { type: Array, default: () => [] },
-  },
-  setup() {
-    const router = useRouter()
-    const gotoTag = (tag) => {
-      const value = encodeURIComponent(tag.id ?? tag.name)
-      router.push({ path: '/', query: { tags: value } }).then(() => {
-        window.location.reload()
-      })
-    }
-    return { gotoTag }
-  },
+const gotoTag = async (tag) => {
+  const value = encodeURIComponent(tag.id ?? tag.name)
+  await navigateTo({ path: '/', query: { tags: value } }, { replace: true })
 }
 </script>
 

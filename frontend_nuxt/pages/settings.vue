@@ -65,6 +65,7 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import AvatarCropper from '~/components/AvatarCropper.vue'
 import BaseInput from '~/components/BaseInput.vue'
 import Dropdown from '~/components/Dropdown.vue'
@@ -72,7 +73,6 @@ import { toast } from '~/main'
 import { fetchCurrentUser, getToken, setToken } from '~/utils/auth'
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
-const router = useRouter()
 const username = ref('')
 const introduction = ref('')
 const usernameError = ref('')
@@ -102,7 +102,7 @@ onMounted(async () => {
     }
   } else {
     toast.error('请先登录')
-    router.push('/login')
+    navigateTo('/login', { replace: true })
   }
   isLoadingPage.value = false
 })
