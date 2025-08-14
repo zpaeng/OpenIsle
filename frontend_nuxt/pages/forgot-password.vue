@@ -2,6 +2,7 @@
   <div class="forgot-page">
     <div class="forgot-content">
       <div class="forgot-title">找回密码</div>
+ 
       <div v-if="step === 0" class="step-content">
         <BaseInput icon="fas fa-envelope" v-model="email" placeholder="邮箱" />
         <div v-if="emailError" class="error-message">{{ emailError }}</div>
@@ -19,6 +20,10 @@
         <div class="primary-button" @click="resetPassword" v-if="!isResetting">重置密码</div>
         <div class="primary-button disabled" v-else>提交中...</div>
       </div>
+      <div class="hint-message">
+        <i class="fas fa-info-circle"></i>
+        使用 Google 注册的用户可使用对应的邮箱进行找回密码
+      </div>
     </div>
   </div>
 </template>
@@ -26,6 +31,8 @@
 <script setup>
 import { toast } from '~/main'
 import BaseInput from '~/components/BaseInput.vue'
+import { useRoute } from 'vue-router'
+
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
 
@@ -39,6 +46,7 @@ const passwordError = ref('')
 const isSending = ref(false)
 const isVerifying = ref(false)
 const isResetting = ref(false)
+const route = useRoute()
 
 onMounted(() => {
   if (route.query.email) {
@@ -136,6 +144,21 @@ const resetPassword = async () => {
 .forgot-title {
   font-size: 24px;
   font-weight: bold;
+}
+
+.forgot-content .hint-message {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  font-size: 13px;
+  color: var(--blockquote-text-color);
+}
+
+.hint-message i {
+  color: var(--primary-color);
+  font-size: 14px;
 }
 .step-content {
   display: flex;
