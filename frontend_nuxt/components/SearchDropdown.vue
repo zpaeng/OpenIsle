@@ -110,6 +110,10 @@ watch(selected, (val) => {
   selected.value = null
   keyword.value = ''
 })
+
+defineExpose({
+  toggle,
+})
 </script>
 
 <style scoped>
