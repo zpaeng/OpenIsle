@@ -8,7 +8,7 @@
           </button>
           <span v-if="isMobile && unreadCount > 0" class="menu-unread-dot"></span>
         </div>
-        <div class="logo-container" @click="goToHome">
+        <NuxtLink class="logo-container" to="/">
           <img
             alt="OpenIsle"
             src="https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/image.png"
@@ -16,7 +16,7 @@
             height="60"
           />
           <div class="logo-text">OpenIsle</div>
-        </div>
+        </NuxtLink>
       </div>
 
       <ClientOnly>
@@ -184,6 +184,8 @@ onMounted(async () => {
   font-size: 20px;
   font-weight: bold;
   cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 }
 
 .header-content {
