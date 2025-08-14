@@ -339,19 +339,6 @@ watch(
   { immediate: true },
 )
 
-/** 外部刷新事件（发帖后刷新首屏） **/
-const refreshHome = async () => {
-  selectedCategory.value = ''
-  selectedTags.value = []
-  await refreshFirst()
-}
-onMounted(() => {
-  window.addEventListener('refresh-home', refreshHome)
-})
-onBeforeUnmount(() => {
-  window.removeEventListener('refresh-home', refreshHome)
-})
-
 /** 切换分类/标签/Tab：useAsyncData 已 watch，这里只需确保 options 加载 **/
 watch([selectedCategory, selectedTags], () => {
   loadOptions()
