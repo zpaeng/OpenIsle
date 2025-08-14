@@ -12,7 +12,7 @@ export default defineNuxtConfig({
       twitterClientId: process.env.NUXT_PUBLIC_TWITTER_CLIENT_ID || '',
     },
   },
-  // Ensure Vditor styles load before our overrides in global.css
+  // 确保 Vditor 样式在 global.css 覆盖前加载
   css: ['vditor/dist/index.css', '~/assets/fonts.css', '~/assets/global.css'],
   app: {
     head: {
