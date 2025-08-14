@@ -1,4 +1,3 @@
-import { API_BASE_URL } from '../main'
 import { getToken } from './auth'
 
 function urlBase64ToUint8Array(base64String) {
@@ -21,6 +20,8 @@ function arrayBufferToBase64(buffer) {
 
 export async function registerPush() {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return
+  const config = useRuntimeConfig()
+  const API_BASE_URL = config.public.apiBaseUrl
   try {
     const reg = await navigator.serviceWorker.register('/notifications-sw.js')
     const res = await fetch(`${API_BASE_URL}/api/push/public-key`)

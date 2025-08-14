@@ -46,11 +46,27 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import { API_BASE_URL, toast } from '~/main'
+import { toast } from '~/main'
 import { authState, getToken } from '~/utils/auth'
 import { reactionEmojiMap } from '~/utils/reactions'
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
+const emit = defineEmits(['update:modelValue'])
+const props = defineProps({
+  modelValue: { type: Array, default: () => [] },
+  contentType: { type: String, required: true },
+  contentId: { type: [Number, String], required: true },
+})
+
+watch(
+  () => props.modelValue,
+  (v) => (reactions.value = v),
+)
+
+const reactions = ref(props.modelValue)
+const reactionTypes = ref([])
 
 let cachedTypes = null
 const fetchTypes = async () => {
@@ -71,151 +87,118 @@ const fetchTypes = async () => {
   return cachedTypes
 }
 
-export default {
-  name: 'ReactionsGroup',
-  props: {
-    modelValue: { type: Array, default: () => [] },
-    contentType: { type: String, required: true },
-    contentId: { type: [Number, String], required: true },
-  },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const reactions = ref(props.modelValue)
-    watch(
-      () => props.modelValue,
-      (v) => (reactions.value = v),
-    )
+onMounted(async () => {
+  reactionTypes.value = await fetchTypes()
+})
 
-    const reactionTypes = ref([])
-    onMounted(async () => {
-      reactionTypes.value = await fetchTypes()
+const counts = computed(() => {
+  const c = {}
+  for (const r of reactions.value) {
+    c[r.type] = (c[r.type] || 0) + 1
+  }
+  return c
+})
+
+const totalCount = computed(() => Object.values(counts.value).reduce((a, b) => a + b, 0))
+const likeCount = computed(() => counts.value['LIKE'] || 0)
+
+const userReacted = (type) =>
+  reactions.value.some((r) => r.type === type && r.user === authState.username)
+
+const displayedReactions = computed(() => {
+  return Object.entries(counts.value)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([type]) => ({ type }))
+})
+
+const panelTypes = computed(() => reactionTypes.value.filter((t) => t !== 'LIKE'))
+
+const panelVisible = ref(false)
+let hideTimer = null
+const openPanel = () => {
+  clearTimeout(hideTimer)
+  panelVisible.value = true
+}
+const scheduleHide = () => {
+  clearTimeout(hideTimer)
+  hideTimer = setTimeout(() => {
+    panelVisible.value = false
+  }, 500)
+}
+const cancelHide = () => {
+  clearTimeout(hideTimer)
+}
+
+const toggleReaction = async (type) => {
+  const token = getToken()
+  if (!token) {
+    toast.error('请先登录')
+    return
+  }
+  const url =
+    props.contentType === 'post'
+      ? `${API_BASE_URL}/api/posts/${props.contentId}/reactions`
+      : `${API_BASE_URL}/api/comments/${props.contentId}/reactions`
+
+  // optimistic update
+  const existingIdx = reactions.value.findIndex(
+    (r) => r.type === type && r.user === authState.username,
+  )
+  let tempReaction = null
+  let removedReaction = null
+  if (existingIdx > -1) {
+    removedReaction = reactions.value.splice(existingIdx, 1)[0]
+  } else {
+    tempReaction = { type, user: authState.username }
+    reactions.value.push(tempReaction)
+  }
+  emit('update:modelValue', reactions.value)
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ type }),
     })
-
-    const counts = computed(() => {
-      const c = {}
-      for (const r of reactions.value) {
-        c[r.type] = (c[r.type] || 0) + 1
-      }
-      return c
-    })
-
-    const totalCount = computed(() => Object.values(counts.value).reduce((a, b) => a + b, 0))
-    const likeCount = computed(() => counts.value['LIKE'] || 0)
-
-    const userReacted = (type) =>
-      reactions.value.some((r) => r.type === type && r.user === authState.username)
-
-    const displayedReactions = computed(() => {
-      return Object.entries(counts.value)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .map(([type]) => ({ type }))
-    })
-
-    const panelTypes = computed(() => reactionTypes.value.filter((t) => t !== 'LIKE'))
-
-    const panelVisible = ref(false)
-    let hideTimer = null
-    const openPanel = () => {
-      clearTimeout(hideTimer)
-      panelVisible.value = true
-    }
-    const scheduleHide = () => {
-      clearTimeout(hideTimer)
-      hideTimer = setTimeout(() => {
-        panelVisible.value = false
-      }, 500)
-    }
-    const cancelHide = () => {
-      clearTimeout(hideTimer)
-    }
-
-    const toggleReaction = async (type) => {
-      const token = getToken()
-      if (!token) {
-        toast.error('请先登录')
-        return
-      }
-      const url =
-        props.contentType === 'post'
-          ? `${API_BASE_URL}/api/posts/${props.contentId}/reactions`
-          : `${API_BASE_URL}/api/comments/${props.contentId}/reactions`
-
-      // optimistic update
-      const existingIdx = reactions.value.findIndex(
-        (r) => r.type === type && r.user === authState.username,
-      )
-      let tempReaction = null
-      let removedReaction = null
-      if (existingIdx > -1) {
-        removedReaction = reactions.value.splice(existingIdx, 1)[0]
+    if (res.ok) {
+      if (res.status === 204) {
+        // removal already reflected
       } else {
-        tempReaction = { type, user: authState.username }
-        reactions.value.push(tempReaction)
+        const data = await res.json()
+        const idx = tempReaction ? reactions.value.indexOf(tempReaction) : -1
+        if (idx > -1) {
+          reactions.value.splice(idx, 1, data)
+        } else if (removedReaction) {
+          // server added back reaction even though we removed? restore data
+          reactions.value.push(data)
+        }
+        if (data.reward && data.reward > 0) {
+          toast.success(`获得 ${data.reward} 经验值`)
+        }
       }
       emit('update:modelValue', reactions.value)
-
-      try {
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ type }),
-        })
-        if (res.ok) {
-          if (res.status === 204) {
-            // removal already reflected
-          } else {
-            const data = await res.json()
-            const idx = tempReaction ? reactions.value.indexOf(tempReaction) : -1
-            if (idx > -1) {
-              reactions.value.splice(idx, 1, data)
-            } else if (removedReaction) {
-              // server added back reaction even though we removed? restore data
-              reactions.value.push(data)
-            }
-            if (data.reward && data.reward > 0) {
-              toast.success(`获得 ${data.reward} 经验值`)
-            }
-          }
-          emit('update:modelValue', reactions.value)
-        } else {
-          // revert optimistic update on failure
-          if (tempReaction) {
-            const idx = reactions.value.indexOf(tempReaction)
-            if (idx > -1) reactions.value.splice(idx, 1)
-          } else if (removedReaction) {
-            reactions.value.push(removedReaction)
-          }
-          emit('update:modelValue', reactions.value)
-          toast.error('操作失败')
-        }
-      } catch (e) {
-        if (tempReaction) {
-          const idx = reactions.value.indexOf(tempReaction)
-          if (idx > -1) reactions.value.splice(idx, 1)
-        } else if (removedReaction) {
-          reactions.value.push(removedReaction)
-        }
-        emit('update:modelValue', reactions.value)
-        toast.error('操作失败')
+    } else {
+      // revert optimistic update on failure
+      if (tempReaction) {
+        const idx = reactions.value.indexOf(tempReaction)
+        if (idx > -1) reactions.value.splice(idx, 1)
+      } else if (removedReaction) {
+        reactions.value.push(removedReaction)
       }
+      emit('update:modelValue', reactions.value)
+      toast.error('操作失败')
     }
-
-    return {
-      reactionEmojiMap,
-      counts,
-      totalCount,
-      likeCount,
-      displayedReactions,
-      panelTypes,
-      panelVisible,
-      openPanel,
-      scheduleHide,
-      cancelHide,
-      toggleReaction,
-      userReacted,
+  } catch (e) {
+    if (tempReaction) {
+      const idx = reactions.value.indexOf(tempReaction)
+      if (idx > -1) reactions.value.splice(idx, 1)
+    } else if (removedReaction) {
+      reactions.value.push(removedReaction)
     }
-  },
+    emit('update:modelValue', reactions.value)
+    toast.error('操作失败')
+  }
 }
 </script>
 

@@ -29,35 +29,28 @@
   </div>
 </template>
 
-<script>
-import { API_BASE_URL } from '~/main'
+<script setup>
 import TimeManager from '~/utils/time'
 import MilkTeaActivityComponent from '~/components/MilkTeaActivityComponent.vue'
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
 
-export default {
-  name: 'ActivityListPageView',
-  components: { MilkTeaActivityComponent },
-  data() {
-    return {
-      activities: [],
-      TimeManager,
-      isLoadingActivities: false,
+const activities = ref([])
+const isLoadingActivities = ref(false)
+
+onMounted(async () => {
+  isLoadingActivities.value = true
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/activities`)
+    if (res.ok) {
+      activities.value = await res.json()
     }
-  },
-  async mounted() {
-    this.isLoadingActivities = true
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/activities`)
-      if (res.ok) {
-        this.activities = await res.json()
-      }
-    } catch (e) {
-      console.error(e)
-    } finally {
-      this.isLoadingActivities = false
-    }
-  },
-}
+  } catch (e) {
+    console.error(e)
+  } finally {
+    isLoadingActivities.value = false
+  }
+})
 </script>
 
 <style scoped>

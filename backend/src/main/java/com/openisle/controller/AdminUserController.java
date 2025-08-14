@@ -18,7 +18,7 @@ public class AdminUserController {
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
     private final EmailSender emailSender;
-    @Value("${app.website-url:https://www.open-isle.com}")
+    @Value("${app.website-url}")
     private String websiteUrl;
 
     @PostMapping("/{id}/approve")

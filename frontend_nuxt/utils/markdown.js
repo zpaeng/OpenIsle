@@ -52,9 +52,11 @@ function tiebaEmojiPlugin(md) {
 
 // 链接在新窗口打开
 function linkPlugin(md) {
-  const defaultRender = md.renderer.rules.link_open || function(tokens, idx, options, env, self) {
-    return self.renderToken(tokens, idx, options)
-  }
+  const defaultRender =
+    md.renderer.rules.link_open ||
+    function (tokens, idx, options, env, self) {
+      return self.renderToken(tokens, idx, options)
+    }
 
   md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
     const token = tokens[idx]

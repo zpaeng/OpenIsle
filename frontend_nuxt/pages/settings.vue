@@ -64,173 +64,168 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted } from 'vue'
 import AvatarCropper from '~/components/AvatarCropper.vue'
 import BaseInput from '~/components/BaseInput.vue'
 import Dropdown from '~/components/Dropdown.vue'
-import { API_BASE_URL, toast } from '~/main'
+import { toast } from '~/main'
 import { fetchCurrentUser, getToken, setToken } from '~/utils/auth'
-export default {
-  name: 'SettingsPageView',
-  components: { BaseInput, Dropdown, AvatarCropper },
-  data() {
-    return {
-      username: '',
-      introduction: '',
-      usernameError: '',
-      avatar: '',
-      avatarFile: null,
-      tempAvatar: '',
-      showCropper: false,
-      role: '',
-      publishMode: 'DIRECT',
-      passwordStrength: 'LOW',
-      aiFormatLimit: 3,
-      registerMode: 'DIRECT',
-      isLoadingPage: false,
-      isSaving: false,
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
+const username = ref('')
+const introduction = ref('')
+const usernameError = ref('')
+const avatar = ref('')
+const avatarFile = ref(null)
+const tempAvatar = ref('')
+const showCropper = ref(false)
+const role = ref('')
+const publishMode = ref('DIRECT')
+const passwordStrength = ref('LOW')
+const aiFormatLimit = ref(3)
+const registerMode = ref('DIRECT')
+const isLoadingPage = ref(false)
+const isSaving = ref(false)
+
+onMounted(async () => {
+  isLoadingPage.value = true
+  const user = await fetchCurrentUser()
+
+  if (user) {
+    username.value = user.username
+    introduction.value = user.introduction || ''
+    avatar.value = user.avatar
+    role.value = user.role
+    if (role.value === 'ADMIN') {
+      loadAdminConfig()
     }
-  },
-  async mounted() {
-    this.isLoadingPage = true
-    const user = await fetchCurrentUser()
+  } else {
+    toast.error('请先登录')
+    navigateTo('/login', { replace: true })
+  }
+  isLoadingPage.value = false
+})
 
-    if (user) {
-      this.username = user.username
-      this.introduction = user.introduction || ''
-      this.avatar = user.avatar
-      this.role = user.role
-      if (this.role === 'ADMIN') {
-        this.loadAdminConfig()
-      }
-    } else {
-      toast.error('请先登录')
-      this.$router.push('/login')
+const onAvatarChange = (e) => {
+  const file = e.target.files[0]
+  if (file) {
+    const reader = new FileReader()
+    reader.onload = () => {
+      tempAvatar.value = reader.result
+      showCropper.value = true
     }
-    this.isLoadingPage = false
-  },
-  methods: {
-    onAvatarChange(e) {
-      const file = e.target.files[0]
-      if (file) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          this.tempAvatar = reader.result
-          this.showCropper = true
-        }
-        reader.readAsDataURL(file)
+    reader.readAsDataURL(file)
+  }
+}
+const onCropped = ({ file, url }) => {
+  avatarFile.value = file
+  avatar.value = url
+}
+const fetchPublishModes = () => {
+  return Promise.resolve([
+    { id: 'DIRECT', name: '直接发布', icon: 'fas fa-bolt' },
+    { id: 'REVIEW', name: '审核后发布', icon: 'fas fa-search' },
+  ])
+}
+const fetchPasswordStrengths = () => {
+  return Promise.resolve([
+    { id: 'LOW', name: '低', icon: 'fas fa-lock-open' },
+    { id: 'MEDIUM', name: '中', icon: 'fas fa-lock' },
+    { id: 'HIGH', name: '高', icon: 'fas fa-user-shield' },
+  ])
+}
+const fetchAiLimits = () => {
+  return Promise.resolve([
+    { id: 3, name: '3次' },
+    { id: 5, name: '5次' },
+    { id: 10, name: '10次' },
+    { id: -1, name: '无限' },
+  ])
+}
+const fetchRegisterModes = () => {
+  return Promise.resolve([
+    { id: 'DIRECT', name: '直接注册', icon: 'fas fa-user-check' },
+    { id: 'WHITELIST', name: '白名单邀请制', icon: 'fas fa-envelope' },
+  ])
+}
+const loadAdminConfig = async () => {
+  try {
+    const token = getToken()
+    const res = await fetch(`${API_BASE_URL}/api/admin/config`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (res.ok) {
+      const data = await res.json()
+      publishMode.value = data.publishMode
+      passwordStrength.value = data.passwordStrength
+      aiFormatLimit.value = data.aiFormatLimit
+      registerMode.value = data.registerMode
+    }
+  } catch (e) {
+    // ignore
+  }
+}
+const save = async () => {
+  isSaving.value = true
+
+  do {
+    let token = getToken()
+    usernameError.value = ''
+    if (!username.value) {
+      usernameError.value = '用户名不能为空'
+    }
+    if (usernameError.value) {
+      toast.error(usernameError.value)
+      break
+    }
+    if (avatarFile.value) {
+      const form = new FormData()
+      form.append('file', avatarFile.value)
+      const res = await fetch(`${API_BASE_URL}/api/users/me/avatar`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: form,
+      })
+      const data = await res.json()
+      if (res.ok) {
+        avatar.value = data.url
+      } else {
+        toast.error(data.error || '上传失败')
+        break
       }
-    },
-    onCropped({ file, url }) {
-      this.avatarFile = file
-      this.avatar = url
-    },
-    fetchPublishModes() {
-      return Promise.resolve([
-        { id: 'DIRECT', name: '直接发布', icon: 'fas fa-bolt' },
-        { id: 'REVIEW', name: '审核后发布', icon: 'fas fa-search' },
-      ])
-    },
-    fetchPasswordStrengths() {
-      return Promise.resolve([
-        { id: 'LOW', name: '低', icon: 'fas fa-lock-open' },
-        { id: 'MEDIUM', name: '中', icon: 'fas fa-lock' },
-        { id: 'HIGH', name: '高', icon: 'fas fa-user-shield' },
-      ])
-    },
-    fetchAiLimits() {
-      return Promise.resolve([
-        { id: 3, name: '3次' },
-        { id: 5, name: '5次' },
-        { id: 10, name: '10次' },
-        { id: -1, name: '无限' },
-      ])
-    },
-    fetchRegisterModes() {
-      return Promise.resolve([
-        { id: 'DIRECT', name: '直接注册', icon: 'fas fa-user-check' },
-        { id: 'WHITELIST', name: '白名单邀请制', icon: 'fas fa-envelope' },
-      ])
-    },
-    async loadAdminConfig() {
-      try {
-        const token = getToken()
-        const res = await fetch(`${API_BASE_URL}/api/admin/config`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        if (res.ok) {
-          const data = await res.json()
-          this.publishMode = data.publishMode
-          this.passwordStrength = data.passwordStrength
-          this.aiFormatLimit = data.aiFormatLimit
-          this.registerMode = data.registerMode
-        }
-      } catch (e) {
-        // ignore
-      }
-    },
-    async save() {
-      this.isSaving = true
+    }
+    const res = await fetch(`${API_BASE_URL}/api/users/me`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ username: username.value, introduction: introduction.value }),
+    })
 
-      do {
-        let token = getToken()
-        this.usernameError = ''
-        if (!this.username) {
-          this.usernameError = '用户名不能为空'
-        }
-        if (this.usernameError) {
-          toast.error(this.usernameError)
-          break
-        }
-        if (this.avatarFile) {
-          const form = new FormData()
-          form.append('file', this.avatarFile)
-          const res = await fetch(`${API_BASE_URL}/api/users/me/avatar`, {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${token}` },
-            body: form,
-          })
-          const data = await res.json()
-          if (res.ok) {
-            this.avatar = data.url
-          } else {
-            toast.error(data.error || '上传失败')
-            break
-          }
-        }
-        const res = await fetch(`${API_BASE_URL}/api/users/me`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ username: this.username, introduction: this.introduction }),
-        })
+    const data = await res.json()
+    if (!res.ok) {
+      toast.error(data.error || '保存失败')
+      break
+    }
+    if (data.token) {
+      setToken(data.token)
+      token = data.token
+    }
+    if (role.value === 'ADMIN') {
+      await fetch(`${API_BASE_URL}/api/admin/config`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          publishMode: publishMode.value,
+          passwordStrength: passwordStrength.value,
+          aiFormatLimit: aiFormatLimit.value,
+          registerMode: registerMode.value,
+        }),
+      })
+    }
+    toast.success('保存成功')
+  } while (!isSaving.value)
 
-        const data = await res.json()
-        if (!res.ok) {
-          toast.error(data.error || '保存失败')
-          break
-        }
-        if (data.token) {
-          setToken(data.token)
-          token = data.token
-        }
-        if (this.role === 'ADMIN') {
-          await fetch(`${API_BASE_URL}/api/admin/config`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({
-              publishMode: this.publishMode,
-              passwordStrength: this.passwordStrength,
-              aiFormatLimit: this.aiFormatLimit,
-              registerMode: this.registerMode,
-            }),
-          })
-        }
-        toast.success('保存成功')
-      } while (!this.isSaving)
-
-      this.isSaving = false
-    },
-  },
+  isSaving.value = false
 }
 </script>
 

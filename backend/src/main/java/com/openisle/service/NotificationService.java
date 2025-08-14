@@ -36,7 +36,7 @@ public class NotificationService {
     private final ReactionRepository reactionRepository;
     private final Executor notificationExecutor;
 
-    @Value("${app.website-url:https://www.open-isle.com}")
+    @Value("${app.website-url}")
     private String websiteUrl;
 
     private static final Pattern MENTION_PATTERN = Pattern.compile("@\\[([^\\]]+)\\]");

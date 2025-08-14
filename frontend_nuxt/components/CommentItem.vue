@@ -90,11 +90,10 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { computed, ref, watch } from 'vue'
 import VueEasyLightbox from 'vue-easy-lightbox'
-import { useRouter } from 'vue-router'
-import { API_BASE_URL, toast } from '~/main'
+import { toast } from '~/main'
 import { authState, getToken } from '~/utils/auth'
 import { handleMarkdownClick, renderMarkdown } from '~/utils/markdown'
 import { getMedalTitle } from '~/utils/medal'
@@ -102,271 +101,236 @@ import TimeManager from '~/utils/time'
 import BaseTimeline from '~/components/BaseTimeline.vue'
 import CommentEditor from '~/components/CommentEditor.vue'
 import DropdownMenu from '~/components/DropdownMenu.vue'
-import LoginOverlay from '~/components/LoginOverlay.vue'
 import ReactionsGroup from '~/components/ReactionsGroup.vue'
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
 
-const CommentItem = {
-  name: 'CommentItem',
-  emits: ['deleted'],
-  props: {
-    comment: {
-      type: Object,
-      required: true,
-    },
-    level: {
-      type: Number,
-      default: 0,
-    },
-    defaultShowReplies: {
-      type: Boolean,
-      default: false,
-    },
-    postAuthorId: {
-      type: [Number, String],
-      required: true,
-    },
+const props = defineProps({
+  comment: {
+    type: Object,
+    required: true,
   },
-  setup(props, { emit }) {
-    const router = useRouter()
-    const showReplies = ref(props.level === 0 ? true : props.defaultShowReplies)
-    watch(
-      () => props.defaultShowReplies,
-      (val) => {
-        showReplies.value = props.level === 0 ? true : val
-      },
-    )
-    const showEditor = ref(false)
-    const editorWrapper = ref(null)
-    const isWaitingForReply = ref(false)
-    const lightboxVisible = ref(false)
-    const lightboxIndex = ref(0)
-    const lightboxImgs = ref([])
-    const loggedIn = computed(() => authState.loggedIn)
-    const countReplies = (list) => list.reduce((sum, r) => sum + 1 + countReplies(r.reply || []), 0)
-    const replyCount = computed(() => countReplies(props.comment.reply || []))
-    const toggleReplies = () => {
-      showReplies.value = !showReplies.value
-    }
-    const toggleEditor = () => {
-      showEditor.value = !showEditor.value
-      if (showEditor.value) {
-        setTimeout(() => {
-          editorWrapper.value?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-        }, 100)
-      }
-    }
-
-    // 合并所有子回复为一个扁平数组
-    const flattenReplies = (list) => {
-      let result = []
-      for (const r of list) {
-        result.push(r)
-        if (r.reply && r.reply.length > 0) {
-          result = result.concat(flattenReplies(r.reply))
-        }
-      }
-      return result
-    }
-
-    const replyList = computed(() => {
-      if (props.level < 1) {
-        return props.comment.reply
-      }
-
-      return flattenReplies(props.comment.reply || [])
-    })
-
-    const isAuthor = computed(() => authState.username === props.comment.userName)
-    const isPostAuthor = computed(() => Number(authState.userId) === Number(props.postAuthorId))
-    const isAdmin = computed(() => authState.role === 'ADMIN')
-    const commentMenuItems = computed(() => {
-      const items = []
-      if (isAuthor.value || isAdmin.value) {
-        items.push({ text: '删除评论', color: 'red', onClick: () => deleteComment() })
-      }
-      if (isAdmin.value || isPostAuthor.value) {
-        if (props.comment.pinned) {
-          items.push({ text: '取消置顶', onClick: () => unpinComment() })
-        } else {
-          items.push({ text: '置顶', onClick: () => pinComment() })
-        }
-      }
-      return items
-    })
-    const deleteComment = async () => {
-      const token = getToken()
-      if (!token) {
-        toast.error('请先登录')
-        return
-      }
-      console.debug('Deleting comment', props.comment.id)
-      const res = await fetch(`${API_BASE_URL}/api/comments/${props.comment.id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      console.debug('Delete comment response status', res.status)
-      if (res.ok) {
-        toast.success('已删除')
-        emit('deleted', props.comment.id)
-      } else {
-        toast.error('操作失败')
-      }
-    }
-    const pinComment = async () => {
-      const token = getToken()
-      if (!token) {
-        toast.error('请先登录')
-        return
-      }
-      const url = isAdmin.value
-        ? `${API_BASE_URL}/api/admin/comments/${props.comment.id}/pin`
-        : `${API_BASE_URL}/api/comments/${props.comment.id}/pin`
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (res.ok) {
-        props.comment.pinned = true
-        toast.success('已置顶')
-      } else {
-        toast.error('操作失败')
-      }
-    }
-    const unpinComment = async () => {
-      const token = getToken()
-      if (!token) {
-        toast.error('请先登录')
-        return
-      }
-      const url = isAdmin.value
-        ? `${API_BASE_URL}/api/admin/comments/${props.comment.id}/unpin`
-        : `${API_BASE_URL}/api/comments/${props.comment.id}/unpin`
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (res.ok) {
-        props.comment.pinned = false
-        toast.success('已取消置顶')
-      } else {
-        toast.error('操作失败')
-      }
-    }
-    const submitReply = async (parentUserName, text, clear) => {
-      if (!text.trim()) return
-      isWaitingForReply.value = true
-      const token = getToken()
-      if (!token) {
-        toast.error('请先登录')
-        isWaitingForReply.value = false
-        return
-      }
-      console.debug('Submitting reply', { parentId: props.comment.id, text })
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/comments/${props.comment.id}/replies`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ content: text }),
-        })
-        console.debug('Submit reply response status', res.status)
-        if (res.ok) {
-          const data = await res.json()
-          console.debug('Submit reply response data', data)
-          const replyList = props.comment.reply || (props.comment.reply = [])
-          replyList.push({
-            id: data.id,
-            userName: data.author.username,
-            time: TimeManager.format(data.createdAt),
-            avatar: data.author.avatar,
-            medal: data.author.displayMedal,
-            text: data.content,
-            parentUserName: parentUserName,
-            reactions: [],
-            reply: (data.replies || []).map((r) => ({
-              id: r.id,
-              userName: r.author.username,
-              time: TimeManager.format(r.createdAt),
-              avatar: r.author.avatar,
-              text: r.content,
-              reactions: r.reactions || [],
-              reply: [],
-              openReplies: false,
-              src: r.author.avatar,
-              iconClick: () => router.push(`/users/${r.author.id}`),
-            })),
-            openReplies: false,
-            src: data.author.avatar,
-            iconClick: () => router.push(`/users/${data.author.id}`),
-          })
-          clear()
-          showEditor.value = false
-          toast.success('回复成功')
-        } else if (res.status === 429) {
-          toast.error('回复过于频繁，请稍后再试')
-        } else {
-          toast.error(`回复失败: ${res.status} ${res.statusText}`)
-        }
-      } catch (e) {
-        console.debug('Submit reply error', e)
-        toast.error(`回复失败: ${e.message}`)
-      } finally {
-        isWaitingForReply.value = false
-      }
-    }
-    const copyCommentLink = () => {
-      const link = `${location.origin}${location.pathname}#comment-${props.comment.id}`
-      navigator.clipboard.writeText(link).then(() => {
-        toast.success('已复制')
-      })
-    }
-    const handleContentClick = (e) => {
-      handleMarkdownClick(e)
-      if (e.target.tagName === 'IMG') {
-        const container = e.target.parentNode
-        const imgs = [...container.querySelectorAll('img')].map((i) => i.src)
-        lightboxImgs.value = imgs
-        lightboxIndex.value = imgs.indexOf(e.target.src)
-        lightboxVisible.value = true
-      }
-    }
-    return {
-      showReplies,
-      toggleReplies,
-      showEditor,
-      toggleEditor,
-      submitReply,
-      copyCommentLink,
-      renderMarkdown,
-      isWaitingForReply,
-      commentMenuItems,
-      deleteComment,
-      pinComment,
-      unpinComment,
-      isPostAuthor,
-      lightboxVisible,
-      lightboxIndex,
-      lightboxImgs,
-      handleContentClick,
-      loggedIn,
-      replyCount,
-      replyList,
-      getMedalTitle,
-      editorWrapper,
-    }
+  level: {
+    type: Number,
+    default: 0,
   },
+  defaultShowReplies: {
+    type: Boolean,
+    default: false,
+  },
+  postAuthorId: {
+    type: [Number, String],
+    required: true,
+  },
+})
+
+const emit = defineEmits(['deleted'])
+
+const showReplies = ref(props.level === 0 ? true : props.defaultShowReplies)
+watch(
+  () => props.defaultShowReplies,
+  (val) => {
+    showReplies.value = props.level === 0 ? true : val
+  },
+)
+const showEditor = ref(false)
+const editorWrapper = ref(null)
+const isWaitingForReply = ref(false)
+const lightboxVisible = ref(false)
+const lightboxIndex = ref(0)
+const lightboxImgs = ref([])
+const loggedIn = computed(() => authState.loggedIn)
+const countReplies = (list) => list.reduce((sum, r) => sum + 1 + countReplies(r.reply || []), 0)
+const replyCount = computed(() => countReplies(props.comment.reply || []))
+
+const toggleReplies = () => {
+  showReplies.value = !showReplies.value
 }
 
-CommentItem.components = {
-  CommentItem,
-  CommentEditor,
-  BaseTimeline,
-  ReactionsGroup,
-  DropdownMenu,
-  VueEasyLightbox,
-  LoginOverlay,
+const toggleEditor = () => {
+  showEditor.value = !showEditor.value
+  if (showEditor.value) {
+    setTimeout(() => {
+      editorWrapper.value?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }, 100)
+  }
 }
 
-export default CommentItem
+const flattenReplies = (list) => {
+  let result = []
+  for (const r of list) {
+    result.push(r)
+    if (r.reply && r.reply.length > 0) {
+      result = result.concat(flattenReplies(r.reply))
+    }
+  }
+  return result
+}
+
+const replyList = computed(() => {
+  if (props.level < 1) {
+    return props.comment.reply
+  }
+
+  return flattenReplies(props.comment.reply || [])
+})
+
+const isAuthor = computed(() => authState.username === props.comment.userName)
+const isPostAuthor = computed(() => Number(authState.userId) === Number(props.postAuthorId))
+const isAdmin = computed(() => authState.role === 'ADMIN')
+const commentMenuItems = computed(() => {
+  const items = []
+  if (isAuthor.value || isAdmin.value) {
+    items.push({ text: '删除评论', color: 'red', onClick: () => deleteComment() })
+  }
+  if (isAdmin.value || isPostAuthor.value) {
+    if (props.comment.pinned) {
+      items.push({ text: '取消置顶', onClick: () => unpinComment() })
+    } else {
+      items.push({ text: '置顶', onClick: () => pinComment() })
+    }
+  }
+  return items
+})
+const deleteComment = async () => {
+  const token = getToken()
+  if (!token) {
+    toast.error('请先登录')
+    return
+  }
+  console.debug('Deleting comment', props.comment.id)
+  const res = await fetch(`${API_BASE_URL}/api/comments/${props.comment.id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  console.debug('Delete comment response status', res.status)
+  if (res.ok) {
+    toast.success('已删除')
+    emit('deleted', props.comment.id)
+  } else {
+    toast.error('操作失败')
+  }
+}
+const submitReply = async (parentUserName, text, clear) => {
+  if (!text.trim()) return
+  isWaitingForReply.value = true
+  const token = getToken()
+  if (!token) {
+    toast.error('请先登录')
+    isWaitingForReply.value = false
+    return
+  }
+  console.debug('Submitting reply', { parentId: props.comment.id, text })
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/comments/${props.comment.id}/replies`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ content: text }),
+    })
+    console.debug('Submit reply response status', res.status)
+    if (res.ok) {
+      const data = await res.json()
+      console.debug('Submit reply response data', data)
+      const replyList = props.comment.reply || (props.comment.reply = [])
+      replyList.push({
+        id: data.id,
+        userName: data.author.username,
+        time: TimeManager.format(data.createdAt),
+        avatar: data.author.avatar,
+        medal: data.author.displayMedal,
+        text: data.content,
+        parentUserName: parentUserName,
+        reactions: [],
+        reply: (data.replies || []).map((r) => ({
+          id: r.id,
+          userName: r.author.username,
+          time: TimeManager.format(r.createdAt),
+          avatar: r.author.avatar,
+          text: r.content,
+          reactions: r.reactions || [],
+          reply: [],
+          openReplies: false,
+          src: r.author.avatar,
+          iconClick: () => navigateTo(`/users/${r.author.id}`),
+        })),
+        openReplies: false,
+        src: data.author.avatar,
+        iconClick: () => navigateTo(`/users/${data.author.id}`),
+      })
+      clear()
+      showEditor.value = false
+      toast.success('回复成功')
+    } else if (res.status === 429) {
+      toast.error('回复过于频繁，请稍后再试')
+    } else {
+      toast.error(`回复失败: ${res.status} ${res.statusText}`)
+    }
+  } catch (e) {
+    console.debug('Submit reply error', e)
+    toast.error(`回复失败: ${e.message}`)
+  } finally {
+    isWaitingForReply.value = false
+  }
+}
+
+const pinComment = async () => {
+  const token = getToken()
+  if (!token) {
+    toast.error('请先登录')
+    return
+  }
+  const url = isAdmin.value
+    ? `${API_BASE_URL}/api/admin/comments/${props.comment.id}/pin`
+    : `${API_BASE_URL}/api/comments/${props.comment.id}/pin`
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (res.ok) {
+    props.comment.pinned = true
+    toast.success('已置顶')
+  } else {
+    toast.error('操作失败')
+  }
+}
+const unpinComment = async () => {
+  const token = getToken()
+  if (!token) {
+    toast.error('请先登录')
+    return
+  }
+  const url = isAdmin.value
+    ? `${API_BASE_URL}/api/admin/comments/${props.comment.id}/unpin`
+    : `${API_BASE_URL}/api/comments/${props.comment.id}/unpin`
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (res.ok) {
+    props.comment.pinned = false
+    toast.success('已取消置顶')
+  } else {
+    toast.error('操作失败')
+  }
+}
+
+const copyCommentLink = () => {
+  const link = `${location.origin}${location.pathname}#comment-${props.comment.id}`
+  navigator.clipboard.writeText(link).then(() => {
+    toast.success('已复制')
+  })
+}
+
+const handleContentClick = (e) => {
+  handleMarkdownClick(e)
+  if (e.target.tagName === 'IMG') {
+    const container = e.target.parentNode
+    const imgs = [...container.querySelectorAll('img')].map((i) => i.src)
+    lightboxImgs.value = imgs
+    lightboxIndex.value = imgs.indexOf(e.target.src)
+    lightboxVisible.value = true
+  }
+}
 </script>
 
 <style scoped>

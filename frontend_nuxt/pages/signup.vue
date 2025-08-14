@@ -89,135 +89,128 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import BaseInput from '~/components/BaseInput.vue'
-import { API_BASE_URL, toast } from '~/main'
+import { toast } from '~/main'
 import { discordAuthorize } from '~/utils/discord'
 import { githubAuthorize } from '~/utils/github'
 import { googleAuthorize } from '~/utils/google'
 import { twitterAuthorize } from '~/utils/twitter'
-export default {
-  name: 'SignupPageView',
-  components: { BaseInput },
-  setup() {
-    return { googleAuthorize }
-  },
-  data() {
-    return {
-      emailStep: 0,
-      email: '',
-      username: '',
-      password: '',
-      registerMode: 'DIRECT',
-      emailError: '',
-      usernameError: '',
-      passwordError: '',
-      code: '',
-      isWaitingForEmailSent: false,
-      isWaitingForEmailVerified: false,
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
+const emailStep = ref(0)
+const email = ref('')
+const username = ref('')
+const password = ref('')
+const registerMode = ref('DIRECT')
+const emailError = ref('')
+const usernameError = ref('')
+const passwordError = ref('')
+const code = ref('')
+const isWaitingForEmailSent = ref(false)
+const isWaitingForEmailVerified = ref(false)
+
+onMounted(async () => {
+  username.value = route.query.u || ''
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/config`)
+    if (res.ok) {
+      const data = await res.json()
+      registerMode.value = data.registerMode
     }
-  },
-  async mounted() {
-    this.username = this.$route.query.u || ''
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/config`)
-      if (res.ok) {
-        const data = await res.json()
-        this.registerMode = data.registerMode
-      }
-    } catch {
-      /* ignore */
+  } catch {
+    /* ignore */
+  }
+  if (route.query.verify) {
+    emailStep.value = 1
+  }
+})
+
+const clearErrors = () => {
+  emailError.value = ''
+  usernameError.value = ''
+  passwordError.value = ''
+}
+
+const sendVerification = async () => {
+  clearErrors()
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(email.value)) {
+    emailError.value = '邮箱格式不正确'
+  }
+  if (!password.value || password.value.length < 6) {
+    passwordError.value = '密码至少6位'
+  }
+  if (!username.value) {
+    usernameError.value = '用户名不能为空'
+  }
+  if (emailError.value || passwordError.value || usernameError.value) {
+    return
+  }
+  try {
+    isWaitingForEmailSent.value = true
+    const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: username.value,
+        email: email.value,
+        password: password.value,
+      }),
+    })
+    isWaitingForEmailSent.value = false
+    const data = await res.json()
+    if (res.ok) {
+      emailStep.value = 1
+      toast.success('验证码已发送，请查看邮箱')
+    } else if (data.field) {
+      if (data.field === 'username') usernameError.value = data.error
+      if (data.field === 'email') emailError.value = data.error
+      if (data.field === 'password') passwordError.value = data.error
+    } else {
+      toast.error(data.error || '发送失败')
     }
-    if (this.$route.query.verify) {
-      this.emailStep = 1
+  } catch (e) {
+    toast.error('发送失败')
+  }
+}
+
+const verifyCode = async () => {
+  try {
+    isWaitingForEmailVerified.value = true
+    const res = await fetch(`${API_BASE_URL}/api/auth/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code: code.value,
+        username: username.value,
+      }),
+    })
+    const data = await res.json()
+    if (res.ok) {
+      if (registerMode.value === 'WHITELIST') {
+        navigateTo(`/signup-reason?token=${data.token}`, { replace: true })
+      } else {
+        toast.success('注册成功，请登录')
+        navigateTo('/login', { replace: true })
+      }
+    } else {
+      toast.error(data.error || '注册失败')
     }
-  },
-  methods: {
-    clearErrors() {
-      this.emailError = ''
-      this.usernameError = ''
-      this.passwordError = ''
-    },
-    async sendVerification() {
-      this.clearErrors()
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (!emailRegex.test(this.email)) {
-        this.emailError = '邮箱格式不正确'
-      }
-      if (!this.password || this.password.length < 6) {
-        this.passwordError = '密码至少6位'
-      }
-      if (!this.username) {
-        this.usernameError = '用户名不能为空'
-      }
-      if (this.emailError || this.passwordError || this.usernameError) {
-        return
-      }
-      try {
-        this.isWaitingForEmailSent = true
-        const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username: this.username,
-            email: this.email,
-            password: this.password,
-          }),
-        })
-        this.isWaitingForEmailSent = false
-        const data = await res.json()
-        if (res.ok) {
-          this.emailStep = 1
-          toast.success('验证码已发送，请查看邮箱')
-        } else if (data.field) {
-          if (data.field === 'username') this.usernameError = data.error
-          if (data.field === 'email') this.emailError = data.error
-          if (data.field === 'password') this.passwordError = data.error
-        } else {
-          toast.error(data.error || '发送失败')
-        }
-      } catch (e) {
-        toast.error('发送失败')
-      }
-    },
-    async verifyCode() {
-      try {
-        this.isWaitingForEmailVerified = true
-        const res = await fetch(`${API_BASE_URL}/api/auth/verify`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            code: this.code,
-            username: this.username,
-          }),
-        })
-        const data = await res.json()
-        if (res.ok) {
-          if (this.registerMode === 'WHITELIST') {
-            this.$router.push('/signup-reason?token=' + data.token)
-          } else {
-            toast.success('注册成功，请登录')
-            this.$router.push('/login')
-          }
-        } else {
-          toast.error(data.error || '注册失败')
-        }
-      } catch (e) {
-        toast.error('注册失败')
-      } finally {
-        this.isWaitingForEmailVerified = false
-      }
-    },
-    signupWithGithub() {
-      githubAuthorize()
-    },
-    signupWithDiscord() {
-      discordAuthorize()
-    },
-    signupWithTwitter() {
-      twitterAuthorize()
-    },
-  },
+  } catch (e) {
+    toast.error('注册失败')
+  } finally {
+    isWaitingForEmailVerified.value = false
+  }
+}
+const signupWithGithub = () => {
+  githubAuthorize()
+}
+const signupWithDiscord = () => {
+  discordAuthorize()
+}
+const signupWithTwitter = () => {
+  twitterAuthorize()
 }
 </script>
 

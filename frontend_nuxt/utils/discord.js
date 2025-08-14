@@ -1,9 +1,11 @@
-import { API_BASE_URL, DISCORD_CLIENT_ID, toast } from '../main'
-import { WEBSITE_BASE_URL } from '../constants'
+import { toast } from '../main'
 import { setToken, loadCurrentUser } from './auth'
 import { registerPush } from './push'
 
 export function discordAuthorize(state = '') {
+  const config = useRuntimeConfig()
+  const WEBSITE_BASE_URL = config.public.websiteBaseUrl
+  const DISCORD_CLIENT_ID = config.public.discordClientId
   if (!DISCORD_CLIENT_ID) {
     toast.error('Discord 登录不可用')
     return
@@ -15,6 +17,8 @@ export function discordAuthorize(state = '') {
 
 export async function discordExchange(code, state, reason) {
   try {
+    const config = useRuntimeConfig()
+    const API_BASE_URL = config.public.apiBaseUrl
     const res = await fetch(`${API_BASE_URL}/api/auth/discord`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

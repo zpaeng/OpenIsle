@@ -26,49 +26,43 @@
   </Dropdown>
 </template>
 
-<script>
+<script setup>
 import { computed, ref, watch } from 'vue'
-import { API_BASE_URL } from '~/main'
 import Dropdown from '~/components/Dropdown.vue'
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
 
-export default {
-  name: 'CategorySelect',
-  components: { Dropdown },
-  props: {
-    modelValue: { type: [String, Number], default: '' },
-    options: { type: Array, default: () => [] },
+const props = defineProps({
+  modelValue: { type: [String, Number], default: '' },
+  options: { type: Array, default: () => [] },
+})
+
+const emit = defineEmits(['update:modelValue'])
+
+const providedOptions = ref(Array.isArray(props.options) ? [...props.options] : [])
+watch(
+  () => props.options,
+  (val) => {
+    providedOptions.value = Array.isArray(val) ? [...val] : []
   },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const providedOptions = ref(Array.isArray(props.options) ? [...props.options] : [])
+)
 
-    watch(
-      () => props.options,
-      (val) => {
-        providedOptions.value = Array.isArray(val) ? [...val] : []
-      },
-    )
-
-    const fetchCategories = async () => {
-      const res = await fetch(`${API_BASE_URL}/api/categories`)
-      if (!res.ok) return []
-      const data = await res.json()
-      return [{ id: '', name: '无分类' }, ...data]
-    }
-
-    const isImageIcon = (icon) => {
-      if (!icon) return false
-      return /^https?:\/\//.test(icon) || icon.startsWith('/')
-    }
-
-    const selected = computed({
-      get: () => props.modelValue,
-      set: (v) => emit('update:modelValue', v),
-    })
-
-    return { fetchCategories, selected, isImageIcon, providedOptions }
-  },
+const fetchCategories = async () => {
+  const res = await fetch(`${API_BASE_URL}/api/categories`)
+  if (!res.ok) return []
+  const data = await res.json()
+  return [{ id: '', name: '无分类' }, ...data]
 }
+
+const isImageIcon = (icon) => {
+  if (!icon) return false
+  return /^https?:\/\//.test(icon) || icon.startsWith('/')
+}
+
+const selected = computed({
+  get: () => props.modelValue,
+  set: (v) => emit('update:modelValue', v),
+})
 </script>
 
 <style scoped>

@@ -12,25 +12,15 @@
   </div>
 </template>
 
-<script>
-import { useRouter } from 'vue-router'
+<script setup>
+const props = defineProps({
+  category: { type: Object, default: null },
+})
 
-export default {
-  name: 'ArticleCategory',
-  props: {
-    category: { type: Object, default: null },
-  },
-  setup(props) {
-    const router = useRouter()
-    const gotoCategory = () => {
-      if (!props.category) return
-      const value = encodeURIComponent(props.category.id ?? props.category.name)
-      router.push({ path: '/', query: { category: value } }).then(() => {
-        window.location.reload()
-      })
-    }
-    return { gotoCategory }
-  },
+const gotoCategory = async () => {
+  if (!props.category) return
+  const value = encodeURIComponent(props.category.id ?? props.category.name)
+  await navigateTo({ path: '/', query: { category: value } }, { replace: true })
 }
 </script>
 

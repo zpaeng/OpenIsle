@@ -1,4 +1,3 @@
-import { API_BASE_URL } from '~/main'
 import { getToken } from './auth'
 import { reactive } from 'vue'
 
@@ -7,6 +6,8 @@ export const notificationState = reactive({
 })
 
 export async function fetchUnreadCount() {
+  const config = useRuntimeConfig()
+  const API_BASE_URL = config.public.apiBaseUrl
   try {
     const token = getToken()
     if (!token) {
@@ -31,6 +32,9 @@ export async function fetchUnreadCount() {
 
 export async function markNotificationsRead(ids) {
   try {
+    const config = useRuntimeConfig()
+    const API_BASE_URL = config.public.apiBaseUrl
+
     const token = getToken()
     if (!token || !ids || ids.length === 0) return false
     const res = await fetch(`${API_BASE_URL}/api/notifications/read`, {
@@ -49,6 +53,9 @@ export async function markNotificationsRead(ids) {
 
 export async function fetchNotificationPreferences() {
   try {
+    const config = useRuntimeConfig()
+    const API_BASE_URL = config.public.apiBaseUrl
+
     const token = getToken()
     if (!token) return []
     const res = await fetch(`${API_BASE_URL}/api/notifications/prefs`, {
@@ -63,6 +70,8 @@ export async function fetchNotificationPreferences() {
 
 export async function updateNotificationPreference(type, enabled) {
   try {
+    const config = useRuntimeConfig()
+    const API_BASE_URL = config.public.apiBaseUrl
     const token = getToken()
     if (!token) return false
     const res = await fetch(`${API_BASE_URL}/api/notifications/prefs`, {

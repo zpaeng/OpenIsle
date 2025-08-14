@@ -36,98 +36,80 @@
   </div>
 </template>
 
-<script>
-import { ref, watch } from 'vue'
+<script setup>
 import { useIsMobile } from '~/utils/screen'
-import { useRouter } from 'vue-router'
 import Dropdown from '~/components/Dropdown.vue'
-import { API_BASE_URL } from '~/main'
 import { stripMarkdown } from '~/utils/markdown'
+import { ref, watch } from 'vue'
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
 
-export default {
-  name: 'SearchDropdown',
-  components: { Dropdown },
-  emits: ['close'],
-  setup(props, { emit }) {
-    const router = useRouter()
-    const keyword = ref('')
-    const selected = ref(null)
-    const results = ref([])
-    const dropdown = ref(null)
-    const isMobile = useIsMobile()
+const emit = defineEmits(['close'])
 
-    const toggle = () => {
-      dropdown.value.toggle()
-    }
+const keyword = ref('')
+const selected = ref(null)
+const results = ref([])
+const dropdown = ref(null)
+const isMobile = useIsMobile()
 
-    const onClose = () => emit('close')
-
-    const fetchResults = async (kw) => {
-      if (!kw) return []
-      const res = await fetch(`${API_BASE_URL}/api/search/global?keyword=${encodeURIComponent(kw)}`)
-      if (!res.ok) return []
-      const data = await res.json()
-      results.value = data.map((r) => ({
-        id: r.id,
-        text: r.text,
-        type: r.type,
-        subText: r.subText,
-        extra: r.extra,
-        postId: r.postId,
-      }))
-      return results.value
-    }
-
-    const highlight = (text) => {
-      text = stripMarkdown(text)
-      if (!keyword.value) return text
-      const reg = new RegExp(keyword.value, 'gi')
-      const res = text.replace(reg, (m) => `<span class="highlight">${m}</span>`)
-      return res
-    }
-
-    const iconMap = {
-      user: 'fas fa-user',
-      post: 'fas fa-file-alt',
-      comment: 'fas fa-comment',
-      category: 'fas fa-folder',
-      tag: 'fas fa-hashtag',
-    }
-
-    watch(selected, (val) => {
-      if (!val) return
-      const opt = results.value.find((r) => r.id === val)
-      if (!opt) return
-      if (opt.type === 'post' || opt.type === 'post_title') {
-        router.push(`/posts/${opt.id}`)
-      } else if (opt.type === 'user') {
-        router.push(`/users/${opt.id}`)
-      } else if (opt.type === 'comment') {
-        if (opt.postId) {
-          router.push(`/posts/${opt.postId}#comment-${opt.id}`)
-        }
-      } else if (opt.type === 'category') {
-        router.push({ path: '/', query: { category: opt.id } })
-      } else if (opt.type === 'tag') {
-        router.push({ path: '/', query: { tags: opt.id } })
-      }
-      selected.value = null
-      keyword.value = ''
-    })
-
-    return {
-      keyword,
-      selected,
-      fetchResults,
-      highlight,
-      iconMap,
-      isMobile,
-      dropdown,
-      onClose,
-      toggle,
-    }
-  },
+const toggle = () => {
+  dropdown.value.toggle()
 }
+
+const onClose = () => emit('close')
+
+const fetchResults = async (kw) => {
+  if (!kw) return []
+  const res = await fetch(`${API_BASE_URL}/api/search/global?keyword=${encodeURIComponent(kw)}`)
+  if (!res.ok) return []
+  const data = await res.json()
+  results.value = data.map((r) => ({
+    id: r.id,
+    text: r.text,
+    type: r.type,
+    subText: r.subText,
+    extra: r.extra,
+    postId: r.postId,
+  }))
+  return results.value
+}
+
+const highlight = (text) => {
+  text = stripMarkdown(text)
+  if (!keyword.value) return text
+  const reg = new RegExp(keyword.value, 'gi')
+  const res = text.replace(reg, (m) => `<span class="highlight">${m}</span>`)
+  return res
+}
+
+const iconMap = {
+  user: 'fas fa-user',
+  post: 'fas fa-file-alt',
+  comment: 'fas fa-comment',
+  category: 'fas fa-folder',
+  tag: 'fas fa-hashtag',
+}
+
+watch(selected, (val) => {
+  if (!val) return
+  const opt = results.value.find((r) => r.id === val)
+  if (!opt) return
+  if (opt.type === 'post' || opt.type === 'post_title') {
+    navigateTo(`/posts/${opt.id}`, { replace: true })
+  } else if (opt.type === 'user') {
+    navigateTo(`/users/${opt.id}`, { replace: true })
+  } else if (opt.type === 'comment') {
+    if (opt.postId) {
+      navigateTo(`/posts/${opt.postId}#comment-${opt.id}`, { replace: true })
+    }
+  } else if (opt.type === 'category') {
+    navigateTo({ path: '/', query: { category: opt.id } }, { replace: true })
+  } else if (opt.type === 'tag') {
+    navigateTo({ path: '/', query: { tags: opt.id } }, { replace: true })
+  }
+  selected.value = null
+  keyword.value = ''
+})
 </script>
 
 <style scoped>

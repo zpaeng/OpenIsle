@@ -9,18 +9,9 @@
   </div>
 </template>
 
-<script>
-import { useRouter } from 'vue-router'
-
-export default {
-  name: 'LoginOverlay',
-  setup() {
-    const router = useRouter()
-    const goLogin = () => {
-      router.push('/login')
-    }
-    return { goLogin }
-  },
+<script setup>
+const goLogin = () => {
+  navigateTo('/login', { replace: true })
 }
 </script>
 

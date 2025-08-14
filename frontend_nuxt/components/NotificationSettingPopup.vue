@@ -11,27 +11,19 @@
   </BasePopup>
 </template>
 
-<script>
+<script setup>
 import BasePopup from '~/components/BasePopup.vue'
-import { useRouter } from 'vue-router'
 
-export default {
-  name: 'NotificationSettingPopup',
-  components: { BasePopup },
-  props: {
-    visible: { type: Boolean, default: false },
-  },
-  emits: ['close'],
-  setup(props, { emit }) {
-    const router = useRouter()
-    const gotoSetting = () => {
-      emit('close')
-      router.push('/message?tab=control')
-    }
-    const close = () => emit('close')
-    return { gotoSetting, close }
-  },
+defineProps({
+  visible: { type: Boolean, default: false },
+})
+const emit = defineEmits(['close'])
+
+const gotoSetting = () => {
+  emit('close')
+  navigateTo('/message?tab=control', { replace: true })
 }
+const close = () => emit('close')
 </script>
 
 <style scoped>
