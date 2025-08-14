@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -62,8 +63,11 @@ public class TagController {
     @GetMapping
     public List<TagDto> list(@RequestParam(value = "keyword", required = false) String keyword,
                              @RequestParam(value = "limit", required = false) Integer limit) {
-        List<TagDto> dtos = tagService.searchTags(keyword).stream()
-                .map(t -> tagMapper.toDto(t, postService.countPostsByTag(t.getId())))
+        List<Tag> tags = tagService.searchTags(keyword);
+        List<Long> tagIds = tags.stream().map(Tag::getId).toList();
+        Map<Long, Long> postCntByTagIds = postService.countPostsByTagIds(tagIds);
+        List<TagDto> dtos = tags.stream()
+                .map(t -> tagMapper.toDto(t, postCntByTagIds.getOrDefault(t.getId(), 0L)))
                 .sorted((a, b) -> Long.compare(b.getCount(), a.getCount()))
                 .collect(Collectors.toList());
         if (limit != null && limit > 0 && dtos.size() > limit) {

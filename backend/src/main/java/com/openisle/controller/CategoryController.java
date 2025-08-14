@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -44,8 +45,11 @@ public class CategoryController {
 
     @GetMapping
     public List<CategoryDto> list() {
-        return categoryService.listCategories().stream()
-                .map(c -> categoryMapper.toDto(c, postService.countPostsByCategory(c.getId())))
+        List<Category> all = categoryService.listCategories();
+        List<Long> ids = all.stream().map(Category::getId).toList();
+        Map<Long, Long> postsCntByCategoryIds = postService.countPostsByCategoryIds(ids);
+        return all.stream()
+                .map(c -> categoryMapper.toDto(c, postsCntByCategoryIds.getOrDefault(c.getId(), 0L)))
                 .sorted((a, b) -> Long.compare(b.getCount(), a.getCount()))
                 .collect(Collectors.toList());
     }

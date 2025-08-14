@@ -92,7 +92,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     long countByCategory_Id(Long categoryId);
 
+    @Query("SELECT c.id, COUNT(p) FROM Post p JOIN p.category c WHERE c.id IN :categoryIds GROUP BY c.id")
+    List<Object[]> countPostsByCategoryIds(@Param("categoryIds") List<Long> categoryIds);
+
     long countDistinctByTags_Id(Long tagId);
+
+    @Query("SELECT t.id, COUNT(DISTINCT p) FROM Post p JOIN p.tags t WHERE t.id IN :tagIds GROUP BY t.id")
+    List<Object[]> countPostsByTagIds(@Param("tagIds") List<Long> tagIds);
 
     long countByAuthor_Id(Long userId);
 
