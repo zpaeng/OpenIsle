@@ -82,6 +82,7 @@ export default {
 .dropdown-item {
   padding: 8px 16px;
   white-space: nowrap;
+  cursor: pointer;
 }
 .dropdown-item:hover {
   background-color: var(--menu-selected-background-color);
