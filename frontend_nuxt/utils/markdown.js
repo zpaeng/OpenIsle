@@ -50,6 +50,31 @@ function tiebaEmojiPlugin(md) {
   })
 }
 
+// 链接在新窗口打开
+function linkPlugin(md) {
+  const defaultRender =
+    md.renderer.rules.link_open ||
+    function (tokens, idx, options, env, self) {
+      return self.renderToken(tokens, idx, options)
+    }
+
+  md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
+    const token = tokens[idx]
+    const hrefIndex = token.attrIndex('href')
+
+    if (hrefIndex >= 0) {
+      const href = token.attrs[hrefIndex][1]
+      // 如果是外部链接，添加 target="_blank" 和 rel="noopener noreferrer"
+      if (href.startsWith('http://') || href.startsWith('https://')) {
+        token.attrPush(['target', '_blank'])
+        token.attrPush(['rel', 'noopener noreferrer'])
+      }
+    }
+
+    return defaultRender(tokens, idx, options, env, self)
+  }
+}
+
 const md = new MarkdownIt({
   html: false,
   linkify: true,
@@ -67,6 +92,7 @@ const md = new MarkdownIt({
 
 md.use(mentionPlugin)
 md.use(tiebaEmojiPlugin)
+md.use(linkPlugin) // 添加链接插件
 
 export function renderMarkdown(text) {
   return md.render(text || '')

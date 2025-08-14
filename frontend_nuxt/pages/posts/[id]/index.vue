@@ -195,6 +195,7 @@
               :comment="item"
               :level="0"
               :default-show-replies="item.openReplies"
+              :post-author-id="author.id"
               @deleted="onCommentDeleted"
             />
           </template>
@@ -391,6 +392,7 @@ const mapComment = (c, parentUserName = '', level = 0) => ({
   avatar: c.author.avatar,
   text: c.content,
   reactions: c.reactions || [],
+  pinned: !!c.pinnedAt,
   reply: (c.replies || []).map((r) => mapComment(r, c.author.username, level + 1)),
   openReplies: level === 0,
   src: c.author.avatar,

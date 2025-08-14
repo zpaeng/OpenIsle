@@ -69,6 +69,8 @@ public class PostService {
     private final EmailSender emailSender;
     private final ApplicationContext applicationContext;
     private final ConcurrentMap<Long, ScheduledFuture<?>> scheduledFinalizations = new ConcurrentHashMap<>();
+    @Value("${app.website-url:https://www.open-isle.com}")
+    private String websiteUrl;
 
     @org.springframework.beans.factory.annotation.Autowired
     public PostService(PostRepository postRepository,
@@ -249,6 +251,15 @@ public class PostService {
                 if (w.getEmail() != null) {
                     emailSender.sendEmail(w.getEmail(), "你中奖了", "恭喜你在抽奖贴 \"" + lp.getTitle() + "\" 中获奖");
                 }
+                notificationService.createNotification(w, NotificationType.LOTTERY_WIN, lp, null, null, lp.getAuthor(), null, null);
+                notificationService.sendCustomPush(w, "你中奖了", String.format("%s/posts/%d", websiteUrl, lp.getId()));
+            }
+            if (lp.getAuthor() != null) {
+                if (lp.getAuthor().getEmail() != null) {
+                    emailSender.sendEmail(lp.getAuthor().getEmail(), "抽奖已开奖", "您的抽奖贴 \"" + lp.getTitle() + "\" 已开奖");
+                }
+                notificationService.createNotification(lp.getAuthor(), NotificationType.LOTTERY_DRAW, lp, null, null, null, null, null);
+                notificationService.sendCustomPush(lp.getAuthor(), "抽奖已开奖", String.format("%s/posts/%d", websiteUrl, lp.getId()));
             }
         });
     }
