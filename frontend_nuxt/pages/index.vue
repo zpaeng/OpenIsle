@@ -116,7 +116,7 @@
   </div>
 </template>
 <script setup>
-import { ref, watch, watchEffect, computed, onMounted, onBeforeUnmount } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import ArticleCategory from '~/components/ArticleCategory.vue'
 import ArticleTags from '~/components/ArticleTags.vue'
 import CategorySelect from '~/components/CategorySelect.vue'
@@ -195,7 +195,7 @@ watch(
 const loadOptions = async () => {
   if (selectedCategory.value && !isNaN(selectedCategory.value)) {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/categories/${selectedCategory.value}`)
+      const res = await fetch(`${API_BASE_URL}/api/categories/`)
       if (res.ok) categoryOptions.value = [await res.json()]
     } catch {}
   }
