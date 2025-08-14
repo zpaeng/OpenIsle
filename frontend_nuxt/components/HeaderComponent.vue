@@ -75,7 +75,11 @@ const userMenu = ref(null)
 const menuBtn = ref(null)
 
 const goToHome = async () => {
-  await navigateTo('/', { replace: true })
+  if (router.currentRoute.value.fullPath === '/') {
+    window.dispatchEvent(new Event('refresh-home'))
+  } else {
+    await navigateTo('/', { replace: true })
+  }
 }
 const search = () => {
   showSearch.value = true
