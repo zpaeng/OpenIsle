@@ -128,41 +128,46 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { themeState, cycleTheme, ThemeMode } from '~/utils/theme'
 import { authState } from '~/utils/auth'
 import { fetchUnreadCount, notificationState } from '~/utils/notification'
+
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
 
 const props = defineProps({
-  visible: {
-    type: Boolean,
-    default: true,
-  },
+  visible: { type: Boolean, default: true },
 })
-
 const emit = defineEmits(['item-click'])
 
 const categoryOpen = ref(true)
 const tagOpen = ref(true)
-const isLoadingCategory = ref(false)
-const isLoadingTag = ref(false)
-const categoryData = ref([])
-const tagData = ref([])
 
-const fetchCategoryData = async () => {
-  isLoadingCategory.value = true
-  const res = await fetch(`${API_BASE_URL}/api/categories`)
-  const data = await res.json()
-  categoryData.value = data
-  isLoadingCategory.value = false
-}
+/** ✅ 用 useAsyncData 替换原生 fetch，避免 SSR+CSR 二次请求 */
+const {
+  data: categoryData,
+  pending: isLoadingCategory,
+  error: categoryError,
+} = await useAsyncData(
+  // 稳定 key：避免 hydration 期误判
+  'menu:categories',
+  () => $fetch(`${API_BASE_URL}/api/categories`),
+  {
+    server: true, // SSR 预取
+    default: () => [], // 初始默认值，减少空判断
+    // 5 分钟内复用缓存，避免路由往返重复请求
+    staleTime: 5 * 60 * 1000,
+  },
+)
 
-const fetchTagData = async () => {
-  isLoadingTag.value = true
-  const res = await fetch(`${API_BASE_URL}/api/tags?limit=10`)
-  const data = await res.json()
-  tagData.value = data
-  isLoadingTag.value = false
-}
+const {
+  data: tagData,
+  pending: isLoadingTag,
+  error: tagError,
+} = await useAsyncData('menu:tags', () => $fetch(`${API_BASE_URL}/api/tags?limit=10`), {
+  server: true,
+  default: () => [],
+  staleTime: 5 * 60 * 1000,
+})
 
+/** 其余逻辑保持不变 */
 const iconClass = computed(() => {
   switch (themeState.mode) {
     case ThemeMode.DARK:
@@ -188,6 +193,7 @@ const updateCount = async () => {
 
 onMounted(async () => {
   await updateCount()
+  // 登录态变化时再拉一次未读数；与 useAsyncData 无关
   watch(() => authState.loggedIn, updateCount)
 })
 
@@ -211,8 +217,6 @@ const gotoTag = (t) => {
   navigateTo({ path: '/', query: { tags: value } }, { replace: true })
   handleItemClick()
 }
-
-await Promise.all([fetchCategoryData(), fetchTagData()])
 </script>
 
 <style scoped>
