@@ -13,7 +13,7 @@ export default defineNuxtConfig({
     },
   },
   // Ensure Vditor styles load before our overrides in global.css
-  css: ['vditor/dist/index.css', '~/assets/global.css'],
+  css: ['vditor/dist/index.css', '~/assets/fonts.css', '~/assets/global.css'],
   app: {
     head: {
       script: [

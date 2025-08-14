@@ -86,7 +86,11 @@ const md = new MarkdownIt({
     } else {
       code = hljs.highlightAuto(str).value
     }
-    return `<pre class="code-block"><button class="copy-code-btn">Copy</button><code class="hljs language-${lang || ''}">${code}</code></pre>`
+    const lineNumbers = code
+      .trim()
+      .split('\n')
+      .map(() => `<div class="line-number"></div>`)
+    return `<pre class="code-block"><button class="copy-code-btn">Copy</button><div class="line-numbers">${lineNumbers.join('')}</div><code class="hljs language-${lang || ''}">${code.trim()}</code></pre>`
   },
 })
 

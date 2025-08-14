@@ -265,7 +265,7 @@ const {
       time: TimeManager.format(
         selectedTopic.value === '最新回复' ? p.lastReplyAt || p.createdAt : p.createdAt,
       ),
-      pinned: !!p.pinnedAt,
+      pinned: Boolean(p.pinned ?? p.pinnedAt ?? p.pinned_at),
       type: p.type,
     }))
   },
@@ -308,7 +308,7 @@ const fetchNextPage = async () => {
         time: TimeManager.format(
           selectedTopic.value === '最新回复' ? p.lastReplyAt || p.createdAt : p.createdAt,
         ),
-        pinned: !!p.pinnedAt,
+        pinned: Boolean(p.pinned ?? p.pinnedAt ?? p.pinned_at),
         type: p.type,
       }))
       articles.value.push(...mapped)

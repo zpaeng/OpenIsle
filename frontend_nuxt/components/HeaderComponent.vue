@@ -146,14 +146,6 @@ onMounted(async () => {
       await updateUnread()
     },
   )
-
-  watch(
-    () => router.currentRoute.value.fullPath,
-    () => {
-      if (userMenu.value) userMenu.value.close()
-      showSearch.value = false
-    },
-  )
 })
 </script>
 
