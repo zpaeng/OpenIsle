@@ -31,16 +31,15 @@ import com.openisle.service.EmailSender;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.List;
+import java.util.*;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledFuture;
@@ -567,8 +566,29 @@ public class PostService {
         return postRepository.countByCategory_Id(categoryId);
     }
 
+    public Map<Long, Long> countPostsByCategoryIds(List<Long> categoryIds) {
+        Map<Long, Long> result = new HashMap<>();
+        var dbResult = postRepository.countPostsByCategoryIds(categoryIds);
+        dbResult.forEach(r -> {
+            result.put(((Long)r[0]), ((Long)r[1]));
+        });
+        return result;
+    }
+
     public long countPostsByTag(Long tagId) {
         return postRepository.countDistinctByTags_Id(tagId);
+    }
+
+    public Map<Long, Long> countPostsByTagIds(List<Long> tagIds) {
+        Map<Long, Long> result = new HashMap<>();
+        if (CollectionUtils.isEmpty(tagIds)) {
+            return result;
+        }
+        var dbResult = postRepository.countPostsByTagIds(tagIds);
+        dbResult.forEach(r -> {
+            result.put(((Long)r[0]), ((Long)r[1]));
+        });
+        return result;
     }
 
     private java.util.List<Post> sortByPinnedAndCreated(java.util.List<Post> posts) {
