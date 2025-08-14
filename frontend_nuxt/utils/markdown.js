@@ -1,5 +1,14 @@
 import hljs from 'highlight.js'
-import 'highlight.js/styles/github.css'
+if (typeof window !== 'undefined') {
+  const theme =
+    document.documentElement.dataset.theme ||
+    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+  if (theme === 'dark') {
+    import('highlight.js/styles/atom-one-dark.css')
+  } else {
+    import('highlight.js/styles/atom-one-light.css')
+  }
+}
 import MarkdownIt from 'markdown-it'
 import { toast } from '../main'
 import { tiebaEmoji } from './tiebaEmoji'
