@@ -77,7 +77,7 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import 'flatpickr/dist/flatpickr.css'
 import { computed, onMounted, ref, watch } from 'vue'
 import FlatPickr from 'vue-flatpickr-component'
