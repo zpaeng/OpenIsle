@@ -2,7 +2,7 @@
   <transition name="slide">
     <nav v-if="visible" class="menu">
       <div class="menu-item-container">
-        <NuxtLink class="menu-item" exact-active-class="selected" to="/" @click="handleHomeClick">
+        <NuxtLink class="menu-item" exact-active-class="selected" to="/" @click="handleItemClick">
           <i class="menu-item-icon fas fa-hashtag"></i>
           <span class="menu-item-text">话题</span>
         </NuxtLink>
@@ -190,10 +190,6 @@ onMounted(async () => {
   await updateCount()
   watch(() => authState.loggedIn, updateCount)
 })
-
-const handleHomeClick = () => {
-  navigateTo('/', { replace: true })
-}
 
 const handleItemClick = () => {
   if (window.innerWidth <= 768) emit('item-click')
