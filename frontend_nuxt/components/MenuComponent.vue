@@ -1,119 +1,120 @@
 <template>
   <transition name="slide">
     <nav v-if="visible" class="menu">
-      <div class="menu-item-container">
-        <NuxtLink class="menu-item" exact-active-class="selected" to="/" @click="handleItemClick">
-          <i class="menu-item-icon fas fa-hashtag"></i>
-          <span class="menu-item-text">话题</span>
-        </NuxtLink>
-        <NuxtLink
-          class="menu-item"
-          exact-active-class="selected"
-          to="/message"
-          @click="handleItemClick"
-        >
-          <i class="menu-item-icon fas fa-envelope"></i>
-          <span class="menu-item-text">我的消息</span>
-          <span v-if="unreadCount > 0" class="unread-container">
-            <span class="unread"> {{ showUnreadCount }} </span>
-          </span>
-        </NuxtLink>
-        <NuxtLink
-          class="menu-item"
-          exact-active-class="selected"
-          to="/about"
-          @click="handleItemClick"
-        >
-          <i class="menu-item-icon fas fa-info-circle"></i>
-          <span class="menu-item-text">关于</span>
-        </NuxtLink>
-        <NuxtLink
-          class="menu-item"
-          exact-active-class="selected"
-          to="/activities"
-          @click="handleItemClick"
-        >
-          <i class="menu-item-icon fas fa-gift"></i>
-          <span class="menu-item-text">🔥 活动</span>
-        </NuxtLink>
-        <NuxtLink
-          v-if="shouldShowStats"
-          class="menu-item"
-          exact-active-class="selected"
-          to="/about/stats"
-          @click="handleItemClick"
-        >
-          <i class="menu-item-icon fas fa-chart-line"></i>
-          <span class="menu-item-text">站点统计</span>
-        </NuxtLink>
-        <NuxtLink
-          class="menu-item"
-          exact-active-class="selected"
-          to="/new-post"
-          @click="handleItemClick"
-        >
-          <i class="menu-item-icon fas fa-edit"></i>
-          <span class="menu-item-text">发帖</span>
-        </NuxtLink>
-      </div>
-
-      <div class="menu-section">
-        <div class="section-header" @click="categoryOpen = !categoryOpen">
-          <span>类别</span>
-          <i :class="categoryOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
-        </div>
-        <div v-if="categoryOpen" class="section-items">
-          <div v-if="isLoadingCategory" class="menu-loading-container">
-            <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
-          </div>
-          <div
-            v-else
-            v-for="c in categoryData"
-            :key="c.id"
-            class="section-item"
-            @click="gotoCategory(c)"
+      <div class="menu-content">
+        <div class="menu-item-container">
+          <NuxtLink class="menu-item" exact-active-class="selected" to="/" @click="handleItemClick">
+            <i class="menu-item-icon fas fa-hashtag"></i>
+            <span class="menu-item-text">话题</span>
+          </NuxtLink>
+          <NuxtLink
+            class="menu-item"
+            exact-active-class="selected"
+            to="/message"
+            @click="handleItemClick"
           >
-            <template v-if="c.smallIcon || c.icon">
-              <img
-                v-if="isImageIcon(c.smallIcon || c.icon)"
-                :src="c.smallIcon || c.icon"
-                class="section-item-icon"
-                :alt="c.name"
-              />
-              <i v-else :class="['section-item-icon', c.smallIcon || c.icon]"></i>
-            </template>
-            <span class="section-item-text">
-              {{ c.name }}
-              <span class="section-item-text-count" v-if="c.count >= 0">x {{ c.count }}</span>
+            <i class="menu-item-icon fas fa-envelope"></i>
+            <span class="menu-item-text">我的消息</span>
+            <span v-if="unreadCount > 0" class="unread-container">
+              <span class="unread"> {{ showUnreadCount }} </span>
             </span>
-          </div>
+          </NuxtLink>
+          <NuxtLink
+            class="menu-item"
+            exact-active-class="selected"
+            to="/about"
+            @click="handleItemClick"
+          >
+            <i class="menu-item-icon fas fa-info-circle"></i>
+            <span class="menu-item-text">关于</span>
+          </NuxtLink>
+          <NuxtLink
+            class="menu-item"
+            exact-active-class="selected"
+            to="/activities"
+            @click="handleItemClick"
+          >
+            <i class="menu-item-icon fas fa-gift"></i>
+            <span class="menu-item-text">🔥 活动</span>
+          </NuxtLink>
+          <NuxtLink
+            v-if="shouldShowStats"
+            class="menu-item"
+            exact-active-class="selected"
+            to="/about/stats"
+            @click="handleItemClick"
+          >
+            <i class="menu-item-icon fas fa-chart-line"></i>
+            <span class="menu-item-text">站点统计</span>
+          </NuxtLink>
+          <NuxtLink
+            class="menu-item"
+            exact-active-class="selected"
+            to="/new-post"
+            @click="handleItemClick"
+          >
+            <i class="menu-item-icon fas fa-edit"></i>
+            <span class="menu-item-text">发帖</span>
+          </NuxtLink>
         </div>
-      </div>
 
-      <div class="menu-section">
-        <div class="section-header" @click="tagOpen = !tagOpen">
-          <span>tag</span>
-          <i :class="tagOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
-        </div>
-        <div v-if="tagOpen" class="section-items">
-          <div v-if="isLoadingTag" class="menu-loading-container">
-            <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+        <div class="menu-section">
+          <div class="section-header" @click="categoryOpen = !categoryOpen">
+            <span>类别</span>
+            <i :class="categoryOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
           </div>
-          <div v-else v-for="t in tagData" :key="t.id" class="section-item" @click="gotoTag(t)">
-            <img
-              v-if="isImageIcon(t.smallIcon || t.icon)"
-              :src="t.smallIcon || t.icon"
-              class="section-item-icon"
-              :alt="t.name"
-            />
-            <i v-else class="section-item-icon fas fa-hashtag"></i>
-            <span class="section-item-text"
-              >{{ t.name }} <span class="section-item-text-count">x {{ t.count }}</span></span
+          <div v-if="categoryOpen" class="section-items">
+            <div v-if="isLoadingCategory" class="menu-loading-container">
+              <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+            </div>
+            <div
+              v-else
+              v-for="c in categoryData"
+              :key="c.id"
+              class="section-item"
+              @click="gotoCategory(c)"
             >
+              <template v-if="c.smallIcon || c.icon">
+                <img
+                  v-if="isImageIcon(c.smallIcon || c.icon)"
+                  :src="c.smallIcon || c.icon"
+                  class="section-item-icon"
+                  :alt="c.name"
+                />
+                <i v-else :class="['section-item-icon', c.smallIcon || c.icon]"></i>
+              </template>
+              <span class="section-item-text">
+                {{ c.name }}
+                <span class="section-item-text-count" v-if="c.count >= 0">x {{ c.count }}</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="menu-section">
+          <div class="section-header" @click="tagOpen = !tagOpen">
+            <span>tag</span>
+            <i :class="tagOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+          </div>
+          <div v-if="tagOpen" class="section-items">
+            <div v-if="isLoadingTag" class="menu-loading-container">
+              <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+            </div>
+            <div v-else v-for="t in tagData" :key="t.id" class="section-item" @click="gotoTag(t)">
+              <img
+                v-if="isImageIcon(t.smallIcon || t.icon)"
+                :src="t.smallIcon || t.icon"
+                class="section-item-icon"
+                :alt="t.name"
+              />
+              <i v-else class="section-item-icon fas fa-hashtag"></i>
+              <span class="section-item-text"
+                >{{ t.name }} <span class="section-item-text-count">x {{ t.count }}</span></span
+              >
+            </div>
           </div>
         </div>
       </div>
-
       <div class="menu-footer">
         <div class="menu-footer-btn" @click="cycleTheme">
           <i :class="iconClass"></i>
@@ -223,19 +224,27 @@ const gotoTag = (t) => {
 .menu {
   position: sticky;
   top: var(--header-height);
-  width: 200px;
+  width: 220px;
   background-color: var(--menu-background-color);
   height: calc(100vh - 20px - var(--header-height));
   border-right: 1px solid var(--menu-border-color);
   display: flex;
   flex-direction: column;
-  padding: 10px;
   overflow-y: auto;
   scrollbar-width: none;
 }
 
-.menu-item-container {
+.menu-content {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 10px 10px 0 10px;
 }
+
+/* .menu-item-container { */
+/**/
+/* } */
 
 .menu-item {
   padding: 4px 10px;
@@ -282,10 +291,8 @@ const gotoTag = (t) => {
 }
 
 .menu-footer {
-  position: fixed;
+  position: relation;
   height: 30px;
-  bottom: 10px;
-  right: 10px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -371,6 +378,10 @@ const gotoTag = (t) => {
     top: calc(var(--header-height) + 10px);
     padding-top: 10px;
     background-color: var(--background-color-blur);
+  }
+
+  .menu-content {
+    border-radius: 20px;
   }
 
   .slide-enter-active,
