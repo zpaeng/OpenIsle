@@ -67,4 +67,10 @@ public class Post {
     @Column
     private LocalDateTime pinnedAt;
 
+    @Column(nullable = false)
+    private long commentCount = 0;
+
+    @Column
+    private LocalDateTime lastReplyAt;
+
 }
