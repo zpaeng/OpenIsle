@@ -50,7 +50,7 @@
           </div>
         </div>
 
-        <div v-if="isLoadingPosts && articles.length === 0" class="loading-container">
+        <div v-if="pendingFirst" class="loading-container">
           <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
         </div>
 
@@ -60,7 +60,12 @@
           </div>
         </div>
 
-        <div class="article-item" v-for="article in articles" :key="article.id">
+        <div
+          v-if="!pendingFirst"
+          class="article-item"
+          v-for="article in articles"
+          :key="article.id"
+        >
           <div class="article-main-container">
             <NuxtLink class="article-item-title main-item" :to="`/posts/${article.id}`">
               <i v-if="article.pinned" class="fas fa-thumbtack pinned-icon"></i>
@@ -104,15 +109,14 @@
         热门帖子功能开发中，敬请期待。
       </div>
       <div v-else class="placeholder-container">分类浏览功能开发中，敬请期待。</div>
-      <div v-if="isLoadingPosts && articles.length > 0" class="loading-container bottom-loading">
+      <div v-if="isLoadingMore && articles.length > 0" class="loading-container bottom-loading">
         <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
       </div>
     </div>
   </div>
 </template>
-
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, watch, watchEffect, computed, onMounted, onBeforeUnmount } from 'vue'
 import ArticleCategory from '~/components/ArticleCategory.vue'
 import ArticleTags from '~/components/ArticleTags.vue'
 import CategorySelect from '~/components/CategorySelect.vue'
@@ -142,7 +146,9 @@ const selectedTags = ref([])
 const route = useRoute()
 const tagOptions = ref([])
 const categoryOptions = ref([])
-const isLoadingPosts = ref(false)
+
+const isLoadingMore = ref(false)
+
 const topics = ref(['最新回复', '最新', '排行榜' /*, '热门', '类别'*/])
 const selectedTopic = ref(
   route.query.view === 'ranking' ? '排行榜' : route.query.view === 'latest' ? '最新' : '最新回复',
@@ -153,11 +159,11 @@ const pageSize = 10
 const isMobile = useIsMobile()
 const allLoaded = ref(false)
 
+/** URL 参数 -> 本地筛选值 **/
 const selectedCategorySet = (category) => {
   const c = decodeURIComponent(category)
   selectedCategory.value = isNaN(c) ? c : Number(c)
 }
-
 const selectedTagsSet = (tags) => {
   const t = Array.isArray(tags) ? tags.join(',') : tags
   selectedTags.value = t
@@ -167,23 +173,17 @@ const selectedTagsSet = (tags) => {
     .map((v) => (isNaN(v) ? v : Number(v)))
 }
 
+/** 初始化：仅在客户端首渲染时根据路由同步一次 **/
 onMounted(() => {
-  const query = route.query
-  const category = query.category
-  const tags = query.tags
-
-  if (category) {
-    selectedCategorySet(category)
-  }
-  if (tags) {
-    selectedTagsSet(tags)
-  }
+  const { category, tags } = route.query
+  if (category) selectedCategorySet(category)
+  if (tags) selectedTagsSet(tags)
 })
 
+/** 路由变更时同步筛选 **/
 watch(
   () => route.query,
-  () => {
-    const query = route.query
+  (query) => {
     const category = query.category
     const tags = query.tags
     category && selectedCategorySet(category)
@@ -191,18 +191,14 @@ watch(
   },
 )
 
+/** 选项加载（分类/标签名称回填） **/
 const loadOptions = async () => {
   if (selectedCategory.value && !isNaN(selectedCategory.value)) {
     try {
       const res = await fetch(`${API_BASE_URL}/api/categories/${selectedCategory.value}`)
-      if (res.ok) {
-        categoryOptions.value = [await res.json()]
-      }
-    } catch (e) {
-      /* ignore */
-    }
+      if (res.ok) categoryOptions.value = [await res.json()]
+    } catch {}
   }
-
   if (selectedTags.value.length) {
     const arr = []
     for (const t of selectedTags.value) {
@@ -210,74 +206,97 @@ const loadOptions = async () => {
         try {
           const r = await fetch(`${API_BASE_URL}/api/tags/${t}`)
           if (r.ok) arr.push(await r.json())
-        } catch (e) {
-          /* ignore */
-        }
+        } catch {}
       }
     }
     tagOptions.value = arr
   }
 }
 
-const buildUrl = () => {
-  let url = `${API_BASE_URL}/api/posts?page=${page.value}&pageSize=${pageSize}`
-  if (selectedCategory.value) {
-    url += `&categoryId=${selectedCategory.value}`
-  }
-  if (selectedTags.value.length) {
-    selectedTags.value.forEach((t) => {
-      url += `&tagIds=${t}`
-    })
-  }
-  return url
+/** 列表 API 路径与查询参数 **/
+const baseQuery = computed(() => ({
+  categoryId: selectedCategory.value || undefined,
+  tagIds: selectedTags.value.length ? selectedTags.value : undefined,
+}))
+const listApiPath = computed(() => {
+  if (selectedTopic.value === '排行榜') return '/api/posts/ranking'
+  if (selectedTopic.value === '最新回复') return '/api/posts/latest-reply'
+  return '/api/posts'
+})
+const buildUrl = ({ pageNo }) => {
+  const url = new URL(`${API_BASE_URL}${listApiPath.value}`)
+  url.searchParams.set('page', pageNo)
+  url.searchParams.set('pageSize', pageSize)
+  if (baseQuery.value.categoryId) url.searchParams.set('categoryId', baseQuery.value.categoryId)
+  if (baseQuery.value.tagIds)
+    for (const t of baseQuery.value.tagIds) url.searchParams.append('tagIds', t)
+  return url.toString()
 }
+const tokenHeader = computed(() => {
+  const token = getToken()
+  return token ? { Authorization: `Bearer ${token}` } : {}
+})
 
-const buildRankUrl = () => {
-  let url = `${API_BASE_URL}/api/posts/ranking?page=${page.value}&pageSize=${pageSize}`
-  if (selectedCategory.value) {
-    url += `&categoryId=${selectedCategory.value}`
-  }
-  if (selectedTags.value.length) {
-    selectedTags.value.forEach((t) => {
-      url += `&tagIds=${t}`
-    })
-  }
-  return url
-}
+/** —— 首屏数据托管（SSR） —— **/
+const asyncKey = computed(() => [
+  'home:firstpage',
+  selectedTopic.value,
+  String(baseQuery.value.categoryId ?? ''),
+  JSON.stringify(baseQuery.value.tagIds ?? []),
+])
+const {
+  data: firstPage,
+  pending: pendingFirst,
+  refresh: refreshFirst,
+} = await useAsyncData(
+  () => asyncKey.value.join('::'),
+  async () => {
+    const res = await $fetch(buildUrl({ pageNo: 0 }), { headers: tokenHeader.value })
+    const data = Array.isArray(res) ? res : []
+    return data.map((p) => ({
+      id: p.id,
+      title: p.title,
+      description: p.content,
+      category: p.category,
+      tags: p.tags || [],
+      members: (p.participants || []).map((m) => ({ id: m.id, avatar: m.avatar })),
+      comments: p.commentCount,
+      views: p.views,
+      time: TimeManager.format(
+        selectedTopic.value === '最新回复' ? p.lastReplyAt || p.createdAt : p.createdAt,
+      ),
+      pinned: !!p.pinnedAt,
+      type: p.type,
+    }))
+  },
+  {
+    server: true,
+    default: () => [],
+    watch: [selectedTopic, baseQuery],
+  },
+)
 
-const buildReplyUrl = () => {
-  let url = `${API_BASE_URL}/api/posts/latest-reply?page=${page.value}&pageSize=${pageSize}`
-  if (selectedCategory.value) {
-    url += `&categoryId=${selectedCategory.value}`
-  }
-  if (selectedTags.value.length) {
-    selectedTags.value.forEach((t) => {
-      url += `&tagIds=${t}`
-    })
-  }
-  return url
-}
-
-const fetchPosts = async (reset = false) => {
-  if (reset) {
+/** 首屏/筛选变更：重置分页并灌入 firstPage **/
+watch(
+  firstPage,
+  (data) => {
     page.value = 0
-    allLoaded.value = false
-    articles.value = []
-  }
-  if (isLoadingPosts.value || allLoaded.value) return
-  try {
-    isLoadingPosts.value = true
-    const token = getToken()
-    const res = await fetch(buildUrl(), {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : '',
-      },
-    })
-    isLoadingPosts.value = false
-    if (!res.ok) return
-    const data = await res.json()
-    articles.value.push(
-      ...data.map((p) => ({
+    articles.value = [...(data || [])]
+    allLoaded.value = (data?.length || 0) < pageSize
+  },
+  { immediate: true },
+)
+
+/** —— 滚动加载更多 —— **/
+let inflight = null
+const fetchNextPage = async () => {
+  if (allLoaded.value || pendingFirst.value || inflight) return
+  const nextPage = page.value + 1
+  isLoadingMore.value = true
+  inflight = $fetch(buildUrl({ pageNo: nextPage }), { headers: tokenHeader.value })
+    .then((res) => {
+      const data = Array.isArray(res) ? res : []
+      const mapped = data.map((p) => ({
         id: p.id,
         title: p.title,
         description: p.content,
@@ -286,142 +305,72 @@ const fetchPosts = async (reset = false) => {
         members: (p.participants || []).map((m) => ({ id: m.id, avatar: m.avatar })),
         comments: p.commentCount,
         views: p.views,
-        time: TimeManager.format(p.createdAt),
+        time: TimeManager.format(
+          selectedTopic.value === '最新回复' ? p.lastReplyAt || p.createdAt : p.createdAt,
+        ),
         pinned: !!p.pinnedAt,
         type: p.type,
-      })),
-    )
-    if (data.length < pageSize) {
-      allLoaded.value = true
-    } else {
-      page.value += 1
-    }
-  } catch (e) {
-    console.error(e)
-  }
-}
-
-const fetchRanking = async (reset = false) => {
-  if (reset) {
-    page.value = 0
-    allLoaded.value = false
-    articles.value = []
-  }
-  if (isLoadingPosts.value || allLoaded.value) return
-  try {
-    isLoadingPosts.value = true
-    const token = getToken()
-    const res = await fetch(buildRankUrl(), {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : '',
-      },
+      }))
+      articles.value.push(...mapped)
+      if (data.length < pageSize) {
+        allLoaded.value = true
+      } else {
+        page.value = nextPage
+      }
     })
-    isLoadingPosts.value = false
-    if (!res.ok) return
-    const data = await res.json()
-    articles.value.push(
-      ...data.map((p) => ({
-        id: p.id,
-        title: p.title,
-        description: p.content,
-        category: p.category,
-        tags: p.tags || [],
-        members: (p.participants || []).map((m) => ({ id: m.id, avatar: m.avatar })),
-        comments: p.commentCount,
-        views: p.views,
-        time: TimeManager.format(p.createdAt),
-        pinned: !!p.pinnedAt,
-        type: p.type,
-      })),
-    )
-    if (data.length < pageSize) {
-      allLoaded.value = true
-    } else {
-      page.value += 1
-    }
-  } catch (e) {
-    console.error(e)
-  }
-}
-
-const fetchLatestReply = async (reset = false) => {
-  if (reset) {
-    page.value = 0
-    allLoaded.value = false
-    articles.value = []
-  }
-  if (isLoadingPosts.value || allLoaded.value) return
-  try {
-    isLoadingPosts.value = true
-    const token = getToken()
-    const res = await fetch(buildReplyUrl(), {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : '',
-      },
+    .finally(() => {
+      inflight = null
+      isLoadingMore.value = false
     })
-    isLoadingPosts.value = false
-    if (!res.ok) return
-    const data = await res.json()
-    articles.value.push(
-      ...data.map((p) => ({
-        id: p.id,
-        title: p.title,
-        description: p.content,
-        category: p.category,
-        tags: p.tags || [],
-        members: (p.participants || []).map((m) => ({ id: m.id, avatar: m.avatar })),
-        comments: p.commentCount,
-        views: p.views,
-        time: TimeManager.format(p.lastReplyAt || p.createdAt),
-        pinned: !!p.pinnedAt,
-        type: p.type,
-      })),
-    )
-    if (data.length < pageSize) {
-      allLoaded.value = true
-    } else {
-      page.value += 1
-    }
-  } catch (e) {
-    console.error(e)
-  }
 }
 
-const fetchContent = async (reset = false) => {
-  if (selectedTopic.value === '排行榜') {
-    await fetchRanking(reset)
-  } else if (selectedTopic.value === '最新回复') {
-    await fetchLatestReply(reset)
-  } else {
-    await fetchPosts(reset)
-  }
+/** 绑定滚动加载（避免挂载瞬间触发） **/
+let initialReady = false
+const loadMoreGuarded = async () => {
+  if (!initialReady) return
+  await fetchNextPage()
 }
+useScrollLoadMore(loadMoreGuarded)
+watch(
+  articles,
+  () => {
+    if (!initialReady && articles.value.length) initialReady = true
+  },
+  { immediate: true },
+)
 
-const refreshHome = () => {
-  fetchContent(true)
+/** 外部刷新事件（发帖后刷新首屏） **/
+const refreshHome = async () => {
+  selectedCategory.value = ''
+  selectedTags.value = []
+  await refreshFirst()
 }
-
 onMounted(() => {
   window.addEventListener('refresh-home', refreshHome)
 })
-
 onBeforeUnmount(() => {
   window.removeEventListener('refresh-home', refreshHome)
 })
 
-useScrollLoadMore(fetchContent)
-
+/** 切换分类/标签/Tab：useAsyncData 已 watch，这里只需确保 options 加载 **/
 watch([selectedCategory, selectedTags], () => {
-  fetchContent(true)
+  loadOptions()
 })
-
 watch(selectedTopic, () => {
-  fetchContent(true)
+  // 仅当需要额外选项时加载
+  loadOptions()
 })
 
-const sanitizeDescription = (text) => stripMarkdown(text)
+/** 选项首屏加载：服务端执行一次；客户端兜底 **/
+if (import.meta.server) {
+  await loadOptions()
+}
+onMounted(() => {
+  if (categoryOptions.value.length === 0 && tagOptions.value.length === 0) loadOptions()
+})
 
-await Promise.all([loadOptions(), fetchContent()])
+/** 其他工具函数 **/
+const sanitizeDescription = (text) => stripMarkdown(text)
 </script>
 
 <style scoped>
