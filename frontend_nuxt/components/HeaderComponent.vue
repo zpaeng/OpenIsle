@@ -8,7 +8,7 @@
           </button>
           <span v-if="isMobile && unreadCount > 0" class="menu-unread-dot"></span>
         </div>
-        <NuxtLink class="logo-container" to="/" replace @click="handleLogoClick">
+        <NuxtLink class="logo-container" :to="`/`">
           <img
             alt="OpenIsle"
             src="https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/image.png"
@@ -51,7 +51,6 @@
 <script setup>
 import { ClientOnly } from '#components'
 import { computed, nextTick, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import DropdownMenu from '~/components/DropdownMenu.vue'
 import SearchDropdown from '~/components/SearchDropdown.vue'
 import { authState, clearToken, loadCurrentUser } from '~/utils/auth'
@@ -67,19 +66,12 @@ const props = defineProps({
 const isLogin = computed(() => authState.loggedIn)
 const isMobile = useIsMobile()
 const unreadCount = computed(() => notificationState.unreadCount)
-const router = useRouter()
 const avatar = ref('')
 const showSearch = ref(false)
 const searchDropdown = ref(null)
 const userMenu = ref(null)
 const menuBtn = ref(null)
 
-const handleLogoClick = (event) => {
-  if (router.currentRoute.value.fullPath === '/') {
-    event.preventDefault()
-    window.dispatchEvent(new Event('refresh-home'))
-  }
-}
 const search = () => {
   showSearch.value = true
   nextTick(() => {
