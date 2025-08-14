@@ -392,7 +392,7 @@ const mapComment = (c, parentUserName = '', level = 0) => ({
   avatar: c.author.avatar,
   text: c.content,
   reactions: c.reactions || [],
-  pinned: !!c.pinnedAt,
+  pinned: Boolean(c.pinned ?? c.pinnedAt ?? c.pinned_at),
   reply: (c.replies || []).map((r) => mapComment(r, c.author.username, level + 1)),
   openReplies: level === 0,
   src: c.author.avatar,
