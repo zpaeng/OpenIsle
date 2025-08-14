@@ -60,8 +60,7 @@ public class PostMapper {
         dto.setCategory(categoryMapper.toDto(post.getCategory()));
         dto.setTags(post.getTags().stream().map(tagMapper::toDto).collect(Collectors.toList()));
         dto.setViews(post.getViews());
-        //dto.setCommentCount(commentService.countComments(post.getId()));
-        dto.setCommentCount(post.getCommentCount());
+        dto.setCommentCount(commentService.countComments(post.getId()));
         dto.setStatus(post.getStatus());
         dto.setPinnedAt(post.getPinnedAt());
 

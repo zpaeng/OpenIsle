@@ -612,7 +612,7 @@ public class PostService {
                 .sorted(java.util.Comparator
                         .comparing(Post::getPinnedAt, java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder()))
                         .thenComparing(p -> {
-                            java.time.LocalDateTime t = p.getLastReplyAt();
+                            java.time.LocalDateTime t = commentRepository.findLastCommentTime(p);
                             return t != null ? t : p.getCreatedAt();
                         }, java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder())))
                 .toList();

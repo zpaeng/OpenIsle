@@ -58,11 +58,6 @@ public class CommentService {
         comment.setContent(content);
         comment = commentRepository.save(comment);
         log.debug("Comment {} saved for post {}", comment.getId(), postId);
-
-        post.setCommentCount(post.getCommentCount() + 1);
-        post.setLastReplyAt(LocalDateTime.now());
-        postRepository.save(post);
-
         imageUploader.addReferences(imageUploader.extractUrls(content));
         if (!author.getId().equals(post.getAuthor().getId())) {
             notificationService.createNotification(post.getAuthor(), NotificationType.COMMENT_REPLY, post, comment, null, null, null, null);
@@ -106,13 +101,6 @@ public class CommentService {
         comment.setContent(content);
         comment = commentRepository.save(comment);
         log.debug("Reply {} saved for parent {}", comment.getId(), parentId);
-
-        Post post = postRepository.findById(parent.getPost().getId())
-                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
-        post.setCommentCount(post.getCommentCount() + 1);
-        post.setLastReplyAt(LocalDateTime.now());
-        postRepository.save(post);
-
         imageUploader.addReferences(imageUploader.extractUrls(content));
         if (!author.getId().equals(parent.getAuthor().getId())) {
             notificationService.createNotification(parent.getAuthor(), NotificationType.COMMENT_REPLY, parent.getPost(), comment, null, null, null, null);
