@@ -117,7 +117,7 @@
       </div>
       
       <!-- 解决动态样式的水合错误 -->
-      <ClientOnly>
+      <ClientOnly v-if='!isMobile'>
         <div class="menu-footer">
           <div class="menu-footer-btn" @click="cycleTheme">
             <i :class="iconClass"></i>
@@ -133,6 +133,9 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { themeState, cycleTheme, ThemeMode } from '~/utils/theme'
 import { authState } from '~/utils/auth'
 import { fetchUnreadCount, notificationState } from '~/utils/notification'
+import { useIsMobile } from '~/utils/screen'
+
+const isMobile = useIsMobile()
 
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl

@@ -25,6 +25,10 @@
             <i class="fas fa-search"></i>
           </div>
 
+          <div v-if="isMobile" class="theme-icon" @click="cycleTheme">
+            <i :class="iconClass"></i>
+          </div>
+
           <ToolTip v-if="!isMobile" content="发帖" placement="bottom">
             <div class="new-post-icon" @click="goToNewPost">
               <i class="fas fa-edit"></i>
@@ -64,6 +68,8 @@ import SearchDropdown from '~/components/SearchDropdown.vue'
 import { authState, clearToken, loadCurrentUser } from '~/utils/auth'
 import { fetchUnreadCount, notificationState } from '~/utils/notification'
 import { useIsMobile } from '~/utils/screen'
+import { themeState, cycleTheme, ThemeMode } from '~/utils/theme'
+
 const props = defineProps({
   showMenuBtn: {
     type: Boolean,
@@ -135,6 +141,18 @@ const headerMenuItems = computed(() => [
   { text: '个人主页', onClick: goToProfile },
   { text: '退出', onClick: goToLogout },
 ])
+
+ /** 其余逻辑保持不变 */
+ const iconClass = computed(() => {
+   switch (themeState.mode) {
+     case ThemeMode.DARK:
+       return 'fas fa-moon'
+     case ThemeMode.LIGHT:
+       return 'fas fa-sun'
+     default:
+       return 'fas fa-desktop'
+   }
+ })
 
 onMounted(async () => {
   const updateAvatar = async () => {
@@ -287,7 +305,7 @@ onMounted(async () => {
   background-color: var(--menu-selected-background-color);
 }
 
-.search-icon {
+.search-icon, .theme-icon {
   font-size: 18px;
   cursor: pointer;
 }
