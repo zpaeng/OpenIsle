@@ -24,11 +24,13 @@ function apply(mode) {
       : mode
   if (root.dataset.theme === newMode) return
   root.dataset.theme = newMode
-  
+
   // 更新 meta 标签
   const androidMeta = document.querySelector('meta[name="theme-color"]')
   const iosMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')
-  const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim();
+  const themeColor = getComputedStyle(document.documentElement)
+    .getPropertyValue('--background-color')
+    .trim()
   const themeStatus = newMode === 'dark' ? 'black-translucent' : 'default'
 
   if (androidMeta) {
@@ -39,7 +41,7 @@ function apply(mode) {
     newAndroidMeta.content = themeColor
     document.head.appendChild(newAndroidMeta)
   }
-  
+
   if (iosMeta) {
     iosMeta.content = themeStatus
   } else {
@@ -69,8 +71,19 @@ export function setTheme(mode) {
 
 function getCircle(event) {
   if (!import.meta.client) return undefined
-  const x = event.clientX
-  const y = event.clientY
+
+  let x, y
+  if (event.touches?.length) {
+    x = event.touches[0].clientX
+    y = event.touches[0].clientY
+  } else if (event.changedTouches?.length) {
+    x = event.changedTouches[0].clientX
+    y = event.changedTouches[0].clientY
+  } else {
+    x = event.clientX
+    y = event.clientY
+  }
+
   return {
     x,
     y,
