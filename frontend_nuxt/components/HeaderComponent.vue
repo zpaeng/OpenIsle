@@ -127,6 +127,7 @@ const goToNewPost = () => {
 
 const refrechData = async () => {
   await fetchUnreadCount()
+  window.dispatchEvent(new Event('refresh-home'))
 }
 
 const headerMenuItems = computed(() => [

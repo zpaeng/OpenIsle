@@ -351,6 +351,8 @@ if (import.meta.server) {
 }
 onMounted(() => {
   if (categoryOptions.value.length === 0 && tagOptions.value.length === 0) loadOptions()
+
+  window.addEventListener('refresh-home', refreshFirst)
 })
 
 /** 其他工具函数 **/
@@ -380,7 +382,6 @@ const sanitizeDescription = (text) => stripMarkdown(text)
   font-size: 32px;
   font-weight: bold;
 }
-
 
 .loading-container {
   display: flex;
