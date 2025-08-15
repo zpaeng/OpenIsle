@@ -24,6 +24,29 @@ function apply(mode) {
       : mode
   if (root.dataset.theme === newMode) return
   root.dataset.theme = newMode
+  
+  // 更新 meta 标签
+  const androidMeta = document.querySelector('meta[name="theme-color"]')
+  const iosMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')
+  const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim();
+
+  if (androidMeta) {
+    androidMeta.content = themeColor
+  } else {
+    const newAndroidMeta = document.createElement('meta')
+    newAndroidMeta.name = 'theme-color'
+    newAndroidMeta.content = themeColor
+    document.head.appendChild(newAndroidMeta)
+  }
+  
+  if (iosMeta) {
+    iosMeta.content = themeColor
+  } else {
+    const newIosMeta = document.createElement('meta')
+    newIosMeta.name = 'apple-mobile-web-app-status-bar-style'
+    newIosMeta.content = themeColor
+    document.head.appendChild(newIosMeta)
+  }
 }
 
 export function initTheme() {
