@@ -20,7 +20,7 @@
       </div>
 
       <ClientOnly>
-        <div v-if="isLogin" class="header-content-right">
+        <div class="header-content-right">
           <div v-if="isMobile" class="search-icon" @click="search">
             <i class="fas fa-search"></i>
           </div>
@@ -29,13 +29,13 @@
             <i :class="iconClass"></i>
           </div>
 
-          <ToolTip v-if="!isMobile" content="发帖" placement="bottom">
+          <ToolTip v-if="!isMobile && isLogin" content="发帖" placement="bottom">
             <div class="new-post-icon" @click="goToNewPost">
               <i class="fas fa-edit"></i>
             </div>
           </ToolTip>
 
-          <DropdownMenu ref="userMenu" :items="headerMenuItems">
+          <DropdownMenu v-if="isLogin" ref="userMenu" :items="headerMenuItems">
             <template #trigger>
               <div class="avatar-container">
                 <img class="avatar-img" :src="avatar" alt="avatar" />
@@ -43,14 +43,11 @@
               </div>
             </template>
           </DropdownMenu>
-        </div>
 
-        <div v-else class="header-content-right">
-          <div v-if="isMobile" class="search-icon" @click="search">
-            <i class="fas fa-search"></i>
+          <div v-if="!isLogin" class="auth-btns">
+            <div class="header-content-item-main" @click="goToLogin">登录</div>
+            <div class="header-content-item-secondary" @click="goToSignup">注册</div>
           </div>
-          <div class="header-content-item-main" @click="goToLogin">登录</div>
-          <div class="header-content-item-secondary" @click="goToSignup">注册</div>
         </div>
       </ClientOnly>
 
@@ -142,17 +139,17 @@ const headerMenuItems = computed(() => [
   { text: '退出', onClick: goToLogout },
 ])
 
- /** 其余逻辑保持不变 */
- const iconClass = computed(() => {
-   switch (themeState.mode) {
-     case ThemeMode.DARK:
-       return 'fas fa-moon'
-     case ThemeMode.LIGHT:
-       return 'fas fa-sun'
-     default:
-       return 'fas fa-desktop'
-   }
- })
+/** 其余逻辑保持不变 */
+const iconClass = computed(() => {
+  switch (themeState.mode) {
+    case ThemeMode.DARK:
+      return 'fas fa-moon'
+    case ThemeMode.LIGHT:
+      return 'fas fa-sun'
+    default:
+      return 'fas fa-desktop'
+  }
+})
 
 onMounted(async () => {
   const updateAvatar = async () => {
@@ -210,10 +207,8 @@ onMounted(async () => {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
   width: 100%;
   height: 100%;
-  margin: 0 auto;
   max-width: var(--page-max-width);
 }
 
@@ -224,6 +219,14 @@ onMounted(async () => {
 }
 
 .header-content-right {
+  display: flex;
+  margin-left: auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+}
+
+.auth-btns {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -305,7 +308,8 @@ onMounted(async () => {
   background-color: var(--menu-selected-background-color);
 }
 
-.search-icon, .theme-icon {
+.search-icon,
+.theme-icon {
   font-size: 18px;
   cursor: pointer;
 }
