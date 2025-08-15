@@ -16,7 +16,7 @@
         <NuxtPage keepalive />
       </div>
 
-      <div v-if="showNewPostIcon" class="new-post-icon" @click="goToNewPost">
+      <div v-if="showNewPostIcon && isMobile" class="new-post-icon" @click="goToNewPost">
         <i class="fas fa-edit"></i>
       </div>
     </div>
@@ -32,7 +32,6 @@ import { useIsMobile } from '~/utils/screen'
 
 const isMobile = useIsMobile()
 const menuVisible = ref(!isMobile.value)
-const route = useRoute()
 
 const showNewPostIcon = computed(() => useRoute().path === '/')
 
