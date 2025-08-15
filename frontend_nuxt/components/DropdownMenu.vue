@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 export default {
   name: 'DropdownMenu',
   props: {
@@ -61,6 +61,7 @@ export default {
   position: relative;
   display: inline-block;
 }
+
 .dropdown-trigger {
   cursor: pointer;
   display: inline-flex;
@@ -71,7 +72,7 @@ export default {
   position: absolute;
   top: 100%;
   right: 0;
-  background-color: var(--menu-background-color);
+  background-color: var(--app-menu-background-color);
   border: 1px solid var(--normal-border-color);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   border-radius: 8px;
@@ -84,6 +85,7 @@ export default {
   white-space: nowrap;
   cursor: pointer;
 }
+
 .dropdown-item:hover {
   background-color: var(--menu-selected-background-color);
 }

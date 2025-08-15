@@ -37,10 +37,10 @@
 </template>
 
 <script setup>
-import { useIsMobile } from '~/utils/screen'
+import { ref, watch } from 'vue'
 import Dropdown from '~/components/Dropdown.vue'
 import { stripMarkdown } from '~/utils/markdown'
-import { ref, watch } from 'vue'
+import { useIsMobile } from '~/utils/screen'
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
 
@@ -135,7 +135,7 @@ defineExpose({
 }
 
 .text-input {
-  background-color: var(--menu-background-color);
+  background-color: var(--app-menu-background-color);
   color: var(--text-color);
   border: none;
   outline: none;
