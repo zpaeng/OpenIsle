@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+
     <div class="header-container">
       <HeaderComponent
         ref="header"
@@ -9,11 +10,16 @@
     </div>
 
     <div class="main-container">
+   
       <div class="menu-container" v-click-outside="handleMenuOutside">
         <MenuComponent :visible="!hideMenu && menuVisible" @item-click="menuVisible = false" />
       </div>
       <div class="content" :class="{ 'menu-open': menuVisible && !hideMenu }">
         <NuxtPage keepalive />
+      </div>
+ 
+      <div v-if='!menuVisible && route.path !== "/new-post"'  class="new-post-icon" @click="goToNewPost">
+        <i class="fas fa-edit"></i>
       </div>
     </div>
     <GlobalPopups />
@@ -23,8 +29,8 @@
 <script>
 import HeaderComponent from '~/components/HeaderComponent.vue'
 import MenuComponent from '~/components/MenuComponent.vue'
-
 import GlobalPopups from '~/components/GlobalPopups.vue'
+import { useIsMobile } from '~/utils/screen'
 
 export default {
   name: 'App',
@@ -32,6 +38,8 @@ export default {
   setup() {
     const isMobile = useIsMobile()
     const menuVisible = ref(!isMobile.value)
+    const route = useRoute()
+
     const hideMenu = computed(() => {
       return [
         '/login',
@@ -65,12 +73,16 @@ export default {
       }
     }
 
-    return { menuVisible, hideMenu, handleMenuOutside, header }
+    const goToNewPost = () => { 
+      navigateTo('/new-post', { replace: false })
+    }
+
+    return { menuVisible, hideMenu, handleMenuOutside, header, route, goToNewPost }
   },
 }
 </script>
 <style src="~/assets/global.css"></style>
-<style>
+<style scoped>
 .header-container {
   position: fixed;
   top: 0;
@@ -101,6 +113,22 @@ export default {
   flex-direction: row;
   max-width: var(--page-max-width);
   margin: 0 auto;
+}
+
+.new-post-icon {
+  background-color: var(--primary-color);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  position: fixed;
+  bottom: 40px;
+  right: 20px;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 @media (max-width: 768px) {

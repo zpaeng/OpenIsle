@@ -26,6 +26,7 @@
           </div>
 
           <ToolTip
+            v-if="!isMobile"
             content="发帖"
             placement="bottom"
           >
@@ -62,6 +63,7 @@
 import { ClientOnly } from '#components'
 import { computed, nextTick, ref, watch } from 'vue'
 import DropdownMenu from '~/components/DropdownMenu.vue'
+import ToolTip from '~/components/ToolTip.vue'
 import SearchDropdown from '~/components/SearchDropdown.vue'
 import { authState, clearToken, loadCurrentUser } from '~/utils/auth'
 import { fetchUnreadCount, notificationState } from '~/utils/notification'
