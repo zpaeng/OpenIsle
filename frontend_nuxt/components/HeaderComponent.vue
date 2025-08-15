@@ -25,11 +25,7 @@
             <i class="fas fa-search"></i>
           </div>
 
-          <ToolTip
-            v-if="!isMobile"
-            content="发帖"
-            placement="bottom"
-          >
+          <ToolTip v-if="!isMobile" content="发帖" placement="bottom">
             <div class="new-post-icon" @click="goToNewPost">
               <i class="fas fa-edit"></i>
             </div>
@@ -294,6 +290,7 @@ onMounted(async () => {
 .new-post-icon {
   font-size: 18px;
   cursor: pointer;
+  margin-right: 10px;
 }
 
 @media (max-width: 1200px) {

@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-
     <div class="header-container">
       <HeaderComponent
         ref="header"
@@ -10,15 +9,18 @@
     </div>
 
     <div class="main-container">
-   
       <div class="menu-container" v-click-outside="handleMenuOutside">
         <MenuComponent :visible="!hideMenu && menuVisible" @item-click="menuVisible = false" />
       </div>
       <div class="content" :class="{ 'menu-open': menuVisible && !hideMenu }">
         <NuxtPage keepalive />
       </div>
- 
-      <div v-if='!menuVisible && route.path !== "/new-post"'  class="new-post-icon" @click="goToNewPost">
+
+      <div
+        v-if="!menuVisible && route.path !== '/new-post'"
+        class="new-post-icon"
+        @click="goToNewPost"
+      >
         <i class="fas fa-edit"></i>
       </div>
     </div>
@@ -73,7 +75,7 @@ export default {
       }
     }
 
-    const goToNewPost = () => { 
+    const goToNewPost = () => {
       navigateTo('/new-post', { replace: false })
     }
 
@@ -116,9 +118,10 @@ export default {
 }
 
 .new-post-icon {
-  background-color: var(--primary-color);
-  width: 40px;
-  height: 40px;
+  background-color: var(--new-post-icon-color);
+  color: white;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   position: fixed;
   bottom: 40px;
@@ -127,6 +130,7 @@ export default {
   cursor: pointer;
   z-index: 1000;
   display: flex;
+  backdrop-filter: blur(5px);
   justify-content: center;
   align-items: center;
 }
