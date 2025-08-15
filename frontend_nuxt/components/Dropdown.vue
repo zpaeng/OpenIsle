@@ -114,7 +114,7 @@
 </template>
 
 <script>
-import { ref, computed, watch, onMounted } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useIsMobile } from '~/utils/screen'
 
 export default {
@@ -312,7 +312,7 @@ export default {
   border: none;
   outline: none;
   margin-left: 5px;
-  background-color: var(--menu-background-color);
+  background-color: var(--app-menu-background-color);
   color: var(--text-color);
 }
 
@@ -352,7 +352,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: var(--menu-background-color);
+  background-color: var(--app-menu-background-color);
   z-index: 1300;
   display: flex;
   flex-direction: column;

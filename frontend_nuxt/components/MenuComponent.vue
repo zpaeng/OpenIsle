@@ -115,9 +115,9 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 解决动态样式的水合错误 -->
-      <ClientOnly v-if='!isMobile'>
+      <ClientOnly v-if="!isMobile">
         <div class="menu-footer">
           <div class="menu-footer-btn" @click="cycleTheme">
             <i :class="iconClass"></i>
@@ -129,11 +129,11 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
-import { themeState, cycleTheme, ThemeMode } from '~/utils/theme'
+import { computed, onMounted, ref, watch } from 'vue'
 import { authState } from '~/utils/auth'
 import { fetchUnreadCount, notificationState } from '~/utils/notification'
 import { useIsMobile } from '~/utils/screen'
+import { cycleTheme, ThemeMode, themeState } from '~/utils/theme'
 
 const isMobile = useIsMobile()
 
@@ -232,7 +232,7 @@ const gotoTag = (t) => {
   position: sticky;
   top: var(--header-height);
   width: 220px;
-  background-color: var(--menu-background-color);
+  background-color: var(--app-menu-background-color);
   height: calc(100vh - 20px - var(--header-height));
   border-right: 1px solid var(--menu-border-color);
   display: flex;

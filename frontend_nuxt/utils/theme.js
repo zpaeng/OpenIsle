@@ -24,11 +24,13 @@ function apply(mode) {
       : mode
   if (root.dataset.theme === newMode) return
   root.dataset.theme = newMode
-  
+
   // 更新 meta 标签
   const androidMeta = document.querySelector('meta[name="theme-color"]')
   const iosMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')
-  const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim();
+  const themeColor = getComputedStyle(document.documentElement)
+    .getPropertyValue('--background-color')
+    .trim()
   const themeStatus = newMode === 'dark' ? 'black-translucent' : 'default'
 
   if (androidMeta) {
@@ -39,7 +41,7 @@ function apply(mode) {
     newAndroidMeta.content = themeColor
     document.head.appendChild(newAndroidMeta)
   }
-  
+
   if (iosMeta) {
     iosMeta.content = themeStatus
   } else {
@@ -106,8 +108,52 @@ function withViewTransition(event, applyFn, direction = true) {
       })
       .catch(console.warn)
   } else {
-    applyFn()
+    fallbackThemeTransition(applyFn)
   }
+}
+
+function fallbackThemeTransition(applyFn) {
+  if (!import.meta.client) return
+
+  const root = document.documentElement
+  const computedStyle = getComputedStyle(root)
+
+  // 获取当前背景色用于过渡
+  const currentBg = computedStyle.getPropertyValue('--background-color').trim()
+
+  // 创建过渡元素
+  const transitionElement = document.createElement('div')
+  transitionElement.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: ${currentBg};
+    z-index: 9999;
+    pointer-events: none;
+    backdrop-filter: blur(1px);
+  `
+  document.body.appendChild(transitionElement)
+
+  // 使用 Web Animations API 实现淡出动画
+  const animation = transitionElement.animate([{ opacity: 1 }, { opacity: 0 }], {
+    duration: 300,
+    easing: 'ease-out',
+  })
+
+  // 应用主题变更
+  applyFn()
+
+  // 动画完成后清理
+  animation.finished
+    .then(() => {
+      document.body.removeChild(transitionElement)
+    })
+    .catch(() => {
+      // 降级处理
+      document.body.removeChild(transitionElement)
+    })
 }
 
 function getSystemTheme() {
