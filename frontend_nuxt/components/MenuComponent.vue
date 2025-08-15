@@ -116,7 +116,7 @@
         </div>
       </div>
       <div class="menu-footer">
-        <div class="menu-footer-btn" @click="cycleTheme">
+        <div class="menu-footer-btn" @click="(e) => cycleTheme(e)">
           <i :class="iconClass"></i>
         </div>
       </div>
