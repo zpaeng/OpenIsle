@@ -10,7 +10,7 @@
 
 OpenIsle 是一个使用 Spring Boot 和 Vue 3 构建的全栈开源社区平台，提供用户注册、登录、贴文发布、评论交互等完整功能，可用于项目社区或直接打造自主社区站点。
 
-## 🚀 部署
+## 🚧 开发
 
 ### 后端
 
@@ -20,9 +20,26 @@ OpenIsle 是一个使用 Spring Boot 和 Vue 3 构建的全栈开源社区平台
 
 ### 前端
 
-1. `cd open-isle-cli`
-2. 执行 `npm install`
-3. `npm run serve`可在本地启动开发服务，产品环境使用 `npm run build`生成 `dist/` 文件，配合线上网站方式部署
+1. 进入前端目录
+    ```bash
+    cd frontend_nuxt
+    ```
+2. 安装依赖
+    ```bash
+    npm install
+    ```
+3. 启动开发服务
+    ```bash
+    npm run dev
+    ```
+
+    生产版本使用如下命令编译：
+
+    ```bash
+    npm run build
+    ```
+
+    会在 `.output` 目录生成文件，配合线上网站方式部署
 
 ## ✨ 项目特点
 
