@@ -190,11 +190,13 @@ body {
   opacity: 1;
 }
 
+.about-content a,
 .info-content-text a {
   color: var(--primary-color);
   text-decoration: none;
 }
 
+.about-content a:hover,
 .info-content-text a:hover {
   text-decoration: underline;
 }
