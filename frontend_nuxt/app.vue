@@ -16,7 +16,7 @@
         <NuxtPage keepalive />
       </div>
 
-      <div v-if="showNewPostIcon && isMobile" class="new-post-icon" @click="goToNewPost">
+      <div v-if="showNewPostIcon && isMobile" class="app-new-post-icon" @click="goToNewPost">
         <i class="fas fa-edit"></i>
       </div>
     </div>
@@ -74,7 +74,7 @@ const goToNewPost = () => {
 </script>
 
 <style src="~/assets/global.css"></style>
-<style scoped>
+<style>
 .header-container {
   position: fixed;
   top: 0;
@@ -107,7 +107,7 @@ const goToNewPost = () => {
   margin: 0 auto;
 }
 
-.new-post-icon {
+.app-new-post-icon {
   background-color: var(--new-post-icon-color);
   color: white;
   width: 60px;
