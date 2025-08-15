@@ -29,6 +29,7 @@ function apply(mode) {
   const androidMeta = document.querySelector('meta[name="theme-color"]')
   const iosMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')
   const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim();
+  const themeStatus = newMode === 'dark' ? 'black-translucent' : 'default'
 
   if (androidMeta) {
     androidMeta.content = themeColor
@@ -40,11 +41,11 @@ function apply(mode) {
   }
   
   if (iosMeta) {
-    iosMeta.content = themeColor
+    iosMeta.content = themeStatus
   } else {
     const newIosMeta = document.createElement('meta')
     newIosMeta.name = 'apple-mobile-web-app-status-bar-style'
-    newIosMeta.content = themeColor
+    newIosMeta.content = themeStatus
     document.head.appendChild(newIosMeta)
   }
 }

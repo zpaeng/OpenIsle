@@ -29,10 +29,13 @@ export default defineNuxtConfig({
 
                 
                 let themeColor = '#fff';
+                let themeStatus = 'default';
                 if (theme === 'dark') {
                   themeColor = '#333';
+                  themeStatus = 'black-translucent';
                 } else {
                   themeColor = '#ffffff';
+                  themeStatus = 'default';
                 }
                 
                 const androidMeta = document.createElement('meta');
@@ -41,8 +44,8 @@ export default defineNuxtConfig({
                 
                 const iosMeta = document.createElement('meta');
                 iosMeta.name = 'apple-mobile-web-app-status-bar-style';
-                iosMeta.content = themeColor;
-                
+                iosMeta.content = themeStatus;
+
                 document.head.appendChild(androidMeta);
                 document.head.appendChild(iosMeta);
               } catch (e) {
