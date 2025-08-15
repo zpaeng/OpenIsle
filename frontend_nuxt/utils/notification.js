@@ -1,7 +1,7 @@
 import { navigateTo, useRuntimeConfig } from 'nuxt/app'
 import { reactive, ref } from 'vue'
 import { toast } from '~/composables/useToast'
-import { getToken } from '~/utils/auth'
+import { authState, getToken } from '~/utils/auth'
 import { reactionEmojiMap } from '~/utils/reactions'
 
 export const notificationState = reactive({
@@ -303,13 +303,41 @@ function createFetchNotifications() {
       fetchUnreadCount()
     }
   }
+
+  const markAllRead = async () => {
+    // 除了 REGISTER_REQUEST 类型消息
+    const idsToMark = notifications.value
+      .filter((n) => n.type !== 'REGISTER_REQUEST' && !n.read)
+      .map((n) => n.id)
+    if (idsToMark.length === 0) return
+    notifications.value.forEach((n) => {
+      if (n.type !== 'REGISTER_REQUEST') n.read = true
+    })
+    notificationState.unreadCount = notifications.value.filter((n) => !n.read).length
+    const ok = await markNotificationsRead(idsToMark)
+    if (!ok) {
+      notifications.value.forEach((n) => {
+        if (idsToMark.includes(n.id)) n.read = false
+      })
+      await fetchUnreadCount()
+      return
+    }
+    fetchUnreadCount()
+    if (authState.role === 'ADMIN') {
+      toast.success('已读所有消息（注册请求除外）')
+    } else {
+      toast.success('已读所有消息')
+    }
+  }
   return {
     fetchNotifications,
     markRead,
     notifications,
     isLoadingMessage,
+    markRead,
+    markAllRead,
   }
 }
 
-export const { fetchNotifications, markRead, notifications, isLoadingMessage } =
+export const { fetchNotifications, markRead, notifications, isLoadingMessage, markAllRead } =
   createFetchNotifications()
