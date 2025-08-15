@@ -1,10 +1,7 @@
 <template>
   <div class="home-page">
     <div v-if="!isMobile" class="search-container">
-      <div class="search-title">一切可能，从此刻启航</div>
-      <div class="search-subtitle">
-        愿你在此遇见灵感与共鸣。若有疑惑，欢迎发问，亦可在知识的海洋中搜寻答案。
-      </div>
+      <div class="search-title">一切可能，从此刻启航，在此遇见灵感与共鸣</div>
       <SearchDropdown />
     </div>
 
@@ -371,8 +368,8 @@ const sanitizeDescription = (text) => stripMarkdown(text)
 }
 
 .search-container {
-  margin-top: 100px;
-  padding: 20px;
+  margin-top: 32px;
+  padding: 20px 20px 32px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -384,9 +381,6 @@ const sanitizeDescription = (text) => stripMarkdown(text)
   font-weight: bold;
 }
 
-.search-subtitle {
-  font-size: 16px;
-}
 
 .loading-container {
   display: flex;

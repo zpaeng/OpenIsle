@@ -10,6 +10,15 @@
           <NuxtLink
             class="menu-item"
             exact-active-class="selected"
+            to="/new-post"
+            @click="handleItemClick"
+          >
+            <i class="menu-item-icon fas fa-edit"></i>
+            <span class="menu-item-text">发帖</span>
+          </NuxtLink>
+          <NuxtLink
+            class="menu-item"
+            exact-active-class="selected"
             to="/message"
             @click="handleItemClick"
           >
@@ -46,15 +55,6 @@
           >
             <i class="menu-item-icon fas fa-chart-line"></i>
             <span class="menu-item-text">站点统计</span>
-          </NuxtLink>
-          <NuxtLink
-            class="menu-item"
-            exact-active-class="selected"
-            to="/new-post"
-            @click="handleItemClick"
-          >
-            <i class="menu-item-icon fas fa-edit"></i>
-            <span class="menu-item-text">发帖</span>
           </NuxtLink>
         </div>
 
