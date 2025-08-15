@@ -60,4 +60,27 @@ export default defineNuxtConfig({
       isCustomElement: (tag) => ['l-hatch', 'l-hatch-spinner'].includes(tag),
     },
   },
+  vite: {
+    build: {
+      // increase warning limit and split large libraries into separate chunks
+      chunkSizeWarningLimit: 1024,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('vditor')) {
+                return 'vditor'
+              }
+              if (id.includes('echarts')) {
+                return 'echarts'
+              }
+              if (id.includes('highlight.js')) {
+                return 'highlight'
+              }
+            }
+          },
+        },
+      },
+    },
+  },
 })

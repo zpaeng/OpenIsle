@@ -8,7 +8,7 @@
           </button>
           <span v-if="isMobile && unreadCount > 0" class="menu-unread-dot"></span>
         </div>
-        <NuxtLink class="logo-container" :to="`/`">
+        <NuxtLink class="logo-container" :to="`/`" @click="refrechData">
           <img
             alt="OpenIsle"
             src="https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/image.png"
@@ -25,11 +25,7 @@
             <i class="fas fa-search"></i>
           </div>
 
-          <ToolTip
-            v-if="!isMobile"
-            content="发帖"
-            placement="bottom"
-          >
+          <ToolTip v-if="!isMobile" content="发帖" placement="bottom">
             <div class="new-post-icon" @click="goToNewPost">
               <i class="fas fa-edit"></i>
             </div>
@@ -127,6 +123,10 @@ const goToLogout = () => {
 
 const goToNewPost = () => {
   navigateTo('/new-post', { replace: false })
+}
+
+const refrechData = async () => {
+  await fetchUnreadCount()
 }
 
 const headerMenuItems = computed(() => [
@@ -294,6 +294,7 @@ onMounted(async () => {
 .new-post-icon {
   font-size: 18px;
   cursor: pointer;
+  margin-right: 10px;
 }
 
 @media (max-width: 1200px) {

@@ -115,11 +115,15 @@
           </div>
         </div>
       </div>
-      <div class="menu-footer">
-        <div class="menu-footer-btn" @click="(e) => cycleTheme(e)">
-          <i :class="iconClass"></i>
+      
+      <!-- 解决动态样式的水合错误 -->
+      <ClientOnly>
+        <div class="menu-footer">
+          <div class="menu-footer-btn" @click="cycleTheme">
+            <i :class="iconClass"></i>
+          </div>
         </div>
-      </div>
+      </ClientOnly>
     </nav>
   </transition>
 </template>
