@@ -8,7 +8,7 @@
           </button>
           <span v-if="isMobile && unreadCount > 0" class="menu-unread-dot"></span>
         </div>
-        <NuxtLink class="logo-container" :to="`/`">
+        <NuxtLink class="logo-container" :to="`/`" @click="refrechData">
           <img
             alt="OpenIsle"
             src="https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/image.png"
@@ -123,6 +123,10 @@ const goToLogout = () => {
 
 const goToNewPost = () => {
   navigateTo('/new-post', { replace: false })
+}
+
+const refrechData = async () => {
+  await fetchUnreadCount()
 }
 
 const headerMenuItems = computed(() => [
