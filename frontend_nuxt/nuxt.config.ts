@@ -26,7 +26,31 @@ export default defineNuxtConfig({
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                 const theme = mode === 'dark' || mode === 'light' ? mode : (prefersDark ? 'dark' : 'light');
                 document.documentElement.dataset.theme = theme;
-              } catch (e) {}
+
+                
+                let themeColor = '#fff';
+                let themeStatus = 'default';
+                if (theme === 'dark') {
+                  themeColor = '#333';
+                  themeStatus = 'black-translucent';
+                } else {
+                  themeColor = '#ffffff';
+                  themeStatus = 'default';
+                }
+                
+                const androidMeta = document.createElement('meta');
+                androidMeta.name = 'theme-color';
+                androidMeta.content = themeColor;
+                
+                const iosMeta = document.createElement('meta');
+                iosMeta.name = 'apple-mobile-web-app-status-bar-style';
+                iosMeta.content = themeStatus;
+
+                document.head.appendChild(androidMeta);
+                document.head.appendChild(iosMeta);
+              } catch (e) {
+                console.warn('Theme initialization failed:', e);
+              }
             })();
           `,
         },
