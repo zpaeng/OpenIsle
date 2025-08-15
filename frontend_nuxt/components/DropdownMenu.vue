@@ -3,17 +3,19 @@
     <div class="dropdown-trigger" @click="toggle">
       <slot name="trigger"></slot>
     </div>
-    <div v-if="visible" class="dropdown-menu-container">
-      <div
-        v-for="(item, idx) in items"
-        :key="idx"
-        class="dropdown-item"
-        :style="{ color: item.color || 'inherit' }"
-        @click="handle(item)"
-      >
-        {{ item.text }}
+    <Transition name="dropdown-menu">
+      <div v-if="visible" class="dropdown-menu-container">
+        <div
+          v-for="(item, idx) in items"
+          :key="idx"
+          class="dropdown-item"
+          :style="{ color: item.color || 'inherit' }"
+          @click="handle(item)"
+        >
+          {{ item.text }}
+        </div>
       </div>
-    </div>
+    </Transition>
   </div>
 </template>
 
@@ -65,6 +67,16 @@ export default {
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+}
+
+.dropdown-menu-enter-active,
+.dropdown-menu-leave-active {
+  transition: all 0.4s;
+}
+.dropdown-menu-enter-from,
+.dropdown-menu-leave-to {
+  opacity: 0;
+  transform: translateY(-16px);
 }
 
 .dropdown-menu-container {

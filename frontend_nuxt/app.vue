@@ -75,6 +75,17 @@ const goToNewPost = () => {
 
 <style src="~/assets/global.css"></style>
 <style>
+/* 页面过渡效果 */
+.page-enter-active,
+.page-leave-active {
+  transition: all 0.4s;
+}
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+  filter: blur(10px);
+}
+
 .header-container {
   position: fixed;
   top: 0;
