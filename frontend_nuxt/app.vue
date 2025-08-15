@@ -16,11 +16,7 @@
         <NuxtPage keepalive />
       </div>
 
-      <div
-        v-if="!menuVisible && route.path !== '/new-post'"
-        class="new-post-icon"
-        @click="goToNewPost"
-      >
+      <div v-if="showNewPostIcon && isMobile" class="new-post-icon" @click="goToNewPost">
         <i class="fas fa-edit"></i>
       </div>
     </div>
@@ -28,61 +24,55 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import HeaderComponent from '~/components/HeaderComponent.vue'
 import MenuComponent from '~/components/MenuComponent.vue'
 import GlobalPopups from '~/components/GlobalPopups.vue'
 import { useIsMobile } from '~/utils/screen'
 
-export default {
-  name: 'App',
-  components: { HeaderComponent, MenuComponent, GlobalPopups },
-  setup() {
-    const isMobile = useIsMobile()
-    const menuVisible = ref(!isMobile.value)
-    const route = useRoute()
+const isMobile = useIsMobile()
+const menuVisible = ref(!isMobile.value)
 
-    const hideMenu = computed(() => {
-      return [
-        '/login',
-        '/signup',
-        '/404',
-        '/signup-reason',
-        '/github-callback',
-        '/twitter-callback',
-        '/discord-callback',
-        '/forgot-password',
-        '/google-callback',
-      ].includes(useRoute().path)
-    })
+const showNewPostIcon = computed(() => useRoute().path === '/')
 
-    const header = useTemplateRef('header')
+const hideMenu = computed(() => {
+  return [
+    '/login',
+    '/signup',
+    '/404',
+    '/signup-reason',
+    '/github-callback',
+    '/twitter-callback',
+    '/discord-callback',
+    '/forgot-password',
+    '/google-callback',
+  ].includes(useRoute().path)
+})
 
-    onMounted(() => {
-      if (typeof window !== 'undefined') {
-        menuVisible.value = window.innerWidth > 768
-      }
-    })
+const header = useTemplateRef('header')
 
-    const handleMenuOutside = (event) => {
-      const btn = header.value.$refs.menuBtn
-      if (btn && (btn === event.target || btn.contains(event.target))) {
-        return // 如果是菜单按钮的点击，不处理关闭
-      }
+onMounted(() => {
+  if (typeof window !== 'undefined') {
+    menuVisible.value = window.innerWidth > 768
+  }
+})
 
-      if (isMobile.value) {
-        menuVisible.value = false
-      }
-    }
+const handleMenuOutside = (event) => {
+  const btn = header.value.$refs.menuBtn
+  if (btn && (btn === event.target || btn.contains(event.target))) {
+    return // 如果是菜单按钮的点击，不处理关闭
+  }
 
-    const goToNewPost = () => {
-      navigateTo('/new-post', { replace: false })
-    }
+  if (isMobile.value) {
+    menuVisible.value = false
+  }
+}
 
-    return { menuVisible, hideMenu, handleMenuOutside, header, route, goToNewPost }
-  },
+const goToNewPost = () => {
+  navigateTo('/new-post', { replace: false })
 }
 </script>
+
 <style src="~/assets/global.css"></style>
 <style scoped>
 .header-container {
