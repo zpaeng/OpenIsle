@@ -24,6 +24,16 @@
           <div v-if="isMobile" class="search-icon" @click="search">
             <i class="fas fa-search"></i>
           </div>
+
+          <ToolTip
+            content="发帖"
+            placement="bottom"
+          >
+            <div class="new-post-icon" @click="goToNewPost">
+              <i class="fas fa-edit"></i>
+            </div>
+          </ToolTip>
+
           <DropdownMenu ref="userMenu" :items="headerMenuItems">
             <template #trigger>
               <div class="avatar-container">
@@ -111,6 +121,10 @@ const goToSignup = () => {
 const goToLogout = () => {
   clearToken()
   navigateTo('/login', { replace: true })
+}
+
+const goToNewPost = () => {
+  navigateTo('/new-post', { replace: false })
 }
 
 const headerMenuItems = computed(() => [
@@ -271,6 +285,11 @@ onMounted(async () => {
 }
 
 .search-icon {
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.new-post-icon {
   font-size: 18px;
   cursor: pointer;
 }
