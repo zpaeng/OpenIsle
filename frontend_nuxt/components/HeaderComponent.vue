@@ -318,7 +318,6 @@ onMounted(async () => {
 .new-post-icon {
   font-size: 18px;
   cursor: pointer;
-  margin-right: 10px;
 }
 
 @media (max-width: 1200px) {
