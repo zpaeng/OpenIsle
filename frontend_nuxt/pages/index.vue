@@ -150,6 +150,13 @@ const topics = ref(['最新回复', '最新', '排行榜' /*, '热门', '类别'
 const selectedTopic = ref(
   route.query.view === 'ranking' ? '排行榜' : route.query.view === 'latest' ? '最新' : '最新回复',
 )
+
+if (import.meta.client) {
+  const storedTopic = localStorage.getItem('home-selected-topic')
+  if (storedTopic && topics.value.includes(storedTopic)) {
+    selectedTopic.value = storedTopic
+  }
+}
 const articles = ref([])
 const page = ref(0)
 const pageSize = 10
@@ -340,7 +347,10 @@ watch(
 watch([selectedCategory, selectedTags], () => {
   loadOptions()
 })
-watch(selectedTopic, () => {
+watch(selectedTopic, (topic) => {
+  if (import.meta.client) {
+    localStorage.setItem('home-selected-topic', topic)
+  }
   // 仅当需要额外选项时加载
   loadOptions()
 })
