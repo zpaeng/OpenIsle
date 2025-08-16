@@ -536,6 +536,7 @@ const sanitizeDescription = (text) => stripMarkdown(text)
   font-size: 14px;
   color: gray;
   display: -webkit-box;
+  line-clamp: 3;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
