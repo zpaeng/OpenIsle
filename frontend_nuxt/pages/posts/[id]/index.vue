@@ -867,6 +867,7 @@ onMounted(async () => {
   direction: ltr;
   height: 300px;
   width: 2px;
+  appearance: none;
   -webkit-appearance: none;
   background: transparent;
 }
