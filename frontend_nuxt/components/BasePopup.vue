@@ -41,8 +41,8 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: var(--blur-2);
+  -webkit-backdrop-filter: var(--blur-2);
 }
 .popup-content {
   position: relative;

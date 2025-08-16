@@ -143,7 +143,7 @@ function fallbackThemeTransition(applyFn) {
     background-color: ${currentBg};
     z-index: 9999;
     pointer-events: none;
-    backdrop-filter: blur(1px);
+    backdrop-filter: var(--blur-1);
   `
   document.body.appendChild(transitionElement)
 
