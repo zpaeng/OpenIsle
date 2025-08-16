@@ -23,15 +23,27 @@
           <i class="fas fa-coins"></i>
           {{ good.cost }} 积分
         </div>
-        <div class="goods-item-button">兑换</div>
+        <div class="goods-item-button" @click="openRedeem(good)">兑换</div>
       </div>
     </section>
+    <RedeemPopup
+      :visible="dialogVisible"
+      v-model="contact"
+      :loading="loading"
+      @close="closeRedeem"
+      @submit="submitRedeem"
+    />
   </div>
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import { authState, fetchCurrentUser } from '~/utils/auth'
+import { authState, fetchCurrentUser, getToken } from '~/utils/auth'
+import { toast } from '~/main'
+import RedeemPopup from '~/components/RedeemPopup.vue'
+
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
 
 const point = ref(null)
 
@@ -42,25 +54,59 @@ const pointRules = [
   '评论被点赞：每次 10 积分',
 ]
 
-const goods = [
-  {
-    name: 'GPT Plus 1 个月',
-    cost: 20000,
-    image: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/icons/chatgpt.png',
-  },
-  {
-    name: '奶茶',
-    cost: 5000,
-    image: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/icons/coffee.png',
-  },
-]
+const goods = ref([])
+const dialogVisible = ref(false)
+const contact = ref('')
+const loading = ref(false)
+const selectedGood = ref(null)
 
 onMounted(async () => {
   if (authState.loggedIn) {
     const user = await fetchCurrentUser()
     point.value = user ? user.point : null
   }
+  await loadGoods()
 })
+
+const loadGoods = async () => {
+  const res = await fetch(`${API_BASE_URL}/api/point-goods`)
+  if (res.ok) {
+    goods.value = await res.json()
+  }
+}
+
+const openRedeem = (good) => {
+  selectedGood.value = good
+  dialogVisible.value = true
+}
+
+const closeRedeem = () => {
+  dialogVisible.value = false
+}
+
+const submitRedeem = async () => {
+  if (!selectedGood.value || !contact.value) return
+  loading.value = true
+  const token = getToken()
+  const res = await fetch(`${API_BASE_URL}/api/point-goods/redeem`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ goodId: selectedGood.value.id, contact: contact.value }),
+  })
+  if (res.ok) {
+    const data = await res.json()
+    point.value = data.point
+    toast.success('兑换成功！')
+    dialogVisible.value = false
+    contact.value = ''
+  } else {
+    toast.error('兑换失败')
+  }
+  loading.value = false
+}
 </script>
 
 <style scoped>
