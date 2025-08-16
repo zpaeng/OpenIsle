@@ -6,14 +6,18 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-staging:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    environment: Staging
+    environment: Deploy
+
     steps:
-      - name: Deploy to Staging Server
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: root
           key: ${{ secrets.SSH_KEY }}
-          script: bash /opt/openisle/deploy-staging.sh
+          script: bash /opt/openisle/deploy.sh
+
