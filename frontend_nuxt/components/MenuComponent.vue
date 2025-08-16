@@ -239,6 +239,7 @@ const gotoTag = (t) => {
   flex-direction: column;
   overflow-y: auto;
   scrollbar-width: none;
+  backdrop-filter: var(--blur-10);
 }
 
 .menu-content {

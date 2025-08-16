@@ -649,6 +649,7 @@ onActivated(() => {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  backdrop-filter: var(--blur-10);
 }
 
 .message-page-header-right {

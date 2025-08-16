@@ -210,6 +210,7 @@ onMounted(async () => {
   width: 100%;
   height: 100%;
   max-width: var(--page-max-width);
+  backdrop-filter: var(--blur-10);
 }
 
 .header-content-left {

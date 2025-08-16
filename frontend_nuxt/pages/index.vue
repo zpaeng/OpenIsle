@@ -417,6 +417,7 @@ const sanitizeDescription = (text) => stripMarkdown(text)
   gap: 10px;
   width: 100%;
   padding: 10px 0;
+  backdrop-filter: var(--blur-10);
 }
 
 .topic-item-container {

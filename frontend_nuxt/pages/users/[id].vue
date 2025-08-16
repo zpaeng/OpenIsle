@@ -229,62 +229,64 @@
             text="暂无时间线"
             icon="fas fa-inbox"
           />
-          <BaseTimeline :items="filteredTimelineItems">
-            <template #item="{ item }">
-              <template v-if="item.type === 'post'">
-                发布了文章
-                <router-link :to="`/posts/${item.post.id}`" class="timeline-link">
-                  {{ item.post.title }}
-                </router-link>
-                <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
+          <div class="timeline-list">
+            <BaseTimeline :items="filteredTimelineItems">
+              <template #item="{ item }">
+                <template v-if="item.type === 'post'">
+                  发布了文章
+                  <router-link :to="`/posts/${item.post.id}`" class="timeline-link">
+                    {{ item.post.title }}
+                  </router-link>
+                  <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
+                </template>
+                <template v-else-if="item.type === 'comment'">
+                  在
+                  <router-link :to="`/posts/${item.comment.post.id}`" class="timeline-link">
+                    {{ item.comment.post.title }}
+                  </router-link>
+                  下评论了
+                  <router-link
+                    :to="`/posts/${item.comment.post.id}#comment-${item.comment.id}`"
+                    class="timeline-link"
+                  >
+                    {{ stripMarkdownLength(item.comment.content, 200) }}
+                  </router-link>
+                  <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
+                </template>
+                <template v-else-if="item.type === 'reply'">
+                  在
+                  <router-link :to="`/posts/${item.comment.post.id}`" class="timeline-link">
+                    {{ item.comment.post.title }}
+                  </router-link>
+                  下对
+                  <router-link
+                    :to="`/posts/${item.comment.post.id}#comment-${item.comment.parentComment.id}`"
+                    class="timeline-link"
+                  >
+                    {{ stripMarkdownLength(item.comment.parentComment.content, 200) }}
+                  </router-link>
+                  回复了
+                  <router-link
+                    :to="`/posts/${item.comment.post.id}#comment-${item.comment.id}`"
+                    class="timeline-link"
+                  >
+                    {{ stripMarkdownLength(item.comment.content, 200) }}
+                  </router-link>
+                  <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
+                </template>
+                <template v-else-if="item.type === 'tag'">
+                  创建了标签
+                  <span class="timeline-link" @click="gotoTag(item.tag)">
+                    {{ item.tag.name }}<span v-if="item.tag.count"> x{{ item.tag.count }}</span>
+                  </span>
+                  <div class="timeline-snippet" v-if="item.tag.description">
+                    {{ item.tag.description }}
+                  </div>
+                  <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
+                </template>
               </template>
-              <template v-else-if="item.type === 'comment'">
-                在
-                <router-link :to="`/posts/${item.comment.post.id}`" class="timeline-link">
-                  {{ item.comment.post.title }}
-                </router-link>
-                下评论了
-                <router-link
-                  :to="`/posts/${item.comment.post.id}#comment-${item.comment.id}`"
-                  class="timeline-link"
-                >
-                  {{ stripMarkdownLength(item.comment.content, 200) }}
-                </router-link>
-                <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
-              </template>
-              <template v-else-if="item.type === 'reply'">
-                在
-                <router-link :to="`/posts/${item.comment.post.id}`" class="timeline-link">
-                  {{ item.comment.post.title }}
-                </router-link>
-                下对
-                <router-link
-                  :to="`/posts/${item.comment.post.id}#comment-${item.comment.parentComment.id}`"
-                  class="timeline-link"
-                >
-                  {{ stripMarkdownLength(item.comment.parentComment.content, 200) }}
-                </router-link>
-                回复了
-                <router-link
-                  :to="`/posts/${item.comment.post.id}#comment-${item.comment.id}`"
-                  class="timeline-link"
-                >
-                  {{ stripMarkdownLength(item.comment.content, 200) }}
-                </router-link>
-                <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
-              </template>
-              <template v-else-if="item.type === 'tag'">
-                创建了标签
-                <span class="timeline-link" @click="gotoTag(item.tag)">
-                  {{ item.tag.name }}<span v-if="item.tag.count"> x{{ item.tag.count }}</span>
-                </span>
-                <div class="timeline-snippet" v-if="item.tag.description">
-                  {{ item.tag.description }}
-                </div>
-                <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
-              </template>
-            </template>
-          </BaseTimeline>
+            </BaseTimeline>
+          </div>
         </div>
 
         <div v-else-if="selectedTab === 'following'" class="follow-container">
@@ -729,6 +731,7 @@ watch(selectedTab, async (val) => {
   border-bottom: 1px solid var(--normal-border-color);
   scrollbar-width: none;
   overflow-x: auto;
+  backdrop-filter: var(--blur-10);
 }
 
 .profile-tabs-item {
@@ -810,7 +813,10 @@ watch(selectedTab, async (val) => {
   display: flex;
   flex-direction: row;
   border-bottom: 1px solid var(--normal-border-color);
-  margin-bottom: 10px;
+}
+
+.timeline-list {
+  padding: 10px 20px;
 }
 
 .timeline-tab-item {
@@ -821,10 +827,6 @@ watch(selectedTab, async (val) => {
 .timeline-tab-item.selected {
   color: var(--primary-color);
   border-bottom: 2px solid var(--primary-color);
-}
-
-.profile-timeline {
-  padding: 20px;
 }
 
 .timeline-date {

@@ -15,8 +15,7 @@
   /* 加一个app前缀防止与firefox的userChrome.css中的--menu-background-color冲突 */
   --app-menu-background-color: white;
   --background-color: white;
-  /* --background-color-blur: rgba(255, 255, 255, 0.57); */
-  --background-color-blur: var(--background-color);
+  --background-color-blur: rgba(255, 255, 255, 0.57);
   --menu-border-color: lightgray;
   --normal-border-color: lightgray;
   --menu-selected-background-color: rgba(208, 250, 255, 0.659);
@@ -70,6 +69,7 @@
   --blur-4: none;
   --blur-5: none;
   --blur-10: none;
+  --background-color-blur: var(--background-color);
 }
 
 body {
