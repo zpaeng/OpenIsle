@@ -636,6 +636,8 @@ onActivated(() => {
 .message-page {
   background-color: var(--background-color);
   overflow-x: hidden;
+  height: calc(100vh - var(--header-height));
+  overflow-y: auto;
 }
 
 .message-page-header {
