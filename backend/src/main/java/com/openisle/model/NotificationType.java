@@ -32,6 +32,8 @@ public enum NotificationType {
     REGISTER_REQUEST,
     /** A user redeemed an activity reward */
     ACTIVITY_REDEEM,
+    /** A user redeemed a point good */
+    POINT_REDEEM,
     /** You won a lottery post */
     LOTTERY_WIN,
     /** Your lottery post was drawn */

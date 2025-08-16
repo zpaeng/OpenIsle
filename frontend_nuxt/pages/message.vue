@@ -130,6 +130,12 @@
                     申请进行奶茶兑换，联系方式是：{{ item.content }}
                   </NotificationContainer>
                 </template>
+                <template v-else-if="item.type === 'POINT_REDEEM' && !item.parentComment">
+                  <NotificationContainer :item="item" :markRead="markRead">
+                    <span class="notif-user">{{ item.fromUser.username }} </span>
+                    申请积分兑换，联系方式是：{{ item.content }}
+                  </NotificationContainer>
+                </template>
                 <template v-else-if="item.type === 'REACTION' && item.post && !item.comment">
                   <NotificationContainer :item="item" :markRead="markRead">
                     <span class="notif-user">{{ item.fromUser.username }} </span> 对我的文章
@@ -610,6 +616,8 @@ const formatType = (t) => {
       return '有人申请注册'
     case 'ACTIVITY_REDEEM':
       return '有人申请兑换奶茶'
+    case 'POINT_REDEEM':
+      return '有人申请积分兑换'
     case 'LOTTERY_WIN':
       return '抽奖中奖了'
     case 'LOTTERY_DRAW':
