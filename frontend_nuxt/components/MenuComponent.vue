@@ -56,6 +56,19 @@
             <i class="menu-item-icon fas fa-chart-line"></i>
             <span class="menu-item-text">站点统计</span>
           </NuxtLink>
+          <NuxtLink
+            v-if="authState.loggedIn"
+            class="menu-item"
+            exact-active-class="selected"
+            to="/about/points"
+            @click="handleItemClick"
+          >
+            <i class="menu-item-icon fas fa-coins"></i>
+            <span class="menu-item-text">
+              积分商城
+              <span v-if="myPoint !== null" class="point-count">{{ myPoint }}</span>
+            </span>
+          </NuxtLink>
         </div>
 
         <div class="menu-section">
@@ -130,7 +143,7 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import { authState } from '~/utils/auth'
+import { authState, fetchCurrentUser } from '~/utils/auth'
 import { fetchUnreadCount, notificationState } from '~/utils/notification'
 import { useIsMobile } from '~/utils/screen'
 import { cycleTheme, ThemeMode, themeState } from '~/utils/theme'
@@ -147,6 +160,7 @@ const emit = defineEmits(['item-click'])
 
 const categoryOpen = ref(true)
 const tagOpen = ref(true)
+const myPoint = ref(null)
 
 /** ✅ 用 useAsyncData 替换原生 fetch，避免 SSR+CSR 二次请求 */
 const {
@@ -191,6 +205,15 @@ const unreadCount = computed(() => notificationState.unreadCount)
 const showUnreadCount = computed(() => (unreadCount.value > 99 ? '99+' : unreadCount.value))
 const shouldShowStats = computed(() => authState.role === 'ADMIN')
 
+const loadPoint = async () => {
+  if (authState.loggedIn) {
+    const user = await fetchCurrentUser()
+    myPoint.value = user ? user.point : null
+  } else {
+    myPoint.value = null
+  }
+}
+
 const updateCount = async () => {
   if (authState.loggedIn) {
     await fetchUnreadCount()
@@ -200,9 +223,15 @@ const updateCount = async () => {
 }
 
 onMounted(async () => {
-  await updateCount()
-  // 登录态变化时再拉一次未读数；与 useAsyncData 无关
-  watch(() => authState.loggedIn, updateCount)
+  await Promise.all([updateCount(), loadPoint()])
+  // 登录态变化时再拉一次未读数和积分；与 useAsyncData 无关
+  watch(
+    () => authState.loggedIn,
+    () => {
+      updateCount()
+      loadPoint()
+    },
+  )
 })
 
 const handleItemClick = () => {
@@ -290,6 +319,12 @@ const gotoTag = (t) => {
   color: white;
   font-size: 9px;
   font-weight: bold;
+}
+
+.point-count {
+  margin-left: 4px;
+  font-size: 12px;
+  color: var(--primary-color);
 }
 
 .menu-item-icon {
