@@ -60,7 +60,7 @@
             v-if="authState.loggedIn"
             class="menu-item"
             exact-active-class="selected"
-            to="/about/points"
+            to="/points"
             @click="handleItemClick"
           >
             <i class="menu-item-icon fas fa-coins"></i>

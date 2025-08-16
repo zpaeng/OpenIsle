@@ -28,6 +28,7 @@ const reason = ref('')
 const error = ref('')
 const isWaitingForRegister = ref(false)
 const token = ref('')
+const route = useRoute()
 
 onMounted(async () => {
   token.value = route.query.token || ''
@@ -50,8 +51,8 @@ const submit = async () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        token: this.token,
-        reason: this.reason,
+        token: token.value,
+        reason: reason.value,
       }),
     })
     isWaitingForRegister.value = false
