@@ -31,7 +31,7 @@ public class PointMallService {
         }
         user.setPoint(user.getPoint() - good.getCost());
         userRepository.save(user);
-        notificationService.createActivityRedeemNotifications(user, good.getName() + ": " + contact);
+        notificationService.createPointRedeemNotifications(user, good.getName() + ": " + contact);
         return user.getPoint();
     }
 }

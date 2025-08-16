@@ -145,6 +145,30 @@ class NotificationServiceTest {
     }
 
     @Test
+    void createPointRedeemNotificationsDeletesOldOnes() {
+        NotificationRepository nRepo = mock(NotificationRepository.class);
+        UserRepository uRepo = mock(UserRepository.class);
+        ReactionRepository rRepo = mock(ReactionRepository.class);
+        EmailSender email = mock(EmailSender.class);
+        PushNotificationService push = mock(PushNotificationService.class);
+        Executor executor = Runnable::run;
+        NotificationService service = new NotificationService(nRepo, uRepo, email, push, rRepo, executor);
+        org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
+
+        User admin = new User();
+        admin.setId(10L);
+        User user = new User();
+        user.setId(20L);
+
+        when(uRepo.findByRole(Role.ADMIN)).thenReturn(List.of(admin));
+
+        service.createPointRedeemNotifications(user, "contact");
+
+        verify(nRepo).deleteByTypeAndFromUser(NotificationType.POINT_REDEEM, user);
+        verify(nRepo).save(any(Notification.class));
+    }
+
+    @Test
     void createNotificationSendsEmailForCommentReply() {
         NotificationRepository nRepo = mock(NotificationRepository.class);
         UserRepository uRepo = mock(UserRepository.class);
