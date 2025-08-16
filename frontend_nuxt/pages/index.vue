@@ -147,9 +147,20 @@ const categoryOptions = ref([])
 const isLoadingMore = ref(false)
 
 const topics = ref(['最新回复', '最新', '排行榜' /*, '热门', '类别'*/])
-const selectedTopic = ref(
-  route.query.view === 'ranking' ? '排行榜' : route.query.view === 'latest' ? '最新' : '最新回复',
-)
+const HOME_TAB_KEY = 'homeTab'
+const routeDefault =
+  route.query.view === 'ranking' ? '排行榜' : route.query.view === 'latest' ? '最新' : null
+const selectedTopic = ref(routeDefault || '最新回复')
+if (import.meta.client) {
+  if (routeDefault) {
+    localStorage.setItem(HOME_TAB_KEY, routeDefault)
+  } else {
+    const stored = localStorage.getItem(HOME_TAB_KEY)
+    if (stored && topics.value.includes(stored)) {
+      selectedTopic.value = stored
+    }
+  }
+}
 const articles = ref([])
 const page = ref(0)
 const pageSize = 10
@@ -340,7 +351,8 @@ watch(
 watch([selectedCategory, selectedTags], () => {
   loadOptions()
 })
-watch(selectedTopic, () => {
+watch(selectedTopic, (val) => {
+  if (import.meta.client) localStorage.setItem(HOME_TAB_KEY, val)
   // 仅当需要额外选项时加载
   loadOptions()
 })
