@@ -13,7 +13,7 @@ jobs:
       - name: Deploy to Staging Server
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.STG_SSH_HOST }}
+          host: ${{ secrets.SSH_HOST }}
           username: root
-          key: ${{ secrets.STG_SSH_KEY }}
+          key: ${{ secrets.SSH_KEY }}
           script: bash /opt/openisle/deploy-staging.sh
