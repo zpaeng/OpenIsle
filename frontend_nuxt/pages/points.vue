@@ -7,6 +7,10 @@
       </div>
     </section>
 
+    <div class="loading-points-container" v-if="isLoading">
+      <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+    </div>
+
     <div class="point-info">
       <p v-if="authState.loggedIn && point !== null">
         <span><i class="fas fa-coins coin-icon"></i></span>我的积分：<span class="point-value">{{
@@ -23,7 +27,13 @@
           <i class="fas fa-coins"></i>
           {{ good.cost }} 积分
         </div>
-        <div class="goods-item-button" @click="openRedeem(good)">兑换</div>
+        <div
+          class="goods-item-button"
+          :class="{ disabled: !authState.loggedIn || point === null || point < good.cost }"
+          @click="openRedeem(good)"
+        >
+          兑换
+        </div>
       </div>
     </section>
     <RedeemPopup
@@ -46,6 +56,7 @@ const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
 
 const point = ref(null)
+const isLoading = ref(false)
 
 const pointRules = [
   '发帖：每天前两次，每次 30 积分',
@@ -61,11 +72,13 @@ const loading = ref(false)
 const selectedGood = ref(null)
 
 onMounted(async () => {
+  isLoading.value = true
   if (authState.loggedIn) {
     const user = await fetchCurrentUser()
     point.value = user ? user.point : null
   }
   await loadGoods()
+  isLoading.value = false
 })
 
 const loadGoods = async () => {
@@ -76,6 +89,10 @@ const loadGoods = async () => {
 }
 
 const openRedeem = (good) => {
+  if (!authState.loggedIn || point.value === null || point.value < good.cost) {
+    toast.error('积分不足')
+    return
+  }
   selectedGood.value = good
   dialogVisible.value = true
 }
@@ -115,6 +132,13 @@ const submitRedeem = async () => {
   max-width: var(--page-max-width);
   background-color: var(--background-color);
   margin: 0 auto;
+}
+
+.loading-points-container {
+  margin-top: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .point-info {
@@ -182,6 +206,12 @@ const submitRedeem = async () => {
 
 .goods-item-button:hover {
   background-color: var(--primary-color-hover);
+}
+
+.goods-item-button.disabled,
+.goods-item-button.disabled:hover {
+  background-color: var(--primary-color-disabled);
+  cursor: not-allowed;
 }
 
 .section-title {
