@@ -147,7 +147,7 @@ public class NotificationService {
      */
     @org.springframework.transaction.annotation.Transactional
     public void createPointRedeemNotifications(User user, String content) {
-        notificationRepository.deleteByTypeAndFromUser(NotificationType.POINT_REDEEM, user);
+//        notificationRepository.deleteByTypeAndFromUser(NotificationType.POINT_REDEEM, user);
         for (User admin : userRepository.findByRole(Role.ADMIN)) {
             createNotification(admin, NotificationType.POINT_REDEEM, null, null,
                     null, user, null, content);
