@@ -71,8 +71,19 @@ export function setTheme(mode) {
 
 function getCircle(event) {
   if (!import.meta.client) return undefined
-  const x = event.clientX
-  const y = event.clientY
+
+  let x, y
+  if (event.touches?.length) {
+    x = event.touches[0].clientX
+    y = event.touches[0].clientY
+  } else if (event.changedTouches?.length) {
+    x = event.changedTouches[0].clientX
+    y = event.changedTouches[0].clientY
+  } else {
+    x = event.clientX
+    y = event.clientY
+  }
+
   return {
     x,
     y,
