@@ -188,7 +188,7 @@ onMounted(async () => {
   justify-content: center;
   height: var(--header-height);
   background-color: var(--background-color-blur);
-  backdrop-filter: blur(10px);
+  backdrop-filter: var(--blur-10);
   color: var(--header-text-color);
   border-bottom: 1px solid var(--header-border-color);
 }

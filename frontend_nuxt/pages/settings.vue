@@ -36,6 +36,13 @@
           <BaseInput v-model="introduction" textarea rows="3" placeholder="说些什么..." />
           <div class="setting-description">自我介绍会出现在你的个人主页，可以简要介绍自己</div>
         </div>
+        <div class="form-row switch-row">
+          <div class="setting-title">毛玻璃效果</div>
+          <label class="switch">
+            <input type="checkbox" v-model="frosted" />
+            <span class="slider"></span>
+          </label>
+        </div>
       </div>
       <div v-if="role === 'ADMIN'" class="admin-section">
         <h3>管理员设置</h3>
@@ -65,12 +72,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import AvatarCropper from '~/components/AvatarCropper.vue'
 import BaseInput from '~/components/BaseInput.vue'
 import Dropdown from '~/components/Dropdown.vue'
 import { toast } from '~/main'
 import { fetchCurrentUser, getToken, setToken } from '~/utils/auth'
+import { frostedState, setFrosted } from '~/utils/frosted'
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
 const username = ref('')
@@ -87,6 +95,7 @@ const aiFormatLimit = ref(3)
 const registerMode = ref('DIRECT')
 const isLoadingPage = ref(false)
 const isSaving = ref(false)
+const frosted = ref(true)
 
 onMounted(async () => {
   isLoadingPage.value = true
@@ -105,6 +114,7 @@ onMounted(async () => {
     navigateTo('/login', { replace: true })
   }
   isLoadingPage.value = false
+  frosted.value = frostedState.enabled
 })
 
 const onAvatarChange = (e) => {
@@ -118,6 +128,7 @@ const onAvatarChange = (e) => {
     reader.readAsDataURL(file)
   }
 }
+watch(frosted, (val) => setFrosted(val))
 const onCropped = ({ file, url }) => {
   avatarFile.value = file
   avatar.value = url
@@ -298,6 +309,58 @@ const save = async () => {
 
 .dropdown-row {
   max-width: 200px;
+}
+
+.switch-row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 200px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.2s;
+  border-radius: 20px;
+}
+
+.slider:before {
+  position: absolute;
+  content: '';
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.2s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--primary-color);
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
 }
 
 .profile-section {
