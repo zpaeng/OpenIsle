@@ -1,0 +1,17 @@
+name: Staging CI & CD
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    environment: Staging
+    steps:
+      - name: Deploy to Staging Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.STG_SSH_HOST }}
+          username: root
+          key: ${{ secrets.STG_SSH_KEY }}
+          script: bash /opt/openisle/deploy-staging.sh
