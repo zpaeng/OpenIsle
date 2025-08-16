@@ -204,12 +204,32 @@
         </div>
 
         <div v-else-if="selectedTab === 'timeline'" class="profile-timeline">
+          <div class="timeline-tabs">
+            <div
+              :class="['timeline-tab-item', { selected: timelineFilter === 'all' }]"
+              @click="timelineFilter = 'all'"
+            >
+              全部
+            </div>
+            <div
+              :class="['timeline-tab-item', { selected: timelineFilter === 'articles' }]"
+              @click="timelineFilter = 'articles'"
+            >
+              文章
+            </div>
+            <div
+              :class="['timeline-tab-item', { selected: timelineFilter === 'comments' }]"
+              @click="timelineFilter = 'comments'"
+            >
+              评论和回复
+            </div>
+          </div>
           <BasePlaceholder
-            v-if="timelineItems.length === 0"
+            v-if="filteredTimelineItems.length === 0"
             text="暂无时间线"
             icon="fas fa-inbox"
           />
-          <BaseTimeline :items="timelineItems">
+          <BaseTimeline :items="filteredTimelineItems">
             <template #item="{ item }">
               <template v-if="item.type === 'post'">
                 发布了文章
@@ -324,6 +344,15 @@ const hotPosts = ref([])
 const hotReplies = ref([])
 const hotTags = ref([])
 const timelineItems = ref([])
+const timelineFilter = ref('all')
+const filteredTimelineItems = computed(() => {
+  if (timelineFilter.value === 'articles') {
+    return timelineItems.value.filter((item) => item.type === 'post')
+  } else if (timelineFilter.value === 'comments') {
+    return timelineItems.value.filter((item) => item.type === 'comment' || item.type === 'reply')
+  }
+  return timelineItems.value
+})
 const followers = ref([])
 const followings = ref([])
 const medals = ref([])
@@ -775,6 +804,23 @@ watch(selectedTab, async (val) => {
 .hot-topic,
 .hot-tag {
   width: 40%;
+}
+
+.timeline-tabs {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px solid var(--normal-border-color);
+  margin-bottom: 10px;
+}
+
+.timeline-tab-item {
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.timeline-tab-item.selected {
+  color: var(--primary-color);
+  border-bottom: 2px solid var(--primary-color);
 }
 
 .profile-timeline {
