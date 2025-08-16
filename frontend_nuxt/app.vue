@@ -131,7 +131,7 @@ const goToNewPost = () => {
   cursor: pointer;
   z-index: 1000;
   display: flex;
-  backdrop-filter: blur(5px);
+  backdrop-filter: var(--blur-5);
   justify-content: center;
   align-items: center;
 }

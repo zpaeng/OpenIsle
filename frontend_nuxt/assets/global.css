@@ -7,11 +7,15 @@
   --header-background-color: white;
   --header-border-color: lightgray;
   --header-text-color: black;
+  --blur-1: blur(1px);
+  --blur-2: blur(2px);
+  --blur-4: blur(4px);
+  --blur-5: blur(5px);
+  --blur-10: blur(10px);
   /* 加一个app前缀防止与firefox的userChrome.css中的--menu-background-color冲突 */
   --app-menu-background-color: white;
   --background-color: white;
-  /* --background-color-blur: rgba(255, 255, 255, 0.57); */
-  --background-color-blur: var(--background-color);
+  --background-color-blur: rgba(255, 255, 255, 0.57);
   --menu-border-color: lightgray;
   --normal-border-color: lightgray;
   --menu-selected-background-color: rgba(208, 250, 255, 0.659);
@@ -57,6 +61,15 @@
   --blockquote-text-color: #999;
   --article-info-background-color: #747373;
   --activity-card-background-color: #585858;
+}
+
+:root[data-frosted='off'] {
+  --blur-1: none;
+  --blur-2: none;
+  --blur-4: none;
+  --blur-5: none;
+  --blur-10: none;
+  --background-color-blur: var(--background-color);
 }
 
 body {

@@ -27,6 +27,10 @@
             >找回密码</a
           >
         </div>
+        <div class="hint-message">
+          <i class="fas fa-info-circle"></i>
+          使用右侧第三方OAuth注册/登录的用户可使用对应的邮箱进行重设密码
+        </div>
       </div>
     </div>
 
@@ -257,6 +261,11 @@ const loginWithTwitter = () => {
 
 .login-page-button-secondary-link {
   color: var(--primary-color);
+}
+
+.hint-message {
+  font-size: 12px;
+  opacity: 0.7;
 }
 
 @media (max-width: 768px) {

@@ -147,9 +147,17 @@ const categoryOptions = ref([])
 const isLoadingMore = ref(false)
 
 const topics = ref(['最新回复', '最新', '排行榜' /*, '热门', '类别'*/])
+const selectedTopicCookie = useCookie('homeTab')
 const selectedTopic = ref(
-  route.query.view === 'ranking' ? '排行榜' : route.query.view === 'latest' ? '最新' : '最新回复',
+  selectedTopicCookie.value
+    ? selectedTopicCookie.value
+    : route.query.view === 'ranking'
+      ? '排行榜'
+      : route.query.view === 'latest'
+        ? '最新'
+        : '最新回复',
 )
+if (!selectedTopicCookie.value) selectedTopicCookie.value = selectedTopic.value
 const articles = ref([])
 const page = ref(0)
 const pageSize = 10
@@ -175,6 +183,11 @@ onMounted(() => {
   const { category, tags } = route.query
   if (category) selectedCategorySet(category)
   if (tags) selectedTagsSet(tags)
+
+  const saved = localStorage.getItem('homeTab')
+  if (saved) {
+    selectedTopic.value = saved
+  }
 })
 
 /** 路由变更时同步筛选 **/
@@ -340,9 +353,13 @@ watch(
 watch([selectedCategory, selectedTags], () => {
   loadOptions()
 })
-watch(selectedTopic, () => {
+watch(selectedTopic, (val) => {
   // 仅当需要额外选项时加载
   loadOptions()
+  selectedTopicCookie.value = val
+  if (process.client) {
+    localStorage.setItem('homeTab', val)
+  }
 })
 
 /** 选项首屏加载：服务端执行一次；客户端兜底 **/
@@ -417,6 +434,7 @@ const sanitizeDescription = (text) => stripMarkdown(text)
   gap: 10px;
   width: 100%;
   padding: 10px 0;
+  backdrop-filter: var(--blur-10);
 }
 
 .topic-item-container {

@@ -3,304 +3,379 @@
     <!-- 触发器 -->
     <div
       class="tooltip-trigger"
-      @mouseenter="handleMouseEnter"
-      @mouseleave="handleMouseLeave"
-      @click="handleClick"
-      @focus="handleFocus"
-      @blur="handleBlur"
       :tabindex="focusable ? 0 : -1"
+      :aria-describedby="visible ? ariaId : undefined"
+      @mouseenter="onTriggerMouseEnter"
+      @mouseleave="onTriggerMouseLeave"
+      @click="onTriggerClick"
+      @focus="onTriggerFocus"
+      @blur="onTriggerBlur"
     >
       <slot />
     </div>
 
-    <!-- 提示内容 -->
-    <Transition name="tooltip-fade">
-      <div
-        v-if="visible"
-        ref="tooltipRef"
-        class="tooltip-content"
-        :class="[
-          `tooltip-${placement}`,
-          { 'tooltip-dark': dark },
-          { 'tooltip-light': !dark }
-        ]"
-        :style="tooltipStyle"
-        role="tooltip"
-        :aria-describedby="ariaId"
-      >
-        <div class="tooltip-inner">
-          <slot name="content">
-            {{ content }}
-          </slot>
+    <!-- 提示内容（Teleport 到 body） -->
+    <Teleport to="body" v-if="mounted">
+      <Transition name="tooltip-fade">
+        <div
+          v-show="visible"
+          :id="ariaId"
+          ref="tooltipRef"
+          class="tooltip-content"
+          :class="[
+            `tooltip-${currentPlacement}`,
+            dark ? 'tooltip-dark' : 'tooltip-light',
+            props.trigger === 'hover' ? 'tooltip-noninteractive' : '',
+          ]"
+          :style="tooltipInlineStyle"
+          role="tooltip"
+        >
+          <div class="tooltip-inner">
+            <slot name="content">
+              {{ content }}
+            </slot>
+          </div>
+
+          <!-- 箭头 -->
+          <div
+            class="tooltip-arrow"
+            :class="`tooltip-arrow-${currentPlacement}`"
+            :style="arrowStyle"
+          ></div>
         </div>
-        <div class="tooltip-arrow" :class="`tooltip-arrow-${placement}`"></div>
-      </div>
-    </Transition>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
-<script>
-import { ref, computed, onMounted, onBeforeUnmount, nextTick, useId, watch } from 'vue'
+<script setup lang="ts">
+import {
+  ref,
+  computed,
+  onMounted,
+  onBeforeUnmount,
+  nextTick,
+  watch,
+  defineProps,
+  defineEmits,
+  defineOptions,
+  useId,
+} from 'vue'
 
-export default {
-  name: 'ToolTip',
-  props: {
-    // 提示内容
-    content: {
-      type: String,
-      default: ''
-    },
-    // 触发方式：hover、click、focus
-    trigger: {
-      type: String,
-      default: 'hover',
-      validator: (value) => ['hover', 'click', 'focus', 'manual'].includes(value)
-    },
-    // 位置：top、bottom、left、right
-    placement: {
-      type: String,
-      default: 'top',
-      validator: (value) => ['top', 'bottom', 'left', 'right'].includes(value)
-    },
-    // 是否启用暗色主题
-    dark: {
-      type: Boolean,
-      default: false
-    },
-    // 延迟显示时间（毫秒）
-    delay: {
-      type: Number,
-      default: 100
-    },
-    // 是否禁用
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    // 是否可通过Tab键聚焦
-    focusable: {
-      type: Boolean,
-      default: true
-    },
-    // 偏移距离
-    offset: {
-      type: Number,
-      default: 8
-    },
-    // 最大宽度
-    maxWidth: {
-      type: [String, Number],
-      default: '200px'
-    }
+defineOptions({ name: 'Tooltip' })
+
+type Trigger = 'hover' | 'click' | 'focus' | 'manual'
+type Placement = 'top' | 'bottom' | 'left' | 'right'
+
+const props = defineProps({
+  content: { type: String, default: '' },
+  trigger: {
+    type: String as () => Trigger,
+    default: 'hover',
+    validator: (v: string) => ['hover', 'click', 'focus', 'manual'].includes(v),
   },
-  emits: ['show', 'hide'],
-  setup(props, { emit }) {
-    const wrapperRef = ref(null)
-    const tooltipRef = ref(null)
-    const visible = ref(false)
-    const ariaId = ref(`tooltip-${useId()}`)
-    
-    let showTimer = null
-    let hideTimer = null
+  placement: {
+    type: String as () => Placement,
+    default: 'top',
+    validator: (v: string) => ['top', 'bottom', 'left', 'right'].includes(v),
+  },
+  dark: { type: Boolean, default: false },
+  delay: { type: Number, default: 100 },
+  disabled: { type: Boolean, default: false },
+  focusable: { type: Boolean, default: true },
+  offset: { type: Number, default: 8 },
+  maxWidth: { type: [String, Number], default: '200px' },
+  /** 隐藏延时（毫秒），hover 离开后等待一点点以防抖 */
+  hideDelay: { type: Number, default: 80 },
+})
 
-    // 计算tooltip样式
-    const tooltipStyle = computed(() => {
-      const maxWidth = typeof props.maxWidth === 'number' 
-        ? `${props.maxWidth}px` 
-        : props.maxWidth
-      
-      return {
-        maxWidth,
-        zIndex: 2000
-      }
-    })
+const emit = defineEmits<{
+  (e: 'show'): void
+  (e: 'hide'): void
+}>()
 
-    // 显示tooltip
-    const show = () => {
-      if (props.disabled) return
-      
-      clearTimeout(hideTimer)
-      showTimer = setTimeout(() => {
-        visible.value = true
-        emit('show')
-        nextTick(() => {
-          updatePosition()
-        })
-      }, props.delay)
-    }
+const wrapperRef = ref<HTMLElement | null>(null)
+const tooltipRef = ref<HTMLElement | null>(null)
+const visible = ref(false)
+const currentPlacement = ref<Placement>(props.placement)
+const ariaId = ref(`tooltip-${useId()}`)
+const mounted = ref(false)
 
-    // 隐藏tooltip
-    const hide = () => {
-      clearTimeout(showTimer)
-      hideTimer = setTimeout(() => {
-        visible.value = false
-        emit('hide')
-      }, 100)
-    }
+let showTimer: number | null = null
+let hideTimer: number | null = null
+let ro: ResizeObserver | null = null
+let rafId: number | null = null
 
-    // 立即显示（用于manual模式）
-    const showImmediately = () => {
-      if (props.disabled) return
-      clearTimeout(hideTimer)
-      clearTimeout(showTimer)
-      visible.value = true
-      emit('show')
-      nextTick(() => {
-        updatePosition()
-      })
-    }
+const maxWidthValue = computed(() => {
+  return typeof props.maxWidth === 'number' ? `${props.maxWidth}px` : props.maxWidth
+})
 
-    // 立即隐藏（用于manual模式）
-    const hideImmediately = () => {
-      clearTimeout(showTimer)
-      clearTimeout(hideTimer)
-      visible.value = false
-      emit('hide')
-    }
+const tooltipTransform = ref('translate3d(-9999px, -9999px, 0)')
 
-    // 更新位置
-    const updatePosition = () => {
-      if (!wrapperRef.value || !tooltipRef.value) return
+const tooltipInlineStyle = computed(() => ({
+  position: 'fixed',
+  top: '0px',
+  left: '0px',
+  zIndex: 2000,
+  maxWidth: maxWidthValue.value,
+  transform: tooltipTransform.value,
+}))
 
-      const trigger = wrapperRef.value.querySelector('.tooltip-trigger')
-      const tooltip = tooltipRef.value
-      
-      if (!trigger) return
+const arrowStyle = ref<Record<string, string>>({})
 
-      const triggerRect = trigger.getBoundingClientRect()
-      const tooltipRect = tooltip.getBoundingClientRect()
-      
-      let top = 0
-      let left = 0
-
-      switch (props.placement) {
-        case 'top':
-          top = triggerRect.top - tooltipRect.height - props.offset
-          left = triggerRect.left + (triggerRect.width - tooltipRect.width) / 2
-          break
-        case 'bottom':
-          top = triggerRect.bottom + props.offset
-          left = triggerRect.left + (triggerRect.width - tooltipRect.width) / 2
-          break
-        case 'left':
-          top = triggerRect.top + (triggerRect.height - tooltipRect.height) / 2
-          left = triggerRect.left - tooltipRect.width - props.offset
-          break
-        case 'right':
-          top = triggerRect.top + (triggerRect.height - tooltipRect.height) / 2
-          left = triggerRect.right + props.offset
-          break
-      }
-
-      // 边界检测
-      const padding = 8
-      const viewportWidth = window.innerWidth
-      const viewportHeight = window.innerHeight
-
-      if (left < padding) {
-        left = padding
-      } else if (left + tooltipRect.width > viewportWidth - padding) {
-        left = viewportWidth - tooltipRect.width - padding
-      }
-
-      if (top < padding) {
-        top = padding
-      } else if (top + tooltipRect.height > viewportHeight - padding) {
-        top = viewportHeight - tooltipRect.height - padding
-      }
-
-      tooltip.style.position = 'fixed'
-      tooltip.style.top = `${top}px`
-      tooltip.style.left = `${left}px`
-    }
-
-    // 事件处理
-    const handleMouseEnter = () => {
-      if (props.trigger === 'hover') {
-        show()
-      }
-    }
-
-    const handleMouseLeave = () => {
-      if (props.trigger === 'hover') {
-        hide()
-      }
-    }
-
-    const handleClick = () => {
-      if (props.trigger === 'click') {
-        if (visible.value) {
-          hide()
-        } else {
-          show()
-        }
-      }
-    }
-
-    const handleFocus = () => {
-      if (props.trigger === 'focus') {
-        show()
-      }
-    }
-
-    const handleBlur = () => {
-      if (props.trigger === 'focus') {
-        hide()
-      }
-    }
-
-    // 点击外部隐藏
-    const handleClickOutside = (event) => {
-      if (props.trigger === 'click' && wrapperRef.value && !wrapperRef.value.contains(event.target)) {
-        hide()
-      }
-    }
-
-    // 窗口大小改变时重新计算位置
-    const handleResize = () => {
-      if (visible.value) {
-        updatePosition()
-      }
-    }
-
-    // 监听禁用状态变化
-    watch(() => props.disabled, (newVal) => {
-      if (newVal && visible.value) {
-        hideImmediately()
-      }
-    })
-
-    onMounted(() => {
-      document.addEventListener('click', handleClickOutside)
-      window.addEventListener('resize', handleResize)
-      window.addEventListener('scroll', handleResize)
-    })
-
-    onBeforeUnmount(() => {
-      clearTimeout(showTimer)
-      clearTimeout(hideTimer)
-      document.removeEventListener('click', handleClickOutside)
-      window.removeEventListener('resize', handleResize)
-      window.removeEventListener('scroll', handleResize)
-    })
-
-    return {
-      wrapperRef,
-      tooltipRef,
-      visible,
-      ariaId,
-      tooltipStyle,
-      handleMouseEnter,
-      handleMouseLeave,
-      handleClick,
-      handleFocus,
-      handleBlur,
-      // 暴露给父组件的方法
-      show: showImmediately,
-      hide: hideImmediately
-    }
+const clearTimers = () => {
+  if (showTimer) {
+    window.clearTimeout(showTimer)
+    showTimer = null
+  }
+  if (hideTimer) {
+    window.clearTimeout(hideTimer)
+    hideTimer = null
   }
 }
+
+const show = async () => {
+  if (props.disabled) return
+  clearTimers()
+  showTimer = window.setTimeout(async () => {
+    visible.value = true
+    emit('show')
+    await nextTick()
+    updatePosition()
+  }, props.delay)
+}
+
+const hide = () => {
+  clearTimers()
+  hideTimer = window.setTimeout(() => {
+    visible.value = false
+    emit('hide')
+  }, props.hideDelay)
+}
+
+const showImmediately = async () => {
+  if (props.disabled) return
+  clearTimers()
+  visible.value = true
+  emit('show')
+  await nextTick()
+  updatePosition()
+}
+const hideImmediately = () => {
+  clearTimers()
+  visible.value = false
+  emit('hide')
+}
+
+// 触发器事件
+const onTriggerMouseEnter = () => {
+  if (props.trigger === 'hover') show()
+}
+const onTriggerMouseLeave = () => {
+  // 关键修改：hover 模式下，离开触发区即开始隐藏计时，不再保持可交互
+  if (props.trigger === 'hover') hide()
+}
+const onTriggerClick = () => {
+  if (props.trigger !== 'click') return
+  visible.value ? hideImmediately() : showImmediately()
+}
+const onTriggerFocus = () => {
+  if (props.trigger === 'focus') showImmediately()
+}
+const onTriggerBlur = () => {
+  if (props.trigger === 'focus') hideImmediately()
+}
+
+// 点击外部关闭（只对 click 模式）
+const onClickOutside = (e: MouseEvent) => {
+  if (props.trigger !== 'click') return
+  const w = wrapperRef.value
+  const t = tooltipRef.value
+  const target = e.target as Node
+  if (w && !w.contains(target) && t && !t.contains(target)) {
+    hideImmediately()
+  }
+}
+
+// 定位算法
+function clamp(n: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, n))
+}
+
+function computeBasePosition(
+  placement: Placement,
+  triggerRect: DOMRect,
+  tooltipRect: DOMRect,
+  offset: number,
+) {
+  const centerX = triggerRect.left + triggerRect.width / 2
+  const centerY = triggerRect.top + triggerRect.height / 2
+
+  switch (placement) {
+    case 'top':
+      return {
+        top: triggerRect.top - tooltipRect.height - offset,
+        left: centerX - tooltipRect.width / 2,
+      }
+    case 'bottom':
+      return {
+        top: triggerRect.bottom + offset,
+        left: centerX - tooltipRect.width / 2,
+      }
+    case 'left':
+      return {
+        top: centerY - tooltipRect.height / 2,
+        left: triggerRect.left - tooltipRect.width - offset,
+      }
+    case 'right':
+      return {
+        top: centerY - tooltipRect.height / 2,
+        left: triggerRect.right + offset,
+      }
+  }
+}
+
+function positionWithSmartFlip(
+  preferred: Placement,
+  triggerRect: DOMRect,
+  tooltipRect: DOMRect,
+  offset: number,
+) {
+  const padding = 8
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+
+  let placement: Placement = preferred
+  let { top, left } = computeBasePosition(placement, triggerRect, tooltipRect, offset)!
+
+  const outTop = top < padding
+  const outBottom = top + tooltipRect.height > vh - padding
+  const outLeft = left < padding
+  const outRight = left + tooltipRect.width > vw - padding
+
+  if (
+    placement === 'top' &&
+    outTop &&
+    triggerRect.bottom + offset + tooltipRect.height <= vh - padding
+  ) {
+    placement = 'bottom'
+    ;({ top, left } = computeBasePosition(placement, triggerRect, tooltipRect, offset)!)
+  } else if (
+    placement === 'bottom' &&
+    outBottom &&
+    triggerRect.top - offset - tooltipRect.height >= padding
+  ) {
+    placement = 'top'
+    ;({ top, left } = computeBasePosition(placement, triggerRect, tooltipRect, offset)!)
+  } else if (
+    placement === 'left' &&
+    outLeft &&
+    triggerRect.right + offset + tooltipRect.width <= vw - padding
+  ) {
+    placement = 'right'
+    ;({ top, left } = computeBasePosition(placement, triggerRect, tooltipRect, offset)!)
+  } else if (
+    placement === 'right' &&
+    outRight &&
+    triggerRect.left - offset - tooltipRect.width >= padding
+  ) {
+    placement = 'left'
+    ;({ top, left } = computeBasePosition(placement, triggerRect, tooltipRect, offset)!)
+  }
+
+  top = clamp(top, padding, vh - tooltipRect.height - padding)
+  left = clamp(left, padding, vw - tooltipRect.width - padding)
+
+  const triggerCenterX = triggerRect.left + triggerRect.width / 2
+  const triggerCenterY = triggerRect.top + triggerRect.height / 2
+  const arrowLeft = clamp(triggerCenterX - left, 10, tooltipRect.width - 10)
+  const arrowTop = clamp(triggerCenterY - top, 10, tooltipRect.height - 10)
+
+  return { placement, top, left, arrowLeft, arrowTop }
+}
+
+const updatePosition = () => {
+  if (!wrapperRef.value || !tooltipRef.value || !visible.value) return
+  if (rafId) cancelAnimationFrame(rafId)
+  rafId = requestAnimationFrame(() => {
+    const triggerEl = wrapperRef.value!.querySelector('.tooltip-trigger') as HTMLElement | null
+    const tooltipEl = tooltipRef.value!
+    if (!triggerEl) return
+
+    const triggerRect = triggerEl.getBoundingClientRect()
+    const tooltipRect = tooltipEl.getBoundingClientRect()
+    const { placement, top, left, arrowLeft, arrowTop } = positionWithSmartFlip(
+      props.placement,
+      triggerRect,
+      tooltipRect,
+      props.offset,
+    )
+
+    currentPlacement.value = placement
+    tooltipTransform.value = `translate3d(${Math.round(left)}px, ${Math.round(top)}px, 0)`
+    if (placement === 'top' || placement === 'bottom') {
+      arrowStyle.value = { '--arrow-left': `${Math.round(arrowLeft)}px` } as any
+    } else {
+      arrowStyle.value = { '--arrow-top': `${Math.round(arrowTop)}px` } as any
+    }
+  })
+}
+
+const onEnvChanged = () => {
+  if (visible.value) updatePosition()
+}
+
+watch(
+  () => props.disabled,
+  (v) => {
+    if (v && visible.value) hideImmediately()
+  },
+)
+watch(
+  () => props.placement,
+  () => {
+    if (visible.value) nextTick(updatePosition)
+  },
+)
+watch(visible, (v) => {
+  if (!mounted.value) return
+  if (v) {
+    if ('ResizeObserver' in window && !ro) {
+      ro = new ResizeObserver(() => updatePosition())
+      if (tooltipRef.value) ro.observe(tooltipRef.value)
+      const triggerEl = wrapperRef.value?.querySelector('.tooltip-trigger') as HTMLElement | null
+      if (triggerEl) ro.observe(triggerEl)
+    }
+    updatePosition()
+  } else {
+    if (ro) {
+      ro.disconnect()
+      ro = null
+    }
+  }
+})
+
+onMounted(() => {
+  mounted.value = true
+  window.addEventListener('resize', onEnvChanged, { passive: true })
+  window.addEventListener('scroll', onEnvChanged, { passive: true, capture: true })
+  document.addEventListener('click', onClickOutside, true)
+})
+
+onBeforeUnmount(() => {
+  clearTimers()
+  if (rafId) cancelAnimationFrame(rafId)
+  if (ro) {
+    ro.disconnect()
+    ro = null
+  }
+  document.removeEventListener('click', onClickOutside, true)
+  window.removeEventListener('resize', onEnvChanged)
+  window.removeEventListener('scroll', onEnvChanged, true)
+})
+
+// 暴露给父组件（manual 可用）
+defineExpose({ show: showImmediately, hide: hideImmediately, updatePosition })
 </script>
 
 <style scoped>
@@ -308,16 +383,23 @@ export default {
   position: relative;
   display: inline-block;
 }
-
 .tooltip-trigger {
   display: inline-block;
   outline: none;
 }
+.tooltip-trigger:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
 
 .tooltip-content {
-  position: fixed;
+  will-change: transform;
+  pointer-events: auto; /* 默认允许交互（click/focus 模式） */
+}
+.tooltip-noninteractive {
+  /* hover 模式下禁用指针事件，避免移入浮层导致保持显示 */
   pointer-events: none;
-  z-index: 2000;
 }
 
 .tooltip-inner {
@@ -326,23 +408,22 @@ export default {
   font-size: 14px;
   line-height: 1.4;
   word-wrap: break-word;
+  border: 1px solid transparent;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* 亮色主题 */
+/* 主题 */
 .tooltip-light .tooltip-inner {
   background-color: var(--background-color);
   color: var(--text-color);
-  border: 1px solid var(--normal-border-color);
+  border-color: var(--normal-border-color);
 }
-
-/* 暗色主题 */
 .tooltip-dark .tooltip-inner {
   background-color: rgba(0, 0, 0, 0.9);
-  color: white;
+  color: #fff;
 }
 
-/* 箭头基础样式 */
+/* 箭头（用 CSS 变量控制偏移） */
 .tooltip-arrow {
   position: absolute;
   width: 0;
@@ -350,18 +431,16 @@ export default {
   border-style: solid;
 }
 
-/* 顶部箭头 */
+/* 顶部 */
 .tooltip-top .tooltip-arrow-top {
   bottom: -6px;
-  left: 50%;
+  left: var(--arrow-left, 50%);
   transform: translateX(-50%);
   border-width: 6px 6px 0 6px;
 }
-
 .tooltip-light.tooltip-top .tooltip-arrow-top {
   border-color: var(--normal-border-color) transparent transparent transparent;
 }
-
 .tooltip-light.tooltip-top .tooltip-arrow-top::after {
   content: '';
   position: absolute;
@@ -371,23 +450,20 @@ export default {
   border-style: solid;
   border-color: var(--background-color) transparent transparent transparent;
 }
-
 .tooltip-dark.tooltip-top .tooltip-arrow-top {
   border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
 }
 
-/* 底部箭头 */
+/* 底部 */
 .tooltip-bottom .tooltip-arrow-bottom {
   top: -6px;
-  left: 50%;
+  left: var(--arrow-left, 50%);
   transform: translateX(-50%);
   border-width: 0 6px 6px 6px;
 }
-
 .tooltip-light.tooltip-bottom .tooltip-arrow-bottom {
   border-color: transparent transparent var(--normal-border-color) transparent;
 }
-
 .tooltip-light.tooltip-bottom .tooltip-arrow-bottom::after {
   content: '';
   position: absolute;
@@ -397,23 +473,20 @@ export default {
   border-style: solid;
   border-color: transparent transparent var(--background-color) transparent;
 }
-
 .tooltip-dark.tooltip-bottom .tooltip-arrow-bottom {
   border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent;
 }
 
-/* 左侧箭头 */
+/* 左侧 */
 .tooltip-left .tooltip-arrow-left {
   right: -6px;
-  top: 50%;
+  top: var(--arrow-top, 50%);
   transform: translateY(-50%);
   border-width: 6px 0 6px 6px;
 }
-
 .tooltip-light.tooltip-left .tooltip-arrow-left {
   border-color: transparent transparent transparent var(--normal-border-color);
 }
-
 .tooltip-light.tooltip-left .tooltip-arrow-left::after {
   content: '';
   position: absolute;
@@ -423,23 +496,20 @@ export default {
   border-style: solid;
   border-color: transparent transparent transparent var(--background-color);
 }
-
 .tooltip-dark.tooltip-left .tooltip-arrow-left {
   border-color: transparent transparent transparent rgba(0, 0, 0, 0.9);
 }
 
-/* 右侧箭头 */
+/* 右侧 */
 .tooltip-right .tooltip-arrow-right {
   left: -6px;
-  top: 50%;
+  top: var(--arrow-top, 50%);
   transform: translateY(-50%);
   border-width: 6px 6px 6px 0;
 }
-
 .tooltip-light.tooltip-right .tooltip-arrow-right {
   border-color: transparent var(--normal-border-color) transparent transparent;
 }
-
 .tooltip-light.tooltip-right .tooltip-arrow-right::after {
   content: '';
   position: absolute;
@@ -449,7 +519,6 @@ export default {
   border-style: solid;
   border-color: transparent var(--background-color) transparent transparent;
 }
-
 .tooltip-dark.tooltip-right .tooltip-arrow-right {
   border-color: transparent rgba(0, 0, 0, 0.9) transparent transparent;
 }
@@ -457,32 +526,22 @@ export default {
 /* 过渡动画 */
 .tooltip-fade-enter-active,
 .tooltip-fade-leave-active {
-  transition: all 0.2s ease;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
 }
-
-.tooltip-fade-enter-from {
-  opacity: 0;
-  transform: scale(0.8);
-}
-
+.tooltip-fade-enter-from,
 .tooltip-fade-leave-to {
   opacity: 0;
-  transform: scale(0.8);
+  transform: translate3d(0, 4px, 0) scale(0.98);
 }
 
-/* 响应式调整 */
+/* 响应式微调 */
 @media (max-width: 768px) {
   .tooltip-inner {
     padding: 6px 10px;
     font-size: 13px;
     max-width: 250px;
   }
-}
-
-/* 键盘导航样式 */
-.tooltip-trigger:focus-visible {
-  outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
-  border-radius: 4px;
 }
 </style>
