@@ -69,7 +69,7 @@
     </div>
 
     <div class="other-signup-page-content">
-      <div class="signup-page-button" @click="googleAuthorize">
+      <div class="signup-page-button" @click="signupWithGoogle">
         <img class="signup-page-button-icon" src="~/assets/icons/google.svg" alt="Google Logo" />
         <div class="signup-page-button-text">Google 注册</div>
       </div>
@@ -111,9 +111,11 @@ const passwordError = ref('')
 const code = ref('')
 const isWaitingForEmailSent = ref(false)
 const isWaitingForEmailVerified = ref(false)
+const inviteToken = ref('')
 
 onMounted(async () => {
   username.value = route.query.u || ''
+  inviteToken.value = route.query.invite_token || ''
   try {
     const res = await fetch(`${API_BASE_URL}/api/config`)
     if (res.ok) {
@@ -205,14 +207,17 @@ const verifyCode = async () => {
     isWaitingForEmailVerified.value = false
   }
 }
+const signupWithGoogle = () => {
+  googleAuthorize(inviteToken.value)
+}
 const signupWithGithub = () => {
-  githubAuthorize()
+  githubAuthorize(inviteToken.value)
 }
 const signupWithDiscord = () => {
-  discordAuthorize()
+  discordAuthorize(inviteToken.value)
 }
 const signupWithTwitter = () => {
-  twitterAuthorize()
+  twitterAuthorize(inviteToken.value)
 }
 </script>
 
