@@ -13,6 +13,14 @@
         <p>每人每天仅能生产3个邀请链接</p>
       </div>
     </div>
+
+    <div v-if="inviteCode" class="invite-code-link-content">
+      <p>
+        邀请链接：https://openisle.com/signup?invite_token=1234567890
+        <span> <i class="fas fa-copy copy-icon"></i> </span>
+      </p>
+    </div>
+
     <div class="generate-button">生成邀请链接</div>
   </div>
 </template>
@@ -99,6 +107,17 @@ onMounted(async () => {
   opacity: 0.8;
   font-size: 12px;
   color: var(--primary-color);
+}
+
+.invite-code-link-content {
+  margin-top: 20px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.copy-icon {
+  cursor: pointer;
+  margin-left: 5px;
 }
 
 @media screen and (max-width: 768px) {
