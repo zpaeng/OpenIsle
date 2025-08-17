@@ -96,6 +96,7 @@ import { discordAuthorize } from '~/utils/discord'
 import { githubAuthorize } from '~/utils/github'
 import { googleAuthorize } from '~/utils/google'
 import { twitterAuthorize } from '~/utils/twitter'
+import { loadCurrentUser, setToken } from '~/utils/auth'
 
 const route = useRoute()
 const config = useRuntimeConfig()
@@ -160,6 +161,7 @@ const sendVerification = async () => {
         username: username.value,
         email: email.value,
         password: password.value,
+        inviteToken: inviteToken.value,
       }),
     })
     isWaitingForEmailSent.value = false
@@ -192,11 +194,18 @@ const verifyCode = async () => {
     })
     const data = await res.json()
     if (res.ok) {
-      if (registerMode.value === 'WHITELIST') {
-        navigateTo(`/signup-reason?token=${data.token}`, { replace: true })
-      } else {
-        toast.success('注册成功，请登录')
-        navigateTo('/login', { replace: true })
+      if (data.reason_code === 'VERIFIED_AND_APPROVED') {
+        toast.success('注册成功')
+        setToken(data.token)
+        loadCurrentUser()
+        navigateTo('/', { replace: true })
+      } else if (data.reason_code === 'VERIFIED') {
+        if (registerMode.value === 'WHITELIST') {
+          navigateTo(`/signup-reason?token=${data.token}`, { replace: true })
+        } else {
+          toast.success('注册成功，请登录')
+          navigateTo('/login', { replace: true })
+        }
       }
     } else {
       toast.error(data.error || '注册失败')

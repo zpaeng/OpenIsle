@@ -48,12 +48,13 @@ public class AuthController {
         }
         if (req.getInviteToken() != null && !req.getInviteToken().isEmpty()) {
             if (!inviteService.validate(req.getInviteToken())) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Invalid invite token"));
+                return ResponseEntity.badRequest().body(Map.of("error", "邀请码使用次数过多"));
             }
             try {
                 User user = userService.registerWithInvite(
                         req.getUsername(), req.getEmail(), req.getPassword());
                 inviteService.consume(req.getInviteToken());
+                emailService.sendEmail(user.getEmail(), "在网站填写验证码以验证", "您的验证码是 " + user.getVerificationCode());
                 return ResponseEntity.ok(Map.of(
                         "token", jwtService.generateToken(user.getUsername()),
                         "reason_code", "INVITE_APPROVED"
@@ -78,10 +79,26 @@ public class AuthController {
     public ResponseEntity<?> verify(@RequestBody VerifyRequest req) {
         boolean ok = userService.verifyCode(req.getUsername(), req.getCode());
         if (ok) {
-            return ResponseEntity.ok(Map.of(
-                    "message", "Verified",
-                    "token", jwtService.generateReasonToken(req.getUsername())
-            ));
+            Optional<User> userOpt = userService.findByUsername(req.getUsername());
+            if (userOpt.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Invalid credentials"));
+            }
+
+            User user = userOpt.get();
+
+            if (user.isApproved()) {
+                return ResponseEntity.ok(Map.of(
+                        "message", "Verified and isApproved",
+                        "reason_code", "VERIFIED_AND_APPROVED",
+                        "token", jwtService.generateToken(req.getUsername())
+                ));
+            } else {
+                return ResponseEntity.ok(Map.of(
+                        "message", "Verified",
+                        "reason_code", "VERIFIED",
+                        "token", jwtService.generateReasonToken(req.getUsername())
+                ));
+            }
         }
         return ResponseEntity.badRequest().body(Map.of("error", "Invalid verification code"));
     }

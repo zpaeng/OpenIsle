@@ -48,9 +48,9 @@ onMounted(async () => {
   isLoadingUser.value = true
   user.value = await fetchCurrentUser()
   isLoadingUser.value = false
-  if (user.value) {
-    await fetchInvite(false)
-  }
+  // if (user.value) {
+  //   await fetchInvite(false)
+  // }
 })
 
 const fetchInvite = async (showToast = true) => {
