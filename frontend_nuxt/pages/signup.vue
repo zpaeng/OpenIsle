@@ -96,6 +96,8 @@ import { discordAuthorize } from '~/utils/discord'
 import { githubAuthorize } from '~/utils/github'
 import { googleAuthorize } from '~/utils/google'
 import { twitterAuthorize } from '~/utils/twitter'
+
+const route = useRoute()
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
 const emailStep = ref(0)

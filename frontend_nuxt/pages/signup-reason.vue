@@ -28,6 +28,7 @@ const reason = ref('')
 const error = ref('')
 const isWaitingForRegister = ref(false)
 const token = ref('')
+const route = useRoute()
 
 onMounted(async () => {
   token.value = route.query.token || ''
