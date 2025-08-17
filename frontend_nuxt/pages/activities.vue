@@ -25,6 +25,7 @@
         </div>
       </div>
       <MilkTeaActivityComponent v-if="a.type === 'MILK_TEA'" />
+      <InviteCodeActivityComponent v-if="a.type === 'INVITE_POINTS'" />
     </div>
   </div>
 </template>
@@ -32,6 +33,7 @@
 <script setup>
 import TimeManager from '~/utils/time'
 import MilkTeaActivityComponent from '~/components/MilkTeaActivityComponent.vue'
+import InviteCodeActivityComponent from '~/components/InviteCodeActivityComponent.vue'
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
 
@@ -75,6 +77,7 @@ onMounted(async () => {
   background-color: var(--activity-card-background-color);
   border-radius: 20px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
 }
 
 .activity-card-left-avatar-img {
@@ -139,6 +142,10 @@ onMounted(async () => {
 .activity-link {
   text-decoration: none;
   color: inherit;
+}
+
+.activity-card-normal-right {
+  width: 100%;
 }
 
 @media screen and (max-width: 768px) {

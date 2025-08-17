@@ -22,6 +22,7 @@ const iconMap = {
   POST_UNSUBSCRIBED: 'fas fa-bookmark',
   REGISTER_REQUEST: 'fas fa-user-clock',
   ACTIVITY_REDEEM: 'fas fa-coffee',
+  POINT_REDEEM: 'fas fa-gift',
   LOTTERY_WIN: 'fas fa-trophy',
   LOTTERY_DRAW: 'fas fa-bullhorn',
   MENTION: 'fas fa-at',

@@ -69,7 +69,7 @@
     </div>
 
     <div class="other-signup-page-content">
-      <div class="signup-page-button" @click="googleAuthorize">
+      <div class="signup-page-button" @click="signupWithGoogle">
         <img class="signup-page-button-icon" src="~/assets/icons/google.svg" alt="Google Logo" />
         <div class="signup-page-button-text">Google 注册</div>
       </div>
@@ -96,6 +96,7 @@ import { discordAuthorize } from '~/utils/discord'
 import { githubAuthorize } from '~/utils/github'
 import { googleAuthorize } from '~/utils/google'
 import { twitterAuthorize } from '~/utils/twitter'
+import { loadCurrentUser, setToken } from '~/utils/auth'
 
 const route = useRoute()
 const config = useRuntimeConfig()
@@ -111,9 +112,11 @@ const passwordError = ref('')
 const code = ref('')
 const isWaitingForEmailSent = ref(false)
 const isWaitingForEmailVerified = ref(false)
+const inviteToken = ref('')
 
 onMounted(async () => {
   username.value = route.query.u || ''
+  inviteToken.value = route.query.invite_token || ''
   try {
     const res = await fetch(`${API_BASE_URL}/api/config`)
     if (res.ok) {
@@ -158,6 +161,7 @@ const sendVerification = async () => {
         username: username.value,
         email: email.value,
         password: password.value,
+        inviteToken: inviteToken.value,
       }),
     })
     isWaitingForEmailSent.value = false
@@ -190,11 +194,18 @@ const verifyCode = async () => {
     })
     const data = await res.json()
     if (res.ok) {
-      if (registerMode.value === 'WHITELIST') {
-        navigateTo(`/signup-reason?token=${data.token}`, { replace: true })
-      } else {
-        toast.success('注册成功，请登录')
-        navigateTo('/login', { replace: true })
+      if (data.reason_code === 'VERIFIED_AND_APPROVED') {
+        toast.success('注册成功')
+        setToken(data.token)
+        loadCurrentUser()
+        navigateTo('/', { replace: true })
+      } else if (data.reason_code === 'VERIFIED') {
+        if (registerMode.value === 'WHITELIST') {
+          navigateTo(`/signup-reason?token=${data.token}`, { replace: true })
+        } else {
+          toast.success('注册成功，请登录')
+          navigateTo('/login', { replace: true })
+        }
       }
     } else {
       toast.error(data.error || '注册失败')
@@ -205,14 +216,17 @@ const verifyCode = async () => {
     isWaitingForEmailVerified.value = false
   }
 }
+const signupWithGoogle = () => {
+  googleAuthorize(inviteToken.value)
+}
 const signupWithGithub = () => {
-  githubAuthorize()
+  githubAuthorize(inviteToken.value)
 }
 const signupWithDiscord = () => {
-  discordAuthorize()
+  discordAuthorize(inviteToken.value)
 }
 const signupWithTwitter = () => {
-  twitterAuthorize()
+  twitterAuthorize(inviteToken.value)
 }
 </script>
 

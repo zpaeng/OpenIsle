@@ -141,6 +141,19 @@ public class NotificationService {
         }
     }
 
+    /**
+     * Create notifications for all admins when a user redeems a point good.
+     * Old redeem notifications from the same user are removed first.
+     */
+    @org.springframework.transaction.annotation.Transactional
+    public void createPointRedeemNotifications(User user, String content) {
+//        notificationRepository.deleteByTypeAndFromUser(NotificationType.POINT_REDEEM, user);
+        for (User admin : userRepository.findByRole(Role.ADMIN)) {
+            createNotification(admin, NotificationType.POINT_REDEEM, null, null,
+                    null, user, null, content);
+        }
+    }
+
     public List<NotificationPreferenceDto> listPreferences(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));

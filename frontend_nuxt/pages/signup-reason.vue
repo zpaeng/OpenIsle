@@ -51,8 +51,8 @@ const submit = async () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        token: this.token,
-        reason: this.reason,
+        token: token.value,
+        reason: reason.value,
       }),
     })
     isWaitingForRegister.value = false

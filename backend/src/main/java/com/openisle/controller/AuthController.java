@@ -29,6 +29,7 @@ public class AuthController {
     private final RegisterModeService registerModeService;
     private final NotificationService notificationService;
     private final UserRepository userRepository;
+    private final InviteService inviteService;
 
 
     @Value("${app.captcha.enabled:false}")
@@ -45,6 +46,26 @@ public class AuthController {
         if (captchaEnabled && registerCaptchaEnabled && !captchaService.verify(req.getCaptcha())) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid captcha"));
         }
+        if (req.getInviteToken() != null && !req.getInviteToken().isEmpty()) {
+            if (!inviteService.validate(req.getInviteToken())) {
+                return ResponseEntity.badRequest().body(Map.of("error", "邀请码使用次数过多"));
+            }
+            try {
+                User user = userService.registerWithInvite(
+                        req.getUsername(), req.getEmail(), req.getPassword());
+                inviteService.consume(req.getInviteToken());
+                emailService.sendEmail(user.getEmail(), "在网站填写验证码以验证", "您的验证码是 " + user.getVerificationCode());
+                return ResponseEntity.ok(Map.of(
+                        "token", jwtService.generateToken(user.getUsername()),
+                        "reason_code", "INVITE_APPROVED"
+                ));
+            } catch (FieldException e) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "field", e.getField(),
+                        "error", e.getMessage()
+                ));
+            }
+        }
         User user = userService.register(
                 req.getUsername(), req.getEmail(), req.getPassword(), "", registerModeService.getRegisterMode());
         emailService.sendEmail(user.getEmail(), "在网站填写验证码以验证", "您的验证码是 " + user.getVerificationCode());
@@ -58,10 +79,26 @@ public class AuthController {
     public ResponseEntity<?> verify(@RequestBody VerifyRequest req) {
         boolean ok = userService.verifyCode(req.getUsername(), req.getCode());
         if (ok) {
-            return ResponseEntity.ok(Map.of(
-                    "message", "Verified",
-                    "token", jwtService.generateReasonToken(req.getUsername())
-            ));
+            Optional<User> userOpt = userService.findByUsername(req.getUsername());
+            if (userOpt.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Invalid credentials"));
+            }
+
+            User user = userOpt.get();
+
+            if (user.isApproved()) {
+                return ResponseEntity.ok(Map.of(
+                        "message", "Verified and isApproved",
+                        "reason_code", "VERIFIED_AND_APPROVED",
+                        "token", jwtService.generateToken(req.getUsername())
+                ));
+            } else {
+                return ResponseEntity.ok(Map.of(
+                        "message", "Verified",
+                        "reason_code", "VERIFIED",
+                        "token", jwtService.generateReasonToken(req.getUsername())
+                ));
+            }
         }
         return ResponseEntity.badRequest().body(Map.of("error", "Invalid verification code"));
     }
@@ -106,27 +143,42 @@ public class AuthController {
 
     @PostMapping("/google")
     public ResponseEntity<?> loginWithGoogle(@RequestBody GoogleLoginRequest req) {
-        Optional<User> user = googleAuthService.authenticate(req.getIdToken(), registerModeService.getRegisterMode());
-        if (user.isPresent()) {
-            if (RegisterMode.DIRECT.equals(registerModeService.getRegisterMode())) {
-                return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
+        boolean viaInvite = req.getInviteToken() != null && !req.getInviteToken().isEmpty();
+        if (viaInvite && !inviteService.validate(req.getInviteToken())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid invite token"));
+        }
+        Optional<AuthResult> resultOpt = googleAuthService.authenticate(
+                req.getIdToken(),
+                registerModeService.getRegisterMode(),
+                viaInvite);
+        if (resultOpt.isPresent()) {
+            AuthResult result = resultOpt.get();
+            if (viaInvite && result.isNewUser()) {
+                inviteService.consume(req.getInviteToken());
+                return ResponseEntity.ok(Map.of(
+                        "token", jwtService.generateToken(result.getUser().getUsername()),
+                        "reason_code", "INVITE_APPROVED"
+                ));
             }
-            if (!user.get().isApproved()) {
-                if (user.get().getRegisterReason() != null && !user.get().getRegisterReason().isEmpty()) {
+            if (RegisterMode.DIRECT.equals(registerModeService.getRegisterMode())) {
+                return ResponseEntity.ok(Map.of("token", jwtService.generateToken(result.getUser().getUsername())));
+            }
+            if (!result.getUser().isApproved()) {
+                if (result.getUser().getRegisterReason() != null && !result.getUser().getRegisterReason().isEmpty()) {
                     return ResponseEntity.badRequest().body(Map.of(
                             "error", "Account awaiting approval",
                             "reason_code", "IS_APPROVING",
-                            "token", jwtService.generateReasonToken(user.get().getUsername())
+                            "token", jwtService.generateReasonToken(result.getUser().getUsername())
                     ));
                 }
                 return ResponseEntity.badRequest().body(Map.of(
                         "error", "Account awaiting approval",
                         "reason_code", "NOT_APPROVED",
-                        "token", jwtService.generateReasonToken(user.get().getUsername())
+                        "token", jwtService.generateReasonToken(result.getUser().getUsername())
                 ));
             }
 
-            return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
+            return ResponseEntity.ok(Map.of("token", jwtService.generateToken(result.getUser().getUsername())));
         }
         return ResponseEntity.badRequest().body(Map.of(
                 "error", "Invalid google token",
@@ -165,28 +217,44 @@ public class AuthController {
 
     @PostMapping("/github")
     public ResponseEntity<?> loginWithGithub(@RequestBody GithubLoginRequest req) {
-        Optional<User> user = githubAuthService.authenticate(req.getCode(), registerModeService.getRegisterMode(), req.getRedirectUri());
-        if (user.isPresent()) {
-            if (RegisterMode.DIRECT.equals(registerModeService.getRegisterMode())) {
-                return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
+        boolean viaInvite = req.getInviteToken() != null && !req.getInviteToken().isEmpty();
+        if (viaInvite && !inviteService.validate(req.getInviteToken())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid invite token"));
+        }
+        Optional<AuthResult> resultOpt = githubAuthService.authenticate(
+                req.getCode(),
+                registerModeService.getRegisterMode(),
+                req.getRedirectUri(),
+                viaInvite);
+        if (resultOpt.isPresent()) {
+            AuthResult result = resultOpt.get();
+            if (viaInvite && result.isNewUser()) {
+                inviteService.consume(req.getInviteToken());
+                return ResponseEntity.ok(Map.of(
+                        "token", jwtService.generateToken(result.getUser().getUsername()),
+                        "reason_code", "INVITE_APPROVED"
+                ));
             }
-            if (!user.get().isApproved()) {
-                if (user.get().getRegisterReason() != null && !user.get().getRegisterReason().isEmpty()) {
+            if (RegisterMode.DIRECT.equals(registerModeService.getRegisterMode())) {
+                return ResponseEntity.ok(Map.of("token", jwtService.generateToken(result.getUser().getUsername())));
+            }
+            if (!result.getUser().isApproved()) {
+                if (result.getUser().getRegisterReason() != null && !result.getUser().getRegisterReason().isEmpty()) {
                     // 已填写注册理由
                     return ResponseEntity.badRequest().body(Map.of(
                             "error", "Account awaiting approval",
                             "reason_code", "IS_APPROVING",
-                            "token", jwtService.generateReasonToken(user.get().getUsername())
+                            "token", jwtService.generateReasonToken(result.getUser().getUsername())
                     ));
                 }
                 return ResponseEntity.badRequest().body(Map.of(
                         "error", "Account awaiting approval",
                         "reason_code", "NOT_APPROVED",
-                        "token", jwtService.generateReasonToken(user.get().getUsername())
+                        "token", jwtService.generateReasonToken(result.getUser().getUsername())
                 ));
             }
 
-            return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
+            return ResponseEntity.ok(Map.of("token", jwtService.generateToken(result.getUser().getUsername())));
         }
         return ResponseEntity.badRequest().body(Map.of(
                 "error", "Invalid github code",
@@ -196,27 +264,43 @@ public class AuthController {
 
     @PostMapping("/discord")
     public ResponseEntity<?> loginWithDiscord(@RequestBody DiscordLoginRequest req) {
-        Optional<User> user = discordAuthService.authenticate(req.getCode(), registerModeService.getRegisterMode(), req.getRedirectUri());
-        if (user.isPresent()) {
-            if (RegisterMode.DIRECT.equals(registerModeService.getRegisterMode())) {
-                return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
+        boolean viaInvite = req.getInviteToken() != null && !req.getInviteToken().isEmpty();
+        if (viaInvite && !inviteService.validate(req.getInviteToken())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid invite token"));
+        }
+        Optional<AuthResult> resultOpt = discordAuthService.authenticate(
+                req.getCode(),
+                registerModeService.getRegisterMode(),
+                req.getRedirectUri(),
+                viaInvite);
+        if (resultOpt.isPresent()) {
+            AuthResult result = resultOpt.get();
+            if (viaInvite && result.isNewUser()) {
+                inviteService.consume(req.getInviteToken());
+                return ResponseEntity.ok(Map.of(
+                        "token", jwtService.generateToken(result.getUser().getUsername()),
+                        "reason_code", "INVITE_APPROVED"
+                ));
             }
-            if (!user.get().isApproved()) {
-                if (user.get().getRegisterReason() != null && !user.get().getRegisterReason().isEmpty()) {
+            if (RegisterMode.DIRECT.equals(registerModeService.getRegisterMode())) {
+                return ResponseEntity.ok(Map.of("token", jwtService.generateToken(result.getUser().getUsername())));
+            }
+            if (!result.getUser().isApproved()) {
+                if (result.getUser().getRegisterReason() != null && !result.getUser().getRegisterReason().isEmpty()) {
                     return ResponseEntity.badRequest().body(Map.of(
                             "error", "Account awaiting approval",
                             "reason_code", "IS_APPROVING",
-                            "token", jwtService.generateReasonToken(user.get().getUsername())
+                            "token", jwtService.generateReasonToken(result.getUser().getUsername())
                     ));
                 }
                 return ResponseEntity.badRequest().body(Map.of(
                         "error", "Account awaiting approval",
                         "reason_code", "NOT_APPROVED",
-                        "token", jwtService.generateReasonToken(user.get().getUsername())
+                        "token", jwtService.generateReasonToken(result.getUser().getUsername())
                 ));
             }
 
-            return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
+            return ResponseEntity.ok(Map.of("token", jwtService.generateToken(result.getUser().getUsername())));
         }
         return ResponseEntity.badRequest().body(Map.of(
                 "error", "Invalid discord code",
@@ -226,31 +310,44 @@ public class AuthController {
       
     @PostMapping("/twitter")
     public ResponseEntity<?> loginWithTwitter(@RequestBody TwitterLoginRequest req) {
-        Optional<User> user = twitterAuthService.authenticate(
+        boolean viaInvite = req.getInviteToken() != null && !req.getInviteToken().isEmpty();
+        if (viaInvite && !inviteService.validate(req.getInviteToken())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid invite token"));
+        }
+        Optional<AuthResult> resultOpt = twitterAuthService.authenticate(
                 req.getCode(),
                 req.getCodeVerifier(),
                 registerModeService.getRegisterMode(),
-                req.getRedirectUri());
-        if (user.isPresent()) {
-            if (RegisterMode.DIRECT.equals(registerModeService.getRegisterMode())) {
-                return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
+                req.getRedirectUri(),
+                viaInvite);
+        if (resultOpt.isPresent()) {
+            AuthResult result = resultOpt.get();
+            if (viaInvite && result.isNewUser()) {
+                inviteService.consume(req.getInviteToken());
+                return ResponseEntity.ok(Map.of(
+                        "token", jwtService.generateToken(result.getUser().getUsername()),
+                        "reason_code", "INVITE_APPROVED"
+                ));
             }
-            if (!user.get().isApproved()) {
-                if (user.get().getRegisterReason() != null && !user.get().getRegisterReason().isEmpty()) {
+            if (RegisterMode.DIRECT.equals(registerModeService.getRegisterMode())) {
+                return ResponseEntity.ok(Map.of("token", jwtService.generateToken(result.getUser().getUsername())));
+            }
+            if (!result.getUser().isApproved()) {
+                if (result.getUser().getRegisterReason() != null && !result.getUser().getRegisterReason().isEmpty()) {
                     return ResponseEntity.badRequest().body(Map.of(
                             "error", "Account awaiting approval",
                             "reason_code", "IS_APPROVING",
-                            "token", jwtService.generateReasonToken(user.get().getUsername())
+                            "token", jwtService.generateReasonToken(result.getUser().getUsername())
                     ));
                 }
                 return ResponseEntity.badRequest().body(Map.of(
                         "error", "Account awaiting approval",
                         "reason_code", "NOT_APPROVED",
-                        "token", jwtService.generateReasonToken(user.get().getUsername())
+                        "token", jwtService.generateReasonToken(result.getUser().getUsername())
                 ));
             }
 
-            return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.get().getUsername())));
+            return ResponseEntity.ok(Map.of("token", jwtService.generateToken(result.getUser().getUsername())));
         }
         return ResponseEntity.badRequest().body(Map.of(
                 "error", "Invalid twitter code",

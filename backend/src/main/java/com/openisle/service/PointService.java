@@ -26,6 +26,11 @@ public class PointService {
         return addPoint(user, 30);
     }
 
+    public int awardForInvite(String userName) {
+        User user = userRepository.findByUsername(userName).orElseThrow();
+        return addPoint(user, 500);
+    }
+
     private PointLog getTodayLog(User user) {
         LocalDate today = LocalDate.now();
         return pointLogRepository.findByUserAndLogDate(user, today)
