@@ -74,6 +74,13 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User registerWithInvite(String username, String email, String password) {
+        User user = register(username, email, password, "", com.openisle.model.RegisterMode.DIRECT);
+        user.setVerified(true);
+        user.setVerificationCode(null);
+        return userRepository.save(user);
+    }
+
     private String genCode() {
         return String.format("%06d", new Random().nextInt(1000000));
     }

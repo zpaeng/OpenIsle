@@ -33,11 +33,12 @@ public class TwitterAuthService {
     @Value("${twitter.client-secret:}")
     private String clientSecret;
 
-    public Optional<User> authenticate(
+    public Optional<AuthResult> authenticate(
             String code,
             String codeVerifier,
             RegisterMode mode,
-            String redirectUri) {
+            String redirectUri,
+            boolean viaInvite) {
 
         logger.debug("Starting authentication with code {} and verifier {}", code, codeVerifier);
 
@@ -106,10 +107,10 @@ public class TwitterAuthService {
         // Twitter v2 默认拿不到 email；如果你申请到 email.scope，可改用 /2/users/:id?user.fields=email
         String email = username + "@twitter.com";
         logger.debug("Processing user {} with email {}", username, email);
-        return Optional.of(processUser(email, username, avatar, mode));
+        return Optional.of(processUser(email, username, avatar, mode, viaInvite));
     }
 
-    private User processUser(String email, String username, String avatar, com.openisle.model.RegisterMode mode) {
+    private AuthResult processUser(String email, String username, String avatar, com.openisle.model.RegisterMode mode, boolean viaInvite) {
         Optional<User> existing = userRepository.findByEmail(email);
         if (existing.isPresent()) {
             User user = existing.get();
@@ -119,7 +120,7 @@ public class TwitterAuthService {
                 userRepository.save(user);
             }
             logger.debug("Existing user {} authenticated", user.getUsername());
-            return user;
+            return new AuthResult(user, false);
         }
         String baseUsername = username != null ? username : email.split("@")[0];
         String finalUsername = baseUsername;
@@ -133,13 +134,13 @@ public class TwitterAuthService {
         user.setPassword("");
         user.setRole(Role.USER);
         user.setVerified(true);
-        user.setApproved(mode == com.openisle.model.RegisterMode.DIRECT);
+        user.setApproved(mode == com.openisle.model.RegisterMode.DIRECT || viaInvite);
         if (avatar != null) {
             user.setAvatar(avatar);
         } else {
             user.setAvatar("https://twitter.com/" + finalUsername + "/profile_image");
         }
         logger.debug("Creating new user {}", finalUsername);
-        return userRepository.save(user);
+        return new AuthResult(userRepository.save(user), true);
     }
 }

@@ -24,6 +24,9 @@ public class JwtService {
     @Value("${app.jwt.reset-secret}")
     private String resetSecret;
 
+    @Value("${app.jwt.invite-secret}")
+    private String inviteSecret;
+
     @Value("${app.jwt.expiration}")
     private long expiration;
 
@@ -70,6 +73,17 @@ public class JwtService {
                 .compact();
     }
 
+    public String generateInviteToken(String subject) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + expiration);
+        return Jwts.builder()
+                .setSubject(subject)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(getSigningKeyForSecret(inviteSecret))
+                .compact();
+    }
+
     public String validateAndGetSubject(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getSigningKeyForSecret(secret))
@@ -91,6 +105,15 @@ public class JwtService {
     public String validateAndGetSubjectForReset(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getSigningKeyForSecret(resetSecret))
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject();
+    }
+
+    public String validateAndGetSubjectForInvite(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKeyForSecret(inviteSecret))
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
