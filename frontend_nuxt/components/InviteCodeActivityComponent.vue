@@ -6,11 +6,11 @@
         <span class="invite-code-description-title-text">邀请规则说明</span>
       </div>
       <div class="invite-code-description-content">
-        <p>邀请好友注册并登录，每次可以获得500积分</p>
+        <p>⚠️邀请好友注册并登录，每次可以获得500积分🎉🎉🎉</p>
         <p>邀请链接的有效期为1个月</p>
         <p>每一个邀请链接的邀请人数上限为3人</p>
         <p>通过邀请链接注册，无需注册审核</p>
-        <p>每人每天仅能生产3个邀请链接</p>
+        <p>每人每天仅能生产1个邀请链接</p>
       </div>
     </div>
 

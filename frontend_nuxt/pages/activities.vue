@@ -145,7 +145,7 @@ onMounted(async () => {
 }
 
 .activity-card-normal-right {
-  width: calc(100% - 150px);
+  width: 100%;
 }
 
 @media screen and (max-width: 768px) {
