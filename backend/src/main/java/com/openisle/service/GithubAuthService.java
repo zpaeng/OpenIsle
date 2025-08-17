@@ -30,7 +30,7 @@ public class GithubAuthService {
     @Value("${github.client-secret:}")
     private String clientSecret;
 
-    public Optional<User> authenticate(String code, com.openisle.model.RegisterMode mode, String redirectUri) {
+    public Optional<AuthResult> authenticate(String code, com.openisle.model.RegisterMode mode, String redirectUri, boolean viaInvite) {
         try {
             String tokenUrl = "https://github.com/login/oauth/access_token";
             HttpHeaders headers = new HttpHeaders();
@@ -86,13 +86,13 @@ public class GithubAuthService {
             if (email == null) {
                 email = username + "@users.noreply.github.com";
             }
-            return Optional.of(processUser(email, username, avatarUrl, mode));
+            return Optional.of(processUser(email, username, avatarUrl, mode, viaInvite));
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
-    private User processUser(String email, String username, String avatar, com.openisle.model.RegisterMode mode) {
+    private AuthResult processUser(String email, String username, String avatar, com.openisle.model.RegisterMode mode, boolean viaInvite) {
         Optional<User> existing = userRepository.findByEmail(email);
         if (existing.isPresent()) {
             User user = existing.get();
@@ -101,7 +101,7 @@ public class GithubAuthService {
                 user.setVerificationCode(null);
                 userRepository.save(user);
             }
-            return user;
+            return new AuthResult(user, false);
         }
         String baseUsername = username != null ? username : email.split("@")[0];
         String finalUsername = baseUsername;
@@ -115,12 +115,12 @@ public class GithubAuthService {
         user.setPassword("");
         user.setRole(Role.USER);
         user.setVerified(true);
-        user.setApproved(mode == com.openisle.model.RegisterMode.DIRECT);
+        user.setApproved(mode == com.openisle.model.RegisterMode.DIRECT || viaInvite);
         if (avatar != null) {
             user.setAvatar(avatar);
         } else {
             user.setAvatar(avatarGenerator.generate(finalUsername));
         }
-        return userRepository.save(user);
+        return new AuthResult(userRepository.save(user), true);
     }
 }

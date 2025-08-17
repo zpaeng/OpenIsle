@@ -25,7 +25,7 @@ public class GoogleAuthService {
     @Value("${google.client-id:}")
     private String clientId;
 
-    public Optional<User> authenticate(String idTokenString, com.openisle.model.RegisterMode mode) {
+    public Optional<AuthResult> authenticate(String idTokenString, com.openisle.model.RegisterMode mode, boolean viaInvite) {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
                 .setAudience(Collections.singletonList(clientId))
                 .build();
@@ -38,13 +38,13 @@ public class GoogleAuthService {
             String email = payload.getEmail();
             String name = (String) payload.get("name");
             String picture = (String) payload.get("picture");
-            return Optional.of(processUser(email, name, picture, mode));
+            return Optional.of(processUser(email, name, picture, mode, viaInvite));
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
-    private User processUser(String email, String name, String avatar, com.openisle.model.RegisterMode mode) {
+    private AuthResult processUser(String email, String name, String avatar, com.openisle.model.RegisterMode mode, boolean viaInvite) {
         Optional<User> existing = userRepository.findByEmail(email);
         if (existing.isPresent()) {
             User user = existing.get();
@@ -53,8 +53,7 @@ public class GoogleAuthService {
                 user.setVerificationCode(null);
                 userRepository.save(user);
             }
-
-            return user;
+            return new AuthResult(user, false);
         }
         User user = new User();
         String baseUsername = email.split("@")[0];
@@ -68,12 +67,12 @@ public class GoogleAuthService {
         user.setPassword("");
         user.setRole(Role.USER);
         user.setVerified(true);
-        user.setApproved(mode == com.openisle.model.RegisterMode.DIRECT);
+        user.setApproved(mode == com.openisle.model.RegisterMode.DIRECT || viaInvite);
         if (avatar != null) {
             user.setAvatar(avatar);
         } else {
             user.setAvatar(avatarGenerator.generate(username));
         }
-        return userRepository.save(user);
+        return new AuthResult(userRepository.save(user), true);
     }
 }

@@ -26,7 +26,7 @@ public class DiscordAuthService {
     @Value("${discord.client-secret:}")
     private String clientSecret;
 
-    public Optional<User> authenticate(String code, com.openisle.model.RegisterMode mode, String redirectUri) {
+    public Optional<AuthResult> authenticate(String code, com.openisle.model.RegisterMode mode, String redirectUri, boolean viaInvite) {
         try {
             String tokenUrl = "https://discord.com/api/oauth2/token";
             HttpHeaders headers = new HttpHeaders();
@@ -67,13 +67,13 @@ public class DiscordAuthService {
             if (email == null) {
                 email = (username != null ? username : id) + "@users.noreply.discord.com";
             }
-            return Optional.of(processUser(email, username, avatar, mode));
+            return Optional.of(processUser(email, username, avatar, mode, viaInvite));
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
-    private User processUser(String email, String username, String avatar, com.openisle.model.RegisterMode mode) {
+    private AuthResult processUser(String email, String username, String avatar, com.openisle.model.RegisterMode mode, boolean viaInvite) {
         Optional<User> existing = userRepository.findByEmail(email);
         if (existing.isPresent()) {
             User user = existing.get();
@@ -82,7 +82,7 @@ public class DiscordAuthService {
                 user.setVerificationCode(null);
                 userRepository.save(user);
             }
-            return user;
+            return new AuthResult(user, false);
         }
         String baseUsername = username != null ? username : email.split("@")[0];
         String finalUsername = baseUsername;
@@ -96,12 +96,12 @@ public class DiscordAuthService {
         user.setPassword("");
         user.setRole(Role.USER);
         user.setVerified(true);
-        user.setApproved(mode == com.openisle.model.RegisterMode.DIRECT);
+        user.setApproved(mode == com.openisle.model.RegisterMode.DIRECT || viaInvite);
         if (avatar != null) {
             user.setAvatar(avatar);
         } else {
             user.setAvatar("https://cdn.discordapp.com/embed/avatars/0.png");
         }
-        return userRepository.save(user);
+        return new AuthResult(userRepository.save(user), true);
     }
 }
