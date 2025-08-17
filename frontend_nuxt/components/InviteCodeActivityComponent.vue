@@ -14,28 +14,84 @@
       </div>
     </div>
 
-    <div v-if="inviteCode" class="invite-code-link-content">
+    <div v-if="inviteLink" class="invite-code-link-content">
       <p>
-        邀请链接：https://openisle.com/signup?invite_token=1234567890
-        <span> <i class="fas fa-copy copy-icon"></i> </span>
+        邀请链接：{{ inviteLink }}
+        <span @click="copyLink"><i class="fas fa-copy copy-icon"></i></span>
       </p>
     </div>
 
-    <div class="generate-button">生成邀请链接</div>
+    <div :class="['generate-button', { disabled: !user || loadingInvite }]" @click="generateInvite">
+      生成邀请链接
+    </div>
   </div>
 </template>
 
 <script setup>
-import { fetchCurrentUser } from '~/utils/auth'
+import { toast } from '~/main'
+import { fetchCurrentUser, getToken } from '~/utils/auth'
+
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
+const WEBSITE_BASE_URL = config.public.websiteBaseUrl
 
 const user = ref(null)
 const isLoadingUser = ref(true)
+const inviteCode = ref('')
+const loadingInvite = ref(false)
+
+const inviteLink = computed(() =>
+  inviteCode.value ? `${WEBSITE_BASE_URL}/signup?invite_token=${inviteCode.value}` : '',
+)
 
 onMounted(async () => {
   isLoadingUser.value = true
   user.value = await fetchCurrentUser()
   isLoadingUser.value = false
+  if (user.value) {
+    await fetchInvite(false)
+  }
 })
+
+const fetchInvite = async (showToast = true) => {
+  loadingInvite.value = true
+  const token = getToken()
+  if (!token) {
+    toast.error('请先登录')
+    loadingInvite.value = false
+    return
+  }
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/invite/generate`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (res.ok) {
+      const data = await res.json()
+      inviteCode.value = data.token
+      if (showToast) toast.success('邀请链接已生成')
+    } else {
+      const data = await res.json().catch(() => ({}))
+      toast.error(data.error || '生成邀请链接失败')
+    }
+  } catch (e) {
+    toast.error('生成邀请链接失败')
+  } finally {
+    loadingInvite.value = false
+  }
+}
+
+const generateInvite = () => fetchInvite(true)
+
+const copyLink = async () => {
+  if (!inviteLink.value) return
+  try {
+    await navigator.clipboard.writeText(inviteLink.value)
+    toast.success('已复制')
+  } catch (e) {
+    toast.error('复制失败')
+  }
+}
 </script>
 
 <style scoped>
