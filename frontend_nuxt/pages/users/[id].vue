@@ -130,26 +130,26 @@
                 <BaseTimeline :items="hotReplies">
                   <template #item="{ item }">
                     在
-                    <router-link :to="`/posts/${item.comment.post.id}`" class="timeline-link">
+                    <NuxtLink :to="`/posts/${item.comment.post.id}`" class="timeline-link">
                       {{ item.comment.post.title }}
-                    </router-link>
+                    </NuxtLink>
                     <template v-if="item.comment.parentComment">
                       下对
-                      <router-link
+                      <NuxtLink
                         :to="`/posts/${item.comment.post.id}#comment-${item.comment.parentComment.id}`"
                         class="timeline-link"
                       >
                         {{ stripMarkdownLength(item.comment.parentComment.content, 200) }}
-                      </router-link>
+                      </NuxtLink>
                       回复了
                     </template>
                     <template v-else> 下评论了 </template>
-                    <router-link
+                    <NuxtLink
                       :to="`/posts/${item.comment.post.id}#comment-${item.comment.id}`"
                       class="timeline-link"
                     >
                       {{ stripMarkdownLength(item.comment.content, 200) }}
-                    </router-link>
+                    </NuxtLink>
                     <div class="timeline-date">
                       {{ formatDate(item.comment.createdAt) }}
                     </div>
@@ -165,9 +165,9 @@
               <div class="summary-content" v-if="hotPosts.length > 0">
                 <BaseTimeline :items="hotPosts">
                   <template #item="{ item }">
-                    <router-link :to="`/posts/${item.post.id}`" class="timeline-link">
+                    <NuxtLink :to="`/posts/${item.post.id}`" class="timeline-link">
                       {{ item.post.title }}
-                    </router-link>
+                    </NuxtLink>
                     <div class="timeline-snippet">
                       {{ stripMarkdown(item.post.snippet) }}
                     </div>
@@ -236,44 +236,44 @@
               <template #item="{ item }">
                 <template v-if="item.type === 'post'">
                   发布了文章
-                  <router-link :to="`/posts/${item.post.id}`" class="timeline-link">
+                  <NuxtLink :to="`/posts/${item.post.id}`" class="timeline-link">
                     {{ item.post.title }}
-                  </router-link>
+                  </NuxtLink>
                   <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
                 </template>
                 <template v-else-if="item.type === 'comment'">
                   在
-                  <router-link :to="`/posts/${item.comment.post.id}`" class="timeline-link">
+                  <NuxtLink :to="`/posts/${item.comment.post.id}`" class="timeline-link">
                     {{ item.comment.post.title }}
-                  </router-link>
+                  </NuxtLink>
                   下评论了
-                  <router-link
+                  <NuxtLink
                     :to="`/posts/${item.comment.post.id}#comment-${item.comment.id}`"
                     class="timeline-link"
                   >
                     {{ stripMarkdownLength(item.comment.content, 200) }}
-                  </router-link>
+                  </NuxtLink>
                   <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
                 </template>
                 <template v-else-if="item.type === 'reply'">
                   在
-                  <router-link :to="`/posts/${item.comment.post.id}`" class="timeline-link">
+                  <NuxtLink :to="`/posts/${item.comment.post.id}`" class="timeline-link">
                     {{ item.comment.post.title }}
-                  </router-link>
+                  </NuxtLink>
                   下对
-                  <router-link
+                  <NuxtLink
                     :to="`/posts/${item.comment.post.id}#comment-${item.comment.parentComment.id}`"
                     class="timeline-link"
                   >
                     {{ stripMarkdownLength(item.comment.parentComment.content, 200) }}
-                  </router-link>
+                  </NuxtLink>
                   回复了
-                  <router-link
+                  <NuxtLink
                     :to="`/posts/${item.comment.post.id}#comment-${item.comment.id}`"
                     class="timeline-link"
                   >
                     {{ stripMarkdownLength(item.comment.content, 200) }}
-                  </router-link>
+                  </NuxtLink>
                   <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
                 </template>
                 <template v-else-if="item.type === 'tag'">

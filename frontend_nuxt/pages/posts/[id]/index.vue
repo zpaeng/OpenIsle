@@ -52,11 +52,11 @@
             <div class="user-name">
               {{ author.username }}
               <i class="fas fa-medal medal-icon"></i>
-              <router-link
+              <NuxtLink
                 v-if="author.displayMedal"
                 class="user-medal"
                 :to="`/users/${author.id}?tab=achievements`"
-                >{{ getMedalTitle(author.displayMedal) }}</router-link
+                >{{ getMedalTitle(author.displayMedal) }}</NuxtLink
               >
             </div>
             <div class="post-time">{{ postTime }}</div>
@@ -68,11 +68,11 @@
             <div class="user-name">
               {{ author.username }}
               <i class="fas fa-medal medal-icon"></i>
-              <router-link
+              <NuxtLink
                 v-if="author.displayMedal"
                 class="user-medal"
                 :to="`/users/${author.id}?tab=achievements`"
-                >{{ getMedalTitle(author.displayMedal) }}</router-link
+                >{{ getMedalTitle(author.displayMedal) }}</NuxtLink
               >
             </div>
             <div class="post-time">{{ postTime }}</div>
