@@ -16,11 +16,11 @@
         <div class="info-content-header-left">
           <span class="user-name">{{ comment.userName }}</span>
           <i class="fas fa-medal medal-icon"></i>
-          <router-link
+          <NuxtLink
             v-if="comment.medal"
             class="medal-name"
             :to="`/users/${comment.userId}?tab=achievements`"
-            >{{ getMedalTitle(comment.medal) }}</router-link
+            >{{ getMedalTitle(comment.medal) }}</NuxtLink
           >
           <i v-if="comment.pinned" class="fas fa-thumbtack pin-icon"></i>
           <span v-if="level >= 2">
