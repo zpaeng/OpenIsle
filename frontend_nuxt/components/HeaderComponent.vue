@@ -29,6 +29,18 @@
             <i :class="iconClass"></i>
           </div>
 
+          <div v-if="!isMobile" class="invite_text" @click="copyInviteLink">
+            <i class="fas fa-copy"></i>
+            邀请
+            <i v-if="isCopying" class="fas fa-spinner fa-spin"></i>
+          </div>
+
+          <ToolTip content="复制RSS链接" placement="bottom">
+            <div class="rss-icon" @click="copyRssLink">
+              <i class="fas fa-rss"></i>
+            </div>
+          </ToolTip>
+
           <ToolTip v-if="!isMobile && isLogin" content="发帖" placement="bottom">
             <div class="new-post-icon" @click="goToNewPost">
               <i class="fas fa-edit"></i>
@@ -66,6 +78,11 @@ import { authState, clearToken, loadCurrentUser } from '~/utils/auth'
 import { fetchUnreadCount, notificationState } from '~/utils/notification'
 import { useIsMobile } from '~/utils/screen'
 import { themeState, cycleTheme, ThemeMode } from '~/utils/theme'
+import { toast } from '~/main'
+import { getToken } from '~/utils/auth'
+const config = useRuntimeConfig()
+const API_BASE_URL = config.public.apiBaseUrl
+const WEBSITE_BASE_URL = config.public.websiteBaseUrl
 
 const props = defineProps({
   showMenuBtn: {
@@ -82,6 +99,7 @@ const showSearch = ref(false)
 const searchDropdown = ref(null)
 const userMenu = ref(null)
 const menuBtn = ref(null)
+const isCopying = ref(false)
 
 const search = () => {
   showSearch.value = true
@@ -100,6 +118,41 @@ const goToLogin = () => {
 const goToSettings = () => {
   navigateTo('/settings', { replace: true })
 }
+
+const copyInviteLink = async () => {
+  isCopying.value = true
+  const token = getToken()
+  if (!token) {
+    toast.error('请先登录')
+    return
+  }
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/invite/generate`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (res.ok) {
+      const data = await res.json()
+      const inviteLink = data.token ? `${WEBSITE_BASE_URL}/signup?invite_token=${data.token}` : ''
+      await navigator.clipboard.writeText(inviteLink)
+      toast.success('邀请链接已复制')
+    } else {
+      const data = await res.json().catch(() => ({}))
+      toast.error(data.error || '生成邀请链接失败')
+    }
+  } catch (e) {
+    toast.error('生成邀请链接失败')
+  } finally {
+    isCopying.value = false
+  }
+}
+
+const copyRssLink = async () => {
+  const rssLink = `${API_BASE_URL}/api/rss`
+  await navigator.clipboard.writeText(rssLink)
+  toast.success('RSS链接已复制')
+}
+
 const goToProfile = async () => {
   if (!authState.loggedIn) {
     navigateTo('/login', { replace: true })
@@ -224,7 +277,7 @@ onMounted(async () => {
   margin-left: auto;
   flex-direction: row;
   align-items: center;
-  gap: 20px;
+  gap: 30px;
 }
 
 .auth-btns {
@@ -315,9 +368,24 @@ onMounted(async () => {
   cursor: pointer;
 }
 
+.invite_text {
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--primary-color);
+}
+
+.invite_text:hover {
+  text-decoration: underline;
+}
+
+.rss-icon,
 .new-post-icon {
   font-size: 18px;
   cursor: pointer;
+}
+
+.rss-icon {
+  text-shadow: 0 0 10px var(--primary-color);
 }
 
 @media (max-width: 1200px) {

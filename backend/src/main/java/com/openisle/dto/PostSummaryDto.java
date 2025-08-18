@@ -31,5 +31,6 @@ public class PostSummaryDto {
     private int pointReward;
     private PostType type;
     private LotteryDto lottery;
+    private boolean rssExcluded;
 }
 
