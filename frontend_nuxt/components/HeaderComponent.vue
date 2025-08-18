@@ -419,5 +419,9 @@ onMounted(async () => {
   .logo-text {
     display: none;
   }
+
+  .header-content-right {
+    gap: 15px;
+  }
 }
 </style>
