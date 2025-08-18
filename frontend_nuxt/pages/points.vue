@@ -129,7 +129,7 @@ const submitRedeem = async () => {
 
 <style scoped>
 .point-mall-page {
-  padding-left: 20px;
+  padding: 0 20px;
   max-width: var(--page-max-width);
   background-color: var(--background-color);
   margin: 0 auto;
