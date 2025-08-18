@@ -385,7 +385,22 @@ onMounted(async () => {
 }
 
 .rss-icon {
-  text-shadow: 0 0 10px var(--primary-color);
+  animation: rss-glow 2s 3;
+}
+
+@keyframes rss-glow {
+  0% {
+    text-shadow: 0 0 0px var(--primary-color);
+    opacity: 1;
+  }
+  50% {
+    text-shadow: 0 0 12px var(--primary-color);
+    opacity: 0.8;
+  }
+  100% {
+    text-shadow: 0 0 0px var(--primary-color);
+    opacity: 1;
+  }
 }
 
 @media (max-width: 1200px) {
