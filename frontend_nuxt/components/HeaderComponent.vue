@@ -35,6 +35,12 @@
             <i v-if="isCopying" class="fas fa-spinner fa-spin"></i>
           </div>
 
+          <ToolTip content="复制RSS链接" placement="bottom">
+            <div class="rss-icon" @click="copyRssLink">
+              <i class="fas fa-rss"></i>
+            </div>
+          </ToolTip>
+
           <ToolTip v-if="!isMobile && isLogin" content="发帖" placement="bottom">
             <div class="new-post-icon" @click="goToNewPost">
               <i class="fas fa-edit"></i>
@@ -139,6 +145,12 @@ const copyInviteLink = async () => {
   } finally {
     isCopying.value = false
   }
+}
+
+const copyRssLink = async () => {
+  const rssLink = `${API_BASE_URL}/api/rss`
+  await navigator.clipboard.writeText(rssLink)
+  toast.success('RSS链接已复制')
 }
 
 const goToProfile = async () => {
@@ -366,9 +378,14 @@ onMounted(async () => {
   text-decoration: underline;
 }
 
+.rss-icon,
 .new-post-icon {
   font-size: 18px;
   cursor: pointer;
+}
+
+.rss-icon {
+  text-shadow: 0 0 10px var(--primary-color);
 }
 
 @media (max-width: 1200px) {
