@@ -63,6 +63,7 @@ public class PostMapper {
         dto.setCommentCount(commentService.countComments(post.getId()));
         dto.setStatus(post.getStatus());
         dto.setPinnedAt(post.getPinnedAt());
+        dto.setRssExcluded(post.isRssExcluded());
 
         List<ReactionDto> reactions = reactionService.getReactionsForPost(post.getId())
                 .stream()

@@ -45,4 +45,14 @@ public class AdminPostController {
     public PostSummaryDto unpin(@PathVariable Long id) {
         return postMapper.toSummaryDto(postService.unpinPost(id));
     }
+
+    @PostMapping("/{id}/rss-exclude")
+    public PostSummaryDto excludeFromRss(@PathVariable Long id) {
+        return postMapper.toSummaryDto(postService.excludeFromRss(id));
+    }
+
+    @PostMapping("/{id}/rss-include")
+    public PostSummaryDto includeInRss(@PathVariable Long id) {
+        return postMapper.toSummaryDto(postService.includeInRss(id));
+    }
 }

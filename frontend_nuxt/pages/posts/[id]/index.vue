@@ -268,6 +268,7 @@ const postReactions = ref([])
 const comments = ref([])
 const status = ref('PUBLISHED')
 const pinnedAt = ref(null)
+const rssExcluded = ref(false)
 const isWaitingPostingComment = ref(false)
 const postTime = ref('')
 const postItems = ref([])
@@ -355,6 +356,11 @@ const articleMenuItems = computed(() => {
       items.push({ text: '取消置顶', onClick: () => unpinPost() })
     } else {
       items.push({ text: '置顶', onClick: () => pinPost() })
+    }
+    if (rssExcluded.value) {
+      items.push({ text: '取消rss不推荐', onClick: () => includeRss() })
+    } else {
+      items.push({ text: 'rss不推荐', onClick: () => excludeRss() })
     }
   }
   if (isAdmin.value && status.value === 'PENDING') {
@@ -480,6 +486,7 @@ watchEffect(() => {
   subscribed.value = !!data.subscribed
   status.value = data.status
   pinnedAt.value = data.pinnedAt
+  rssExcluded.value = data.rssExcluded
   postTime.value = TimeManager.format(data.createdAt)
   lottery.value = data.lottery || null
   if (lottery.value && lottery.value.endTime) startCountdown()
@@ -640,6 +647,36 @@ const unpinPost = async () => {
   if (res.ok) {
     toast.success('已取消置顶')
     await refreshPost()
+  } else {
+    toast.error('操作失败')
+  }
+}
+
+const excludeRss = async () => {
+  const token = getToken()
+  if (!token) return
+  const res = await fetch(`${API_BASE_URL}/api/admin/posts/${postId}/rss-exclude`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (res.ok) {
+    rssExcluded.value = true
+    toast.success('已标记为rss不推荐')
+  } else {
+    toast.error('操作失败')
+  }
+}
+
+const includeRss = async () => {
+  const token = getToken()
+  if (!token) return
+  const res = await fetch(`${API_BASE_URL}/api/admin/posts/${postId}/rss-include`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (res.ok) {
+    rssExcluded.value = false
+    toast.success('已取消rss不推荐')
   } else {
     toast.error('操作失败')
   }

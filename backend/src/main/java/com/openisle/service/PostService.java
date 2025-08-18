@@ -132,6 +132,23 @@ public class PostService {
         this.publishMode = publishMode;
     }
 
+    public List<Post> listLatestRssPosts(int limit) {
+        Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return postRepository.findByStatusAndRssExcludedFalseOrderByCreatedAtDesc(PostStatus.PUBLISHED, pageable);
+    }
+
+    public Post excludeFromRss(Long id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
+        post.setRssExcluded(true);
+        return postRepository.save(post);
+    }
+
+    public Post includeInRss(Long id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
+        post.setRssExcluded(false);
+        return postRepository.save(post);
+    }
+
     public Post createPost(String username,
                            Long categoryId,
                            String title,

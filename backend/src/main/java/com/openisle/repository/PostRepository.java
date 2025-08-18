@@ -106,4 +106,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
            "WHERE p.createdAt >= :start AND p.createdAt < :end GROUP BY d ORDER BY d")
     java.util.List<Object[]> countDailyRange(@Param("start") LocalDateTime start,
                                              @Param("end") LocalDateTime end);
+
+    List<Post> findByStatusAndRssExcludedFalseOrderByCreatedAtDesc(PostStatus status, Pageable pageable);
 }
