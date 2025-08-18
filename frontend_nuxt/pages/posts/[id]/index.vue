@@ -358,9 +358,9 @@ const articleMenuItems = computed(() => {
       items.push({ text: '置顶', onClick: () => pinPost() })
     }
     if (rssExcluded.value) {
-      items.push({ text: '取消rss不推荐', onClick: () => includeRss() })
+      items.push({ text: 'rss推荐', onClick: () => includeRss() })
     } else {
-      items.push({ text: 'rss不推荐', onClick: () => excludeRss() })
+      items.push({ text: '取消rss推荐', onClick: () => excludeRss() })
     }
   }
   if (isAdmin.value && status.value === 'PENDING') {
@@ -676,7 +676,7 @@ const includeRss = async () => {
   })
   if (res.ok) {
     rssExcluded.value = false
-    toast.success('已取消rss不推荐')
+    toast.success('已标记为rss推荐')
   } else {
     toast.error('操作失败')
   }
