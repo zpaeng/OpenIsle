@@ -15,7 +15,7 @@
     </div>
 
     <div v-if="inviteLink" class="invite-code-link-content">
-      <p>
+      <p class="invite-code-link-content-text">
         邀请链接：{{ inviteLink }}
         <span @click="copyLink"><i class="fas fa-copy copy-icon"></i></span>
       </p>
@@ -169,6 +169,10 @@ const copyLink = async () => {
   margin-top: 20px;
   font-size: 12px;
   opacity: 0.8;
+}
+
+.invite-code-link-content-text {
+  word-break: break-all;
 }
 
 .copy-icon {
