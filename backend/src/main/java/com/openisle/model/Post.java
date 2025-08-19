@@ -64,6 +64,9 @@ public class Post {
     @Column(nullable = false)
     private PostType type = PostType.NORMAL;
 
+    @Column(nullable = false)
+    private boolean closed = false;
+
     @Column
     private LocalDateTime pinnedAt;
 

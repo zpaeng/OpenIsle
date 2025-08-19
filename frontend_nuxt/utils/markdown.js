@@ -1,4 +1,5 @@
-import hljs from 'highlight.js'
+import hljs from 'highlight.js/lib/common'
+
 if (typeof window !== 'undefined') {
   const theme =
     document.documentElement.dataset.theme ||

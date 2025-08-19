@@ -16,6 +16,7 @@ import {
   getEditorTheme as getEditorThemeUtil,
   getPreviewTheme as getPreviewThemeUtil,
 } from '~/utils/vditor'
+import '~/assets/global.css'
 
 export default {
   name: 'PostEditor',

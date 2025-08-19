@@ -51,7 +51,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { toast } from '~/main'
 import { authState, getToken } from '~/utils/auth'
 import { reactionEmojiMap } from '~/utils/reactions'
-import { useReactionTypes   } from '~/composables/useReactionTypes'
+import { useReactionTypes } from '~/composables/useReactionTypes'
 
 const { reactionTypes, initialize } = useReactionTypes()
 
@@ -237,7 +237,7 @@ onMounted(async () => {
 
 .make-reaction-item {
   cursor: pointer;
-  padding: 10px;
+  padding: 4px;
   opacity: 0.5;
   border-radius: 8px;
   font-size: 20px;

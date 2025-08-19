@@ -512,6 +512,30 @@ public class PostService {
         return postRepository.save(post);
     }
 
+    public Post closePost(Long id, String username) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
+        if (!user.getId().equals(post.getAuthor().getId()) && user.getRole() != Role.ADMIN) {
+            throw new IllegalArgumentException("Unauthorized");
+        }
+        post.setClosed(true);
+        return postRepository.save(post);
+    }
+
+    public Post reopenPost(Long id, String username) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
+        if (!user.getId().equals(post.getAuthor().getId()) && user.getRole() != Role.ADMIN) {
+            throw new IllegalArgumentException("Unauthorized");
+        }
+        post.setClosed(false);
+        return postRepository.save(post);
+    }
+
     @org.springframework.transaction.annotation.Transactional
     public Post updatePost(Long id,
                            String username,

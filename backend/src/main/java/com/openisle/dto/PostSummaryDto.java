@@ -32,5 +32,6 @@ public class PostSummaryDto {
     private PostType type;
     private LotteryDto lottery;
     private boolean rssExcluded;
+    private boolean closed;
 }
 
