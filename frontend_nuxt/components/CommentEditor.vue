@@ -22,6 +22,7 @@ import {
   getEditorTheme as getEditorThemeUtil,
   getPreviewTheme as getPreviewThemeUtil,
 } from '~/utils/vditor'
+import '~/assets/global.css'
 import LoginOverlay from '~/components/LoginOverlay.vue'
 
 export default {
