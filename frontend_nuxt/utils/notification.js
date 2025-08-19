@@ -118,9 +118,7 @@ export async function updateNotificationPreference(type, enabled) {
 function createFetchNotifications() {
   const notifications = ref([])
   const isLoadingMessage = ref(false)
-  const page = ref(0)
-  const currentUnread = ref(false)
-  const fetchNotifications = async ({ unread = false, reset = false } = {}) => {
+  const fetchNotifications = async () => {
     const config = useRuntimeConfig()
     const API_BASE_URL = config.public.apiBaseUrl
     if (isLoadingMessage && notifications && markRead) {
@@ -128,18 +126,11 @@ function createFetchNotifications() {
         const token = getToken()
         if (!token) {
           toast.error('请先登录')
-          return false
-        }
-        if (reset) {
-          notifications.value = []
-          page.value = 0
-          currentUnread.value = unread
+          return
         }
         isLoadingMessage.value = true
-        const endpoint = currentUnread.value
-          ? `/api/notifications/unread?page=${page.value}`
-          : `/api/notifications?page=${page.value}`
-        const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+        notifications.value = []
+        const res = await fetch(`${API_BASE_URL}/api/notifications`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -147,7 +138,7 @@ function createFetchNotifications() {
         isLoadingMessage.value = false
         if (!res.ok) {
           toast.error('获取通知失败')
-          return true
+          return
         }
         const data = await res.json()
 
@@ -293,14 +284,10 @@ function createFetchNotifications() {
             })
           }
         }
-        page.value++
-        return data.length < 50
       } catch (e) {
         console.error(e)
-        return true
       }
     }
-    return true
   }
 
   const markRead = async (id) => {
@@ -348,6 +335,7 @@ function createFetchNotifications() {
     markRead,
     notifications,
     isLoadingMessage,
+    markRead,
     markAllRead,
   }
 }

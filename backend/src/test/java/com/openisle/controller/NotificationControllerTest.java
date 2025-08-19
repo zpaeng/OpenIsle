@@ -45,7 +45,7 @@ class NotificationControllerTest {
         p.setId(2L);
         n.setPost(p);
         n.setCreatedAt(LocalDateTime.now());
-        when(notificationService.listNotifications("alice", null, 0, 50))
+        when(notificationService.listNotifications("alice", null))
                 .thenReturn(List.of(n));
 
         NotificationDto dto = new NotificationDto();
@@ -55,33 +55,7 @@ class NotificationControllerTest {
         dto.setPost(ps);
         when(notificationMapper.toDto(n)).thenReturn(dto);
 
-        mockMvc.perform(get("/api/notifications?page=0")
-                        .principal(new UsernamePasswordAuthenticationToken("alice","p")))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].post.id").value(2));
-    }
-
-    @Test
-    void listUnreadNotifications() throws Exception {
-        Notification n = new Notification();
-        n.setId(1L);
-        n.setType(NotificationType.POST_VIEWED);
-        Post p = new Post();
-        p.setId(2L);
-        n.setPost(p);
-        n.setCreatedAt(LocalDateTime.now());
-        when(notificationService.listNotifications("alice", false, 0, 50))
-                .thenReturn(List.of(n));
-
-        NotificationDto dto = new NotificationDto();
-        dto.setId(1L);
-        PostSummaryDto ps = new PostSummaryDto();
-        ps.setId(2L);
-        dto.setPost(ps);
-        when(notificationMapper.toDto(n)).thenReturn(dto);
-
-        mockMvc.perform(get("/api/notifications/unread?page=0")
+        mockMvc.perform(get("/api/notifications")
                         .principal(new UsernamePasswordAuthenticationToken("alice","p")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
