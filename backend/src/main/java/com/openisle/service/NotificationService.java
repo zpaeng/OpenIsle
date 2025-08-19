@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /** Service for creating and retrieving notifications. */
 @Service
@@ -181,16 +183,21 @@ public class NotificationService {
     }
 
     public List<Notification> listNotifications(String username, Boolean read) {
+        return listNotifications(username, read, 0);
+    }
+
+    public List<Notification> listNotifications(String username, Boolean read, int page) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Set<NotificationType> disabled = user.getDisabledNotificationTypes();
-        List<Notification> list;
+        Page<Notification> p;
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(page, 50);
         if (read == null) {
-            list = notificationRepository.findByUserOrderByCreatedAtDesc(user);
+            p = notificationRepository.findByUserOrderByCreatedAtDesc(user, pageable);
         } else {
-            list = notificationRepository.findByUserAndReadOrderByCreatedAtDesc(user, read);
+            p = notificationRepository.findByUserAndReadOrderByCreatedAtDesc(user, read, pageable);
         }
-        return list.stream().filter(n -> !disabled.contains(n.getType())).collect(Collectors.toList());
+        return p.getContent().stream().filter(n -> !disabled.contains(n.getType())).collect(Collectors.toList());
     }
 
     public void markRead(String username, List<Long> ids) {

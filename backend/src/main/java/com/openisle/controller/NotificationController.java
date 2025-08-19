@@ -23,9 +23,17 @@ public class NotificationController {
     private final NotificationMapper notificationMapper;
 
     @GetMapping
-    public List<NotificationDto> list(@RequestParam(value = "read", required = false) Boolean read,
+    public List<NotificationDto> list(@RequestParam(value = "page", defaultValue = "0") int page,
                                       Authentication auth) {
-        return notificationService.listNotifications(auth.getName(), read).stream()
+        return notificationService.listNotifications(auth.getName(), null, page).stream()
+                .map(notificationMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/unread")
+    public List<NotificationDto> listUnread(@RequestParam(value = "page", defaultValue = "0") int page,
+                                            Authentication auth) {
+        return notificationService.listNotifications(auth.getName(), false, page).stream()
                 .map(notificationMapper::toDto)
                 .collect(Collectors.toList());
     }
