@@ -251,6 +251,7 @@ import { useRouter } from 'vue-router'
 import { useIsMobile } from '~/utils/screen'
 import Dropdown from '~/components/Dropdown.vue'
 import { ClientOnly } from '#components'
+import { useConfirm } from '~/composables/useConfirm'
 
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
@@ -278,6 +279,7 @@ const subscribed = ref(false)
 const commentSort = ref('NEWEST')
 const isFetchingComments = ref(false)
 const isMobile = useIsMobile()
+const { confirm } = useConfirm()
 
 const headerHeight = process.client
   ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0
@@ -349,7 +351,7 @@ const articleMenuItems = computed(() => {
   const items = []
   if (isAuthor.value || isAdmin.value) {
     items.push({ text: '编辑文章', onClick: () => editPost() })
-    items.push({ text: '删除文章', color: 'red', onClick: () => deletePost() })
+    items.push({ text: '删除文章', color: 'red', onClick: deletePost })
   }
   if (isAdmin.value) {
     if (pinnedAt.value) {
@@ -687,19 +689,24 @@ const editPost = () => {
 }
 
 const deletePost = async () => {
-  const token = getToken()
-  if (!token) {
-    toast.error('请先登录')
-    return
-  }
-  const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  if (res.ok) {
-    toast.success('已删除')
-    navigateTo('/', { replace: true })
-  } else {
+  try {
+    await confirm('确认删除', '确定要删除这篇文章吗？此操作不可撤销。')
+    const token = getToken()
+    if (!token) {
+      toast.error('请先登录')
+      return
+    }
+    const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (res.ok) {
+      toast.success('已删除')
+      navigateTo('/', { replace: true })
+    } else {
+      toast.error('操作失败')
+    }
+  } catch (e) {
     toast.error('操作失败')
   }
 }
