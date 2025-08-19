@@ -21,6 +21,7 @@
       </div>
     </div>
     <GlobalPopups />
+    <ConfirmDialog />
   </div>
 </template>
 
@@ -28,6 +29,7 @@
 import HeaderComponent from '~/components/HeaderComponent.vue'
 import MenuComponent from '~/components/MenuComponent.vue'
 import GlobalPopups from '~/components/GlobalPopups.vue'
+import ConfirmDialog from '~/components/ConfirmDialog.vue'
 import { useIsMobile } from '~/utils/screen'
 
 const isMobile = useIsMobile()
