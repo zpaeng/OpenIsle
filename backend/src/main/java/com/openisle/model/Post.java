@@ -68,5 +68,5 @@ public class Post {
     private LocalDateTime pinnedAt;
 
     @Column(nullable = true)
-    private boolean rssExcluded = true;
+    private Boolean rssExcluded = true;
 }
