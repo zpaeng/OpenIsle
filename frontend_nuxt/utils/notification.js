@@ -118,175 +118,162 @@ export async function updateNotificationPreference(type, enabled) {
 function createFetchNotifications() {
   const notifications = ref([])
   const isLoadingMessage = ref(false)
-  const fetchNotifications = async () => {
+  const hasMore = ref(true)
+
+  const fetchNotifications = async ({
+    page = 0,
+    size = 30,
+    unread = false,
+    append = false,
+  } = {}) => {
     const config = useRuntimeConfig()
     const API_BASE_URL = config.public.apiBaseUrl
-    if (isLoadingMessage && notifications && markRead) {
-      try {
-        const token = getToken()
-        if (!token) {
-          toast.error('请先登录')
-          return
-        }
-        isLoadingMessage.value = true
-        notifications.value = []
-        const res = await fetch(`${API_BASE_URL}/api/notifications`, {
+    try {
+      const token = getToken()
+      if (!token) {
+        toast.error('请先登录')
+        return
+      }
+      if (!append) notifications.value = []
+      isLoadingMessage.value = true
+      const res = await fetch(
+        `${API_BASE_URL}/api/notifications${unread ? '/unread' : ''}?page=${page}&size=${size}`,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        })
-        isLoadingMessage.value = false
-        if (!res.ok) {
-          toast.error('获取通知失败')
-          return
-        }
-        const data = await res.json()
-
-        for (const n of data) {
-          if (n.type === 'COMMENT_REPLY') {
-            notifications.value.push({
-              ...n,
-              src: n.comment.author.avatar,
-              iconClick: () => {
-                markRead(n.id)
-                navigateTo(`/users/${n.comment.author.id}`, { replace: true })
-              },
-            })
-          } else if (n.type === 'REACTION') {
-            notifications.value.push({
-              ...n,
-              emoji: reactionEmojiMap[n.reactionType],
-              iconClick: () => {
-                if (n.fromUser) {
-                  markRead(n.id)
-                  navigateTo(`/users/${n.fromUser.id}`, { replace: true })
-                }
-              },
-            })
-          } else if (n.type === 'POST_VIEWED') {
-            notifications.value.push({
-              ...n,
-              src: n.fromUser ? n.fromUser.avatar : null,
-              icon: n.fromUser ? undefined : iconMap[n.type],
-              iconClick: () => {
-                if (n.fromUser) {
-                  markRead(n.id)
-                  navigateTo(`/users/${n.fromUser.id}`, { replace: true })
-                }
-              },
-            })
-          } else if (n.type === 'LOTTERY_WIN') {
-            notifications.value.push({
-              ...n,
-              icon: iconMap[n.type],
-              iconClick: () => {
-                if (n.post) {
-                  markRead(n.id)
-                  router.push(`/posts/${n.post.id}`)
-                }
-              },
-            })
-          } else if (n.type === 'LOTTERY_DRAW') {
-            notifications.value.push({
-              ...n,
-              icon: iconMap[n.type],
-              iconClick: () => {
-                if (n.post) {
-                  markRead(n.id)
-                  router.push(`/posts/${n.post.id}`)
-                }
-              },
-            })
-          } else if (n.type === 'POST_UPDATED') {
-            notifications.value.push({
-              ...n,
-              src: n.comment.author.avatar,
-              iconClick: () => {
-                markRead(n.id)
-                navigateTo(`/users/${n.comment.author.id}`, { replace: true })
-              },
-            })
-          } else if (n.type === 'USER_ACTIVITY') {
-            notifications.value.push({
-              ...n,
-              src: n.comment.author.avatar,
-              iconClick: () => {
-                markRead(n.id)
-                navigateTo(`/users/${n.comment.author.id}`, { replace: true })
-              },
-            })
-          } else if (n.type === 'MENTION') {
-            notifications.value.push({
-              ...n,
-              icon: iconMap[n.type],
-              iconClick: () => {
-                if (n.fromUser) {
-                  markRead(n.id)
-                  navigateTo(`/users/${n.fromUser.id}`, { replace: true })
-                }
-              },
-            })
-          } else if (n.type === 'USER_FOLLOWED' || n.type === 'USER_UNFOLLOWED') {
-            notifications.value.push({
-              ...n,
-              icon: iconMap[n.type],
-              iconClick: () => {
-                if (n.fromUser) {
-                  markRead(n.id)
-                  navigateTo(`/users/${n.fromUser.id}`, { replace: true })
-                }
-              },
-            })
-          } else if (n.type === 'FOLLOWED_POST') {
-            notifications.value.push({
-              ...n,
-              icon: iconMap[n.type],
-              iconClick: () => {
-                if (n.post) {
-                  markRead(n.id)
-                  navigateTo(`/posts/${n.post.id}`, { replace: true })
-                }
-              },
-            })
-          } else if (n.type === 'POST_SUBSCRIBED' || n.type === 'POST_UNSUBSCRIBED') {
-            notifications.value.push({
-              ...n,
-              icon: iconMap[n.type],
-              iconClick: () => {
-                if (n.post) {
-                  markRead(n.id)
-                  navigateTo(`/posts/${n.post.id}`, { replace: true })
-                }
-              },
-            })
-          } else if (n.type === 'POST_REVIEW_REQUEST') {
-            notifications.value.push({
-              ...n,
-              src: n.fromUser ? n.fromUser.avatar : null,
-              icon: n.fromUser ? undefined : iconMap[n.type],
-              iconClick: () => {
-                if (n.post) {
-                  markRead(n.id)
-                  navigateTo(`/posts/${n.post.id}`, { replace: true })
-                }
-              },
-            })
-          } else if (n.type === 'REGISTER_REQUEST') {
-            notifications.value.push({
-              ...n,
-              icon: iconMap[n.type],
-              iconClick: () => {},
-            })
-          } else {
-            notifications.value.push({
-              ...n,
-              icon: iconMap[n.type],
-            })
-          }
-        }
-      } catch (e) {
-        console.error(e)
+        },
+      )
+      isLoadingMessage.value = false
+      if (!res.ok) {
+        toast.error('获取通知失败')
+        return
       }
+      const data = await res.json()
+      const arr = []
+
+      for (const n of data) {
+        if (n.type === 'COMMENT_REPLY') {
+          arr.push({
+            ...n,
+            src: n.comment.author.avatar,
+            iconClick: () => {
+              markRead(n.id)
+              navigateTo(`/users/${n.comment.author.id}`, { replace: true })
+            },
+          })
+        } else if (n.type === 'REACTION') {
+          arr.push({
+            ...n,
+            emoji: reactionEmojiMap[n.reactionType],
+            iconClick: () => {
+              if (n.fromUser) {
+                markRead(n.id)
+                navigateTo(`/users/${n.fromUser.id}`, { replace: true })
+              }
+            },
+          })
+        } else if (n.type === 'POST_VIEWED') {
+          arr.push({
+            ...n,
+            src: n.fromUser ? n.fromUser.avatar : null,
+            icon: n.fromUser ? undefined : iconMap[n.type],
+            iconClick: () => {
+              if (n.fromUser) {
+                markRead(n.id)
+                navigateTo(`/users/${n.fromUser.id}`, { replace: true })
+              }
+            },
+          })
+        } else if (n.type === 'LOTTERY_WIN' || n.type === 'LOTTERY_DRAW') {
+          arr.push({
+            ...n,
+            icon: iconMap[n.type],
+            iconClick: () => {
+              if (n.post) {
+                markRead(n.id)
+                navigateTo(`/posts/${n.post.id}`)
+              }
+            },
+          })
+        } else if (n.type === 'POST_UPDATED' || n.type === 'USER_ACTIVITY') {
+          arr.push({
+            ...n,
+            src: n.comment.author.avatar,
+            iconClick: () => {
+              markRead(n.id)
+              navigateTo(`/users/${n.comment.author.id}`, { replace: true })
+            },
+          })
+        } else if (n.type === 'MENTION') {
+          arr.push({
+            ...n,
+            icon: iconMap[n.type],
+            iconClick: () => {
+              if (n.fromUser) {
+                markRead(n.id)
+                navigateTo(`/users/${n.fromUser.id}`, { replace: true })
+              }
+            },
+          })
+        } else if (n.type === 'USER_FOLLOWED' || n.type === 'USER_UNFOLLOWED') {
+          arr.push({
+            ...n,
+            icon: iconMap[n.type],
+            iconClick: () => {
+              if (n.fromUser) {
+                markRead(n.id)
+                navigateTo(`/users/${n.fromUser.id}`, { replace: true })
+              }
+            },
+          })
+        } else if (
+          n.type === 'FOLLOWED_POST' ||
+          n.type === 'POST_SUBSCRIBED' ||
+          n.type === 'POST_UNSUBSCRIBED'
+        ) {
+          arr.push({
+            ...n,
+            icon: iconMap[n.type],
+            iconClick: () => {
+              if (n.post) {
+                markRead(n.id)
+                navigateTo(`/posts/${n.post.id}`, { replace: true })
+              }
+            },
+          })
+        } else if (n.type === 'POST_REVIEW_REQUEST') {
+          arr.push({
+            ...n,
+            src: n.fromUser ? n.fromUser.avatar : null,
+            icon: n.fromUser ? undefined : iconMap[n.type],
+            iconClick: () => {
+              if (n.post) {
+                markRead(n.id)
+                navigateTo(`/posts/${n.post.id}`, { replace: true })
+              }
+            },
+          })
+        } else if (n.type === 'REGISTER_REQUEST') {
+          arr.push({
+            ...n,
+            icon: iconMap[n.type],
+            iconClick: () => {},
+          })
+        } else {
+          arr.push({
+            ...n,
+            icon: iconMap[n.type],
+          })
+        }
+      }
+
+      if (append) notifications.value.push(...arr)
+      else notifications.value = arr
+      hasMore.value = data.length === size
+    } catch (e) {
+      console.error(e)
+      isLoadingMessage.value = false
     }
   }
 
@@ -335,10 +322,16 @@ function createFetchNotifications() {
     markRead,
     notifications,
     isLoadingMessage,
-    markRead,
     markAllRead,
+    hasMore,
   }
 }
 
-export const { fetchNotifications, markRead, notifications, isLoadingMessage, markAllRead } =
-  createFetchNotifications()
+export const {
+  fetchNotifications,
+  markRead,
+  notifications,
+  isLoadingMessage,
+  markAllRead,
+  hasMore,
+} = createFetchNotifications()

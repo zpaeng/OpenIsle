@@ -180,17 +180,18 @@ public class NotificationService {
         userRepository.save(user);
     }
 
-    public List<Notification> listNotifications(String username, Boolean read) {
+    public List<Notification> listNotifications(String username, Boolean read, int page, int size) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Set<NotificationType> disabled = user.getDisabledNotificationTypes();
-        List<Notification> list;
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        org.springframework.data.domain.Page<Notification> result;
         if (read == null) {
-            list = notificationRepository.findByUserOrderByCreatedAtDesc(user);
+            result = notificationRepository.findByUserOrderByCreatedAtDesc(user, pageable);
         } else {
-            list = notificationRepository.findByUserAndReadOrderByCreatedAtDesc(user, read);
+            result = notificationRepository.findByUserAndReadOrderByCreatedAtDesc(user, read, pageable);
         }
-        return list.stream().filter(n -> !disabled.contains(n.getType())).collect(Collectors.toList());
+        return result.stream().filter(n -> !disabled.contains(n.getType())).collect(Collectors.toList());
     }
 
     public void markRead(String username, List<Long> ids) {
