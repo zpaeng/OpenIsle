@@ -35,7 +35,7 @@
     </div>
 
     <div class="other-login-page-content">
-      <div class="login-page-button" @click="googleAuthorize">
+      <div class="login-page-button" @click="loginWithGoogle">
         <img class="login-page-button-icon" src="../assets/icons/google.svg" alt="Google Logo" />
         <div class="login-page-button-text">Google 登录</div>
       </div>
@@ -106,6 +106,9 @@ const submitLogin = async () => {
   }
 }
 
+const loginWithGoogle = () => {
+  googleAuthorize()
+}
 const loginWithGithub = () => {
   githubAuthorize()
 }
