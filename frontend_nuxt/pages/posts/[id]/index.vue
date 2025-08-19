@@ -166,7 +166,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch, watchEffect } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch, watchEffect, onActivated } from 'vue'
 import VueEasyLightbox from 'vue-easy-lightbox'
 import { useRoute } from 'vue-router'
 import CommentItem from '~/components/CommentItem.vue'
@@ -745,6 +745,11 @@ const jumpToHashComment = async () => {
 const gotoProfile = () => {
   navigateTo(`/users/${author.value.id}`, { replace: true })
 }
+
+onActivated(async () => {
+  await refreshPost()
+  await fetchComments()
+})
 
 onMounted(async () => {
   await fetchComments()
