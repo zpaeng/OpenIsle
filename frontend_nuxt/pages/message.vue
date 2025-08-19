@@ -53,13 +53,13 @@
       </div>
 
       <BasePlaceholder
-        v-else-if="notifications.length === 0"
+        v-else-if="filteredNotifications.length === 0"
         text="暂时没有消息 :)"
         icon="fas fa-inbox"
       />
 
-      <div class="timeline-container" v-if="notifications.length > 0">
-        <BaseTimeline :items="notifications">
+      <div class="timeline-container" v-if="filteredNotifications.length > 0">
+        <BaseTimeline :items="filteredNotifications">
           <template #item="{ item }">
             <div class="notif-content" :class="{ read: item.read }">
               <span v-if="!item.read" class="unread-dot"></span>
@@ -505,17 +505,15 @@
             </div>
           </template>
         </BaseTimeline>
-        <InfiniteLoadMore :key="selectedTab" :on-load="fetchMore" :pause="isLoadingMessage" />
       </div>
     </template>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, onActivated } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import BasePlaceholder from '~/components/BasePlaceholder.vue'
 import BaseTimeline from '~/components/BaseTimeline.vue'
-import InfiniteLoadMore from '~/components/InfiniteLoadMore.vue'
 import NotificationContainer from '~/components/NotificationContainer.vue'
 import { toast } from '~/main'
 import { authState, getToken } from '~/utils/auth'
@@ -527,8 +525,6 @@ import {
   markRead,
   notifications,
   markAllRead,
-  fetchNotificationPreferences,
-  updateNotificationPreference,
 } from '~/utils/notification'
 import TimeManager from '~/utils/time'
 
@@ -539,16 +535,9 @@ const selectedTab = ref(
   ['all', 'unread', 'control'].includes(route.query.tab) ? route.query.tab : 'unread',
 )
 const notificationPrefs = ref([])
-
-const fetchMore = () => fetchNotifications()
-
-const loadInitial = async () => {
-  await fetchNotifications({ reset: true, read: selectedTab.value === 'unread' ? false : null })
-}
-
-watch(selectedTab, async (t) => {
-  await fetchNotifications({ reset: true, read: t === 'unread' ? false : null })
-})
+const filteredNotifications = computed(() =>
+  selectedTab.value === 'all' ? notifications.value : notifications.value.filter((n) => !n.read),
+)
 
 const fetchPrefs = async () => {
   notificationPrefs.value = await fetchNotificationPreferences()
@@ -558,7 +547,7 @@ const togglePref = async (pref) => {
   const ok = await updateNotificationPreference(pref.type, !pref.enabled)
   if (ok) {
     pref.enabled = !pref.enabled
-    await fetchNotifications({ reset: true, read: selectedTab.value === 'unread' ? false : null })
+    await fetchNotifications()
     await fetchUnreadCount()
   } else {
     toast.error('操作失败')
@@ -639,7 +628,7 @@ const formatType = (t) => {
 }
 
 onActivated(() => {
-  loadInitial()
+  fetchNotifications()
   fetchPrefs()
 })
 </script>

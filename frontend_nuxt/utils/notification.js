@@ -118,189 +118,175 @@ export async function updateNotificationPreference(type, enabled) {
 function createFetchNotifications() {
   const notifications = ref([])
   const isLoadingMessage = ref(false)
-  const page = ref(0)
-  const pageSize = 30
-  const readFilter = ref(null)
-  const fetchNotifications = async ({ reset = false, read = null } = {}) => {
+  const fetchNotifications = async () => {
     const config = useRuntimeConfig()
     const API_BASE_URL = config.public.apiBaseUrl
-    if (isLoadingMessage.value) return false
-    try {
-      const token = getToken()
-      if (!token) {
-        toast.error('请先登录')
-        return true
-      }
-      if (reset) {
-        notifications.value = []
-        page.value = 0
-        readFilter.value = read
-      }
-      isLoadingMessage.value = true
-      let url = `${API_BASE_URL}/api/notifications`
-      if (readFilter.value === false) url += '/unread'
-      url += `?page=${page.value}&size=${pageSize}`
-      const res = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      isLoadingMessage.value = false
-      if (!res.ok) {
-        toast.error('获取通知失败')
-        return true
-      }
-      const data = await res.json()
-
-      for (const n of data) {
-        if (n.type === 'COMMENT_REPLY') {
-          notifications.value.push({
-            ...n,
-            src: n.comment.author.avatar,
-            iconClick: () => {
-              markRead(n.id)
-              navigateTo(`/users/${n.comment.author.id}`, { replace: true })
-            },
-          })
-        } else if (n.type === 'REACTION') {
-          notifications.value.push({
-            ...n,
-            emoji: reactionEmojiMap[n.reactionType],
-            iconClick: () => {
-              if (n.fromUser) {
-                markRead(n.id)
-                navigateTo(`/users/${n.fromUser.id}`, { replace: true })
-              }
-            },
-          })
-        } else if (n.type === 'POST_VIEWED') {
-          notifications.value.push({
-            ...n,
-            src: n.fromUser ? n.fromUser.avatar : null,
-            icon: n.fromUser ? undefined : iconMap[n.type],
-            iconClick: () => {
-              if (n.fromUser) {
-                markRead(n.id)
-                navigateTo(`/users/${n.fromUser.id}`, { replace: true })
-              }
-            },
-          })
-        } else if (n.type === 'LOTTERY_WIN') {
-          notifications.value.push({
-            ...n,
-            icon: iconMap[n.type],
-            iconClick: () => {
-              if (n.post) {
-                markRead(n.id)
-                router.push(`/posts/${n.post.id}`)
-              }
-            },
-          })
-        } else if (n.type === 'LOTTERY_DRAW') {
-          notifications.value.push({
-            ...n,
-            icon: iconMap[n.type],
-            iconClick: () => {
-              if (n.post) {
-                markRead(n.id)
-                router.push(`/posts/${n.post.id}`)
-              }
-            },
-          })
-        } else if (n.type === 'POST_UPDATED') {
-          notifications.value.push({
-            ...n,
-            src: n.comment.author.avatar,
-            iconClick: () => {
-              markRead(n.id)
-              navigateTo(`/users/${n.comment.author.id}`, { replace: true })
-            },
-          })
-        } else if (n.type === 'USER_ACTIVITY') {
-          notifications.value.push({
-            ...n,
-            src: n.comment.author.avatar,
-            iconClick: () => {
-              markRead(n.id)
-              navigateTo(`/users/${n.comment.author.id}`, { replace: true })
-            },
-          })
-        } else if (n.type === 'MENTION') {
-          notifications.value.push({
-            ...n,
-            icon: iconMap[n.type],
-            iconClick: () => {
-              if (n.fromUser) {
-                markRead(n.id)
-                navigateTo(`/users/${n.fromUser.id}`, { replace: true })
-              }
-            },
-          })
-        } else if (n.type === 'USER_FOLLOWED' || n.type === 'USER_UNFOLLOWED') {
-          notifications.value.push({
-            ...n,
-            icon: iconMap[n.type],
-            iconClick: () => {
-              if (n.fromUser) {
-                markRead(n.id)
-                navigateTo(`/users/${n.fromUser.id}`, { replace: true })
-              }
-            },
-          })
-        } else if (n.type === 'FOLLOWED_POST') {
-          notifications.value.push({
-            ...n,
-            icon: iconMap[n.type],
-            iconClick: () => {
-              if (n.post) {
-                markRead(n.id)
-                navigateTo(`/posts/${n.post.id}`, { replace: true })
-              }
-            },
-          })
-        } else if (n.type === 'POST_SUBSCRIBED' || n.type === 'POST_UNSUBSCRIBED') {
-          notifications.value.push({
-            ...n,
-            icon: iconMap[n.type],
-            iconClick: () => {
-              if (n.post) {
-                markRead(n.id)
-                navigateTo(`/posts/${n.post.id}`, { replace: true })
-              }
-            },
-          })
-        } else if (n.type === 'POST_REVIEW_REQUEST') {
-          notifications.value.push({
-            ...n,
-            src: n.fromUser ? n.fromUser.avatar : null,
-            icon: n.fromUser ? undefined : iconMap[n.type],
-            iconClick: () => {
-              if (n.post) {
-                markRead(n.id)
-                navigateTo(`/posts/${n.post.id}`, { replace: true })
-              }
-            },
-          })
-        } else if (n.type === 'REGISTER_REQUEST') {
-          notifications.value.push({
-            ...n,
-            icon: iconMap[n.type],
-            iconClick: () => {},
-          })
-        } else {
-          notifications.value.push({
-            ...n,
-            icon: iconMap[n.type],
-          })
+    if (isLoadingMessage && notifications && markRead) {
+      try {
+        const token = getToken()
+        if (!token) {
+          toast.error('请先登录')
+          return
         }
+        isLoadingMessage.value = true
+        notifications.value = []
+        const res = await fetch(`${API_BASE_URL}/api/notifications`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        isLoadingMessage.value = false
+        if (!res.ok) {
+          toast.error('获取通知失败')
+          return
+        }
+        const data = await res.json()
+
+        for (const n of data) {
+          if (n.type === 'COMMENT_REPLY') {
+            notifications.value.push({
+              ...n,
+              src: n.comment.author.avatar,
+              iconClick: () => {
+                markRead(n.id)
+                navigateTo(`/users/${n.comment.author.id}`, { replace: true })
+              },
+            })
+          } else if (n.type === 'REACTION') {
+            notifications.value.push({
+              ...n,
+              emoji: reactionEmojiMap[n.reactionType],
+              iconClick: () => {
+                if (n.fromUser) {
+                  markRead(n.id)
+                  navigateTo(`/users/${n.fromUser.id}`, { replace: true })
+                }
+              },
+            })
+          } else if (n.type === 'POST_VIEWED') {
+            notifications.value.push({
+              ...n,
+              src: n.fromUser ? n.fromUser.avatar : null,
+              icon: n.fromUser ? undefined : iconMap[n.type],
+              iconClick: () => {
+                if (n.fromUser) {
+                  markRead(n.id)
+                  navigateTo(`/users/${n.fromUser.id}`, { replace: true })
+                }
+              },
+            })
+          } else if (n.type === 'LOTTERY_WIN') {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+              iconClick: () => {
+                if (n.post) {
+                  markRead(n.id)
+                  router.push(`/posts/${n.post.id}`)
+                }
+              },
+            })
+          } else if (n.type === 'LOTTERY_DRAW') {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+              iconClick: () => {
+                if (n.post) {
+                  markRead(n.id)
+                  router.push(`/posts/${n.post.id}`)
+                }
+              },
+            })
+          } else if (n.type === 'POST_UPDATED') {
+            notifications.value.push({
+              ...n,
+              src: n.comment.author.avatar,
+              iconClick: () => {
+                markRead(n.id)
+                navigateTo(`/users/${n.comment.author.id}`, { replace: true })
+              },
+            })
+          } else if (n.type === 'USER_ACTIVITY') {
+            notifications.value.push({
+              ...n,
+              src: n.comment.author.avatar,
+              iconClick: () => {
+                markRead(n.id)
+                navigateTo(`/users/${n.comment.author.id}`, { replace: true })
+              },
+            })
+          } else if (n.type === 'MENTION') {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+              iconClick: () => {
+                if (n.fromUser) {
+                  markRead(n.id)
+                  navigateTo(`/users/${n.fromUser.id}`, { replace: true })
+                }
+              },
+            })
+          } else if (n.type === 'USER_FOLLOWED' || n.type === 'USER_UNFOLLOWED') {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+              iconClick: () => {
+                if (n.fromUser) {
+                  markRead(n.id)
+                  navigateTo(`/users/${n.fromUser.id}`, { replace: true })
+                }
+              },
+            })
+          } else if (n.type === 'FOLLOWED_POST') {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+              iconClick: () => {
+                if (n.post) {
+                  markRead(n.id)
+                  navigateTo(`/posts/${n.post.id}`, { replace: true })
+                }
+              },
+            })
+          } else if (n.type === 'POST_SUBSCRIBED' || n.type === 'POST_UNSUBSCRIBED') {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+              iconClick: () => {
+                if (n.post) {
+                  markRead(n.id)
+                  navigateTo(`/posts/${n.post.id}`, { replace: true })
+                }
+              },
+            })
+          } else if (n.type === 'POST_REVIEW_REQUEST') {
+            notifications.value.push({
+              ...n,
+              src: n.fromUser ? n.fromUser.avatar : null,
+              icon: n.fromUser ? undefined : iconMap[n.type],
+              iconClick: () => {
+                if (n.post) {
+                  markRead(n.id)
+                  navigateTo(`/posts/${n.post.id}`, { replace: true })
+                }
+              },
+            })
+          } else if (n.type === 'REGISTER_REQUEST') {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+              iconClick: () => {},
+            })
+          } else {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+            })
+          }
+        }
+      } catch (e) {
+        console.error(e)
       }
-      const done = data.length < pageSize
-      if (!done) page.value++
-      return done
-    } catch (e) {
-      console.error(e)
-      isLoadingMessage.value = false
-      return true
     }
   }
 
@@ -349,6 +335,7 @@ function createFetchNotifications() {
     markRead,
     notifications,
     isLoadingMessage,
+    markRead,
     markAllRead,
   }
 }
