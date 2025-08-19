@@ -17,7 +17,10 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     List<Notification> findByUserAndReadOrderByCreatedAtDesc(User user, boolean read);
     Page<Notification> findByUserOrderByCreatedAtDesc(User user, Pageable pageable);
     Page<Notification> findByUserAndReadOrderByCreatedAtDesc(User user, boolean read, Pageable pageable);
+    Page<Notification> findByUserAndTypeNotInOrderByCreatedAtDesc(User user, java.util.Collection<NotificationType> types, Pageable pageable);
+    Page<Notification> findByUserAndReadAndTypeNotInOrderByCreatedAtDesc(User user, boolean read, java.util.Collection<NotificationType> types, Pageable pageable);
     long countByUserAndRead(User user, boolean read);
+    long countByUserAndReadAndTypeNotIn(User user, boolean read, java.util.Collection<NotificationType> types);
     List<Notification> findByPost(Post post);
     List<Notification> findByComment(Comment comment);
 

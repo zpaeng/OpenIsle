@@ -11,6 +11,7 @@ import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.HashSet;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
@@ -64,6 +65,7 @@ class NotificationServiceTest {
         User user = new User();
         user.setId(2L);
         user.setUsername("bob");
+        user.setDisabledNotificationTypes(new HashSet<>());
         when(uRepo.findByUsername("bob")).thenReturn(Optional.of(user));
 
         Notification n = new Notification();
@@ -90,6 +92,7 @@ class NotificationServiceTest {
         User user = new User();
         user.setId(3L);
         user.setUsername("carl");
+        user.setDisabledNotificationTypes(new HashSet<>());
         when(uRepo.findByUsername("carl")).thenReturn(Optional.of(user));
         when(nRepo.countByUserAndRead(user, false)).thenReturn(5L);
 
@@ -97,6 +100,56 @@ class NotificationServiceTest {
 
         assertEquals(5L, count);
         verify(nRepo).countByUserAndRead(user, false);
+    }
+
+    @Test
+    void listNotificationsFiltersDisabledTypes() {
+        NotificationRepository nRepo = mock(NotificationRepository.class);
+        UserRepository uRepo = mock(UserRepository.class);
+        ReactionRepository rRepo = mock(ReactionRepository.class);
+        EmailSender email = mock(EmailSender.class);
+        PushNotificationService push = mock(PushNotificationService.class);
+        Executor executor = Runnable::run;
+        NotificationService service = new NotificationService(nRepo, uRepo, email, push, rRepo, executor);
+        org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
+
+        User user = new User();
+        user.setId(4L);
+        user.setUsername("dana");
+        when(uRepo.findByUsername("dana")).thenReturn(Optional.of(user));
+
+        Notification n = new Notification();
+        when(nRepo.findByUserAndTypeNotInOrderByCreatedAtDesc(eq(user), eq(user.getDisabledNotificationTypes()), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(n)));
+
+        List<Notification> list = service.listNotifications("dana", null, 0, 10);
+
+        assertEquals(1, list.size());
+        verify(nRepo).findByUserAndTypeNotInOrderByCreatedAtDesc(eq(user), eq(user.getDisabledNotificationTypes()), any(Pageable.class));
+    }
+
+    @Test
+    void countUnreadFiltersDisabledTypes() {
+        NotificationRepository nRepo = mock(NotificationRepository.class);
+        UserRepository uRepo = mock(UserRepository.class);
+        ReactionRepository rRepo = mock(ReactionRepository.class);
+        EmailSender email = mock(EmailSender.class);
+        PushNotificationService push = mock(PushNotificationService.class);
+        Executor executor = Runnable::run;
+        NotificationService service = new NotificationService(nRepo, uRepo, email, push, rRepo, executor);
+        org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
+
+        User user = new User();
+        user.setId(5L);
+        user.setUsername("erin");
+        when(uRepo.findByUsername("erin")).thenReturn(Optional.of(user));
+        when(nRepo.countByUserAndReadAndTypeNotIn(eq(user), eq(false), eq(user.getDisabledNotificationTypes())))
+                .thenReturn(2L);
+
+        long count = service.countUnread("erin");
+
+        assertEquals(2L, count);
+        verify(nRepo).countByUserAndReadAndTypeNotIn(eq(user), eq(false), eq(user.getDisabledNotificationTypes()));
     }
 
     @Test
