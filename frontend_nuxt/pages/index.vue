@@ -550,6 +550,7 @@ const sanitizeDescription = (text) => stripMarkdown(text)
 }
 
 .article-item-description {
+  max-width: 100%;
   margin-top: 10px;
   font-size: 14px;
   color: gray;
