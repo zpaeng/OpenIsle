@@ -116,251 +116,210 @@ export async function updateNotificationPreference(type, enabled) {
  * @returns
  */
 function createFetchNotifications() {
-  const notificationsAll = ref([])
-  const notificationsUnread = ref([])
-  const isLoadingAll = ref(false)
-  const isLoadingUnread = ref(false)
-  const pageSize = 30
-
-  function pushNotification(n, target) {
-    if (n.type === 'COMMENT_REPLY') {
-      target.push({
-        ...n,
-        src: n.comment.author.avatar,
-        iconClick: () => {
-          markRead(n.id)
-          navigateTo(`/users/${n.comment.author.id}`, { replace: true })
-        },
-      })
-    } else if (n.type === 'REACTION') {
-      target.push({
-        ...n,
-        emoji: reactionEmojiMap[n.reactionType],
-        iconClick: () => {
-          if (n.fromUser) {
-            markRead(n.id)
-            navigateTo(`/users/${n.fromUser.id}`, { replace: true })
-          }
-        },
-      })
-    } else if (n.type === 'POST_VIEWED') {
-      target.push({
-        ...n,
-        src: n.fromUser ? n.fromUser.avatar : null,
-        icon: n.fromUser ? undefined : iconMap[n.type],
-        iconClick: () => {
-          if (n.fromUser) {
-            markRead(n.id)
-            navigateTo(`/users/${n.fromUser.id}`, { replace: true })
-          }
-        },
-      })
-    } else if (n.type === 'LOTTERY_WIN') {
-      target.push({
-        ...n,
-        icon: iconMap[n.type],
-        iconClick: () => {
-          if (n.post) {
-            markRead(n.id)
-            router.push(`/posts/${n.post.id}`)
-          }
-        },
-      })
-    } else if (n.type === 'LOTTERY_DRAW') {
-      target.push({
-        ...n,
-        icon: iconMap[n.type],
-        iconClick: () => {
-          if (n.post) {
-            markRead(n.id)
-            router.push(`/posts/${n.post.id}`)
-          }
-        },
-      })
-    } else if (n.type === 'POST_UPDATED') {
-      target.push({
-        ...n,
-        src: n.comment.author.avatar,
-        iconClick: () => {
-          markRead(n.id)
-          navigateTo(`/users/${n.comment.author.id}`, { replace: true })
-        },
-      })
-    } else if (n.type === 'USER_ACTIVITY') {
-      target.push({
-        ...n,
-        src: n.comment.author.avatar,
-        iconClick: () => {
-          markRead(n.id)
-          navigateTo(`/users/${n.comment.author.id}`, { replace: true })
-        },
-      })
-    } else if (n.type === 'MENTION') {
-      target.push({
-        ...n,
-        icon: iconMap[n.type],
-        iconClick: () => {
-          if (n.fromUser) {
-            markRead(n.id)
-            navigateTo(`/users/${n.fromUser.id}`, { replace: true })
-          }
-        },
-      })
-    } else if (n.type === 'USER_FOLLOWED' || n.type === 'USER_UNFOLLOWED') {
-      target.push({
-        ...n,
-        icon: iconMap[n.type],
-        iconClick: () => {
-          if (n.fromUser) {
-            markRead(n.id)
-            navigateTo(`/users/${n.fromUser.id}`, { replace: true })
-          }
-        },
-      })
-    } else if (n.type === 'FOLLOWED_POST') {
-      target.push({
-        ...n,
-        icon: iconMap[n.type],
-        iconClick: () => {
-          if (n.post) {
-            markRead(n.id)
-            navigateTo(`/posts/${n.post.id}`, { replace: true })
-          }
-        },
-      })
-    } else if (n.type === 'POST_SUBSCRIBED' || n.type === 'POST_UNSUBSCRIBED') {
-      target.push({
-        ...n,
-        icon: iconMap[n.type],
-        iconClick: () => {
-          if (n.post) {
-            markRead(n.id)
-            navigateTo(`/posts/${n.post.id}`, { replace: true })
-          }
-        },
-      })
-    } else if (n.type === 'POST_REVIEW_REQUEST') {
-      target.push({
-        ...n,
-        src: n.fromUser ? n.fromUser.avatar : null,
-        icon: n.fromUser ? undefined : iconMap[n.type],
-        iconClick: () => {
-          if (n.post) {
-            markRead(n.id)
-            navigateTo(`/posts/${n.post.id}`, { replace: true })
-          }
-        },
-      })
-    } else if (n.type === 'REGISTER_REQUEST') {
-      target.push({
-        ...n,
-        icon: iconMap[n.type],
-        iconClick: () => {},
-      })
-    } else {
-      target.push({
-        ...n,
-        icon: iconMap[n.type],
-      })
-    }
-  }
-
-  async function fetchAllNotifications(page = 0) {
+  const notifications = ref([])
+  const isLoadingMessage = ref(false)
+  const fetchNotifications = async () => {
     const config = useRuntimeConfig()
     const API_BASE_URL = config.public.apiBaseUrl
-    try {
-      const token = getToken()
-      if (!token) {
-        toast.error('请先登录')
-        return
+    if (isLoadingMessage && notifications && markRead) {
+      try {
+        const token = getToken()
+        if (!token) {
+          toast.error('请先登录')
+          return
+        }
+        isLoadingMessage.value = true
+        notifications.value = []
+        const res = await fetch(`${API_BASE_URL}/api/notifications`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        isLoadingMessage.value = false
+        if (!res.ok) {
+          toast.error('获取通知失败')
+          return
+        }
+        const data = await res.json()
+
+        for (const n of data) {
+          if (n.type === 'COMMENT_REPLY') {
+            notifications.value.push({
+              ...n,
+              src: n.comment.author.avatar,
+              iconClick: () => {
+                markRead(n.id)
+                navigateTo(`/users/${n.comment.author.id}`, { replace: true })
+              },
+            })
+          } else if (n.type === 'REACTION') {
+            notifications.value.push({
+              ...n,
+              emoji: reactionEmojiMap[n.reactionType],
+              iconClick: () => {
+                if (n.fromUser) {
+                  markRead(n.id)
+                  navigateTo(`/users/${n.fromUser.id}`, { replace: true })
+                }
+              },
+            })
+          } else if (n.type === 'POST_VIEWED') {
+            notifications.value.push({
+              ...n,
+              src: n.fromUser ? n.fromUser.avatar : null,
+              icon: n.fromUser ? undefined : iconMap[n.type],
+              iconClick: () => {
+                if (n.fromUser) {
+                  markRead(n.id)
+                  navigateTo(`/users/${n.fromUser.id}`, { replace: true })
+                }
+              },
+            })
+          } else if (n.type === 'LOTTERY_WIN') {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+              iconClick: () => {
+                if (n.post) {
+                  markRead(n.id)
+                  router.push(`/posts/${n.post.id}`)
+                }
+              },
+            })
+          } else if (n.type === 'LOTTERY_DRAW') {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+              iconClick: () => {
+                if (n.post) {
+                  markRead(n.id)
+                  router.push(`/posts/${n.post.id}`)
+                }
+              },
+            })
+          } else if (n.type === 'POST_UPDATED') {
+            notifications.value.push({
+              ...n,
+              src: n.comment.author.avatar,
+              iconClick: () => {
+                markRead(n.id)
+                navigateTo(`/users/${n.comment.author.id}`, { replace: true })
+              },
+            })
+          } else if (n.type === 'USER_ACTIVITY') {
+            notifications.value.push({
+              ...n,
+              src: n.comment.author.avatar,
+              iconClick: () => {
+                markRead(n.id)
+                navigateTo(`/users/${n.comment.author.id}`, { replace: true })
+              },
+            })
+          } else if (n.type === 'MENTION') {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+              iconClick: () => {
+                if (n.fromUser) {
+                  markRead(n.id)
+                  navigateTo(`/users/${n.fromUser.id}`, { replace: true })
+                }
+              },
+            })
+          } else if (n.type === 'USER_FOLLOWED' || n.type === 'USER_UNFOLLOWED') {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+              iconClick: () => {
+                if (n.fromUser) {
+                  markRead(n.id)
+                  navigateTo(`/users/${n.fromUser.id}`, { replace: true })
+                }
+              },
+            })
+          } else if (n.type === 'FOLLOWED_POST') {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+              iconClick: () => {
+                if (n.post) {
+                  markRead(n.id)
+                  navigateTo(`/posts/${n.post.id}`, { replace: true })
+                }
+              },
+            })
+          } else if (n.type === 'POST_SUBSCRIBED' || n.type === 'POST_UNSUBSCRIBED') {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+              iconClick: () => {
+                if (n.post) {
+                  markRead(n.id)
+                  navigateTo(`/posts/${n.post.id}`, { replace: true })
+                }
+              },
+            })
+          } else if (n.type === 'POST_REVIEW_REQUEST') {
+            notifications.value.push({
+              ...n,
+              src: n.fromUser ? n.fromUser.avatar : null,
+              icon: n.fromUser ? undefined : iconMap[n.type],
+              iconClick: () => {
+                if (n.post) {
+                  markRead(n.id)
+                  navigateTo(`/posts/${n.post.id}`, { replace: true })
+                }
+              },
+            })
+          } else if (n.type === 'REGISTER_REQUEST') {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+              iconClick: () => {},
+            })
+          } else {
+            notifications.value.push({
+              ...n,
+              icon: iconMap[n.type],
+            })
+          }
+        }
+      } catch (e) {
+        console.error(e)
       }
-      isLoadingAll.value = true
-      const res = await fetch(`${API_BASE_URL}/api/notifications?page=${page}&size=${pageSize}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      isLoadingAll.value = false
-      if (!res.ok) {
-        toast.error('获取通知失败')
-        return
-      }
-      const data = await res.json()
-      if (page === 0) notificationsAll.value = []
-      for (const n of data) {
-        pushNotification(n, notificationsAll.value)
-      }
-      return data.length
-    } catch (e) {
-      console.error(e)
-      return 0
     }
   }
 
-  async function fetchUnreadNotifications(page = 0) {
-    const config = useRuntimeConfig()
-    const API_BASE_URL = config.public.apiBaseUrl
-    try {
-      const token = getToken()
-      if (!token) {
-        toast.error('请先登录')
-        return
-      }
-      isLoadingUnread.value = true
-      const res = await fetch(
-        `${API_BASE_URL}/api/notifications/unread?page=${page}&size=${pageSize}`,
-        { headers: { Authorization: `Bearer ${token}` } },
-      )
-      isLoadingUnread.value = false
-      if (!res.ok) {
-        toast.error('获取通知失败')
-        return
-      }
-      const data = await res.json()
-      if (page === 0) notificationsUnread.value = []
-      for (const n of data) {
-        pushNotification(n, notificationsUnread.value)
-      }
-      return data.length
-    } catch (e) {
-      console.error(e)
-      return 0
-    }
-  }
-
-  async function markRead(id) {
+  const markRead = async (id) => {
     if (!id) return
-    const nAll = notificationsAll.value.find((n) => n.id === id)
-    const nUnreadIndex = notificationsUnread.value.findIndex((n) => n.id === id)
-    const target = nAll || notificationsUnread.value[nUnreadIndex]
-    if (!target || target.read) return
-    target.read = true
-    if (nUnreadIndex !== -1) notificationsUnread.value.splice(nUnreadIndex, 1)
+    const n = notifications.value.find((n) => n.id === id)
+    if (!n || n.read) return
+    n.read = true
     if (notificationState.unreadCount > 0) notificationState.unreadCount--
     const ok = await markNotificationsRead([id])
     if (!ok) {
-      target.read = false
-      if (nUnreadIndex !== -1) notificationsUnread.value.splice(nUnreadIndex, 0, target)
+      n.read = false
       notificationState.unreadCount++
     } else {
       fetchUnreadCount()
     }
   }
 
-  async function markAllRead() {
-    const ids = [
-      ...new Set(
-        [...notificationsAll.value, ...notificationsUnread.value]
-          .filter((n) => n.type !== 'REGISTER_REQUEST' && !n.read)
-          .map((n) => n.id),
-      ),
-    ]
-    if (ids.length === 0) return
-    notificationsAll.value.forEach((n) => {
+  const markAllRead = async () => {
+    // 除了 REGISTER_REQUEST 类型消息
+    const idsToMark = notifications.value
+      .filter((n) => n.type !== 'REGISTER_REQUEST' && !n.read)
+      .map((n) => n.id)
+    if (idsToMark.length === 0) return
+    notifications.value.forEach((n) => {
       if (n.type !== 'REGISTER_REQUEST') n.read = true
     })
-    notificationsUnread.value = []
-    notificationState.unreadCount = 0
-    const ok = await markNotificationsRead(ids)
+    notificationState.unreadCount = notifications.value.filter((n) => !n.read).length
+    const ok = await markNotificationsRead(idsToMark)
     if (!ok) {
+      notifications.value.forEach((n) => {
+        if (idsToMark.includes(n.id)) n.read = false
+      })
       await fetchUnreadCount()
       return
     }
@@ -371,26 +330,15 @@ function createFetchNotifications() {
       toast.success('已读所有消息')
     }
   }
-
   return {
-    fetchAllNotifications,
-    fetchUnreadNotifications,
+    fetchNotifications,
     markRead,
-    notificationsAll,
-    notificationsUnread,
-    isLoadingAll,
-    isLoadingUnread,
+    notifications,
+    isLoadingMessage,
+    markRead,
     markAllRead,
   }
 }
 
-export const {
-  fetchAllNotifications,
-  fetchUnreadNotifications,
-  markRead,
-  notificationsAll,
-  notificationsUnread,
-  isLoadingAll,
-  isLoadingUnread,
-  markAllRead,
-} = createFetchNotifications()
+export const { fetchNotifications, markRead, notifications, isLoadingMessage, markAllRead } =
+  createFetchNotifications()

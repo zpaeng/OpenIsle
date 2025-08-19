@@ -505,16 +505,13 @@
             </div>
           </template>
         </BaseTimeline>
-        <div v-if="hasMore" class="load-more">
-          <button class="load-more-button" @click="loadMore">加载更多</button>
-        </div>
       </div>
     </template>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import BasePlaceholder from '~/components/BasePlaceholder.vue'
 import BaseTimeline from '~/components/BaseTimeline.vue'
 import NotificationContainer from '~/components/NotificationContainer.vue'
@@ -522,17 +519,12 @@ import { toast } from '~/main'
 import { authState, getToken } from '~/utils/auth'
 import { stripMarkdownLength } from '~/utils/markdown'
 import {
-  fetchAllNotifications,
-  fetchUnreadNotifications,
+  fetchNotifications,
   fetchUnreadCount,
-  isLoadingAll,
-  isLoadingUnread,
+  isLoadingMessage,
   markRead,
-  notificationsAll,
-  notificationsUnread,
+  notifications,
   markAllRead,
-  fetchNotificationPreferences,
-  updateNotificationPreference,
 } from '~/utils/notification'
 import TimeManager from '~/utils/time'
 
@@ -543,18 +535,8 @@ const selectedTab = ref(
   ['all', 'unread', 'control'].includes(route.query.tab) ? route.query.tab : 'unread',
 )
 const notificationPrefs = ref([])
-const pageAll = ref(0)
-const pageUnread = ref(0)
-const hasMoreAll = ref(true)
-const hasMoreUnread = ref(true)
 const filteredNotifications = computed(() =>
-  selectedTab.value === 'all' ? notificationsAll.value : notificationsUnread.value,
-)
-const isLoadingMessage = computed(() =>
-  selectedTab.value === 'all' ? isLoadingAll.value : isLoadingUnread.value,
-)
-const hasMore = computed(() =>
-  selectedTab.value === 'all' ? hasMoreAll.value : hasMoreUnread.value,
+  selectedTab.value === 'all' ? notifications.value : notifications.value.filter((n) => !n.read),
 )
 
 const fetchPrefs = async () => {
@@ -565,14 +547,7 @@ const togglePref = async (pref) => {
   const ok = await updateNotificationPreference(pref.type, !pref.enabled)
   if (ok) {
     pref.enabled = !pref.enabled
-    pageAll.value = 0
-    pageUnread.value = 0
-    const countAll = await fetchAllNotifications(0)
-    const countUnread = await fetchUnreadNotifications(0)
-    pageAll.value = 1
-    pageUnread.value = 1
-    hasMoreAll.value = countAll === 30
-    hasMoreUnread.value = countUnread === 30
+    await fetchNotifications()
     await fetchUnreadCount()
   } else {
     toast.error('操作失败')
@@ -652,34 +627,9 @@ const formatType = (t) => {
   }
 }
 
-const loadMore = async () => {
-  if (selectedTab.value === 'all') {
-    const c = await fetchAllNotifications(pageAll.value)
-    pageAll.value++
-    if (c < 30) hasMoreAll.value = false
-  } else {
-    const c = await fetchUnreadNotifications(pageUnread.value)
-    pageUnread.value++
-    if (c < 30) hasMoreUnread.value = false
-  }
-}
-
-onMounted(async () => {
-  await fetchPrefs()
-  await loadMore()
-  await fetchUnreadCount()
-})
-
-watch(selectedTab, async (tab) => {
-  if (tab === 'all' && notificationsAll.value.length === 0) {
-    pageAll.value = 0
-    hasMoreAll.value = true
-    await loadMore()
-  } else if (tab === 'unread' && notificationsUnread.value.length === 0) {
-    pageUnread.value = 0
-    hasMoreUnread.value = true
-    await loadMore()
-  }
+onActivated(() => {
+  fetchNotifications()
+  fetchPrefs()
 })
 </script>
 
@@ -739,19 +689,6 @@ watch(selectedTab, async (tab) => {
 .timeline-container {
   padding: 10px 20px;
   height: 100%;
-}
-
-.load-more {
-  text-align: center;
-}
-
-.load-more-button {
-  margin: 10px auto;
-  padding: 6px 12px;
-  border: 1px solid var(--normal-border-color);
-  border-radius: 6px;
-  background: transparent;
-  cursor: pointer;
 }
 
 .notif-content {
