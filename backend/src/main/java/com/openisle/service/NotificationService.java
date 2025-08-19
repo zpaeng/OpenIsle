@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.Executor;
-import java.util.stream.Collectors;
 
 /** Service for creating and retrieving notifications. */
 @Service
@@ -180,17 +179,26 @@ public class NotificationService {
         userRepository.save(user);
     }
 
-    public List<Notification> listNotifications(String username, Boolean read) {
+    public List<Notification> listNotifications(String username, Boolean read, int page, int size) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Set<NotificationType> disabled = user.getDisabledNotificationTypes();
-        List<Notification> list;
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        org.springframework.data.domain.Page<Notification> result;
         if (read == null) {
-            list = notificationRepository.findByUserOrderByCreatedAtDesc(user);
+            if (disabled.isEmpty()) {
+                result = notificationRepository.findByUserOrderByCreatedAtDesc(user, pageable);
+            } else {
+                result = notificationRepository.findByUserAndTypeNotInOrderByCreatedAtDesc(user, disabled, pageable);
+            }
         } else {
-            list = notificationRepository.findByUserAndReadOrderByCreatedAtDesc(user, read);
+            if (disabled.isEmpty()) {
+                result = notificationRepository.findByUserAndReadOrderByCreatedAtDesc(user, read, pageable);
+            } else {
+                result = notificationRepository.findByUserAndReadAndTypeNotInOrderByCreatedAtDesc(user, read, disabled, pageable);
+            }
         }
-        return list.stream().filter(n -> !disabled.contains(n.getType())).collect(Collectors.toList());
+        return result.getContent();
     }
 
     public void markRead(String username, List<Long> ids) {
@@ -209,8 +217,10 @@ public class NotificationService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Set<NotificationType> disabled = user.getDisabledNotificationTypes();
-        return notificationRepository.findByUserAndReadOrderByCreatedAtDesc(user, false).stream()
-                .filter(n -> !disabled.contains(n.getType())).count();
+        if (disabled.isEmpty()) {
+            return notificationRepository.countByUserAndRead(user, false);
+        }
+        return notificationRepository.countByUserAndReadAndTypeNotIn(user, false, disabled);
     }
 
     public void notifyMentions(String content, User fromUser, Post post, Comment comment) {

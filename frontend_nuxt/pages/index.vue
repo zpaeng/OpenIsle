@@ -102,25 +102,33 @@
           </div>
         </div>
       </template>
+
       <div v-else-if="selectedTopic === '热门'" class="placeholder-container">
         热门帖子功能开发中，敬请期待。
       </div>
       <div v-else class="placeholder-container">分类浏览功能开发中，敬请期待。</div>
-      <div v-if="isLoadingMore && articles.length > 0" class="loading-container bottom-loading">
-        <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
-      </div>
+
+      <!-- ✅ 通用“底部加载更多”组件（自管 loading/observer/并发） -->
+      <InfiniteLoadMore
+        v-if="articles.length > 0"
+        :key="ioKey"
+        :on-load="fetchNextPage"
+        :pause="pendingFirst"
+        root-margin="200px 0px"
+      />
     </div>
   </div>
 </template>
+
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onBeforeUnmount, nextTick, ref, watch } from 'vue'
 import ArticleCategory from '~/components/ArticleCategory.vue'
 import ArticleTags from '~/components/ArticleTags.vue'
 import CategorySelect from '~/components/CategorySelect.vue'
 import SearchDropdown from '~/components/SearchDropdown.vue'
 import TagSelect from '~/components/TagSelect.vue'
+import InfiniteLoadMore from '~/components/InfiniteLoadMore.vue'
 import { getToken } from '~/utils/auth'
-import { useScrollLoadMore } from '~/utils/loadMore'
 import { stripMarkdown } from '~/utils/markdown'
 import { useIsMobile } from '~/utils/screen'
 import TimeManager from '~/utils/time'
@@ -144,8 +152,6 @@ const route = useRoute()
 const tagOptions = ref([])
 const categoryOptions = ref([])
 
-const isLoadingMore = ref(false)
-
 const topics = ref(['最新回复', '最新', '排行榜' /*, '热门', '类别'*/])
 const selectedTopicCookie = useCookie('homeTab')
 const selectedTopic = ref(
@@ -162,7 +168,6 @@ const articles = ref([])
 const page = ref(0)
 const pageSize = 10
 const isMobile = useIsMobile()
-const allLoaded = ref(false)
 
 /** URL 参数 -> 本地筛选值 **/
 const selectedCategorySet = (category) => {
@@ -286,80 +291,54 @@ const {
   },
 )
 
-/** 首屏/筛选变更：重置分页并灌入 firstPage **/
+/** 首屏/筛选变更：重置分页并灌入 firstPage（InfiniteLoadMore 会凭 key 重建状态） **/
 watch(
   firstPage,
   (data) => {
     page.value = 0
     articles.value = [...(data || [])]
-    allLoaded.value = (data?.length || 0) < pageSize
   },
   { immediate: true },
 )
 
-/** —— 滚动加载更多 —— **/
-let inflight = null
+/** —— 提供给 InfiniteLoadMore 的加载函数 —— **/
 const fetchNextPage = async () => {
-  if (allLoaded.value || pendingFirst.value || inflight) return
+  // 若首屏仍在 pending，由组件 pause 控制，这里兜底返回“未完成”
+  if (pendingFirst.value) return false
+
   const nextPage = page.value + 1
-  isLoadingMore.value = true
-  inflight = $fetch(buildUrl({ pageNo: nextPage }), { headers: tokenHeader.value })
-    .then((res) => {
-      const data = Array.isArray(res) ? res : []
-      const mapped = data.map((p) => ({
-        id: p.id,
-        title: p.title,
-        description: p.content,
-        category: p.category,
-        tags: p.tags || [],
-        members: (p.participants || []).map((m) => ({ id: m.id, avatar: m.avatar })),
-        comments: p.commentCount,
-        views: p.views,
-        time: TimeManager.format(
-          selectedTopic.value === '最新回复' ? p.lastReplyAt || p.createdAt : p.createdAt,
-        ),
-        pinned: Boolean(p.pinned ?? p.pinnedAt ?? p.pinned_at),
-        type: p.type,
-      }))
-      articles.value.push(...mapped)
-      if (data.length < pageSize) {
-        allLoaded.value = true
-      } else {
-        page.value = nextPage
-      }
-    })
-    .finally(() => {
-      inflight = null
-      isLoadingMore.value = false
-    })
+  const res = await $fetch(buildUrl({ pageNo: nextPage }), { headers: tokenHeader.value })
+  const data = Array.isArray(res) ? res : []
+  const mapped = data.map((p) => ({
+    id: p.id,
+    title: p.title,
+    description: p.content,
+    category: p.category,
+    tags: p.tags || [],
+    members: (p.participants || []).map((m) => ({ id: m.id, avatar: m.avatar })),
+    comments: p.commentCount,
+    views: p.views,
+    time: TimeManager.format(
+      selectedTopic.value === '最新回复' ? p.lastReplyAt || p.createdAt : p.createdAt,
+    ),
+    pinned: Boolean(p.pinned ?? p.pinnedAt ?? p.pinned_at),
+    type: p.type,
+  }))
+  articles.value.push(...mapped)
+
+  const done = data.length < pageSize
+  if (!done) page.value = nextPage
+  return done // ✅ 返回给组件，决定是否停止观察
 }
 
-/** 绑定滚动加载（避免挂载瞬间触发） **/
-let initialReady = false
-const loadMoreGuarded = async () => {
-  if (!initialReady) return
-  await fetchNextPage()
-}
-useScrollLoadMore(loadMoreGuarded)
-watch(
-  articles,
-  () => {
-    if (!initialReady && articles.value.length) initialReady = true
-  },
-  { immediate: true },
-)
-
-/** 切换分类/标签/Tab：useAsyncData 已 watch，这里只需确保 options 加载 **/
+/** 选项首屏加载与状态持久 **/
 watch([selectedCategory, selectedTags], () => {
   loadOptions()
 })
 watch(selectedTopic, (val) => {
-  // 仅当需要额外选项时加载
   loadOptions()
   selectedTopicCookie.value = val
-  if (process.client) {
-    localStorage.setItem('homeTab', val)
-  }
+  if (process.client) localStorage.setItem('homeTab', val)
 })
 
 /** 选项首屏加载：服务端执行一次；客户端兜底 **/
@@ -368,9 +347,14 @@ if (import.meta.server) {
 }
 onMounted(() => {
   if (categoryOptions.value.length === 0 && tagOptions.value.length === 0) loadOptions()
-
   window.addEventListener('refresh-home', refreshFirst)
 })
+onBeforeUnmount(() => {
+  window.removeEventListener('refresh-home', refreshFirst)
+})
+
+/** 供 InfiniteLoadMore 重建用的 key：筛选/Tab 改变即重建内部状态 */
+const ioKey = computed(() => asyncKey.value.join('::'))
 
 /** 其他工具函数 **/
 const sanitizeDescription = (text) => stripMarkdown(text)
@@ -407,6 +391,7 @@ const sanitizeDescription = (text) => stripMarkdown(text)
   height: 200px;
 }
 
+/* 这里的 bottom-loading 可保留给首屏 loading 使用；InfiniteLoadMore 自带同名样式也兼容 */
 .bottom-loading {
   height: 100px;
 }
