@@ -51,6 +51,10 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { toast } from '~/main'
 import { authState, getToken } from '~/utils/auth'
 import { reactionEmojiMap } from '~/utils/reactions'
+import { useReactionTypes   } from '~/composables/useReactionTypes'
+
+const { reactionTypes, initialize } = useReactionTypes()
+
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
 const emit = defineEmits(['update:modelValue'])
@@ -66,30 +70,6 @@ watch(
 )
 
 const reactions = ref(props.modelValue)
-const reactionTypes = ref([])
-
-let cachedTypes = null
-const fetchTypes = async () => {
-  if (cachedTypes) return cachedTypes
-  try {
-    const token = getToken()
-    const res = await fetch(`${API_BASE_URL}/api/reaction-types`, {
-      headers: { Authorization: token ? `Bearer ${token}` : '' },
-    })
-    if (res.ok) {
-      cachedTypes = await res.json()
-    } else {
-      cachedTypes = []
-    }
-  } catch {
-    cachedTypes = []
-  }
-  return cachedTypes
-}
-
-onMounted(async () => {
-  reactionTypes.value = await fetchTypes()
-})
 
 const counts = computed(() => {
   const c = {}
@@ -200,6 +180,10 @@ const toggleReaction = async (type) => {
     toast.error('操作失败')
   }
 }
+
+onMounted(async () => {
+  await initialize()
+})
 </script>
 
 <style>
