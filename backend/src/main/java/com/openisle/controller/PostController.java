@@ -62,6 +62,16 @@ public class PostController {
         postService.deletePost(id, auth.getName());
     }
 
+    @PostMapping("/{id}/close")
+    public PostSummaryDto close(@PathVariable Long id, Authentication auth) {
+        return postMapper.toSummaryDto(postService.closePost(id, auth.getName()));
+    }
+
+    @PostMapping("/{id}/reopen")
+    public PostSummaryDto reopen(@PathVariable Long id, Authentication auth) {
+        return postMapper.toSummaryDto(postService.reopenPost(id, auth.getName()));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<PostDetailDto> getPost(@PathVariable Long id, Authentication auth) {
         String viewer = auth != null ? auth.getName() : null;
