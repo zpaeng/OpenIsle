@@ -65,12 +65,12 @@ class NotificationServiceTest {
         when(uRepo.findByUsername("bob")).thenReturn(Optional.of(user));
 
         Notification n = new Notification();
-        when(nRepo.findByUserOrderByCreatedAtDesc(user)).thenReturn(List.of(n));
+        when(nRepo.findByUser(eq(user), any())).thenReturn(new org.springframework.data.domain.PageImpl<>(List.of(n)));
 
-        List<Notification> list = service.listNotifications("bob", null);
+        List<Notification> list = service.listNotifications("bob", null, 0, 50);
 
         assertEquals(1, list.size());
-        verify(nRepo).findByUserOrderByCreatedAtDesc(user);
+        verify(nRepo).findByUser(eq(user), any());
     }
 
     @Test

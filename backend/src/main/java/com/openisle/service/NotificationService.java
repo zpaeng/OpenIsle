@@ -24,6 +24,10 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 /** Service for creating and retrieving notifications. */
 @Service
@@ -180,17 +184,19 @@ public class NotificationService {
         userRepository.save(user);
     }
 
-    public List<Notification> listNotifications(String username, Boolean read) {
+    public List<Notification> listNotifications(String username, Boolean read, int page, int size) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Set<NotificationType> disabled = user.getDisabledNotificationTypes();
-        List<Notification> list;
+        Pageable pageable = PageRequest.of(page, size,
+                Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Notification> pg;
         if (read == null) {
-            list = notificationRepository.findByUserOrderByCreatedAtDesc(user);
+            pg = notificationRepository.findByUser(user, pageable);
         } else {
-            list = notificationRepository.findByUserAndReadOrderByCreatedAtDesc(user, read);
+            pg = notificationRepository.findByUserAndRead(user, read, pageable);
         }
-        return list.stream().filter(n -> !disabled.contains(n.getType())).collect(Collectors.toList());
+        return pg.stream().filter(n -> !disabled.contains(n.getType())).collect(Collectors.toList());
     }
 
     public void markRead(String username, List<Long> ids) {
