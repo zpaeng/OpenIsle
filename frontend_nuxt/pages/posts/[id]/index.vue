@@ -168,6 +168,8 @@
         </div>
       </div>
 
+      <div class="post-close-container">该帖子已关闭，内容仅供阅读，无法进行互动</div>
+
       <ClientOnly>
         <CommentEditor
           @submit="postComment"
@@ -937,6 +939,18 @@ onMounted(async () => {
   flex-direction: row;
   align-items: center;
   gap: 10px;
+}
+
+.post-close-container {
+  padding: 40px;
+  margin-top: 15px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  border: 1px dashed var(--normal-border-color);
+  border-radius: 10px;
+  opacity: 0.5;
 }
 
 .scroller {
