@@ -64,6 +64,7 @@ public class PostMapper {
         dto.setStatus(post.getStatus());
         dto.setPinnedAt(post.getPinnedAt());
         dto.setRssExcluded(post.getRssExcluded() == null || post.getRssExcluded());
+        dto.setClosed(post.isClosed());
 
         List<ReactionDto> reactions = reactionService.getReactionsForPost(post.getId())
                 .stream()

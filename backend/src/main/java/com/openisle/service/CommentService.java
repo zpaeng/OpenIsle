@@ -52,6 +52,9 @@ public class CommentService {
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
+        if (post.isClosed()) {
+            throw new IllegalStateException("Post closed");
+        }
         Comment comment = new Comment();
         comment.setAuthor(author);
         comment.setPost(post);
@@ -94,6 +97,9 @@ public class CommentService {
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Comment parent = commentRepository.findById(parentId)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+        if (parent.getPost().isClosed()) {
+            throw new IllegalStateException("Post closed");
+        }
         Comment comment = new Comment();
         comment.setAuthor(author);
         comment.setPost(parent.getPost());

@@ -57,7 +57,7 @@
           v-if="showEditor"
           @submit="submitReply"
           :loading="isWaitingForReply"
-          :disabled="!loggedIn"
+          :disabled="!loggedIn || postClosed"
           :show-login-overlay="!loggedIn"
           :parent-user-name="comment.userName"
         />
@@ -76,6 +76,7 @@
               :level="level + 1"
               :default-show-replies="item.openReplies"
               :post-author-id="postAuthorId"
+              :post-closed="postClosed"
             />
           </template>
         </BaseTimeline>
@@ -122,6 +123,10 @@ const props = defineProps({
     type: [Number, String],
     required: true,
   },
+  postClosed: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits(['deleted'])
@@ -148,6 +153,7 @@ const toggleReplies = () => {
 }
 
 const toggleEditor = () => {
+  if (props.postClosed) return
   showEditor.value = !showEditor.value
   if (showEditor.value) {
     setTimeout(() => {
@@ -213,6 +219,10 @@ const deleteComment = async () => {
 }
 const submitReply = async (parentUserName, text, clear) => {
   if (!text.trim()) return
+  if (props.postClosed) {
+    toast.error('帖子已关闭')
+    return
+  }
   isWaitingForReply.value = true
   const token = getToken()
   if (!token) {
