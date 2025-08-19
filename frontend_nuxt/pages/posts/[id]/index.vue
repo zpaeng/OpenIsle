@@ -15,6 +15,7 @@
         <div class="article-title-container-right">
           <div v-if="status === 'PENDING'" class="article-pending-button">审核中</div>
           <div v-if="status === 'REJECTED'" class="article-block-button">已拒绝</div>
+          <div v-if="closed" class="article-closed-button">已关闭</div>
           <div
             v-if="loggedIn && !isAuthor && !subscribed"
             class="article-subscribe-button"
@@ -171,7 +172,7 @@
         <CommentEditor
           @submit="postComment"
           :loading="isWaitingPostingComment"
-          :disabled="!loggedIn"
+          :disabled="!loggedIn || closed"
           :show-login-overlay="!loggedIn"
           :parent-user-name="author.username"
         />
@@ -196,6 +197,7 @@
               :level="0"
               :default-show-replies="item.openReplies"
               :post-author-id="author.id"
+              :post-closed="closed"
               @deleted="onCommentDeleted"
             />
           </template>
@@ -278,6 +280,7 @@ const tags = ref([])
 const postReactions = ref([])
 const comments = ref([])
 const status = ref('PUBLISHED')
+const closed = ref(false)
 const pinnedAt = ref(null)
 const rssExcluded = ref(false)
 const isWaitingPostingComment = ref(false)
@@ -361,6 +364,11 @@ const articleMenuItems = computed(() => {
   if (isAuthor.value || isAdmin.value) {
     items.push({ text: '编辑文章', onClick: () => editPost() })
     items.push({ text: '删除文章', color: 'red', onClick: deletePost })
+    if (closed.value) {
+      items.push({ text: '重新打开帖子', onClick: () => reopenPost() })
+    } else {
+      items.push({ text: '关闭帖子', onClick: () => closePost() })
+    }
   }
   if (isAdmin.value) {
     if (pinnedAt.value) {
@@ -496,6 +504,7 @@ watchEffect(() => {
   postReactions.value = data.reactions || []
   subscribed.value = !!data.subscribed
   status.value = data.status
+  closed.value = data.closed
   pinnedAt.value = data.pinnedAt
   rssExcluded.value = data.rssExcluded
   postTime.value = TimeManager.format(data.createdAt)
@@ -555,6 +564,10 @@ const onSliderInput = (e) => {
 
 const postComment = async (parentUserName, text, clear) => {
   if (!text.trim()) return
+  if (closed.value) {
+    toast.error('帖子已关闭')
+    return
+  }
   console.debug('Posting comment', { postId, text })
   isWaitingPostingComment.value = true
   const token = getToken()
@@ -688,6 +701,38 @@ const includeRss = async () => {
   if (res.ok) {
     rssExcluded.value = false
     toast.success('已标记为rss推荐')
+  } else {
+    toast.error('操作失败')
+  }
+}
+
+const closePost = async () => {
+  const token = getToken()
+  if (!token) return
+  const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/close`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (res.ok) {
+    closed.value = true
+    toast.success('已关闭')
+    await refreshPost()
+  } else {
+    toast.error('操作失败')
+  }
+}
+
+const reopenPost = async () => {
+  const token = getToken()
+  if (!token) return
+  const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/reopen`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (res.ok) {
+    closed.value = false
+    toast.success('已重新打开')
+    await refreshPost()
   } else {
     toast.error('操作失败')
   }
@@ -1045,6 +1090,15 @@ onMounted(async () => {
   background-color: var(--background-color);
   color: red;
   border: 1px solid red;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.article-closed-button {
+  background-color: var(--background-color);
+  color: gray;
+  border: 1px solid gray;
   padding: 5px 10px;
   border-radius: 8px;
   font-size: 14px;
