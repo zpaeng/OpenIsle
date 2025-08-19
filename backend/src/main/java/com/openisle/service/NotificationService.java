@@ -24,6 +24,10 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 /** Service for creating and retrieving notifications. */
 @Service
@@ -180,15 +184,24 @@ public class NotificationService {
         userRepository.save(user);
     }
 
-    public List<Notification> listNotifications(String username, Boolean read) {
+    public List<Notification> listNotifications(String username, int page, int size) {
+        return listNotifications(username, null, page, size);
+    }
+
+    public List<Notification> listUnreadNotifications(String username, int page, int size) {
+        return listNotifications(username, false, page, size);
+    }
+
+    private List<Notification> listNotifications(String username, Boolean read, int page, int size) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Set<NotificationType> disabled = user.getDisabledNotificationTypes();
-        List<Notification> list;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Notification> list;
         if (read == null) {
-            list = notificationRepository.findByUserOrderByCreatedAtDesc(user);
+            list = notificationRepository.findByUser(user, pageable);
         } else {
-            list = notificationRepository.findByUserAndReadOrderByCreatedAtDesc(user, read);
+            list = notificationRepository.findByUserAndRead(user, read, pageable);
         }
         return list.stream().filter(n -> !disabled.contains(n.getType())).collect(Collectors.toList());
     }
