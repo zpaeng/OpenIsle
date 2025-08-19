@@ -15,21 +15,13 @@
         <div class="article-title-container-right">
           <div v-if="status === 'PENDING'" class="article-pending-button">审核中</div>
           <div v-if="status === 'REJECTED'" class="article-block-button">已拒绝</div>
-          <div
-            v-if="loggedIn && !isAuthor && !subscribed"
-            class="article-subscribe-button"
-            @click="subscribePost"
-          >
+          <div v-if="loggedIn && !isAuthor && !subscribed" class="article-subscribe-button" @click="subscribePost">
             <i class="fas fa-user-plus"></i>
             <div class="article-subscribe-button-text">
               {{ isMobile ? '订阅' : '订阅文章' }}
             </div>
           </div>
-          <div
-            v-if="loggedIn && !isAuthor && subscribed"
-            class="article-unsubscribe-button"
-            @click="unsubscribePost"
-          >
+          <div v-if="loggedIn && !isAuthor && subscribed" class="article-unsubscribe-button" @click="unsubscribePost">
             <i class="fas fa-user-minus"></i>
             <div class="article-unsubscribe-button-text">
               {{ isMobile ? '退订' : '取消订阅' }}
@@ -52,12 +44,8 @@
             <div class="user-name">
               {{ author.username }}
               <i class="fas fa-medal medal-icon"></i>
-              <NuxtLink
-                v-if="author.displayMedal"
-                class="user-medal"
-                :to="`/users/${author.id}?tab=achievements`"
-                >{{ getMedalTitle(author.displayMedal) }}</NuxtLink
-              >
+              <NuxtLink v-if="author.displayMedal" class="user-medal" :to="`/users/${author.id}?tab=achievements`">{{
+                getMedalTitle(author.displayMedal) }}</NuxtLink>
             </div>
             <div class="post-time">{{ postTime }}</div>
           </div>
@@ -68,20 +56,12 @@
             <div class="user-name">
               {{ author.username }}
               <i class="fas fa-medal medal-icon"></i>
-              <NuxtLink
-                v-if="author.displayMedal"
-                class="user-medal"
-                :to="`/users/${author.id}?tab=achievements`"
-                >{{ getMedalTitle(author.displayMedal) }}</NuxtLink
-              >
+              <NuxtLink v-if="author.displayMedal" class="user-medal" :to="`/users/${author.id}?tab=achievements`">{{
+                getMedalTitle(author.displayMedal) }}</NuxtLink>
             </div>
             <div class="post-time">{{ postTime }}</div>
           </div>
-          <div
-            class="info-content-text"
-            v-html="renderMarkdown(postContent)"
-            @click="handleContentClick"
-          ></div>
+          <div class="info-content-text" v-html="renderMarkdown(postContent)" @click="handleContentClick"></div>
 
           <div class="article-footer-container">
             <ReactionsGroup v-model="postReactions" content-type="post" :content-id="postId">
@@ -98,12 +78,7 @@
           <div class="prize-info">
             <div class="prize-info-left">
               <div class="prize-icon">
-                <img
-                  class="prize-icon-img"
-                  v-if="lottery.prizeIcon"
-                  :src="lottery.prizeIcon"
-                  alt="prize"
-                />
+                <img class="prize-icon-img" v-if="lottery.prizeIcon" :src="lottery.prizeIcon" alt="prize" />
                 <i v-else class="fa-solid fa-gift default-prize-icon"></i>
               </div>
               <div class="prize-name">{{ lottery.prizeDescription }}</div>
@@ -113,11 +88,7 @@
               <div v-if="!isMobile" class="prize-end-time-title">离结束还有</div>
               <div class="prize-end-time-value">{{ countdown }}</div>
               <div v-if="!isMobile" class="join-prize-button-container-desktop">
-                <div
-                  v-if="loggedIn && !hasJoined && !lotteryEnded"
-                  class="join-prize-button"
-                  @click="joinLottery"
-                >
+                <div v-if="loggedIn && !hasJoined && !lotteryEnded" class="join-prize-button" @click="joinLottery">
                   <div class="join-prize-button-text">参与抽奖</div>
                 </div>
                 <div v-else-if="hasJoined" class="join-prize-button-disabled">
@@ -128,11 +99,7 @@
           </div>
 
           <div v-if="isMobile" class="join-prize-button-container-mobile">
-            <div
-              v-if="loggedIn && !hasJoined && !lotteryEnded"
-              class="join-prize-button"
-              @click="joinLottery"
-            >
+            <div v-if="loggedIn && !hasJoined && !lotteryEnded" class="join-prize-button" @click="joinLottery">
               <div class="join-prize-button-text">参与抽奖</div>
             </div>
             <div v-else-if="hasJoined" class="join-prize-button-disabled">
@@ -141,25 +108,13 @@
           </div>
         </div>
         <div class="prize-member-container">
-          <img
-            v-for="p in lotteryParticipants"
-            :key="p.id"
-            class="prize-member-avatar"
-            :src="p.avatar"
-            alt="avatar"
-            @click="gotoUser(p.id)"
-          />
+          <img v-for="p in lotteryParticipants" :key="p.id" class="prize-member-avatar" :src="p.avatar" alt="avatar"
+            @click="gotoUser(p.id)" />
           <div v-if="lotteryEnded && lotteryWinners.length" class="prize-member-winner">
             <i class="fas fa-medal medal-icon"></i>
             <span class="prize-member-winner-name">获奖者: </span>
-            <img
-              v-for="w in lotteryWinners"
-              :key="w.id"
-              class="prize-member-avatar"
-              :src="w.avatar"
-              alt="avatar"
-              @click="gotoUser(w.id)"
-            />
+            <img v-for="w in lotteryWinners" :key="w.id" class="prize-member-avatar" :src="w.avatar" alt="avatar"
+              @click="gotoUser(w.id)" />
             <div v-if="lotteryWinners.length === 1" class="prize-member-winner-name">
               {{ lotteryWinners[0].username }}
             </div>
@@ -168,13 +123,8 @@
       </div>
 
       <ClientOnly>
-        <CommentEditor
-          @submit="postComment"
-          :loading="isWaitingPostingComment"
-          :disabled="!loggedIn"
-          :show-login-overlay="!loggedIn"
-          :parent-user-name="author.username"
-        />
+        <CommentEditor @submit="postComment" :loading="isWaitingPostingComment" :disabled="!loggedIn"
+          :show-login-overlay="!loggedIn" :parent-user-name="author.username" />
       </ClientOnly>
 
       <div class="comment-config-container">
@@ -190,14 +140,8 @@
       <div v-else class="comments-container">
         <BaseTimeline :items="comments">
           <template #item="{ item }">
-            <CommentItem
-              :key="item.id"
-              :comment="item"
-              :level="0"
-              :default-show-replies="item.openReplies"
-              :post-author-id="author.id"
-              @deleted="onCommentDeleted"
-            />
+            <CommentItem :key="item.id" :comment="item" :level="0" :default-show-replies="item.openReplies"
+              :post-author-id="author.id" @deleted="onCommentDeleted" />
           </template>
         </BaseTimeline>
       </div>
@@ -208,26 +152,16 @@
         <div v-if="isWaitingFetchingPost" class="scroller-time">loading...</div>
         <div v-else class="scroller-time">{{ scrollerTopTime }}</div>
         <div class="scroller-middle">
-          <input
-            type="range"
-            class="scroller-range"
-            :max="totalPosts"
-            :min="1"
-            v-model.number="currentIndex"
-            @input="onSliderInput"
-          />
+          <input type="range" class="scroller-range" :max="totalPosts" :min="1" v-model.number="currentIndex"
+            @input="onSliderInput" />
           <div class="scroller-index">{{ currentIndex }}/{{ totalPosts }}</div>
         </div>
         <div v-if="isWaitingFetchingPost" class="scroller-time">loading...</div>
         <div v-else class="scroller-time">{{ lastReplyTime }}</div>
       </div>
     </div>
-    <vue-easy-lightbox
-      :visible="lightboxVisible"
-      :index="lightboxIndex"
-      :imgs="lightboxImgs"
-      @hide="lightboxVisible = false"
-    />
+    <vue-easy-lightbox :visible="lightboxVisible" :index="lightboxIndex" :imgs="lightboxImgs"
+      @hide="lightboxVisible = false" />
   </div>
 </template>
 
@@ -843,6 +777,10 @@ onMounted(async () => {
   scrollbar-width: none;
   padding: 20px;
   width: calc(85% - 40px);
+}
+
+.info-content-text p code {
+  padding: 2px 4px;
 }
 
 .post-page-scroller-container {
