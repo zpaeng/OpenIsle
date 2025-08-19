@@ -53,13 +53,13 @@
       </div>
 
       <BasePlaceholder
-        v-else-if="filteredNotifications.length === 0"
+        v-else-if="notifications.length === 0"
         text="暂时没有消息 :)"
         icon="fas fa-inbox"
       />
 
-      <div class="timeline-container" v-if="filteredNotifications.length > 0">
-        <BaseTimeline :items="filteredNotifications">
+      <div class="timeline-container" v-if="notifications.length > 0">
+        <BaseTimeline :items="notifications">
           <template #item="{ item }">
             <div class="notif-content" :class="{ read: item.read }">
               <span v-if="!item.read" class="unread-dot"></span>
@@ -505,16 +505,23 @@
             </div>
           </template>
         </BaseTimeline>
+        <InfiniteLoadMore
+          :key="ioKey"
+          :on-load="fetchNextPage"
+          :pause="isLoadingMessage"
+          root-margin="200px 0px"
+        />
       </div>
     </template>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onActivated, ref, watch } from 'vue'
 import BasePlaceholder from '~/components/BasePlaceholder.vue'
 import BaseTimeline from '~/components/BaseTimeline.vue'
 import NotificationContainer from '~/components/NotificationContainer.vue'
+import InfiniteLoadMore from '~/components/InfiniteLoadMore.vue'
 import { toast } from '~/main'
 import { authState, getToken } from '~/utils/auth'
 import { stripMarkdownLength } from '~/utils/markdown'
@@ -535,9 +542,11 @@ const selectedTab = ref(
   ['all', 'unread', 'control'].includes(route.query.tab) ? route.query.tab : 'unread',
 )
 const notificationPrefs = ref([])
-const filteredNotifications = computed(() =>
-  selectedTab.value === 'all' ? notifications.value : notifications.value.filter((n) => !n.read),
-)
+const ioKey = computed(() => selectedTab.value)
+const loadFirstPage = async () => {
+  await fetchNotifications({ unread: selectedTab.value === 'unread', reset: true })
+}
+const fetchNextPage = async () => fetchNotifications()
 
 const fetchPrefs = async () => {
   notificationPrefs.value = await fetchNotificationPreferences()
@@ -547,7 +556,7 @@ const togglePref = async (pref) => {
   const ok = await updateNotificationPreference(pref.type, !pref.enabled)
   if (ok) {
     pref.enabled = !pref.enabled
-    await fetchNotifications()
+    await fetchNotifications({ unread: selectedTab.value === 'unread', reset: true })
     await fetchUnreadCount()
   } else {
     toast.error('操作失败')
@@ -627,8 +636,12 @@ const formatType = (t) => {
   }
 }
 
+watch(selectedTab, (val) => {
+  if (val !== 'control') loadFirstPage()
+})
+
 onActivated(() => {
-  fetchNotifications()
+  if (selectedTab.value !== 'control') loadFirstPage()
   fetchPrefs()
 })
 </script>
