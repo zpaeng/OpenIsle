@@ -53,13 +53,13 @@
       </div>
 
       <BasePlaceholder
-        v-else-if="filteredNotifications.length === 0"
+        v-else-if="displayNotifications.length === 0"
         text="暂时没有消息 :)"
         icon="fas fa-inbox"
       />
 
-      <div class="timeline-container" v-if="filteredNotifications.length > 0">
-        <BaseTimeline :items="filteredNotifications">
+      <div class="timeline-container" v-if="displayNotifications.length > 0">
+        <BaseTimeline :items="displayNotifications">
           <template #item="{ item }">
             <div class="notif-content" :class="{ read: item.read }">
               <span v-if="!item.read" class="unread-dot"></span>
@@ -506,25 +506,39 @@
           </template>
         </BaseTimeline>
       </div>
+
+      <InfiniteLoadMore
+        v-if="displayNotifications.length > 0"
+        :key="ioKey"
+        :on-load="fetchNextPage"
+        :pause="isLoadingMessage"
+        root-margin="200px 0px"
+      />
     </template>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onActivated, ref, watch } from 'vue'
 import BasePlaceholder from '~/components/BasePlaceholder.vue'
 import BaseTimeline from '~/components/BaseTimeline.vue'
 import NotificationContainer from '~/components/NotificationContainer.vue'
 import { toast } from '~/main'
 import { authState, getToken } from '~/utils/auth'
 import { stripMarkdownLength } from '~/utils/markdown'
+import InfiniteLoadMore from '~/components/InfiniteLoadMore.vue'
 import {
-  fetchNotifications,
+  fetchAllNotifications,
+  fetchUnreadNotifications,
   fetchUnreadCount,
-  isLoadingMessage,
+  isLoadingAll,
+  isLoadingUnread,
   markRead,
-  notifications,
+  allNotifications,
+  unreadNotifications,
   markAllRead,
+  resetAll,
+  resetUnread,
 } from '~/utils/notification'
 import TimeManager from '~/utils/time'
 
@@ -535,9 +549,24 @@ const selectedTab = ref(
   ['all', 'unread', 'control'].includes(route.query.tab) ? route.query.tab : 'unread',
 )
 const notificationPrefs = ref([])
-const filteredNotifications = computed(() =>
-  selectedTab.value === 'all' ? notifications.value : notifications.value.filter((n) => !n.read),
+const displayNotifications = computed(() =>
+  selectedTab.value === 'all' ? allNotifications.value : unreadNotifications.value,
 )
+const isLoadingMessage = computed(() =>
+  selectedTab.value === 'all' ? isLoadingAll.value : isLoadingUnread.value,
+)
+const ioKey = ref(0)
+
+const fetchNextPage = () =>
+  selectedTab.value === 'all' ? fetchAllNotifications() : fetchUnreadNotifications()
+
+const loadInitial = async () => {
+  if (selectedTab.value === 'all') {
+    if (allNotifications.value.length === 0) await fetchAllNotifications()
+  } else if (selectedTab.value === 'unread') {
+    if (unreadNotifications.value.length === 0) await fetchUnreadNotifications()
+  }
+}
 
 const fetchPrefs = async () => {
   notificationPrefs.value = await fetchNotificationPreferences()
@@ -547,7 +576,9 @@ const togglePref = async (pref) => {
   const ok = await updateNotificationPreference(pref.type, !pref.enabled)
   if (ok) {
     pref.enabled = !pref.enabled
-    await fetchNotifications()
+    resetAll()
+    resetUnread()
+    await loadInitial()
     await fetchUnreadCount()
   } else {
     toast.error('操作失败')
@@ -627,8 +658,13 @@ const formatType = (t) => {
   }
 }
 
+watch(selectedTab, async () => {
+  await loadInitial()
+  ioKey.value++
+})
+
 onActivated(() => {
-  fetchNotifications()
+  loadInitial()
   fetchPrefs()
 })
 </script>
