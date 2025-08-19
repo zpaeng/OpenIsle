@@ -168,7 +168,7 @@
         </div>
       </div>
 
-      <div class="post-close-container">该帖子已关闭，内容仅供阅读，无法进行互动</div>
+      <div v-if="closed" class="post-close-container">该帖子已关闭，内容仅供阅读，无法进行互动</div>
 
       <ClientOnly>
         <CommentEditor
