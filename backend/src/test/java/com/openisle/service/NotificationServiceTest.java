@@ -11,6 +11,7 @@ import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Pageable;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -65,12 +66,12 @@ class NotificationServiceTest {
         when(uRepo.findByUsername("bob")).thenReturn(Optional.of(user));
 
         Notification n = new Notification();
-        when(nRepo.findByUserOrderByCreatedAtDesc(user)).thenReturn(List.of(n));
+        when(nRepo.findByUser(eq(user), any(Pageable.class))).thenReturn(new org.springframework.data.domain.PageImpl<>(List.of(n)));
 
-        List<Notification> list = service.listNotifications("bob", null);
+        List<Notification> list = service.listNotifications("bob", 0, 30);
 
         assertEquals(1, list.size());
-        verify(nRepo).findByUserOrderByCreatedAtDesc(user);
+        verify(nRepo).findByUser(eq(user), any(Pageable.class));
     }
 
     @Test
