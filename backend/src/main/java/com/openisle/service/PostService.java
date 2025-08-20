@@ -579,7 +579,9 @@ public class PostService {
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
-        if (!user.getId().equals(post.getAuthor().getId()) && user.getRole() != Role.ADMIN) {
+        User author = post.getAuthor();
+        boolean adminDeleting = !user.getId().equals(author.getId()) && user.getRole() == Role.ADMIN;
+        if (!user.getId().equals(author.getId()) && user.getRole() != Role.ADMIN) {
             throw new IllegalArgumentException("Unauthorized");
         }
         for (Comment c : commentRepository.findByPostAndParentIsNullOrderByCreatedAtAsc(post)) {
@@ -596,7 +598,12 @@ public class PostService {
                 future.cancel(false);
             }
         }
+        String title = post.getTitle();
         postRepository.delete(post);
+        if (adminDeleting) {
+            notificationService.createNotification(author, NotificationType.POST_DELETED,
+                    null, null, null, user, null, title);
+        }
     }
 
     public java.util.List<Post> getPostsByIds(java.util.List<Long> ids) {
