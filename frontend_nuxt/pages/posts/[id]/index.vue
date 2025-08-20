@@ -17,7 +17,7 @@
           <div v-if="status === 'REJECTED'" class="article-block-button">已拒绝</div>
           <div v-if="closed" class="article-closed-button">已关闭</div>
           <div
-            v-if="loggedIn && !isAuthor && !subscribed"
+            v-if="!closed && loggedIn && !isAuthor && !subscribed"
             class="article-subscribe-button"
             @click="subscribePost"
           >
@@ -27,7 +27,7 @@
             </div>
           </div>
           <div
-            v-if="loggedIn && !isAuthor && subscribed"
+            v-if="!closed && loggedIn && !isAuthor && subscribed"
             class="article-unsubscribe-button"
             @click="unsubscribePost"
           >
@@ -876,12 +876,7 @@ const gotoProfile = () => {
   navigateTo(`/users/${author.value.id}`, { replace: true })
 }
 
-onActivated(async () => {
-  await refreshPost()
-  await fetchComments()
-})
-
-onMounted(async () => {
+const initPage = async () => {
   await fetchComments()
   const hash = location.hash
   const id = hash.startsWith('#comment-') ? hash.substring('#comment-'.length) : null
@@ -889,6 +884,14 @@ onMounted(async () => {
   updateCurrentIndex()
   window.addEventListener('scroll', updateCurrentIndex)
   jumpToHashComment()
+}
+
+onActivated(async () => {
+  await initPage()
+})
+
+onMounted(async () => {
+  await initPage()
 })
 </script>
 
@@ -1067,6 +1070,7 @@ onMounted(async () => {
   white-space: nowrap;
 }
 
+.article-closed-button,
 .article-subscribe-button-text,
 .article-unsubscribe-button-text {
   white-space: nowrap;
