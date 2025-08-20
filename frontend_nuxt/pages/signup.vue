@@ -36,7 +36,7 @@
           class="signup-page-button-primary"
           @click="sendVerification"
         >
-          <div class="signup-page-button-text">验证邮箱</div>
+          <div class="signup-page-button-text">验证并注册</div>
         </div>
         <div v-else class="signup-page-button-primary disabled">
           <div class="signup-page-button-text">
