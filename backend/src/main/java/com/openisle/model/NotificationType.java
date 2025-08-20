@@ -14,6 +14,8 @@ public enum NotificationType {
     POST_REVIEW_REQUEST,
     /** Your post under review was approved or rejected */
     POST_REVIEWED,
+    /** An administrator deleted your post */
+    POST_DELETED,
     /** A subscribed post received a new comment */
     POST_UPDATED,
     /** Someone subscribed to your post */

@@ -495,6 +495,24 @@
                     已被管理员拒绝
                   </NotificationContainer>
                 </template>
+                <template v-else-if="item.type === 'POST_DELETED'">
+                  <NotificationContainer :item="item" :markRead="markRead">
+                    管理员
+                    <template v-if="item.fromUser">
+                      <NuxtLink
+                        class="notif-content-text"
+                        @click="markRead(item.id)"
+                        :to="`/users/${item.fromUser.id}`"
+                      >
+                        {{ item.fromUser.username }}
+                      </NuxtLink>
+                    </template>
+                    删除了您的帖子
+                    <span class="notif-content-text">
+                      {{ stripMarkdownLength(item.content, 100) }}
+                    </span>
+                  </NotificationContainer>
+                </template>
                 <template v-else>
                   <NotificationContainer :item="item" :markRead="markRead">
                     {{ formatType(item.type) }}
@@ -647,6 +665,8 @@ const formatType = (t) => {
       return '抽奖中奖了'
     case 'LOTTERY_DRAW':
       return '抽奖已开奖'
+    case 'POST_DELETED':
+      return '帖子被删除'
     default:
       return t
   }

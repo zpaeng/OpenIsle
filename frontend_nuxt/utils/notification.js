@@ -26,6 +26,7 @@ const iconMap = {
   LOTTERY_WIN: 'fas fa-trophy',
   LOTTERY_DRAW: 'fas fa-bullhorn',
   MENTION: 'fas fa-at',
+  POST_DELETED: 'fas fa-trash',
 }
 
 export async function fetchUnreadCount() {
@@ -174,6 +175,18 @@ function createFetchNotifications() {
             },
           })
         } else if (n.type === 'POST_VIEWED') {
+          arr.push({
+            ...n,
+            src: n.fromUser ? n.fromUser.avatar : null,
+            icon: n.fromUser ? undefined : iconMap[n.type],
+            iconClick: () => {
+              if (n.fromUser) {
+                markRead(n.id)
+                navigateTo(`/users/${n.fromUser.id}`, { replace: true })
+              }
+            },
+          })
+        } else if (n.type === 'POST_DELETED') {
           arr.push({
             ...n,
             src: n.fromUser ? n.fromUser.avatar : null,
