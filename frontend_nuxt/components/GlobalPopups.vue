@@ -95,7 +95,6 @@ const closeMilkTeaPopup = () => {
   if (!process.client) return
   localStorage.setItem('milkTeaActivityPopupShown', 'true')
   showMilkTeaPopup.value = false
-  checkNotificationSetting()
 }
 
 const checkNotificationSetting = async () => {
@@ -108,7 +107,6 @@ const closeNotificationPopup = () => {
   if (!process.client) return
   localStorage.setItem('notificationSettingPopupShown', 'true')
   showNotificationPopup.value = false
-  checkNewMedals()
 }
 const checkNewMedals = async () => {
   if (!process.client) return

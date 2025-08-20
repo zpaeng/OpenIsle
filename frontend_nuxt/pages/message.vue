@@ -542,7 +542,7 @@ import {
   fetchNotifications,
   fetchUnreadCount,
   isLoadingMessage,
-  markRead as markNotificationRead,
+  markNotificationRead,
   notifications,
   markAllRead,
   hasMore,
@@ -598,7 +598,7 @@ const togglePref = async (pref) => {
 }
 
 const markRead = async (id) => {
-  await markNotificationRead(id)
+  markNotificationRead(id)
   if (selectedTab.value === 'unread') {
     const index = notifications.value.findIndex((n) => n.id === id)
     if (index !== -1) notifications.value.splice(index, 1)

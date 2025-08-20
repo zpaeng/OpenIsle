@@ -159,7 +159,7 @@ function createFetchNotifications() {
             ...n,
             src: n.comment.author.avatar,
             iconClick: () => {
-              markRead(n.id)
+              markNotificationRead(n.id)
               navigateTo(`/users/${n.comment.author.id}`, { replace: true })
             },
           })
@@ -169,7 +169,7 @@ function createFetchNotifications() {
             emoji: reactionEmojiMap[n.reactionType],
             iconClick: () => {
               if (n.fromUser) {
-                markRead(n.id)
+                markNotificationRead(n.id)
                 navigateTo(`/users/${n.fromUser.id}`, { replace: true })
               }
             },
@@ -181,7 +181,7 @@ function createFetchNotifications() {
             icon: n.fromUser ? undefined : iconMap[n.type],
             iconClick: () => {
               if (n.fromUser) {
-                markRead(n.id)
+                markNotificationRead(n.id)
                 navigateTo(`/users/${n.fromUser.id}`, { replace: true })
               }
             },
@@ -193,7 +193,7 @@ function createFetchNotifications() {
             icon: n.fromUser ? undefined : iconMap[n.type],
             iconClick: () => {
               if (n.fromUser) {
-                markRead(n.id)
+                markNotificationRead(n.id)
                 navigateTo(`/users/${n.fromUser.id}`, { replace: true })
               }
             },
@@ -204,7 +204,7 @@ function createFetchNotifications() {
             icon: iconMap[n.type],
             iconClick: () => {
               if (n.post) {
-                markRead(n.id)
+                markNotificationRead(n.id)
                 navigateTo(`/posts/${n.post.id}`)
               }
             },
@@ -214,7 +214,7 @@ function createFetchNotifications() {
             ...n,
             src: n.comment.author.avatar,
             iconClick: () => {
-              markRead(n.id)
+              markNotificationRead(n.id)
               navigateTo(`/users/${n.comment.author.id}`, { replace: true })
             },
           })
@@ -224,7 +224,7 @@ function createFetchNotifications() {
             icon: iconMap[n.type],
             iconClick: () => {
               if (n.fromUser) {
-                markRead(n.id)
+                markNotificationRead(n.id)
                 navigateTo(`/users/${n.fromUser.id}`, { replace: true })
               }
             },
@@ -235,7 +235,7 @@ function createFetchNotifications() {
             icon: iconMap[n.type],
             iconClick: () => {
               if (n.fromUser) {
-                markRead(n.id)
+                markNotificationRead(n.id)
                 navigateTo(`/users/${n.fromUser.id}`, { replace: true })
               }
             },
@@ -250,7 +250,7 @@ function createFetchNotifications() {
             icon: iconMap[n.type],
             iconClick: () => {
               if (n.post) {
-                markRead(n.id)
+                markNotificationRead(n.id)
                 navigateTo(`/posts/${n.post.id}`, { replace: true })
               }
             },
@@ -262,7 +262,7 @@ function createFetchNotifications() {
             icon: n.fromUser ? undefined : iconMap[n.type],
             iconClick: () => {
               if (n.post) {
-                markRead(n.id)
+                markNotificationRead(n.id)
                 navigateTo(`/posts/${n.post.id}`, { replace: true })
               }
             },
@@ -290,7 +290,7 @@ function createFetchNotifications() {
     }
   }
 
-  const markRead = async (id) => {
+  const markNotificationRead = async (id) => {
     if (!id) return
     const n = notifications.value.find((n) => n.id === id)
     if (!n || n.read) return
@@ -332,7 +332,7 @@ function createFetchNotifications() {
   }
   return {
     fetchNotifications,
-    markRead,
+    markNotificationRead,
     notifications,
     isLoadingMessage,
     markAllRead,
@@ -342,7 +342,7 @@ function createFetchNotifications() {
 
 export const {
   fetchNotifications,
-  markRead,
+  markNotificationRead,
   notifications,
   isLoadingMessage,
   markAllRead,
