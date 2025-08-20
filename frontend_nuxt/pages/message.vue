@@ -524,7 +524,7 @@ import {
   fetchNotifications,
   fetchUnreadCount,
   isLoadingMessage,
-  markRead,
+  markRead as markNotificationRead,
   notifications,
   markAllRead,
   hasMore,
@@ -576,6 +576,14 @@ const togglePref = async (pref) => {
     await fetchUnreadCount()
   } else {
     toast.error('操作失败')
+  }
+}
+
+const markRead = async (id) => {
+  await markNotificationRead(id)
+  if (selectedTab.value === 'unread') {
+    const index = notifications.value.findIndex((n) => n.id === id)
+    if (index !== -1) notifications.value.splice(index, 1)
   }
 }
 
