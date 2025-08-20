@@ -876,12 +876,7 @@ const gotoProfile = () => {
   navigateTo(`/users/${author.value.id}`, { replace: true })
 }
 
-onActivated(async () => {
-  await refreshPost()
-  await fetchComments()
-})
-
-onMounted(async () => {
+const initPage = async () => {
   await fetchComments()
   const hash = location.hash
   const id = hash.startsWith('#comment-') ? hash.substring('#comment-'.length) : null
@@ -889,6 +884,14 @@ onMounted(async () => {
   updateCurrentIndex()
   window.addEventListener('scroll', updateCurrentIndex)
   jumpToHashComment()
+}
+
+onActivated(async () => {
+  await initPage()
+})
+
+onMounted(async () => {
+  await initPage()
 })
 </script>
 
