@@ -1,4 +1,5 @@
 <p align="center">
+  <img alt="Image" src="https://openisle-1307107697.cos.accelerate.myqcloud.com/dynamic_assert/22752cfac5a04a9c90c41995b9f55fed.png" width="1200">
   <img alt="OpenIsle" src="https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/image.png" width="200">
   <br><br>
   高效的开源社区前后端端平台
