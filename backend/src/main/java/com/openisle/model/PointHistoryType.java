@@ -6,6 +6,7 @@ public enum PointHistoryType {
     POST_LIKED,
     COMMENT_LIKED,
     INVITE,
+    FEATURE,
     SYSTEM_ONLINE,
     REDEEM
 }

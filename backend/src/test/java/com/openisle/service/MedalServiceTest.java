@@ -27,7 +27,7 @@ class MedalServiceTest {
 
         List<MedalDto> medals = service.getMedals(null);
         medals.forEach(m -> assertFalse(m.isCompleted()));
-        assertEquals(5, medals.size());
+        assertEquals(6, medals.size());
     }
 
     @Test

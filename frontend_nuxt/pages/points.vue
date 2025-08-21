@@ -136,6 +136,13 @@
                 }}</NuxtLink>
                 加入社区 🎉，获得 {{ item.amount }} 积分
               </template>
+              <template v-else-if="item.type === 'FEATURE'">
+                文章
+                <NuxtLink :to="`/posts/${item.postId}`" class="timeline-link">{{
+                  item.postTitle
+                }}</NuxtLink>
+                被收录为精选，获得 {{ item.amount }} 积分
+              </template>
               <template v-else-if="item.type === 'REDEEM'">
                 兑换商品，消耗 {{ -item.amount }} 积分
               </template>
@@ -176,6 +183,7 @@ const pointRules = [
   '帖子被点赞：每次 10 积分',
   '评论被点赞：每次 10 积分',
   '邀请好友加入可获得 500 积分/次，注意需要使用邀请链接注册',
+  '文章被收录至精选：每次 500 积分',
 ]
 
 const goods = ref([])
@@ -192,6 +200,7 @@ const iconMap = {
   INVITE: 'fas fa-user-plus',
   SYSTEM_ONLINE: 'fas fa-clock',
   REDEEM: 'fas fa-gift',
+  FEATURE: 'fas fa-star',
 }
 
 onMounted(async () => {

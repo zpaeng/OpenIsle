@@ -67,6 +67,7 @@ public class PostService {
     private final TaskScheduler taskScheduler;
     private final EmailSender emailSender;
     private final ApplicationContext applicationContext;
+    private final PointService pointService;
     private final ConcurrentMap<Long, ScheduledFuture<?>> scheduledFinalizations = new ConcurrentHashMap<>();
     @Value("${app.website-url:https://www.open-isle.com}")
     private String websiteUrl;
@@ -89,6 +90,7 @@ public class PostService {
                        TaskScheduler taskScheduler,
                        EmailSender emailSender,
                        ApplicationContext applicationContext,
+                       PointService pointService,
                        @Value("${app.post.publish-mode:DIRECT}") PublishMode publishMode) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
@@ -107,6 +109,7 @@ public class PostService {
         this.taskScheduler = taskScheduler;
         this.emailSender = emailSender;
         this.applicationContext = applicationContext;
+        this.pointService = pointService;
         this.publishMode = publishMode;
     }
 
@@ -146,7 +149,10 @@ public class PostService {
     public Post includeInRss(Long id) {
         Post post = postRepository.findById(id).orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
         post.setRssExcluded(false);
-        return postRepository.save(post);
+        post = postRepository.save(post);
+        notificationService.createNotification(post.getAuthor(), NotificationType.POST_FEATURED, post, null, null, null, null, null);
+        pointService.awardForFeatured(post.getAuthor().getUsername(), post.getId());
+        return post;
     }
 
     public Post createPost(String username,
@@ -455,6 +461,26 @@ public class PostService {
         }
 
         java.util.List<Post> posts = postRepository.findByCategoriesAndAllTagsOrderByCreatedAtDesc(categories, tags, PostStatus.PUBLISHED, tags.size());
+        return paginate(sortByPinnedAndCreated(posts), page, pageSize);
+    }
+
+    public List<Post> listFeaturedPosts(java.util.List<Long> categoryIds,
+                                        java.util.List<Long> tagIds,
+                                        Integer page,
+                                        Integer pageSize) {
+        List<Post> posts;
+        boolean hasCategories = categoryIds != null && !categoryIds.isEmpty();
+        boolean hasTags = tagIds != null && !tagIds.isEmpty();
+        if (hasCategories && hasTags) {
+            posts = listPostsByCategoriesAndTags(categoryIds, tagIds, null, null);
+        } else if (hasCategories) {
+            posts = listPostsByCategories(categoryIds, null, null);
+        } else if (hasTags) {
+            posts = listPostsByTags(tagIds, null, null);
+        } else {
+            posts = listPosts();
+        }
+        posts = posts.stream().filter(p -> !Boolean.TRUE.equals(p.getRssExcluded())).toList();
         return paginate(sortByPinnedAndCreated(posts), page, pageSize);
     }
 

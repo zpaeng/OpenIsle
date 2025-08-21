@@ -27,6 +27,7 @@ const iconMap = {
   LOTTERY_DRAW: 'fas fa-bullhorn',
   MENTION: 'fas fa-at',
   POST_DELETED: 'fas fa-trash',
+  POST_FEATURED: 'fas fa-star',
 }
 
 export async function fetchUnreadCount() {
@@ -260,6 +261,17 @@ function createFetchNotifications() {
             ...n,
             src: n.fromUser ? n.fromUser.avatar : null,
             icon: n.fromUser ? undefined : iconMap[n.type],
+            iconClick: () => {
+              if (n.post) {
+                markNotificationRead(n.id)
+                navigateTo(`/posts/${n.post.id}`, { replace: true })
+              }
+            },
+          })
+        } else if (n.type === 'POST_FEATURED') {
+          arr.push({
+            ...n,
+            icon: iconMap[n.type],
             iconClick: () => {
               if (n.post) {
                 markNotificationRead(n.id)

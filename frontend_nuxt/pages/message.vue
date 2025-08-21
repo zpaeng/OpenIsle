@@ -493,6 +493,19 @@
                     已被管理员拒绝
                   </NotificationContainer>
                 </template>
+                <template v-else-if="item.type === 'POST_FEATURED'">
+                  <NotificationContainer :item="item" :markRead="markRead">
+                    您的文章
+                    <NuxtLink
+                      class="notif-content-text"
+                      @click="markRead(item.id)"
+                      :to="`/posts/${item.post.id}`"
+                    >
+                      {{ stripMarkdownLength(item.post.title, 100) }}
+                    </NuxtLink>
+                    被收录为精选
+                  </NotificationContainer>
+                </template>
                 <template v-else-if="item.type === 'POST_DELETED'">
                   <NotificationContainer :item="item" :markRead="markRead">
                     管理员
@@ -674,6 +687,8 @@ const formatType = (t) => {
       return '抽奖已开奖'
     case 'POST_DELETED':
       return '帖子被删除'
+    case 'POST_FEATURED':
+      return '文章被精选'
     default:
       return t
   }
