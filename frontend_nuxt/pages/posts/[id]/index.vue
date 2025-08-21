@@ -295,7 +295,7 @@ const commentSort = ref('NEWEST')
 const isFetchingComments = ref(false)
 const isMobile = useIsMobile()
 
-const headerHeight = process.client
+const headerHeight = import.meta.client
   ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0
   : 0
 
@@ -309,7 +309,7 @@ useHead(() => ({
   ],
 }))
 
-if (process.client) {
+if (import.meta.client) {
   onBeforeUnmount(() => {
     window.removeEventListener('scroll', updateCurrentIndex)
     if (countdownTimer) clearInterval(countdownTimer)
@@ -355,7 +355,7 @@ const updateCountdown = () => {
   countdown.value = `${h}:${m}:${s}`
 }
 const startCountdown = () => {
-  if (!process.client) return
+  if (!import.meta.client) return
   if (countdownTimer) clearInterval(countdownTimer)
   updateCountdown()
   countdownTimer = setInterval(updateCountdown, 1000)
@@ -515,7 +515,7 @@ watchEffect(() => {
 })
 
 // 404 客户端跳转
-// if (postError.value?.statusCode === 404 && process.client) {
+// if (postError.value?.statusCode === 404 && import.meta.client) {
 //   router.replace('/404')
 // }
 
@@ -877,6 +877,7 @@ const gotoProfile = () => {
 }
 
 const initPage = async () => {
+  scrollTo(0, 0)
   await fetchComments()
   const hash = location.hash
   const id = hash.startsWith('#comment-') ? hash.substring('#comment-'.length) : null

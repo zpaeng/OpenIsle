@@ -12,7 +12,7 @@ export const authState = reactive({
   role: null,
 })
 
-if (process.client) {
+if (import.meta.client) {
   authState.loggedIn =
     localStorage.getItem(TOKEN_KEY) !== null && localStorage.getItem(TOKEN_KEY) !== ''
   authState.userId = localStorage.getItem(USER_ID_KEY)
@@ -21,18 +21,18 @@ if (process.client) {
 }
 
 export function getToken() {
-  return process.client ? localStorage.getItem(TOKEN_KEY) : null
+  return import.meta.client ? localStorage.getItem(TOKEN_KEY) : null
 }
 
 export function setToken(token) {
-  if (process.client) {
+  if (import.meta.client) {
     localStorage.setItem(TOKEN_KEY, token)
     authState.loggedIn = true
   }
 }
 
 export function clearToken() {
-  if (process.client) {
+  if (import.meta.client) {
     localStorage.removeItem(TOKEN_KEY)
     clearUserInfo()
     authState.loggedIn = false
@@ -40,7 +40,7 @@ export function clearToken() {
 }
 
 export function setUserInfo({ id, username }) {
-  if (process.client) {
+  if (import.meta.client) {
     authState.userId = id
     authState.username = username
     if (arguments[0] && arguments[0].role) {
@@ -53,7 +53,7 @@ export function setUserInfo({ id, username }) {
 }
 
 export function clearUserInfo() {
-  if (process.client) {
+  if (import.meta.client) {
     localStorage.removeItem(USER_ID_KEY)
     localStorage.removeItem(USERNAME_KEY)
     localStorage.removeItem(ROLE_KEY)

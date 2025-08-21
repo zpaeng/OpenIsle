@@ -338,7 +338,7 @@ watch([selectedCategory, selectedTags], () => {
 watch(selectedTopic, (val) => {
   loadOptions()
   selectedTopicCookie.value = val
-  if (process.client) localStorage.setItem('homeTab', val)
+  if (import.meta.client) localStorage.setItem('homeTab', val)
 })
 
 /** 选项首屏加载：服务端执行一次；客户端兜底 **/

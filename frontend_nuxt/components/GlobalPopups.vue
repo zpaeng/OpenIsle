@@ -50,7 +50,7 @@ onMounted(async () => {
 })
 
 const checkMilkTeaActivity = async () => {
-  if (!process.client) return
+  if (!import.meta.client) return
   if (localStorage.getItem('milkTeaActivityPopupShown')) return
   try {
     const res = await fetch(`${API_BASE_URL}/api/activities`)
@@ -68,7 +68,7 @@ const checkMilkTeaActivity = async () => {
 }
 
 const checkInviteCodeActivity = async () => {
-  if (!process.client) return
+  if (!import.meta.client) return
   if (localStorage.getItem('inviteCodeActivityPopupShown')) return
   try {
     const res = await fetch(`${API_BASE_URL}/api/activities`)
@@ -86,30 +86,30 @@ const checkInviteCodeActivity = async () => {
 }
 
 const closeInviteCodePopup = () => {
-  if (!process.client) return
+  if (!import.meta.client) return
   localStorage.setItem('inviteCodeActivityPopupShown', 'true')
   showInviteCodePopup.value = false
 }
 
 const closeMilkTeaPopup = () => {
-  if (!process.client) return
+  if (!import.meta.client) return
   localStorage.setItem('milkTeaActivityPopupShown', 'true')
   showMilkTeaPopup.value = false
 }
 
 const checkNotificationSetting = async () => {
-  if (!process.client) return
+  if (!import.meta.client) return
   if (!authState.loggedIn) return
   if (localStorage.getItem('notificationSettingPopupShown')) return
   showNotificationPopup.value = true
 }
 const closeNotificationPopup = () => {
-  if (!process.client) return
+  if (!import.meta.client) return
   localStorage.setItem('notificationSettingPopupShown', 'true')
   showNotificationPopup.value = false
 }
 const checkNewMedals = async () => {
-  if (!process.client) return
+  if (!import.meta.client) return
   if (!authState.loggedIn || !authState.userId) return
   try {
     const res = await fetch(`${API_BASE_URL}/api/medals?userId=${authState.userId}`)
@@ -127,7 +127,7 @@ const checkNewMedals = async () => {
   }
 }
 const closeMedalPopup = () => {
-  if (!process.client) return
+  if (!import.meta.client) return
   const seen = new Set(JSON.parse(localStorage.getItem('seenMedals') || '[]'))
   newMedals.value.forEach((m) => seen.add(m.type))
   localStorage.setItem('seenMedals', JSON.stringify([...seen]))
