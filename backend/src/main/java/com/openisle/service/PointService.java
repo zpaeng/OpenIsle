@@ -33,6 +33,12 @@ public class PointService {
         return addPoint(user, 500, PointHistoryType.INVITE, null, null, invitee);
     }
 
+    public int awardForFeatured(String userName, Long postId) {
+        User user = userRepository.findByUsername(userName).orElseThrow();
+        Post post = postRepository.findById(postId).orElseThrow();
+        return addPoint(user, 500, PointHistoryType.FEATURE, post, null, null);
+    }
+
     private PointLog getTodayLog(User user) {
         LocalDate today = LocalDate.now();
         return pointLogRepository.findByUserAndLogDate(user, today)

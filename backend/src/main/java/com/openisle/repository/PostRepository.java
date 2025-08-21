@@ -97,6 +97,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     long countDistinctByTags_Id(Long tagId);
 
+    long countByAuthor_IdAndRssExcludedFalse(Long userId);
+
     @Query("SELECT t.id, COUNT(DISTINCT p) FROM Post p JOIN p.tags t WHERE t.id IN :tagIds GROUP BY t.id")
     List<Object[]> countPostsByTagIds(@Param("tagIds") List<Long> tagIds);
 

@@ -26,7 +26,10 @@
     <div class="article-container">
       <template
         v-if="
-          selectedTopic === '最新' || selectedTopic === '排行榜' || selectedTopic === '最新回复'
+          selectedTopic === '最新' ||
+          selectedTopic === '排行榜' ||
+          selectedTopic === '最新回复' ||
+          selectedTopic === '精选'
         "
       >
         <div class="article-header-container">
@@ -152,7 +155,7 @@ const route = useRoute()
 const tagOptions = ref([])
 const categoryOptions = ref([])
 
-const topics = ref(['最新回复', '最新', '排行榜' /*, '热门', '类别'*/])
+const topics = ref(['精选', '最新回复', '最新', '排行榜' /*, '热门', '类别'*/])
 const selectedTopicCookie = useCookie('homeTab')
 const selectedTopic = ref(
   selectedTopicCookie.value
@@ -236,6 +239,7 @@ const baseQuery = computed(() => ({
 const listApiPath = computed(() => {
   if (selectedTopic.value === '排行榜') return '/api/posts/ranking'
   if (selectedTopic.value === '最新回复') return '/api/posts/latest-reply'
+  if (selectedTopic.value === '精选') return '/api/posts/featured'
   return '/api/posts'
 })
 const buildUrl = ({ pageNo }) => {
