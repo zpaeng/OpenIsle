@@ -136,6 +136,9 @@
                 }}</NuxtLink>
                 加入社区 🎉，获得 {{ item.amount }} 积分
               </template>
+              <template v-else-if="item.type === 'REDEEM'">
+                兑换商品，消耗 {{ -item.amount }} 积分
+              </template>
               <template v-else-if="item.type === 'SYSTEM_ONLINE'"> 积分历史系统上线 </template>
               <i class="fas fa-coins"></i> 你目前的积分是 {{ item.balance }}
             </div>
@@ -188,6 +191,7 @@ const iconMap = {
   COMMENT_LIKED: 'fas fa-thumbs-up',
   INVITE: 'fas fa-user-plus',
   SYSTEM_ONLINE: 'fas fa-clock',
+  REDEEM: 'fas fa-gift',
 }
 
 onMounted(async () => {
