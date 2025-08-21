@@ -63,7 +63,7 @@ const isImageIcon = (icon) => {
 }
 
 const buildTagsUrl = (kw = '') => {
-  const base = API_BASE_URL || (process.client ? window.location.origin : '')
+  const base = API_BASE_URL || (import.meta.client ? window.location.origin : '')
   const url = new URL('/api/tags', base)
 
   if (kw) url.searchParams.set('keyword', kw)

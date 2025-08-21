@@ -40,7 +40,7 @@ const stopObserver = () => {
 }
 
 const startObserver = () => {
-  if (!process.client || props.pause || done.value) return
+  if (!import.meta.client || props.pause || done.value) return
   stopObserver()
   io = new IntersectionObserver(
     async (entries) => {
