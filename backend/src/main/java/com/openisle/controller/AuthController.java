@@ -53,7 +53,7 @@ public class AuthController {
             try {
                 User user = userService.registerWithInvite(
                         req.getUsername(), req.getEmail(), req.getPassword());
-                inviteService.consume(req.getInviteToken());
+                inviteService.consume(req.getInviteToken(), user.getUsername());
                 emailService.sendEmail(user.getEmail(), "在网站填写验证码以验证", "您的验证码是 " + user.getVerificationCode());
                 return ResponseEntity.ok(Map.of(
                         "token", jwtService.generateToken(user.getUsername()),
@@ -154,7 +154,7 @@ public class AuthController {
         if (resultOpt.isPresent()) {
             AuthResult result = resultOpt.get();
             if (viaInvite && result.isNewUser()) {
-                inviteService.consume(req.getInviteToken());
+                inviteService.consume(req.getInviteToken(), user.getUsername());
                 return ResponseEntity.ok(Map.of(
                         "token", jwtService.generateToken(result.getUser().getUsername()),
                         "reason_code", "INVITE_APPROVED"
@@ -229,7 +229,7 @@ public class AuthController {
         if (resultOpt.isPresent()) {
             AuthResult result = resultOpt.get();
             if (viaInvite && result.isNewUser()) {
-                inviteService.consume(req.getInviteToken());
+                inviteService.consume(req.getInviteToken(), user.getUsername());
                 return ResponseEntity.ok(Map.of(
                         "token", jwtService.generateToken(result.getUser().getUsername()),
                         "reason_code", "INVITE_APPROVED"
@@ -276,7 +276,7 @@ public class AuthController {
         if (resultOpt.isPresent()) {
             AuthResult result = resultOpt.get();
             if (viaInvite && result.isNewUser()) {
-                inviteService.consume(req.getInviteToken());
+                inviteService.consume(req.getInviteToken(), user.getUsername());
                 return ResponseEntity.ok(Map.of(
                         "token", jwtService.generateToken(result.getUser().getUsername()),
                         "reason_code", "INVITE_APPROVED"
@@ -323,7 +323,7 @@ public class AuthController {
         if (resultOpt.isPresent()) {
             AuthResult result = resultOpt.get();
             if (viaInvite && result.isNewUser()) {
-                inviteService.consume(req.getInviteToken());
+                inviteService.consume(req.getInviteToken(), user.getUsername());
                 return ResponseEntity.ok(Map.of(
                         "token", jwtService.generateToken(result.getUser().getUsername()),
                         "reason_code", "INVITE_APPROVED"

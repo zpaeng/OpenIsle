@@ -45,7 +45,7 @@ public class PostController {
         draftService.deleteDraft(auth.getName());
         PostDetailDto dto = postMapper.toDetailDto(post, auth.getName());
         dto.setReward(levelService.awardForPost(auth.getName()));
-        dto.setPointReward(pointService.awardForPost(auth.getName()));
+        dto.setPointReward(pointService.awardForPost(auth.getName(), post.getId()));
         return ResponseEntity.ok(dto);
     }
 

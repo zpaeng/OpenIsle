@@ -1,62 +1,151 @@
 <template>
   <div class="point-mall-page">
-    <section class="rules">
-      <div class="section-title">🎉 积分规则</div>
-      <div class="section-content">
-        <div class="section-item" v-for="(rule, idx) in pointRules" :key="idx">{{ rule }}</div>
+    <div class="point-tabs">
+      <div
+        :class="['point-tab-item', { selected: selectedTab === 'mall' }]"
+        @click="selectedTab = 'mall'"
+      >
+        积分兑换
       </div>
-    </section>
-
-    <div class="loading-points-container" v-if="isLoading">
-      <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+      <div
+        :class="['point-tab-item', { selected: selectedTab === 'history' }]"
+        @click="selectedTab = 'history'"
+      >
+        积分历史
+      </div>
     </div>
 
-    <div class="point-info">
-      <p v-if="authState.loggedIn && point !== null">
-        <span><i class="fas fa-coins coin-icon"></i></span>我的积分：<span class="point-value">{{
-          point
-        }}</span>
-      </p>
-    </div>
+    <template v-if="selectedTab === 'mall'">
+      <section class="rules">
+        <div class="section-title">🎉 积分规则</div>
+        <div class="section-content">
+          <div class="section-item" v-for="(rule, idx) in pointRules" :key="idx">{{ rule }}</div>
+        </div>
+      </section>
 
-    <section class="goods">
-      <div class="goods-item" v-for="(good, idx) in goods" :key="idx">
-        <img class="goods-item-image" :src="good.image" alt="good.name" />
-        <div class="goods-item-name">{{ good.name }}</div>
-        <div class="goods-item-cost">
-          <i class="fas fa-coins"></i>
-          {{ good.cost }} 积分
-        </div>
-        <div
-          class="goods-item-button"
-          :class="{ disabled: !authState.loggedIn || point === null || point < good.cost }"
-          @click="openRedeem(good)"
-        >
-          兑换
-        </div>
+      <div class="loading-points-container" v-if="isLoading">
+        <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
       </div>
-    </section>
-    <RedeemPopup
-      :visible="dialogVisible"
-      v-model="contact"
-      :loading="loading"
-      @close="closeRedeem"
-      @submit="submitRedeem"
-    />
+
+      <div class="point-info">
+        <p v-if="authState.loggedIn && point !== null">
+          <span><i class="fas fa-coins coin-icon"></i></span>我的积分：<span class="point-value">{{
+            point
+          }}</span>
+        </p>
+      </div>
+
+      <section class="goods">
+        <div class="goods-item" v-for="(good, idx) in goods" :key="idx">
+          <img class="goods-item-image" :src="good.image" alt="good.name" />
+          <div class="goods-item-name">{{ good.name }}</div>
+          <div class="goods-item-cost">
+            <i class="fas fa-coins"></i>
+            {{ good.cost }} 积分
+          </div>
+          <div
+            class="goods-item-button"
+            :class="{ disabled: !authState.loggedIn || point === null || point < good.cost }"
+            @click="openRedeem(good)"
+          >
+            兑换
+          </div>
+        </div>
+      </section>
+      <RedeemPopup
+        :visible="dialogVisible"
+        v-model="contact"
+        :loading="loading"
+        @close="closeRedeem"
+        @submit="submitRedeem"
+      />
+    </template>
+
+    <template v-else>
+      <div class="loading-points-container" v-if="historyLoading">
+        <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+      </div>
+      <BasePlaceholder v-else-if="histories.length === 0" text="暂无积分记录" icon="fas fa-inbox" />
+      <div class="timeline-container" v-else>
+        <BaseTimeline :items="histories">
+          <template #item="{ item }">
+            <div class="history-content">
+              <template v-if="item.type === 'POST'">
+                发送帖子
+                <NuxtLink :to="`/posts/${item.postId}`" class="timeline-link">{{
+                  item.postTitle
+                }}</NuxtLink>
+                ，获得{{ item.amount }}积分
+              </template>
+              <template v-else-if="item.type === 'COMMENT' && item.commentId && !item.fromUserId">
+                发送评论
+                <NuxtLink
+                  :to="`/posts/${item.postId}#comment-${item.commentId}`"
+                  class="timeline-link"
+                  >{{ stripMarkdownLength(item.commentContent, 100) }}</NuxtLink
+                >
+                ，获得{{ item.amount }}积分
+              </template>
+              <template v-else-if="item.type === 'POST_LIKED' && item.fromUserId">
+                帖子
+                <NuxtLink :to="`/posts/${item.postId}`" class="timeline-link">{{
+                  item.postTitle
+                }}</NuxtLink>
+                被
+                <NuxtLink :to="`/users/${item.fromUserId}`" class="timeline-link">{{
+                  item.fromUserName
+                }}</NuxtLink>
+                按赞，获得{{ item.amount }}积分
+              </template>
+              <template v-else-if="item.type === 'COMMENT_LIKED' && item.fromUserId">
+                评论
+                <NuxtLink
+                  :to="`/posts/${item.postId}#comment-${item.commentId}`"
+                  class="timeline-link"
+                  >{{ stripMarkdownLength(item.commentContent, 100) }}</NuxtLink
+                >
+                被
+                <NuxtLink :to="`/users/${item.fromUserId}`" class="timeline-link">{{
+                  item.fromUserName
+                }}</NuxtLink>
+                按赞，获得{{ item.amount }}积分
+              </template>
+              <template v-else-if="item.type === 'INVITE' && item.fromUserId">
+                邀请了好友
+                <NuxtLink :to="`/users/${item.fromUserId}`" class="timeline-link">{{
+                  item.fromUserName
+                }}</NuxtLink
+                >，加入社区，获得 {{ item.amount }} 积分
+              </template>
+              <template v-else-if="item.type === 'SYSTEM_ONLINE'">
+                积分历史系统上线，你目前的积分是 {{ item.balance }}
+              </template>
+            </div>
+          </template>
+        </BaseTimeline>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { authState, fetchCurrentUser, getToken } from '~/utils/auth'
 import { toast } from '~/main'
 import RedeemPopup from '~/components/RedeemPopup.vue'
+import BaseTimeline from '~/components/BaseTimeline.vue'
+import BasePlaceholder from '~/components/BasePlaceholder.vue'
+import { stripMarkdownLength } from '~/utils/markdown'
 
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
 
+const selectedTab = ref('mall')
 const point = ref(null)
 const isLoading = ref(false)
+const histories = ref([])
+const historyLoading = ref(false)
+const historyLoaded = ref(false)
 
 const pointRules = [
   '发帖：每天前两次，每次 30 积分',
@@ -82,11 +171,34 @@ onMounted(async () => {
   isLoading.value = false
 })
 
+watch(selectedTab, (val) => {
+  if (val === 'history' && !historyLoaded.value) {
+    loadHistory()
+  }
+})
+
 const loadGoods = async () => {
   const res = await fetch(`${API_BASE_URL}/api/point-goods`)
   if (res.ok) {
     goods.value = await res.json()
   }
+}
+
+const loadHistory = async () => {
+  if (!authState.loggedIn) {
+    historyLoaded.value = true
+    return
+  }
+  historyLoading.value = true
+  const token = getToken()
+  const res = await fetch(`${API_BASE_URL}/api/point-histories`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (res.ok) {
+    histories.value = await res.json()
+  }
+  historyLoading.value = false
+  historyLoaded.value = true
 }
 
 const openRedeem = (good) => {
@@ -133,6 +245,29 @@ const submitRedeem = async () => {
   max-width: var(--page-max-width);
   background-color: var(--background-color);
   margin: 0 auto;
+}
+
+.point-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--normal-border-color);
+}
+
+.point-tab-item {
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+.point-tab-item.selected {
+  border-bottom: 2px solid var(--primary-color);
+  font-weight: bold;
+}
+
+.timeline-container {
+  margin-top: 20px;
+}
+
+.timeline-link {
+  color: var(--primary-color);
 }
 
 .loading-points-container {
