@@ -155,17 +155,22 @@ const route = useRoute()
 const tagOptions = ref([])
 const categoryOptions = ref([])
 
-const topics = ref(['精选', '最新回复', '最新', '排行榜' /*, '热门', '类别'*/])
+const topics = ref(['最新回复', '最新', '精选', '排行榜' /*, '热门', '类别'*/])
 const selectedTopicCookie = useCookie('homeTab')
-const selectedTopic = ref(
-  selectedTopicCookie.value
-    ? selectedTopicCookie.value
-    : route.query.view === 'ranking'
-      ? '排行榜'
-      : route.query.view === 'latest'
-        ? '最新'
-        : '最新回复',
-)
+
+let defaultTopic = '最新回复'
+
+if (selectedTopicCookie.value) {
+  defaultTopic = selectedTopicCookie.value
+} else if (route.query.view === 'ranking') {
+  defaultTopic = '排行榜'
+} else if (route.query.view === 'latest') {
+  defaultTopic = '最新'
+} else if (route.query.view === 'featured') {
+  defaultTopic = '精选'
+}
+const selectedTopic = ref(defaultTopic)
+
 if (!selectedTopicCookie.value) selectedTopicCookie.value = selectedTopic.value
 const articles = ref([])
 const page = ref(0)
