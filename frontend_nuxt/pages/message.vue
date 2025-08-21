@@ -33,15 +33,13 @@
     <div v-if="selectedTab === 'control'">
       <div class="message-control-container">
         <div class="message-control-title">通知设置</div>
-        <div class="message-control-push-item-container">
-          <div
-            v-for="pref in notificationPrefs"
-            :key="pref.type"
-            class="message-control-push-item"
-            :class="{ select: pref.enabled }"
-            @click="togglePref(pref)"
-          >
-            {{ formatType(pref.type) }}
+        <div class="message-control-item-container">
+          <div v-for="pref in notificationPrefs" :key="pref.type" class="message-control-item">
+            <div class="message-control-item-label">{{ formatType(pref.type) }}</div>
+            <BaseSwitch
+              :model-value="pref.enabled"
+              @update:modelValue="(val) => togglePref(pref, val)"
+            />
           </div>
         </div>
       </div>
@@ -550,6 +548,7 @@ import {
   updateNotificationPreference,
 } from '~/utils/notification'
 import TimeManager from '~/utils/time'
+import BaseSwitch from '~/components/BaseSwitch.vue'
 
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
@@ -582,10 +581,10 @@ const fetchPrefs = async () => {
   notificationPrefs.value = await fetchNotificationPreferences()
 }
 
-const togglePref = async (pref) => {
-  const ok = await updateNotificationPreference(pref.type, !pref.enabled)
+const togglePref = async (pref, value) => {
+  const ok = await updateNotificationPreference(pref.type, value)
   if (ok) {
-    pref.enabled = !pref.enabled
+    pref.enabled = value
     await fetchNotifications({
       page: page.value,
       size: pageSize,
@@ -846,26 +845,21 @@ onActivated(async () => {
   padding: 20px;
 }
 
-.message-control-push-item-container {
+.message-control-item-container {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 10px;
 }
 
-.message-control-push-item {
-  font-size: 14px;
-  margin-bottom: 5px;
-  padding: 8px 16px;
-  border: 1px solid var(--normal-border-color);
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.message-control-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 200px;
 }
 
-.message-control-push-item.select {
-  background-color: var(--primary-color);
-  color: white;
+.message-control-item-label {
+  font-size: 14px;
 }
 
 @media (max-width: 768px) {
