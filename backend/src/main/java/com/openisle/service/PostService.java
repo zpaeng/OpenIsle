@@ -464,13 +464,14 @@ public class PostService {
         return paginate(sortByPinnedAndCreated(posts), page, pageSize);
     }
 
-    public List<Post> listFeaturedPosts(java.util.List<Long> categoryIds,
-                                        java.util.List<Long> tagIds,
+    public List<Post> listFeaturedPosts(List<Long> categoryIds,
+                                        List<Long> tagIds,
                                         Integer page,
                                         Integer pageSize) {
         List<Post> posts;
         boolean hasCategories = categoryIds != null && !categoryIds.isEmpty();
         boolean hasTags = tagIds != null && !tagIds.isEmpty();
+
         if (hasCategories && hasTags) {
             posts = listPostsByCategoriesAndTags(categoryIds, tagIds, null, null);
         } else if (hasCategories) {
@@ -480,9 +481,16 @@ public class PostService {
         } else {
             posts = listPosts();
         }
-        posts = posts.stream().filter(p -> !Boolean.TRUE.equals(p.getRssExcluded())).toList();
+
+        // 仅保留 getRssExcluded 为 0 且不为空
+        // 若字段类型是 Boolean（包装类型），0 等价于 false：
+        posts = posts.stream()
+                .filter(p -> p.getRssExcluded() != null && !p.getRssExcluded())
+                .toList();
+
         return paginate(sortByPinnedAndCreated(posts), page, pageSize);
     }
+
 
     public List<Post> listPendingPosts() {
         return postRepository.findByStatus(PostStatus.PENDING);
