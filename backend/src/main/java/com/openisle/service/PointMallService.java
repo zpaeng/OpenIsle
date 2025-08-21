@@ -3,8 +3,11 @@ package com.openisle.service;
 import com.openisle.exception.FieldException;
 import com.openisle.exception.NotFoundException;
 import com.openisle.model.PointGood;
+import com.openisle.model.PointHistory;
+import com.openisle.model.PointHistoryType;
 import com.openisle.model.User;
 import com.openisle.repository.PointGoodRepository;
+import com.openisle.repository.PointHistoryRepository;
 import com.openisle.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,7 @@ public class PointMallService {
     private final PointGoodRepository pointGoodRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final PointHistoryRepository pointHistoryRepository;
 
     public List<PointGood> listGoods() {
         return pointGoodRepository.findAll();
@@ -32,6 +36,13 @@ public class PointMallService {
         user.setPoint(user.getPoint() - good.getCost());
         userRepository.save(user);
         notificationService.createPointRedeemNotifications(user, good.getName() + ": " + contact);
+        PointHistory history = new PointHistory();
+        history.setUser(user);
+        history.setType(PointHistoryType.REDEEM);
+        history.setAmount(-good.getCost());
+        history.setBalance(user.getPoint());
+        history.setCreatedAt(java.time.LocalDateTime.now());
+        pointHistoryRepository.save(history);
         return user.getPoint();
     }
 }
