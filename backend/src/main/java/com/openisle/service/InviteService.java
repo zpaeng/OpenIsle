@@ -5,6 +5,7 @@ import com.openisle.model.User;
 import com.openisle.repository.InviteTokenRepository;
 import com.openisle.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,6 +18,12 @@ public class InviteService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final PointService pointService;
+
+    @Value
+    public class InviteValidateResult {
+        InviteToken inviteToken;
+        boolean validate;
+    }
 
     public String generate(String username) {
         User inviter = userRepository.findByUsername(username).orElseThrow();
@@ -35,14 +42,17 @@ public class InviteService {
         return token;
     }
 
-    public boolean validate(String token) {
+    public InviteValidateResult validate(String token) {
+        if (token == null || token.isEmpty()) {
+            return new InviteValidateResult(null, false);
+        }
         try {
             jwtService.validateAndGetSubjectForInvite(token);
         } catch (Exception e) {
-            return false;
+            return new InviteValidateResult(null, false);
         }
         InviteToken invite = inviteTokenRepository.findById(token).orElse(null);
-        return invite != null && invite.getUsageCount() < 3;
+        return new InviteValidateResult(invite, invite != null && invite.getUsageCount() < 3);
     }
 
     public void consume(String token, String newUserName) {

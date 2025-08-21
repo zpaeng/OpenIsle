@@ -49,6 +49,9 @@ public class PointService {
 
     private int addPoint(User user, int amount, PointHistoryType type,
                          Post post, Comment comment, User fromUser) {
+        if (pointHistoryRepository.countByUser(user) == 0) {
+            recordHistory(user, PointHistoryType.SYSTEM_ONLINE, 0, null, null, null);
+        }
         user.setPoint(user.getPoint() + amount);
         userRepository.save(user);
         recordHistory(user, type, amount, post, comment, fromUser);
