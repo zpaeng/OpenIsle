@@ -26,6 +26,8 @@ const iconMap = {
   LOTTERY_WIN: 'fas fa-trophy',
   LOTTERY_DRAW: 'fas fa-bullhorn',
   MENTION: 'fas fa-at',
+  POST_DELETED: 'fas fa-trash',
+  POST_FEATURED: 'fas fa-star',
 }
 
 export async function fetchUnreadCount() {
@@ -158,7 +160,7 @@ function createFetchNotifications() {
             ...n,
             src: n.comment.author.avatar,
             iconClick: () => {
-              markRead(n.id)
+              markNotificationRead(n.id)
               navigateTo(`/users/${n.comment.author.id}`, { replace: true })
             },
           })
@@ -168,7 +170,7 @@ function createFetchNotifications() {
             emoji: reactionEmojiMap[n.reactionType],
             iconClick: () => {
               if (n.fromUser) {
-                markRead(n.id)
+                markNotificationRead(n.id)
                 navigateTo(`/users/${n.fromUser.id}`, { replace: true })
               }
             },
@@ -180,7 +182,19 @@ function createFetchNotifications() {
             icon: n.fromUser ? undefined : iconMap[n.type],
             iconClick: () => {
               if (n.fromUser) {
-                markRead(n.id)
+                markNotificationRead(n.id)
+                navigateTo(`/users/${n.fromUser.id}`, { replace: true })
+              }
+            },
+          })
+        } else if (n.type === 'POST_DELETED') {
+          arr.push({
+            ...n,
+            src: n.fromUser ? n.fromUser.avatar : null,
+            icon: n.fromUser ? undefined : iconMap[n.type],
+            iconClick: () => {
+              if (n.fromUser) {
+                markNotificationRead(n.id)
                 navigateTo(`/users/${n.fromUser.id}`, { replace: true })
               }
             },
@@ -191,7 +205,7 @@ function createFetchNotifications() {
             icon: iconMap[n.type],
             iconClick: () => {
               if (n.post) {
-                markRead(n.id)
+                markNotificationRead(n.id)
                 navigateTo(`/posts/${n.post.id}`)
               }
             },
@@ -201,7 +215,7 @@ function createFetchNotifications() {
             ...n,
             src: n.comment.author.avatar,
             iconClick: () => {
-              markRead(n.id)
+              markNotificationRead(n.id)
               navigateTo(`/users/${n.comment.author.id}`, { replace: true })
             },
           })
@@ -211,7 +225,7 @@ function createFetchNotifications() {
             icon: iconMap[n.type],
             iconClick: () => {
               if (n.fromUser) {
-                markRead(n.id)
+                markNotificationRead(n.id)
                 navigateTo(`/users/${n.fromUser.id}`, { replace: true })
               }
             },
@@ -222,7 +236,7 @@ function createFetchNotifications() {
             icon: iconMap[n.type],
             iconClick: () => {
               if (n.fromUser) {
-                markRead(n.id)
+                markNotificationRead(n.id)
                 navigateTo(`/users/${n.fromUser.id}`, { replace: true })
               }
             },
@@ -237,7 +251,7 @@ function createFetchNotifications() {
             icon: iconMap[n.type],
             iconClick: () => {
               if (n.post) {
-                markRead(n.id)
+                markNotificationRead(n.id)
                 navigateTo(`/posts/${n.post.id}`, { replace: true })
               }
             },
@@ -249,7 +263,18 @@ function createFetchNotifications() {
             icon: n.fromUser ? undefined : iconMap[n.type],
             iconClick: () => {
               if (n.post) {
-                markRead(n.id)
+                markNotificationRead(n.id)
+                navigateTo(`/posts/${n.post.id}`, { replace: true })
+              }
+            },
+          })
+        } else if (n.type === 'POST_FEATURED') {
+          arr.push({
+            ...n,
+            icon: iconMap[n.type],
+            iconClick: () => {
+              if (n.post) {
+                markNotificationRead(n.id)
                 navigateTo(`/posts/${n.post.id}`, { replace: true })
               }
             },
@@ -277,7 +302,7 @@ function createFetchNotifications() {
     }
   }
 
-  const markRead = async (id) => {
+  const markNotificationRead = async (id) => {
     if (!id) return
     const n = notifications.value.find((n) => n.id === id)
     if (!n || n.read) return
@@ -319,7 +344,7 @@ function createFetchNotifications() {
   }
   return {
     fetchNotifications,
-    markRead,
+    markNotificationRead,
     notifications,
     isLoadingMessage,
     markAllRead,
@@ -329,7 +354,7 @@ function createFetchNotifications() {
 
 export const {
   fetchNotifications,
-  markRead,
+  markNotificationRead,
   notifications,
   isLoadingMessage,
   markAllRead,

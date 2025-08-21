@@ -26,7 +26,10 @@
     <div class="article-container">
       <template
         v-if="
-          selectedTopic === '最新' || selectedTopic === '排行榜' || selectedTopic === '最新回复'
+          selectedTopic === '最新' ||
+          selectedTopic === '排行榜' ||
+          selectedTopic === '最新回复' ||
+          selectedTopic === '精选'
         "
       >
         <div class="article-header-container">
@@ -152,17 +155,22 @@ const route = useRoute()
 const tagOptions = ref([])
 const categoryOptions = ref([])
 
-const topics = ref(['最新回复', '最新', '排行榜' /*, '热门', '类别'*/])
+const topics = ref(['最新回复', '最新', '精选', '排行榜' /*, '热门', '类别'*/])
 const selectedTopicCookie = useCookie('homeTab')
-const selectedTopic = ref(
-  selectedTopicCookie.value
-    ? selectedTopicCookie.value
-    : route.query.view === 'ranking'
-      ? '排行榜'
-      : route.query.view === 'latest'
-        ? '最新'
-        : '最新回复',
-)
+
+let defaultTopic = '最新回复'
+
+if (selectedTopicCookie.value) {
+  defaultTopic = selectedTopicCookie.value
+} else if (route.query.view === 'ranking') {
+  defaultTopic = '排行榜'
+} else if (route.query.view === 'latest') {
+  defaultTopic = '最新'
+} else if (route.query.view === 'featured') {
+  defaultTopic = '精选'
+}
+const selectedTopic = ref(defaultTopic)
+
 if (!selectedTopicCookie.value) selectedTopicCookie.value = selectedTopic.value
 const articles = ref([])
 const page = ref(0)
@@ -236,6 +244,7 @@ const baseQuery = computed(() => ({
 const listApiPath = computed(() => {
   if (selectedTopic.value === '排行榜') return '/api/posts/ranking'
   if (selectedTopic.value === '最新回复') return '/api/posts/latest-reply'
+  if (selectedTopic.value === '精选') return '/api/posts/featured'
   return '/api/posts'
 })
 const buildUrl = ({ pageNo }) => {
@@ -338,7 +347,7 @@ watch([selectedCategory, selectedTags], () => {
 watch(selectedTopic, (val) => {
   loadOptions()
   selectedTopicCookie.value = val
-  if (process.client) localStorage.setItem('homeTab', val)
+  if (import.meta.client) localStorage.setItem('homeTab', val)
 })
 
 /** 选项首屏加载：服务端执行一次；客户端兜底 **/

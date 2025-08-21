@@ -47,7 +47,7 @@ public class CommentController {
         Comment comment = commentService.addComment(auth.getName(), postId, req.getContent());
         CommentDto dto = commentMapper.toDto(comment);
         dto.setReward(levelService.awardForComment(auth.getName()));
-        dto.setPointReward(pointService.awardForComment(auth.getName(),postId));
+        dto.setPointReward(pointService.awardForComment(auth.getName(), postId, comment.getId()));
         log.debug("createComment succeeded for comment {}", comment.getId());
         return ResponseEntity.ok(dto);
     }

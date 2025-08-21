@@ -34,11 +34,12 @@ class PostServiceTest {
         TaskScheduler taskScheduler = mock(TaskScheduler.class);
         EmailSender emailSender = mock(EmailSender.class);
         ApplicationContext context = mock(ApplicationContext.class);
+        PointService pointService = mock(PointService.class);
 
         PostService service = new PostService(postRepo, userRepo, catRepo, tagRepo, lotteryRepo,
                 notifService, subService, commentService, commentRepo,
                 reactionRepo, subRepo, notificationRepo, postReadService,
-                imageUploader, taskScheduler, emailSender, context, PublishMode.DIRECT);
+                imageUploader, taskScheduler, emailSender, context, pointService, PublishMode.DIRECT);
         when(context.getBean(PostService.class)).thenReturn(service);
 
         Post post = new Post();
@@ -62,6 +63,59 @@ class PostServiceTest {
     }
 
     @Test
+    void deletePostByAdminNotifiesAuthor() {
+        PostRepository postRepo = mock(PostRepository.class);
+        UserRepository userRepo = mock(UserRepository.class);
+        CategoryRepository catRepo = mock(CategoryRepository.class);
+        TagRepository tagRepo = mock(TagRepository.class);
+        LotteryPostRepository lotteryRepo = mock(LotteryPostRepository.class);
+        NotificationService notifService = mock(NotificationService.class);
+        SubscriptionService subService = mock(SubscriptionService.class);
+        CommentService commentService = mock(CommentService.class);
+        CommentRepository commentRepo = mock(CommentRepository.class);
+        ReactionRepository reactionRepo = mock(ReactionRepository.class);
+        PostSubscriptionRepository subRepo = mock(PostSubscriptionRepository.class);
+        NotificationRepository notificationRepo = mock(NotificationRepository.class);
+        PostReadService postReadService = mock(PostReadService.class);
+        ImageUploader imageUploader = mock(ImageUploader.class);
+        TaskScheduler taskScheduler = mock(TaskScheduler.class);
+        EmailSender emailSender = mock(EmailSender.class);
+        ApplicationContext context = mock(ApplicationContext.class);
+        PointService pointService = mock(PointService.class);
+
+        PostService service = new PostService(postRepo, userRepo, catRepo, tagRepo, lotteryRepo,
+                notifService, subService, commentService, commentRepo,
+                reactionRepo, subRepo, notificationRepo, postReadService,
+                imageUploader, taskScheduler, emailSender, context, pointService, PublishMode.DIRECT);
+        when(context.getBean(PostService.class)).thenReturn(service);
+
+        Post post = new Post();
+        post.setId(1L);
+        post.setTitle("T");
+        post.setContent("");
+        User author = new User();
+        author.setId(2L);
+        author.setRole(Role.USER);
+        post.setAuthor(author);
+
+        User admin = new User();
+        admin.setId(1L);
+        admin.setRole(Role.ADMIN);
+
+        when(postRepo.findById(1L)).thenReturn(Optional.of(post));
+        when(userRepo.findByUsername("admin")).thenReturn(Optional.of(admin));
+        when(commentRepo.findByPostAndParentIsNullOrderByCreatedAtAsc(post)).thenReturn(List.of());
+        when(reactionRepo.findByPost(post)).thenReturn(List.of());
+        when(subRepo.findByPost(post)).thenReturn(List.of());
+        when(notificationRepo.findByPost(post)).thenReturn(List.of());
+
+        service.deletePost(1L, "admin");
+
+        verify(notifService).createNotification(eq(author), eq(NotificationType.POST_DELETED), isNull(),
+                isNull(), isNull(), eq(admin), isNull(), eq("T"));
+    }
+
+    @Test
     void createPostRespectsRateLimit() {
         PostRepository postRepo = mock(PostRepository.class);
         UserRepository userRepo = mock(UserRepository.class);
@@ -80,11 +134,12 @@ class PostServiceTest {
         TaskScheduler taskScheduler = mock(TaskScheduler.class);
         EmailSender emailSender = mock(EmailSender.class);
         ApplicationContext context = mock(ApplicationContext.class);
+        PointService pointService = mock(PointService.class);
 
         PostService service = new PostService(postRepo, userRepo, catRepo, tagRepo, lotteryRepo,
                 notifService, subService, commentService, commentRepo,
                 reactionRepo, subRepo, notificationRepo, postReadService,
-                imageUploader, taskScheduler, emailSender, context, PublishMode.DIRECT);
+                imageUploader, taskScheduler, emailSender, context, pointService, PublishMode.DIRECT);
         when(context.getBean(PostService.class)).thenReturn(service);
 
         when(postRepo.countByAuthorAfter(eq("alice"), any())).thenReturn(1L);
@@ -113,11 +168,12 @@ class PostServiceTest {
         TaskScheduler taskScheduler = mock(TaskScheduler.class);
         EmailSender emailSender = mock(EmailSender.class);
         ApplicationContext context = mock(ApplicationContext.class);
+        PointService pointService = mock(PointService.class);
 
         PostService service = new PostService(postRepo, userRepo, catRepo, tagRepo, lotteryRepo,
                 notifService, subService, commentService, commentRepo,
                 reactionRepo, subRepo, notificationRepo, postReadService,
-                imageUploader, taskScheduler, emailSender, context, PublishMode.DIRECT);
+                imageUploader, taskScheduler, emailSender, context, pointService, PublishMode.DIRECT);
         when(context.getBean(PostService.class)).thenReturn(service);
 
         User author = new User();

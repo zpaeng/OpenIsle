@@ -14,6 +14,8 @@ public enum NotificationType {
     POST_REVIEW_REQUEST,
     /** Your post under review was approved or rejected */
     POST_REVIEWED,
+    /** An administrator deleted your post */
+    POST_DELETED,
     /** A subscribed post received a new comment */
     POST_UPDATED,
     /** Someone subscribed to your post */
@@ -38,6 +40,8 @@ public enum NotificationType {
     LOTTERY_WIN,
     /** Your lottery post was drawn */
     LOTTERY_DRAW,
+    /** Your post was featured */
+    POST_FEATURED,
     /** You were mentioned in a post or comment */
     MENTION
 }

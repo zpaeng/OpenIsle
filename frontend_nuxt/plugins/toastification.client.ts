@@ -4,7 +4,7 @@ import '~/assets/toast.css'
 
 export default defineNuxtPlugin(async (nuxtApp) => {
   // 确保只在客户端环境中注册插件
-  if (process.client) {
+  if (import.meta.client) {
     try {
       // 使用动态导入来避免 CommonJS 模块问题
       const { default: Toast, POSITION } = await import('vue-toastification')

@@ -17,7 +17,7 @@
           <div v-if="status === 'REJECTED'" class="article-block-button">已拒绝</div>
           <div v-if="closed" class="article-closed-button">已关闭</div>
           <div
-            v-if="loggedIn && !isAuthor && !subscribed"
+            v-if="!closed && loggedIn && !isAuthor && !subscribed"
             class="article-subscribe-button"
             @click="subscribePost"
           >
@@ -27,7 +27,7 @@
             </div>
           </div>
           <div
-            v-if="loggedIn && !isAuthor && subscribed"
+            v-if="!closed && loggedIn && !isAuthor && subscribed"
             class="article-unsubscribe-button"
             @click="unsubscribePost"
           >
@@ -295,7 +295,7 @@ const commentSort = ref('NEWEST')
 const isFetchingComments = ref(false)
 const isMobile = useIsMobile()
 
-const headerHeight = process.client
+const headerHeight = import.meta.client
   ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0
   : 0
 
@@ -309,7 +309,7 @@ useHead(() => ({
   ],
 }))
 
-if (process.client) {
+if (import.meta.client) {
   onBeforeUnmount(() => {
     window.removeEventListener('scroll', updateCurrentIndex)
     if (countdownTimer) clearInterval(countdownTimer)
@@ -355,7 +355,7 @@ const updateCountdown = () => {
   countdown.value = `${h}:${m}:${s}`
 }
 const startCountdown = () => {
-  if (!process.client) return
+  if (!import.meta.client) return
   if (countdownTimer) clearInterval(countdownTimer)
   updateCountdown()
   countdownTimer = setInterval(updateCountdown, 1000)
@@ -515,7 +515,7 @@ watchEffect(() => {
 })
 
 // 404 客户端跳转
-// if (postError.value?.statusCode === 404 && process.client) {
+// if (postError.value?.statusCode === 404 && import.meta.client) {
 //   router.replace('/404')
 // }
 
@@ -876,12 +876,8 @@ const gotoProfile = () => {
   navigateTo(`/users/${author.value.id}`, { replace: true })
 }
 
-onActivated(async () => {
-  await refreshPost()
-  await fetchComments()
-})
-
-onMounted(async () => {
+const initPage = async () => {
+  scrollTo(0, 0)
   await fetchComments()
   const hash = location.hash
   const id = hash.startsWith('#comment-') ? hash.substring('#comment-'.length) : null
@@ -889,6 +885,14 @@ onMounted(async () => {
   updateCurrentIndex()
   window.addEventListener('scroll', updateCurrentIndex)
   jumpToHashComment()
+}
+
+onActivated(async () => {
+  await initPage()
+})
+
+onMounted(async () => {
+  await initPage()
 })
 </script>
 
@@ -1067,6 +1071,7 @@ onMounted(async () => {
   white-space: nowrap;
 }
 
+.article-closed-button,
 .article-subscribe-button-text,
 .article-unsubscribe-button-text {
   white-space: nowrap;

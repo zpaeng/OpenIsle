@@ -1,5 +1,8 @@
 <template>
   <div class="site-stats-page">
+    <div v-if="isLoading" class="loading-message">
+      <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+    </div>
     <ClientOnly>
       <VChart
         v-if="dauOption"
@@ -51,8 +54,10 @@ const dauOption = ref(null)
 const newUserOption = ref(null)
 const postOption = ref(null)
 const commentOption = ref(null)
+const isLoading = ref(false)
 
 async function loadData() {
+  isLoading.value = true
   const token = getToken()
   const headers = { Authorization: `Bearer ${token}` }
 
@@ -93,6 +98,7 @@ async function loadData() {
     const data = await commentRes.json()
     commentOption.value = toOption('每日回贴量', data)
   }
+  isLoading.value = false
 }
 
 onMounted(loadData)
@@ -104,5 +110,12 @@ onMounted(loadData)
   max-width: var(--page-max-width);
   background-color: var(--background-color);
   margin: 0 auto;
+}
+
+.loading-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
 }
 </style>

@@ -1,7 +1,7 @@
 import { clearToken } from '~/utils/auth'
 
 export default defineNuxtPlugin(() => {
-  if (process.client) {
+  if (import.meta.client) {
     const originalFetch = window.fetch
     window.fetch = async (input, init) => {
       const response = await originalFetch(input, init)

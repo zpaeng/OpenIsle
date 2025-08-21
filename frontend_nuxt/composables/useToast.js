@@ -1,7 +1,7 @@
 // 导出一个便捷的 toast 对象
 export const toast = {
   success: async (message) => {
-    if (process.client) {
+    if (import.meta.client) {
       try {
         const { useToast } = await import('vue-toastification')
         const toastInstance = useToast()
@@ -12,7 +12,7 @@ export const toast = {
     }
   },
   error: async (message) => {
-    if (process.client) {
+    if (import.meta.client) {
       try {
         const { useToast } = await import('vue-toastification')
         const toastInstance = useToast()
@@ -23,7 +23,7 @@ export const toast = {
     }
   },
   warning: async (message) => {
-    if (process.client) {
+    if (import.meta.client) {
       try {
         const { useToast } = await import('vue-toastification')
         const toastInstance = useToast()
@@ -34,7 +34,7 @@ export const toast = {
     }
   },
   info: async (message) => {
-    if (process.client) {
+    if (import.meta.client) {
       try {
         const { useToast } = await import('vue-toastification')
         const toastInstance = useToast()
@@ -48,7 +48,7 @@ export const toast = {
 
 // 导出 useToast composable
 export const useToast = () => {
-  if (process.client) {
+  if (import.meta.client) {
     return new Promise(async (resolve) => {
       try {
         const { useToast: useVueToast } = await import('vue-toastification')
