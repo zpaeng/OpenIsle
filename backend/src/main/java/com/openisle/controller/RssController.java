@@ -107,18 +107,11 @@ public class RssController {
                 enclosure = absolutifyUrl(enclosure, base);
             }
 
-            // Top comments in Markdown
+            // 6) 构造优雅的附加区块（原文链接 + 精选评论），编入 <content:encoded>
             List<Comment> topComments = commentService
                     .getCommentsForPost(p.getId(), CommentSort.MOST_INTERACTIONS);
             topComments = topComments.subList(0, Math.min(10, topComments.size()));
-            StringBuilder commentMd = new StringBuilder();
-            for (Comment c : topComments) {
-                commentMd.append("> @")
-                        .append(nullSafe(c.getAuthor().getUsername()))
-                        .append(": ")
-                        .append(nullSafe(c.getContent()).replace("\r", ""))
-                        .append("\n\n");
-            }
+            String footerHtml = buildFooterHtml(base, link, topComments);
 
             sb.append("<item>");
             elem(sb, "title", cdata(nullSafe(p.getTitle())));
@@ -127,18 +120,16 @@ public class RssController {
             elem(sb, "pubDate", toRfc1123Gmt(p.getCreatedAt().atZone(ZoneId.systemDefault())));
             // 摘要
             elem(sb, "description", cdata(plain));
-            // 全文（HTML）
-            sb.append("<content:encoded><![CDATA[").append(absHtml).append("]]></content:encoded>");
+            // 全文（HTML）：正文 + 优雅的 Markdown 区块（已转 HTML）
+            sb.append("<content:encoded><![CDATA[")
+                    .append(absHtml)
+                    .append(footerHtml)
+                    .append("]]></content:encoded>");
             // 首图 enclosure（图片类型）
             if (enclosure != null) {
                 sb.append("<enclosure url=\"").append(escapeXml(enclosure)).append("\" type=\"")
                         .append(getMimeType(enclosure)).append("\" />");
             }
-            // Markdown comments
-            elem(sb, "commentsMarkdown", cdata(commentMd.toString()));
-            // Markdown original link
-            elem(sb, "originalLinkMarkdown", cdata("[原文链接](" + link + ")"));
-
             sb.append("</item>");
         }
 
@@ -158,8 +149,12 @@ public class RssController {
     private static String sanitizeHtml(String html) {
         if (html == null) return "";
         Safelist wl = Safelist.relaxed()
-                .addTags("pre", "code", "figure", "figcaption", "picture", "source",
-                        "table","thead","tbody","tr","th","td","h1","h2","h3","h4","h5","h6")
+                .addTags(
+                        "pre","code","figure","figcaption","picture","source",
+                        "table","thead","tbody","tr","th","td",
+                        "h1","h2","h3","h4","h5","h6",
+                        "hr","blockquote"
+                )
                 .addAttributes("a", "href", "title", "target", "rel")
                 .addAttributes("img", "src", "alt", "title", "width", "height")
                 .addAttributes("source", "srcset", "type", "media")
@@ -266,6 +261,59 @@ public class RssController {
         if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
         // 默认兜底
         return "image/jpeg";
+    }
+
+    /* ===================== 附加区块（原文链接 + 精选评论） ===================== */
+
+    /**
+     * 将“原文链接 + 精选评论（最多 10 条）”以优雅的 Markdown 形式渲染为 HTML，
+     * 并做 sanitize + 绝对化，然后拼入 content:encoded 尾部。
+     */
+    private static String buildFooterHtml(String baseUrl, String originalLink, List<Comment> topComments) {
+        StringBuilder md = new StringBuilder(256);
+
+        // 分割线
+        md.append("\n\n---\n\n");
+
+        // 原文链接（强调 + 可点击）
+        md.append("**原文链接：** ")
+                .append("[").append(originalLink).append("](").append(originalLink).append(")")
+                .append("\n\n");
+
+        // 精选评论（仅当有评论时展示）
+        if (topComments != null && !topComments.isEmpty()) {
+            md.append("### 精选评论（Top ").append(Math.min(10, topComments.size())).append("）\n\n");
+            for (Comment c : topComments) {
+                String author = usernameOf(c);
+                String content = nullSafe(c.getContent()).replace("\r", "");
+                // 使用引用样式展示，提升可读性
+                md.append("> @").append(author).append(": ").append(content).append("\n\n");
+            }
+        }
+
+        // 渲染为 HTML，并保持和正文一致的处理流程
+        String html = renderMarkdown(md.toString());
+        String safe = sanitizeHtml(html);
+        return absolutifyHtml(safe, baseUrl);
+    }
+
+    private static String usernameOf(Comment c) {
+        if (c == null) return "匿名";
+        try {
+            Object authorObj = c.getAuthor();
+            if (authorObj == null) return "匿名";
+            // 反射避免直接依赖实体字段名变化（也可直接强转到具体类型）
+            String username;
+            try {
+                username = (String) authorObj.getClass().getMethod("getUsername").invoke(authorObj);
+            } catch (Exception e) {
+                username = null;
+            }
+            if (username == null || username.isEmpty()) return "匿名";
+            return username;
+        } catch (Exception ignored) {
+            return "匿名";
+        }
     }
 
     /* ===================== 时间/字符串/XML ===================== */
