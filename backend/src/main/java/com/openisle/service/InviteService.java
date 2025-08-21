@@ -45,10 +45,10 @@ public class InviteService {
         return invite != null && invite.getUsageCount() < 3;
     }
 
-    public void consume(String token) {
+    public void consume(String token, String newUserName) {
         InviteToken invite = inviteTokenRepository.findById(token).orElseThrow();
         invite.setUsageCount(invite.getUsageCount() + 1);
         inviteTokenRepository.save(invite);
-        pointService.awardForInvite(invite.getInviter().getUsername());
+        pointService.awardForInvite(invite.getInviter().getUsername(), newUserName);
     }
 }
