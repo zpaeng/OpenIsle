@@ -1,7 +1,10 @@
 package com.openisle.controller;
 
 import com.openisle.model.Post;
+import com.openisle.model.Comment;
+import com.openisle.model.CommentSort;
 import com.openisle.service.PostService;
+import com.openisle.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -31,6 +34,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class RssController {
     private final PostService postService;
+    private final CommentService commentService;
 
     @Value("${app.website-url:https://www.open-isle.com}")
     private String websiteUrl;
@@ -103,6 +107,19 @@ public class RssController {
                 enclosure = absolutifyUrl(enclosure, base);
             }
 
+            // Top comments in Markdown
+            List<Comment> topComments = commentService
+                    .getCommentsForPost(p.getId(), CommentSort.MOST_INTERACTIONS);
+            topComments = topComments.subList(0, Math.min(10, topComments.size()));
+            StringBuilder commentMd = new StringBuilder();
+            for (Comment c : topComments) {
+                commentMd.append("> @")
+                        .append(nullSafe(c.getAuthor().getUsername()))
+                        .append(": ")
+                        .append(nullSafe(c.getContent()).replace("\r", ""))
+                        .append("\n\n");
+            }
+
             sb.append("<item>");
             elem(sb, "title", cdata(nullSafe(p.getTitle())));
             elem(sb, "link", link);
@@ -117,6 +134,11 @@ public class RssController {
                 sb.append("<enclosure url=\"").append(escapeXml(enclosure)).append("\" type=\"")
                         .append(getMimeType(enclosure)).append("\" />");
             }
+            // Markdown comments
+            elem(sb, "commentsMarkdown", cdata(commentMd.toString()));
+            // Markdown original link
+            elem(sb, "originalLinkMarkdown", cdata("[原文链接](" + link + ")"));
+
             sb.append("</item>");
         }
 
