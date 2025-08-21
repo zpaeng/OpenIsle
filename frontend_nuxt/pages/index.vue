@@ -449,7 +449,7 @@ const sanitizeDescription = (text) => stripMarkdown(text)
 }
 
 .topic-item {
-  padding: 10px 20px;
+  padding: 6px 20px;
   cursor: pointer;
 }
 

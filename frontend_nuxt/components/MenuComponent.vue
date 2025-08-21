@@ -106,7 +106,7 @@
 
         <div class="menu-section">
           <div class="section-header" @click="tagOpen = !tagOpen">
-            <span>tag</span>
+            <span>标签</span>
             <i :class="tagOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
           </div>
           <div v-if="tagOpen" class="section-items">
