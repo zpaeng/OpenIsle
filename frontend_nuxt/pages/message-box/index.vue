@@ -120,7 +120,7 @@ import { getToken, fetchCurrentUser } from '~/utils/auth'
 import { toast } from '~/main'
 import { useWebSocket } from '~/composables/useWebSocket'
 import { useUnreadCount } from '~/composables/useUnreadCount'
-import { useChannelUnread } from '~/composables/useChannelUnread'
+import { useChannelsUnreadCount } from '~/composables/useChannelsUnreadCount'
 import TimeManager from '~/utils/time'
 import { stripMarkdownLength } from '~/utils/markdown'
 import SearchPersonDropdown from '~/components/SearchPersonDropdown.vue'
@@ -136,7 +136,7 @@ const API_BASE_URL = config.public.apiBaseUrl
 const { connect, disconnect, subscribe, isConnected } = useWebSocket()
 const { fetchUnreadCount: refreshGlobalUnreadCount } = useUnreadCount()
 const { fetchChannelUnread: refreshChannelUnread, setFromList: setChannelUnreadFromList } =
-  useChannelUnread()
+  useChannelsUnreadCount()
 let subscription = null
 
 const activeTab = ref('messages')
@@ -257,6 +257,9 @@ watch(isConnected, (newValue) => {
 
     subscription = subscribe(destination, (message) => {
       fetchConversations()
+      if (activeTab.value === 'channels') {
+        fetchChannels()
+      }
     })
   }
 })

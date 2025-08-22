@@ -55,7 +55,10 @@ const subscribe = (destination, callback) => {
   try {
     const subscription = client.value.subscribe(destination, (message) => {
       try {
-        if (destination.includes('/queue/unread-count')) {
+        if (
+          destination.includes('/queue/unread-count') ||
+          destination.includes('/queue/channel-unread')
+        ) {
           callback(message)
         } else {
           const parsedMessage = JSON.parse(message.body)

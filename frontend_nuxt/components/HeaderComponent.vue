@@ -89,7 +89,7 @@ import ToolTip from '~/components/ToolTip.vue'
 import SearchDropdown from '~/components/SearchDropdown.vue'
 import { authState, clearToken, loadCurrentUser } from '~/utils/auth'
 import { useUnreadCount } from '~/composables/useUnreadCount'
-import { useChannelUnread } from '~/composables/useChannelUnread'
+import { useChannelsUnreadCount } from '~/composables/useChannelsUnreadCount'
 import { useIsMobile } from '~/utils/screen'
 import { themeState, cycleTheme, ThemeMode } from '~/utils/theme'
 import { toast } from '~/main'
@@ -108,7 +108,7 @@ const props = defineProps({
 const isLogin = computed(() => authState.loggedIn)
 const isMobile = useIsMobile()
 const { count: unreadMessageCount, fetchUnreadCount } = useUnreadCount()
-const { hasUnread: hasChannelUnread, fetchChannelUnread } = useChannelUnread()
+const { hasUnread: hasChannelUnread, fetchChannelUnread } = useChannelsUnreadCount()
 const avatar = ref('')
 const showSearch = ref(false)
 const searchDropdown = ref(null)

@@ -69,7 +69,7 @@ import { renderMarkdown } from '~/utils/markdown'
 import MessageEditor from '~/components/MessageEditor.vue'
 import { useWebSocket } from '~/composables/useWebSocket'
 import { useUnreadCount } from '~/composables/useUnreadCount'
-import { useChannelUnread } from '~/composables/useChannelUnread'
+import { useChannelsUnreadCount } from '~/composables/useChannelsUnreadCount'
 import TimeManager from '~/utils/time'
 import BaseTimeline from '~/components/BaseTimeline.vue'
 import BasePlaceholder from '~/components/BasePlaceholder.vue'
@@ -79,7 +79,7 @@ const route = useRoute()
 const API_BASE_URL = config.public.apiBaseUrl
 const { connect, disconnect, subscribe, isConnected } = useWebSocket()
 const { fetchUnreadCount: refreshGlobalUnreadCount } = useUnreadCount()
-const { fetchChannelUnread: refreshChannelUnread } = useChannelUnread()
+const { fetchChannelUnread: refreshChannelUnread } = useChannelsUnreadCount()
 let subscription = null
 
 const messages = ref([])

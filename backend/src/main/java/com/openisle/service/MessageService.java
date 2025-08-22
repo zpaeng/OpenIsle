@@ -120,6 +120,9 @@ public class MessageService {
             long unreadCount = getUnreadMessageCount(participant.getUser().getId());
             String username = participant.getUser().getUsername();
             messagingTemplate.convertAndSendToUser(username, "/queue/unread-count", unreadCount);
+
+            long channelUnread = getUnreadChannelCount(participant.getUser().getId());
+            messagingTemplate.convertAndSendToUser(username, "/queue/channel-unread", channelUnread);
         }
 
         return message;
@@ -260,10 +263,26 @@ public class MessageService {
         List<MessageParticipant> participations = participantRepository.findByUserId(userId);
         long totalUnreadCount = 0;
         for (MessageParticipant p : participations) {
+            if (p.getConversation().isChannel()) continue;
             LocalDateTime lastRead = p.getLastReadAt() == null ? LocalDateTime.of(1970, 1, 1, 0, 0) : p.getLastReadAt();
             // 只计算别人发送给当前用户的未读消息
             totalUnreadCount += messageRepository.countByConversationIdAndCreatedAtAfterAndSenderIdNot(p.getConversation().getId(), lastRead, userId);
         }
         return totalUnreadCount;
+    }
+
+    @Transactional(readOnly = true)
+    public long getUnreadChannelCount(Long userId) {
+        List<MessageParticipant> participations = participantRepository.findByUserId(userId);
+        long unreadChannelCount = 0;
+        for (MessageParticipant p : participations) {
+            if (!p.getConversation().isChannel()) continue;
+            LocalDateTime lastRead = p.getLastReadAt() == null ? LocalDateTime.of(1970, 1, 1, 0, 0) : p.getLastReadAt();
+            long unread = messageRepository.countByConversationIdAndCreatedAtAfterAndSenderIdNot(p.getConversation().getId(), lastRead, userId);
+            if (unread > 0) {
+                unreadChannelCount++;
+            }
+        }
+        return unreadChannelCount;
     }
 }
