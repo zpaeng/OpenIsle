@@ -50,7 +50,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         "http://192.168.7.98:*",
                         "http://30.211.97.238:*",
                         websiteUrl,
-                        websiteUrl.replace("://www.", "://")
+                        websiteUrl.replace("://www.", "://"),
 
                         // 线上域名（务必是 https）
                         "https://staging.open-isle.com",
