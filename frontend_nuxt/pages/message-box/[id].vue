@@ -8,13 +8,15 @@
     </div>
 
     <div class="messages-list" ref="messagesListEl">
-      <div v-if="loading" class="loading-container">加载中...</div>
+      <div v-if="loading" class="loading-container">
+        <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+      </div>
       <div v-else-if="error" class="error-container">{{ error }}</div>
       <template v-else>
         <div class="load-more-container" v-if="hasMoreMessages">
-          <button @click="loadMoreMessages" :disabled="loadingMore" class="load-more-button">
+          <div @click="loadMoreMessages" :disabled="loadingMore" class="load-more-button">
             {{ loadingMore ? '加载中...' : '查看更多消息' }}
-          </button>
+          </div>
         </div>
         <BaseTimeline :items="messages">
           <template #item="{ item }">
@@ -382,27 +384,21 @@ onUnmounted(() => {
   padding-bottom: 100px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
   margin-bottom: 10px;
 }
 
 .load-more-container {
   text-align: center;
-  margin-bottom: 20px;
 }
 
 .load-more-button {
-  background-color: var(--bg-color-soft);
-  border: 1px solid var(--border-color);
-  color: var(--text-color-primary);
-  padding: 8px 16px;
-  border-radius: 20px;
+  color: var(--primary-color);
+  font-size: 12px;
   cursor: pointer;
-  transition: background-color 0.2s;
 }
 
 .load-more-button:hover {
-  background-color: var(--border-color);
+  text-decoration: underline;
 }
 
 .message-item {
@@ -458,7 +454,13 @@ onUnmounted(() => {
   margin-right: 20px;
 }
 
-.loading-container,
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
 .error-container {
   text-align: center;
   padding: 50px;

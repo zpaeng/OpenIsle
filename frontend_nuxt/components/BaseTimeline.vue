@@ -41,6 +41,12 @@ export default {
   margin-top: 10px;
 }
 
+.timeline-item:hover {
+  background-color: var(--menu-selected-background-color);
+  transition: background-color 0.2s;
+  border-radius: 10px;
+}
+
 .timeline-icon {
   position: sticky;
   top: 0;

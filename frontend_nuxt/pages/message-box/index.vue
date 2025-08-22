@@ -12,7 +12,12 @@
       <div class="empty-text">暂无会话</div>
     </div>
 
+    <div v-if="!loading" class="search-container">
+      <SearchDropdown />
+    </div>
+
     <div
+      v-if="!loading"
       v-for="convo in conversations"
       :key="convo.id"
       class="conversation-item"
@@ -61,6 +66,7 @@ import { useWebSocket } from '~/composables/useWebSocket'
 import { useUnreadCount } from '~/composables/useUnreadCount'
 import TimeManager from '~/utils/time'
 import { stripMarkdownLength } from '~/utils/markdown'
+import SearchDropdown from '~/components/SearchDropdown.vue'
 
 const config = useRuntimeConfig()
 const conversations = ref([])
@@ -167,6 +173,10 @@ function goToConversation(id) {
   justify-content: center;
   align-items: center;
   height: 300px;
+}
+
+.search-container {
+  margin-bottom: 24px;
 }
 
 .messages-header {
