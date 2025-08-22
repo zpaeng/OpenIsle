@@ -6,10 +6,7 @@
           <button class="menu-btn" ref="menuBtn" @click="$emit('toggle-menu')">
             <i class="fas fa-bars"></i>
           </button>
-          <span
-            v-if="isMobile && (messageUnreadCount > 0 || channelUnreadCount > 0)"
-            class="menu-unread-dot"
-          ></span>
+          <span v-if="isMobile && unreadMessageCount > 0" class="menu-unread-dot"></span>
         </div>
         <NuxtLink class="logo-container" :to="`/`" @click="refrechData">
           <img
@@ -53,10 +50,9 @@
           <ToolTip v-if="isLogin" content="站内信和频道" placement="bottom">
             <div class="messages-icon" @click="goToMessages">
               <i class="fas fa-comments"></i>
-              <span v-if="messageUnreadCount > 0" class="unread-badge">
-                {{ messageUnreadCount }}
-              </span>
-              <span v-else-if="channelUnreadCount > 0" class="messages-unread-dot"></span>
+              <span v-if="unreadMessageCount > 0" class="unread-badge">{{
+                unreadMessageCount
+              }}</span>
             </div>
           </ToolTip>
 
@@ -106,10 +102,7 @@ const props = defineProps({
 
 const isLogin = computed(() => authState.loggedIn)
 const isMobile = useIsMobile()
-const { count: totalUnreadCount, channelUnreadCount, fetchUnreadCount } = useUnreadCount()
-const messageUnreadCount = computed(() =>
-  Math.max(totalUnreadCount.value - channelUnreadCount.value, 0),
-)
+const { count: unreadMessageCount, fetchUnreadCount } = useUnreadCount()
 const avatar = ref('')
 const showSearch = ref(false)
 const searchDropdown = ref(null)
@@ -418,16 +411,6 @@ onMounted(async () => {
   min-width: 16px;
   text-align: center;
   box-sizing: border-box;
-}
-
-.messages-unread-dot {
-  position: absolute;
-  top: -2px;
-  right: -4px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #ff4d4f;
 }
 
 .rss-icon {
