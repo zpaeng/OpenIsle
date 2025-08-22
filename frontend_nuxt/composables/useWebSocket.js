@@ -13,7 +13,7 @@ const connect = (token) => {
 
   const config = useRuntimeConfig()
   const API_BASE_URL = config.public.apiBaseUrl
-  const socketUrl = `${API_BASE_URL}/api/ws`
+  const socketUrl = `${API_BASE_URL}/api/sockjs`
 
   const socket = new SockJS(socketUrl)
   const stompClient = new Client({
