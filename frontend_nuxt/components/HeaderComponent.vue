@@ -6,7 +6,10 @@
           <button class="menu-btn" ref="menuBtn" @click="$emit('toggle-menu')">
             <i class="fas fa-bars"></i>
           </button>
-          <span v-if="isMobile && unreadMessageCount > 0" class="menu-unread-dot"></span>
+          <span
+            v-if="isMobile && (unreadMessageCount > 0 || hasChannelUnread)"
+            class="menu-unread-dot"
+          ></span>
         </div>
         <NuxtLink class="logo-container" :to="`/`" @click="refrechData">
           <img
@@ -53,6 +56,7 @@
               <span v-if="unreadMessageCount > 0" class="unread-badge">{{
                 unreadMessageCount
               }}</span>
+              <span v-else-if="hasChannelUnread" class="unread-dot"></span>
             </div>
           </ToolTip>
 
@@ -85,6 +89,7 @@ import ToolTip from '~/components/ToolTip.vue'
 import SearchDropdown from '~/components/SearchDropdown.vue'
 import { authState, clearToken, loadCurrentUser } from '~/utils/auth'
 import { useUnreadCount } from '~/composables/useUnreadCount'
+import { useChannelsUnreadCount } from '~/composables/useChannelsUnreadCount'
 import { useIsMobile } from '~/utils/screen'
 import { themeState, cycleTheme, ThemeMode } from '~/utils/theme'
 import { toast } from '~/main'
@@ -103,6 +108,7 @@ const props = defineProps({
 const isLogin = computed(() => authState.loggedIn)
 const isMobile = useIsMobile()
 const { count: unreadMessageCount, fetchUnreadCount } = useUnreadCount()
+const { hasUnread: hasChannelUnread, fetchChannelUnread } = useChannelsUnreadCount()
 const avatar = ref('')
 const showSearch = ref(false)
 const searchDropdown = ref(null)
@@ -227,8 +233,10 @@ onMounted(async () => {
   }
   const updateUnread = async () => {
     if (authState.loggedIn) {
-      // Initialize the unread count composable
       fetchUnreadCount()
+      fetchChannelUnread()
+    } else {
+      fetchChannelUnread()
     }
   }
 
@@ -411,6 +419,16 @@ onMounted(async () => {
   min-width: 16px;
   text-align: center;
   box-sizing: border-box;
+}
+
+.unread-dot {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ff4d4f;
 }
 
 .rss-icon {

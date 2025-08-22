@@ -82,6 +82,52 @@ public class MessageService {
         return message;
     }
 
+    @Transactional
+    public Message sendMessageToConversation(Long senderId, Long conversationId, String content) {
+        User sender = userRepository.findById(senderId)
+                .orElseThrow(() -> new IllegalArgumentException("Sender not found"));
+        MessageConversation conversation = conversationRepository.findById(conversationId)
+                .orElseThrow(() -> new IllegalArgumentException("Conversation not found"));
+
+        // Join the conversation if not already a participant (useful for channels)
+        participantRepository.findByConversationIdAndUserId(conversationId, senderId)
+                .orElseGet(() -> {
+                    MessageParticipant p = new MessageParticipant();
+                    p.setConversation(conversation);
+                    p.setUser(sender);
+                    return participantRepository.save(p);
+                });
+
+        Message message = new Message();
+        message.setConversation(conversation);
+        message.setSender(sender);
+        message.setContent(content);
+        message = messageRepository.save(message);
+
+        conversation.setLastMessage(message);
+        conversationRepository.save(conversation);
+
+        MessageDto messageDto = toDto(message);
+        String conversationDestination = "/topic/conversation/" + conversation.getId();
+        messagingTemplate.convertAndSend(conversationDestination, messageDto);
+
+        // Notify all participants except sender for updates
+        for (MessageParticipant participant : conversation.getParticipants()) {
+            if (participant.getUser().getId().equals(senderId)) continue;
+            String userDestination = "/topic/user/" + participant.getUser().getId() + "/messages";
+            messagingTemplate.convertAndSend(userDestination, messageDto);
+
+            long unreadCount = getUnreadMessageCount(participant.getUser().getId());
+            String username = participant.getUser().getUsername();
+            messagingTemplate.convertAndSendToUser(username, "/queue/unread-count", unreadCount);
+
+            long channelUnread = getUnreadChannelCount(participant.getUser().getId());
+            messagingTemplate.convertAndSendToUser(username, "/queue/channel-unread", channelUnread);
+        }
+
+        return message;
+    }
+
     private MessageDto toDto(Message message) {
         MessageDto dto = new MessageDto();
         dto.setId(message.getId());
@@ -108,7 +154,8 @@ public class MessageService {
 
     private MessageConversation findOrCreateConversation(User user1, User user2) {
         log.info("Searching for existing conversation between {} and {}", user1.getUsername(), user2.getUsername());
-        return conversationRepository.findConversationByUsers(user1, user2)
+        return conversationRepository.findConversationsByUsers(user1, user2).stream()
+                .findFirst()
                 .orElseGet(() -> {
                     log.info("No existing conversation found. Creating a new one.");
                     MessageConversation conversation = new MessageConversation();
@@ -134,12 +181,18 @@ public class MessageService {
     @Transactional(readOnly = true)
     public List<ConversationDto> getConversations(Long userId) {
         List<MessageConversation> conversations = conversationRepository.findConversationsByUserIdOrderByLastMessageDesc(userId);
-        return conversations.stream().map(c -> toDto(c, userId)).collect(Collectors.toList());
+        return conversations.stream()
+                .filter(c -> !c.isChannel())
+                .map(c -> toDto(c, userId))
+                .collect(Collectors.toList());
     }
 
     private ConversationDto toDto(MessageConversation conversation, Long userId) {
         ConversationDto dto = new ConversationDto();
         dto.setId(conversation.getId());
+        dto.setChannel(conversation.isChannel());
+        dto.setName(conversation.getName());
+        dto.setAvatar(conversation.getAvatar());
         dto.setCreatedAt(conversation.getCreatedAt());
         if (conversation.getLastMessage() != null) {
             dto.setLastMessage(toDto(conversation.getLastMessage()));
@@ -189,6 +242,9 @@ public class MessageService {
 
         ConversationDetailDto detailDto = new ConversationDetailDto();
         detailDto.setId(conversation.getId());
+        detailDto.setName(conversation.getName());
+        detailDto.setChannel(conversation.isChannel());
+        detailDto.setAvatar(conversation.getAvatar());
         detailDto.setParticipants(participants);
         detailDto.setMessages(messageDtoPage);
 
@@ -208,10 +264,26 @@ public class MessageService {
         List<MessageParticipant> participations = participantRepository.findByUserId(userId);
         long totalUnreadCount = 0;
         for (MessageParticipant p : participations) {
+            if (p.getConversation().isChannel()) continue;
             LocalDateTime lastRead = p.getLastReadAt() == null ? LocalDateTime.of(1970, 1, 1, 0, 0) : p.getLastReadAt();
             // 只计算别人发送给当前用户的未读消息
             totalUnreadCount += messageRepository.countByConversationIdAndCreatedAtAfterAndSenderIdNot(p.getConversation().getId(), lastRead, userId);
         }
         return totalUnreadCount;
+    }
+
+    @Transactional(readOnly = true)
+    public long getUnreadChannelCount(Long userId) {
+        List<MessageParticipant> participations = participantRepository.findByUserId(userId);
+        long unreadChannelCount = 0;
+        for (MessageParticipant p : participations) {
+            if (!p.getConversation().isChannel()) continue;
+            LocalDateTime lastRead = p.getLastReadAt() == null ? LocalDateTime.of(1970, 1, 1, 0, 0) : p.getLastReadAt();
+            long unread = messageRepository.countByConversationIdAndCreatedAtAfterAndSenderIdNot(p.getConversation().getId(), lastRead, userId);
+            if (unread > 0) {
+                unreadChannelCount++;
+            }
+        }
+        return unreadChannelCount;
     }
 }

@@ -1,31 +1,47 @@
 <template>
   <div class="chat-container">
-    <div v-if="!loading && otherParticipant" class="chat-header">
+    <div v-if="!loading" class="chat-header">
       <NuxtLink to="/message-box" class="back-button">
         <i class="fas fa-arrow-left"></i>
       </NuxtLink>
-      <h2 class="participant-name">{{ otherParticipant.username }}</h2>
+      <h2 class="participant-name">
+        {{ isChannel ? conversationName : otherParticipant?.username }}
+      </h2>
     </div>
 
     <div class="messages-list" ref="messagesListEl">
-      <div v-if="loading" class="loading-container">加载中...</div>
+      <div v-if="loading" class="loading-container">
+        <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+      </div>
       <div v-else-if="error" class="error-container">{{ error }}</div>
       <template v-else>
         <div class="load-more-container" v-if="hasMoreMessages">
-          <button @click="loadMoreMessages" :disabled="loadingMore" class="load-more-button">
+          <div @click="loadMoreMessages" :disabled="loadingMore" class="load-more-button">
             {{ loadingMore ? '加载中...' : '查看更多消息' }}
-          </button>
+          </div>
         </div>
         <BaseTimeline :items="messages">
           <template #item="{ item }">
-            <div class="message-timestamp">
-              {{ TimeManager.format(item.createdAt) }}
+            <div class="message-header">
+              <div class="user-name">
+                {{ item.sender.username }}
+              </div>
+              <div class="message-timestamp">
+                {{ TimeManager.format(item.createdAt) }}
+              </div>
             </div>
             <div class="message-content">
               <div class="info-content-text" v-html="renderMarkdown(item.content)"></div>
             </div>
           </template>
         </BaseTimeline>
+        <div class="empty-container">
+          <BasePlaceholder
+            v-if="messages.length === 0"
+            text="暂无会话，发送消息试试 🎉"
+            icon="fas fa-inbox"
+          />
+        </div>
       </template>
     </div>
 
@@ -53,14 +69,17 @@ import { renderMarkdown } from '~/utils/markdown'
 import MessageEditor from '~/components/MessageEditor.vue'
 import { useWebSocket } from '~/composables/useWebSocket'
 import { useUnreadCount } from '~/composables/useUnreadCount'
+import { useChannelsUnreadCount } from '~/composables/useChannelsUnreadCount'
 import TimeManager from '~/utils/time'
 import BaseTimeline from '~/components/BaseTimeline.vue'
+import BasePlaceholder from '~/components/BasePlaceholder.vue'
 
 const config = useRuntimeConfig()
 const route = useRoute()
 const API_BASE_URL = config.public.apiBaseUrl
 const { connect, disconnect, subscribe, isConnected } = useWebSocket()
 const { fetchUnreadCount: refreshGlobalUnreadCount } = useUnreadCount()
+const { fetchChannelUnread: refreshChannelUnread } = useChannelsUnreadCount()
 let subscription = null
 
 const messages = ref([])
@@ -76,11 +95,13 @@ const currentPage = ref(0)
 const totalPages = ref(0)
 const loadingMore = ref(false)
 let scrollInterval = null
+const conversationName = ref('')
+const isChannel = ref(false)
 
 const hasMoreMessages = computed(() => currentPage.value < totalPages.value - 1)
 
 const otherParticipant = computed(() => {
-  if (!currentUser.value || participants.value.length === 0) {
+  if (isChannel.value || !currentUser.value || participants.value.length === 0) {
     return null
   }
   return participants.value.find((p) => p.id !== currentUser.value.id)
@@ -126,6 +147,8 @@ async function fetchMessages(page = 0) {
 
     if (page === 0) {
       participants.value = conversationData.participants
+      conversationName.value = conversationData.name
+      isChannel.value = conversationData.channel
     }
 
     // Since the backend sorts by descending, we need to reverse for correct chat order
@@ -172,27 +195,40 @@ async function loadMoreMessages() {
 
 async function sendMessage(content, clearInput) {
   if (!content.trim()) return
-
-  const recipient = otherParticipant.value
-  if (!recipient) {
-    toast.error('无法确定收信人')
-    return
-  }
-
   sending.value = true
   const token = getToken()
   try {
-    const response = await fetch(`${API_BASE_URL}/api/messages`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        recipientId: recipient.id,
-        content: content,
-      }),
-    })
+    let response
+    if (isChannel.value) {
+      response = await fetch(
+        `${API_BASE_URL}/api/messages/conversations/${conversationId}/messages`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ content }),
+        },
+      )
+    } else {
+      const recipient = otherParticipant.value
+      if (!recipient) {
+        toast.error('无法确定收信人')
+        return
+      }
+      response = await fetch(`${API_BASE_URL}/api/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          recipientId: recipient.id,
+          content: content,
+        }),
+      })
+    }
     if (!response.ok) throw new Error('发送失败')
 
     const newMessage = await response.json()
@@ -224,6 +260,7 @@ async function markConversationAsRead() {
     })
     // After marking as read, refresh the global unread count
     refreshGlobalUnreadCount()
+    refreshChannelUnread()
   } catch (e) {
     console.error('Failed to mark conversation as read', e)
   }
@@ -382,27 +419,21 @@ onUnmounted(() => {
   padding-bottom: 100px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
   margin-bottom: 10px;
 }
 
 .load-more-container {
   text-align: center;
-  margin-bottom: 20px;
 }
 
 .load-more-button {
-  background-color: var(--bg-color-soft);
-  border: 1px solid var(--border-color);
-  color: var(--text-color-primary);
-  padding: 8px 16px;
-  border-radius: 20px;
+  color: var(--primary-color);
+  font-size: 12px;
   cursor: pointer;
-  transition: background-color 0.2s;
 }
 
 .load-more-button:hover {
-  background-color: var(--border-color);
+  text-decoration: underline;
 }
 
 .message-item {
@@ -425,8 +456,20 @@ onUnmounted(() => {
 .message-timestamp {
   font-size: 11px;
   color: var(--text-color-secondary);
-  margin-top: 5px;
   opacity: 0.6;
+}
+
+.message-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-color);
 }
 
 .message-item.sent {
@@ -458,7 +501,13 @@ onUnmounted(() => {
   margin-right: 20px;
 }
 
-.loading-container,
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
 .error-container {
   text-align: center;
   padding: 50px;

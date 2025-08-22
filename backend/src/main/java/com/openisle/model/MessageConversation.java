@@ -20,6 +20,18 @@ public class MessageConversation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Indicates whether this conversation represents a public channel
+    @Column(nullable = false)
+    private boolean channel = false;
+
+    // Channel metadata
+    private String name;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    private String avatar;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

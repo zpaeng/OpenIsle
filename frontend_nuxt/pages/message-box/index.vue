@@ -1,50 +1,111 @@
 <template>
   <div class="messages-container">
-    <div v-if="loading" class="loading-message">
-      <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+    <div class="tabs">
+      <div :class="['tab', { active: activeTab === 'messages' }]" @click="activeTab = 'messages'">
+        站内信
+      </div>
+      <div :class="['tab', { active: activeTab === 'channels' }]" @click="switchToChannels">
+        频道
+      </div>
     </div>
 
-    <div v-else-if="error" class="error-container">
-      <div class="error-text">{{ error }}</div>
-    </div>
-
-    <div v-else-if="conversations.length === 0" class="empty-container">
-      <div class="empty-text">暂无会话</div>
-    </div>
-
-    <div
-      v-for="convo in conversations"
-      :key="convo.id"
-      class="conversation-item"
-      @click="goToConversation(convo.id)"
-    >
-      <div class="conversation-avatar">
-        <img
-          :src="getOtherParticipant(convo)?.avatar || '/default-avatar.svg'"
-          :alt="getOtherParticipant(convo)?.username || '用户'"
-          class="avatar-img"
-          @error="handleAvatarError"
-        />
+    <div v-if="activeTab === 'messages'">
+      <div v-if="loading" class="loading-message">
+        <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
       </div>
 
-      <div class="conversation-content">
-        <div class="conversation-header">
-          <div class="participant-name">
-            {{ getOtherParticipant(convo)?.username || '未知用户' }}
-          </div>
-          <div class="message-time">
-            {{ formatTime(convo.lastMessage?.createdAt || convo.createdAt) }}
-          </div>
+      <div v-else-if="error" class="error-container">
+        <div class="error-text">{{ error }}</div>
+      </div>
+
+      <div v-if="!loading" class="search-container">
+        <SearchPersonDropdown />
+      </div>
+
+      <div v-if="!loading && conversations.length === 0" class="empty-container">
+        <BasePlaceholder v-if="conversations.length === 0" text="暂无会话" icon="fas fa-inbox" />
+      </div>
+
+      <div
+        v-if="!loading"
+        v-for="convo in conversations"
+        :key="convo.id"
+        class="conversation-item"
+        @click="goToConversation(convo.id)"
+      >
+        <div class="conversation-avatar">
+          <img
+            :src="getOtherParticipant(convo)?.avatar || '/default-avatar.svg'"
+            :alt="getOtherParticipant(convo)?.username || '用户'"
+            class="avatar-img"
+            @error="handleAvatarError"
+          />
         </div>
 
-        <div class="last-message-row">
-          <div class="last-message">
-            {{
-              convo.lastMessage ? stripMarkdownLength(convo.lastMessage.content, 100) : '暂无消息'
-            }}
+        <div class="conversation-content">
+          <div class="conversation-header">
+            <div class="participant-name">
+              {{ getOtherParticipant(convo)?.username || '未知用户' }}
+            </div>
+            <div class="message-time">
+              {{ formatTime(convo.lastMessage?.createdAt || convo.createdAt) }}
+            </div>
           </div>
-          <div v-if="convo.unreadCount > 0" class="unread-count-badge">
-            {{ convo.unreadCount }}
+
+          <div class="last-message-row">
+            <div class="last-message">
+              {{
+                convo.lastMessage ? stripMarkdownLength(convo.lastMessage.content, 100) : '暂无消息'
+              }}
+            </div>
+            <div v-if="convo.unreadCount > 0" class="unread-count-badge">
+              {{ convo.unreadCount }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-else>
+      <div v-if="loadingChannels" class="loading-message">
+        <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+      </div>
+      <div v-else>
+        <div v-if="channels.length === 0" class="empty-container">
+          <BasePlaceholder text="暂无频道" icon="fas fa-inbox" />
+        </div>
+        <div
+          v-for="ch in channels"
+          :key="ch.id"
+          class="conversation-item"
+          @click="goToChannel(ch.id)"
+        >
+          <div class="conversation-avatar">
+            <img
+              :src="ch.avatar || '/default-avatar.svg'"
+              :alt="ch.name"
+              class="avatar-img"
+              @error="handleAvatarError"
+            />
+          </div>
+          <div class="conversation-content">
+            <div class="conversation-header">
+              <div class="participant-name">
+                {{ ch.name }}
+                <span v-if="ch.unreadCount > 0" class="unread-dot"></span>
+              </div>
+              <div class="message-time">
+                {{ formatTime(ch.lastMessage?.createdAt || ch.createdAt) }}
+              </div>
+            </div>
+            <div class="last-message-row">
+              <div class="last-message">
+                {{
+                  ch.lastMessage ? stripMarkdownLength(ch.lastMessage.content, 100) : ch.description
+                }}
+              </div>
+              <div class="member-count">成员 {{ ch.memberCount }}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -59,8 +120,11 @@ import { getToken, fetchCurrentUser } from '~/utils/auth'
 import { toast } from '~/main'
 import { useWebSocket } from '~/composables/useWebSocket'
 import { useUnreadCount } from '~/composables/useUnreadCount'
+import { useChannelsUnreadCount } from '~/composables/useChannelsUnreadCount'
 import TimeManager from '~/utils/time'
 import { stripMarkdownLength } from '~/utils/markdown'
+import SearchPersonDropdown from '~/components/SearchPersonDropdown.vue'
+import BasePlaceholder from '~/components/BasePlaceholder.vue'
 
 const config = useRuntimeConfig()
 const conversations = ref([])
@@ -71,7 +135,13 @@ const currentUser = ref(null)
 const API_BASE_URL = config.public.apiBaseUrl
 const { connect, disconnect, subscribe, isConnected } = useWebSocket()
 const { fetchUnreadCount: refreshGlobalUnreadCount } = useUnreadCount()
+const { fetchChannelUnread: refreshChannelUnread, setFromList: setChannelUnreadFromList } =
+  useChannelsUnreadCount()
 let subscription = null
+
+const activeTab = ref('messages')
+const channels = ref([])
+const loadingChannels = ref(false)
 
 async function fetchConversations() {
   const token = getToken()
@@ -113,6 +183,52 @@ function handleAvatarError(event) {
   event.target.src = '/default-avatar.svg'
 }
 
+async function fetchChannels() {
+  const token = getToken()
+  if (!token) {
+    toast.error('请先登录')
+    return
+  }
+  loadingChannels.value = true
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/channels`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!response.ok) throw new Error('无法加载频道')
+    const data = await response.json()
+    channels.value = data
+    setChannelUnreadFromList(data)
+  } catch (e) {
+    toast.error(e.message)
+  } finally {
+    loadingChannels.value = false
+  }
+}
+
+function switchToChannels() {
+  activeTab.value = 'channels'
+  if (channels.value.length === 0) {
+    fetchChannels()
+  }
+}
+
+async function goToChannel(id) {
+  const token = getToken()
+  if (!token) {
+    toast.error('请先登录')
+    return
+  }
+  try {
+    await fetch(`${API_BASE_URL}/api/channels/${id}/join`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    router.push(`/message-box/${id}`)
+  } catch (e) {
+    toast.error(e.message)
+  }
+}
+
 onActivated(async () => {
   loading.value = true
   currentUser.value = await fetchCurrentUser()
@@ -120,6 +236,7 @@ onActivated(async () => {
   if (currentUser.value) {
     await fetchConversations()
     refreshGlobalUnreadCount() // Refresh global count when entering the list
+    refreshChannelUnread()
     const token = getToken()
     if (token && !isConnected.value) {
       connect(token)
@@ -140,6 +257,9 @@ watch(isConnected, (newValue) => {
 
     subscription = subscribe(destination, (message) => {
       fetchConversations()
+      if (activeTab.value === 'channels') {
+        fetchChannels()
+      }
     })
   }
 })
@@ -158,8 +278,22 @@ function goToConversation(id) {
 
 <style scoped>
 .messages-container {
-  margin: 0 auto;
-  padding: 20px;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--normal-border-color);
+  margin-bottom: 16px;
+}
+
+.tab {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.tab.active {
+  font-weight: 600;
+  border-bottom: 2px solid var(--primary-color);
 }
 
 .loading-message {
@@ -167,6 +301,12 @@ function goToConversation(id) {
   justify-content: center;
   align-items: center;
   height: 300px;
+}
+
+.search-container {
+  margin-bottom: 24px;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 .messages-header {
@@ -206,6 +346,8 @@ function goToConversation(id) {
 .conversation-item {
   display: flex;
   align-items: center;
+  margin-left: 20px;
+  margin-right: 20px;
   padding: 8px 10px;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -245,6 +387,12 @@ function goToConversation(id) {
   color: var(--text-color);
 }
 
+.member-count {
+  font-size: 12px;
+  color: gray;
+  flex-shrink: 0;
+}
+
 .message-time {
   font-size: 12px;
   color: gray;
@@ -280,10 +428,20 @@ function goToConversation(id) {
   flex-shrink: 0;
 }
 
+.unread-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: #f56c6c;
+  border-radius: 50%;
+  margin-left: 4px;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .messages-container {
-    padding: 10px 10px;
+  .conversation-item {
+    margin-left: 10px;
+    margin-right: 10px;
   }
 
   .messages-title {
