@@ -41,21 +41,36 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // ① 原生 WebSocket 端点：用 patterns，抗 www/端口漂移
+        // 1) 原生 WebSocket（不带 SockJS）
         registry.addEndpoint("/api/ws")
                 .setAllowedOriginPatterns(
-                        // 本地
-                        "http://localhost:*",
-                        "http://127.0.0.1:*",
-                        "http://192.168.7.98:*",
-                        "http://30.211.97.238:*",
-                        // 线上
                         "https://staging.open-isle.com",
                         "https://www.staging.open-isle.com",
                         websiteUrl,
-                        websiteUrl.replace("://www.", "://")
-                ).withSockJS().setWebSocketEnabled(true).setSessionCookieNeeded(false);
+                        websiteUrl.replace("://www.", "://"),
+                        "http://localhost:*",
+                        "http://127.0.0.1:*",
+                        "http://192.168.7.98:*",
+                        "http://30.211.97.238:*"
+                );
+
+        // 2) SockJS 回退：单独路径
+        registry.addEndpoint("/api/sockjs")
+                .setAllowedOriginPatterns(
+                        "https://staging.open-isle.com",
+                        "https://www.staging.open-isle.com",
+                        websiteUrl,
+                        websiteUrl.replace("://www.", "://"),
+                        "http://localhost:*",
+                        "http://127.0.0.1:*",
+                        "http://192.168.7.98:*",
+                        "http://30.211.97.238:*"
+                )
+                .withSockJS()
+                .setWebSocketEnabled(true)
+                .setSessionCookieNeeded(false);
     }
+
 
 
     @Override
