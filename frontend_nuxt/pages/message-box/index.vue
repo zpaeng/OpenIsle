@@ -117,6 +117,7 @@ import { getToken, fetchCurrentUser } from '~/utils/auth'
 import { toast } from '~/main'
 import { useWebSocket } from '~/composables/useWebSocket'
 import { useUnreadCount } from '~/composables/useUnreadCount'
+import { useChannelUnread } from '~/composables/useChannelUnread'
 import TimeManager from '~/utils/time'
 import { stripMarkdownLength } from '~/utils/markdown'
 import SearchPersonDropdown from '~/components/SearchPersonDropdown.vue'
@@ -131,6 +132,8 @@ const currentUser = ref(null)
 const API_BASE_URL = config.public.apiBaseUrl
 const { connect, disconnect, subscribe, isConnected } = useWebSocket()
 const { fetchUnreadCount: refreshGlobalUnreadCount } = useUnreadCount()
+const { fetchChannelUnread: refreshChannelUnread, setFromList: setChannelUnreadFromList } =
+  useChannelUnread()
 let subscription = null
 
 const activeTab = ref('messages')
@@ -189,7 +192,9 @@ async function fetchChannels() {
       headers: { Authorization: `Bearer ${token}` },
     })
     if (!response.ok) throw new Error('无法加载频道')
-    channels.value = await response.json()
+    const data = await response.json()
+    channels.value = data
+    setChannelUnreadFromList(data)
   } catch (e) {
     toast.error(e.message)
   } finally {
@@ -228,6 +233,7 @@ onActivated(async () => {
   if (currentUser.value) {
     await fetchConversations()
     refreshGlobalUnreadCount() // Refresh global count when entering the list
+    refreshChannelUnread()
     const token = getToken()
     if (token && !isConnected.value) {
       connect(token)

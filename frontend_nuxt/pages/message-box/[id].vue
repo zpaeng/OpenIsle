@@ -69,6 +69,7 @@ import { renderMarkdown } from '~/utils/markdown'
 import MessageEditor from '~/components/MessageEditor.vue'
 import { useWebSocket } from '~/composables/useWebSocket'
 import { useUnreadCount } from '~/composables/useUnreadCount'
+import { useChannelUnread } from '~/composables/useChannelUnread'
 import TimeManager from '~/utils/time'
 import BaseTimeline from '~/components/BaseTimeline.vue'
 import BasePlaceholder from '~/components/BasePlaceholder.vue'
@@ -78,6 +79,7 @@ const route = useRoute()
 const API_BASE_URL = config.public.apiBaseUrl
 const { connect, disconnect, subscribe, isConnected } = useWebSocket()
 const { fetchUnreadCount: refreshGlobalUnreadCount } = useUnreadCount()
+const { fetchChannelUnread: refreshChannelUnread } = useChannelUnread()
 let subscription = null
 
 const messages = ref([])
@@ -258,6 +260,7 @@ async function markConversationAsRead() {
     })
     // After marking as read, refresh the global unread count
     refreshGlobalUnreadCount()
+    refreshChannelUnread()
   } catch (e) {
     console.error('Failed to mark conversation as read', e)
   }
