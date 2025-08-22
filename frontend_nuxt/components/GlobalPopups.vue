@@ -7,6 +7,7 @@
       @close="closeMilkTeaPopup"
     />
     <NotificationSettingPopup :visible="showNotificationPopup" @close="closeNotificationPopup" />
+    <MessagePopup :visible="showMessagePopup" @close="closeMessagePopup" />
     <MedalPopup :visible="showMedalPopup" :medals="newMedals" @close="closeMedalPopup" />
 
     <ActivityPopup
@@ -22,6 +23,7 @@
 import ActivityPopup from '~/components/ActivityPopup.vue'
 import MedalPopup from '~/components/MedalPopup.vue'
 import NotificationSettingPopup from '~/components/NotificationSettingPopup.vue'
+import MessagePopup from '~/components/MessagePopup.vue'
 import { authState } from '~/utils/auth'
 
 const config = useRuntimeConfig()
@@ -33,6 +35,7 @@ const milkTeaIcon = ref('')
 const inviteCodeIcon = ref('')
 
 const showNotificationPopup = ref(false)
+const showMessagePopup = ref(false)
 const showMedalPopup = ref(false)
 const newMedals = ref([])
 
@@ -42,6 +45,9 @@ onMounted(async () => {
 
   await checkInviteCodeActivity()
   if (showInviteCodePopup.value) return
+
+  await checkMessageFeature()
+  if (showMessagePopup.value) return
 
   await checkNotificationSetting()
   if (showNotificationPopup.value) return
@@ -95,6 +101,18 @@ const closeMilkTeaPopup = () => {
   if (!import.meta.client) return
   localStorage.setItem('milkTeaActivityPopupShown', 'true')
   showMilkTeaPopup.value = false
+}
+
+const checkMessageFeature = async () => {
+  if (!import.meta.client) return
+  if (!authState.loggedIn) return
+  if (localStorage.getItem('messageFeaturePopupShown')) return
+  showMessagePopup.value = true
+}
+const closeMessagePopup = () => {
+  if (!import.meta.client) return
+  localStorage.setItem('messageFeaturePopupShown', 'true')
+  showMessagePopup.value = false
 }
 
 const checkNotificationSetting = async () => {
