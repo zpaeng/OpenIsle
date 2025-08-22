@@ -41,23 +41,43 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
+        // ① 原生 WebSocket 端点：用 patterns，抗 www/端口漂移
         registry.addEndpoint("/api/ws")
-                // 安全改进：使用具体的允许源，而不是通配符
-                .setAllowedOrigins(
-                        // 本地开发
+                .setAllowedOriginPatterns(
+                        // 本地
                         "http://localhost:*",
                         "http://127.0.0.1:*",
                         "http://192.168.7.98:*",
                         "http://30.211.97.238:*",
-                        websiteUrl,
-                        websiteUrl.replace("://www.", "://"),
-
-                        // 线上域名（务必是 https）
+                        // 线上
                         "https://staging.open-isle.com",
-                        "https://www.staging.open-isle.com"
-                )
-                .withSockJS();
+                        "https://www.staging.open-isle.com",
+                        websiteUrl,
+                        websiteUrl.replace("://www.", "://")
+                );
+
+        // ② SockJS 注册：要单独再配一次，且只能 exact，不支持 patterns
+        registry.addEndpoint("/api/ws")
+                .setAllowedOrigins(
+                        // 本地（端口要写死）
+                        "http://localhost:3000",
+                        "http://localhost:3001",
+                        "http://127.0.0.1:3000",
+                        "http://127.0.0.1:3001",
+                        "http://192.168.7.98",
+                        "http://192.168.7.98:3000",
+                        "http://30.211.97.238",
+                        "http://30.211.97.238:3000",
+                        // 线上
+                        "https://staging.open-isle.com",
+                        "https://www.staging.open-isle.com",
+                        websiteUrl,
+                        websiteUrl.replace("://www.", "://")
+                )                .withSockJS()
+                .setSessionCookieNeeded(false) // 避免强依赖 JSESSIONID
+                .setWebSocketEnabled(true);
     }
+
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
