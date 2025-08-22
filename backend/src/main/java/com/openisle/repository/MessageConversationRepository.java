@@ -11,8 +11,11 @@ import java.util.List;
 
 @Repository
 public interface MessageConversationRepository extends JpaRepository<MessageConversation, Long> {
-    @Query("SELECT c FROM MessageConversation c JOIN c.participants p1 JOIN c.participants p2 " +
-           "WHERE p1.user = :user1 AND p2.user = :user2 ORDER BY c.createdAt DESC")
+    @Query("SELECT c FROM MessageConversation c " +
+           "WHERE c.channel = false AND size(c.participants) = 2 " +
+           "AND EXISTS (SELECT 1 FROM c.participants p1 WHERE p1.user = :user1) " +
+           "AND EXISTS (SELECT 1 FROM c.participants p2 WHERE p2.user = :user2) " +
+           "ORDER BY c.createdAt DESC")
     List<MessageConversation> findConversationsByUsers(@Param("user1") User user1, @Param("user2") User user2);
     
     @Query("SELECT DISTINCT c FROM MessageConversation c " +
