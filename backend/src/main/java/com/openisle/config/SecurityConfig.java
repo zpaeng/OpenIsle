@@ -175,7 +175,7 @@ public class SecurityConfig {
                         return;
                     }
                 } else if (!uri.startsWith("/api/auth") && !publicGet
-                        && !uri.startsWith("/api/ws") && !uri.startsWith("/api/sockjs") {
+                        && !uri.startsWith("/api/ws") && !uri.startsWith("/api/sockjs")) {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json");
                     response.getWriter().write("{\"error\": \"Missing token\"}");
