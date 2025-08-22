@@ -28,6 +28,13 @@
             </div>
           </template>
         </BaseTimeline>
+        <div class="empty-container">
+          <BasePlaceholder
+            v-if="messages.length === 0"
+            text="暂无会话，发送消息试试 🎉"
+            icon="fas fa-inbox"
+          />
+        </div>
       </template>
     </div>
 
@@ -57,6 +64,7 @@ import { useWebSocket } from '~/composables/useWebSocket'
 import { useUnreadCount } from '~/composables/useUnreadCount'
 import TimeManager from '~/utils/time'
 import BaseTimeline from '~/components/BaseTimeline.vue'
+import BasePlaceholder from '~/components/BasePlaceholder.vue'
 
 const config = useRuntimeConfig()
 const route = useRoute()

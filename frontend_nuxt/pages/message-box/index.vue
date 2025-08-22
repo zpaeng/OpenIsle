@@ -8,12 +8,12 @@
       <div class="error-text">{{ error }}</div>
     </div>
 
-    <div v-else-if="conversations.length === 0" class="empty-container">
-      <div class="empty-text">暂无会话</div>
-    </div>
-
     <div v-if="!loading" class="search-container">
       <SearchPersonDropdown />
+    </div>
+
+    <div v-if="!loading && conversations.length === 0" class="empty-container">
+      <BasePlaceholder v-if="conversations.length === 0" text="暂无会话" icon="fas fa-inbox" />
     </div>
 
     <div
@@ -67,6 +67,7 @@ import { useUnreadCount } from '~/composables/useUnreadCount'
 import TimeManager from '~/utils/time'
 import { stripMarkdownLength } from '~/utils/markdown'
 import SearchPersonDropdown from '~/components/SearchPersonDropdown.vue'
+import BasePlaceholder from '~/components/BasePlaceholder.vue'
 
 const config = useRuntimeConfig()
 const conversations = ref([])
