@@ -44,20 +44,17 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/api/ws")
                 // 安全改进：使用具体的允许源，而不是通配符
                 .setAllowedOrigins(
-                    "http://127.0.0.1:8080",
-                    "http://127.0.0.1:3000",
-                    "http://127.0.0.1:3001",
-                    "http://127.0.0.1",
-                    "http://localhost:8080",
-                    "http://localhost:3000",
-                    "http://localhost:3001",
-                    "http://localhost",
-                    "http://30.211.97.238:3000",
-                    "http://30.211.97.238",
-                    "http://192.168.7.98",
-                    "http://192.168.7.98:3000",
-                    websiteUrl,
-                    websiteUrl.replace("://www.", "://")
+                        // 本地开发
+                        "http://localhost:*",
+                        "http://127.0.0.1:*",
+                        "http://192.168.7.98:*",
+                        "http://30.211.97.238:*",
+                        websiteUrl,
+                        websiteUrl.replace("://www.", "://")
+
+                        // 线上域名（务必是 https）
+                        "https://staging.open-isle.com",
+                        "https://www.staging.open-isle.com"
                 )
                 .withSockJS();
     }
