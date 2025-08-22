@@ -26,6 +26,9 @@
         <template v-else-if="medal.type === 'POST'">
           {{ medal.currentPostCount }}/{{ medal.targetPostCount }}
         </template>
+        <template v-else-if="medal.type === 'FEATURED'">
+          {{ medal.currentFeaturedCount }}/{{ medal.targetFeaturedCount }}
+        </template>
         <template v-else-if="medal.type === 'CONTRIBUTOR'">
           {{ medal.currentContributionLines }}/{{ medal.targetContributionLines }}
         </template>

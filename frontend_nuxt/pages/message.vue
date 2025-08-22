@@ -33,15 +33,13 @@
     <div v-if="selectedTab === 'control'">
       <div class="message-control-container">
         <div class="message-control-title">通知设置</div>
-        <div class="message-control-push-item-container">
-          <div
-            v-for="pref in notificationPrefs"
-            :key="pref.type"
-            class="message-control-push-item"
-            :class="{ select: pref.enabled }"
-            @click="togglePref(pref)"
-          >
-            {{ formatType(pref.type) }}
+        <div class="message-control-item-container">
+          <div v-for="pref in notificationPrefs" :key="pref.type" class="message-control-item">
+            <div class="message-control-item-label">{{ formatType(pref.type) }}</div>
+            <BaseSwitch
+              :model-value="pref.enabled"
+              @update:modelValue="(val) => togglePref(pref, val)"
+            />
           </div>
         </div>
       </div>
@@ -495,6 +493,37 @@
                     已被管理员拒绝
                   </NotificationContainer>
                 </template>
+                <template v-else-if="item.type === 'POST_FEATURED'">
+                  <NotificationContainer :item="item" :markRead="markRead">
+                    您的文章
+                    <NuxtLink
+                      class="notif-content-text"
+                      @click="markRead(item.id)"
+                      :to="`/posts/${item.post.id}`"
+                    >
+                      {{ stripMarkdownLength(item.post.title, 100) }}
+                    </NuxtLink>
+                    被收录为精选
+                  </NotificationContainer>
+                </template>
+                <template v-else-if="item.type === 'POST_DELETED'">
+                  <NotificationContainer :item="item" :markRead="markRead">
+                    管理员
+                    <template v-if="item.fromUser">
+                      <NuxtLink
+                        class="notif-content-text"
+                        @click="markRead(item.id)"
+                        :to="`/users/${item.fromUser.id}`"
+                      >
+                        {{ item.fromUser.username }}
+                      </NuxtLink>
+                    </template>
+                    删除了您的帖子
+                    <span class="notif-content-text">
+                      {{ stripMarkdownLength(item.content, 100) }}
+                    </span>
+                  </NotificationContainer>
+                </template>
                 <template v-else>
                   <NotificationContainer :item="item" :markRead="markRead">
                     {{ formatType(item.type) }}
@@ -524,7 +553,7 @@ import {
   fetchNotifications,
   fetchUnreadCount,
   isLoadingMessage,
-  markRead,
+  markNotificationRead,
   notifications,
   markAllRead,
   hasMore,
@@ -532,6 +561,7 @@ import {
   updateNotificationPreference,
 } from '~/utils/notification'
 import TimeManager from '~/utils/time'
+import BaseSwitch from '~/components/BaseSwitch.vue'
 
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
@@ -564,10 +594,10 @@ const fetchPrefs = async () => {
   notificationPrefs.value = await fetchNotificationPreferences()
 }
 
-const togglePref = async (pref) => {
-  const ok = await updateNotificationPreference(pref.type, !pref.enabled)
+const togglePref = async (pref, value) => {
+  const ok = await updateNotificationPreference(pref.type, value)
   if (ok) {
-    pref.enabled = !pref.enabled
+    pref.enabled = value
     await fetchNotifications({
       page: page.value,
       size: pageSize,
@@ -576,6 +606,14 @@ const togglePref = async (pref) => {
     await fetchUnreadCount()
   } else {
     toast.error('操作失败')
+  }
+}
+
+const markRead = async (id) => {
+  markNotificationRead(id)
+  if (selectedTab.value === 'unread') {
+    const index = notifications.value.findIndex((n) => n.id === id)
+    if (index !== -1) notifications.value.splice(index, 1)
   }
 }
 
@@ -647,6 +685,10 @@ const formatType = (t) => {
       return '抽奖中奖了'
     case 'LOTTERY_DRAW':
       return '抽奖已开奖'
+    case 'POST_DELETED':
+      return '帖子被删除'
+    case 'POST_FEATURED':
+      return '文章被精选'
     default:
       return t
   }
@@ -818,26 +860,21 @@ onActivated(async () => {
   padding: 20px;
 }
 
-.message-control-push-item-container {
+.message-control-item-container {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 10px;
 }
 
-.message-control-push-item {
-  font-size: 14px;
-  margin-bottom: 5px;
-  padding: 8px 16px;
-  border: 1px solid var(--normal-border-color);
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.message-control-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 200px;
 }
 
-.message-control-push-item.select {
-  background-color: var(--primary-color);
-  color: white;
+.message-control-item-label {
+  font-size: 14px;
 }
 
 @media (max-width: 768px) {

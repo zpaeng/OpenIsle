@@ -1,45 +1,18 @@
 <p align="center">
   <img alt="OpenIsle" src="https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/image.png" width="200">
-  <br><br>
-  高效的开源社区前后端端平台
-  <br><br>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square"></a>
+  <br>
+  高效的开源社区前后端平台
+  <br><br><br>
+  <img alt="Image" src="https://openisle-1307107697.cos.accelerate.myqcloud.com/dynamic_assert/22752cfac5a04a9c90c41995b9f55fed.png" width="1200">
 </p>
 
 ## 💡 简介
 
 OpenIsle 是一个使用 Spring Boot 和 Vue 3 构建的全栈开源社区平台，提供用户注册、登录、贴文发布、评论交互等完整功能，可用于项目社区或直接打造自主社区站点。
 
-## 🚧 开发
+## 🚧 开发 & 部署
 
-### 后端
-
-1. 确保安装 JDK 17 及 Maven
-2. 信息配置修改 `src/main/resources/application.properties`，或通过环境变量设置数据库等参数
-3. 执行 `mvn clean package` 生成包，之后使用 `java -jar target/openisle-0.0.1-SNAPSHOT.jar`启动，或在开发时直接使用 `mvn spring-boot:run`
-
-### 前端
-
-1. 进入前端目录
-    ```bash
-    cd frontend_nuxt
-    ```
-2. 安装依赖
-    ```bash
-    npm install
-    ```
-3. 启动开发服务
-    ```bash
-    npm run dev
-    ```
-
-    生产版本使用如下命令编译：
-
-    ```bash
-    npm run build
-    ```
-
-    会在 `.output` 目录生成文件，配合线上网站方式部署
+详细见 [Contributing](https://github.com/nagisa77/OpenIsle?tab=contributing-ov-file)
 
 ## ✨ 项目特点
 

@@ -38,10 +38,7 @@
         </div>
         <div class="form-row switch-row">
           <div class="setting-title">毛玻璃效果</div>
-          <label class="switch">
-            <input type="checkbox" v-model="frosted" />
-            <span class="slider"></span>
-          </label>
+          <BaseSwitch v-model="frosted" />
         </div>
       </div>
       <div v-if="role === 'ADMIN'" class="admin-section">
@@ -76,6 +73,7 @@ import { ref, onMounted, watch } from 'vue'
 import AvatarCropper from '~/components/AvatarCropper.vue'
 import BaseInput from '~/components/BaseInput.vue'
 import Dropdown from '~/components/Dropdown.vue'
+import BaseSwitch from '~/components/BaseSwitch.vue'
 import { toast } from '~/main'
 import { fetchCurrentUser, getToken, setToken } from '~/utils/auth'
 import { frostedState, setFrosted } from '~/utils/frosted'
@@ -316,51 +314,6 @@ const save = async () => {
   align-items: center;
   justify-content: space-between;
   max-width: 200px;
-}
-
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 40px;
-  height: 20px;
-}
-
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  transition: 0.2s;
-  border-radius: 20px;
-}
-
-.slider:before {
-  position: absolute;
-  content: '';
-  height: 16px;
-  width: 16px;
-  left: 2px;
-  bottom: 2px;
-  background-color: white;
-  transition: 0.2s;
-  border-radius: 50%;
-}
-
-input:checked + .slider {
-  background-color: var(--primary-color);
-}
-
-input:checked + .slider:before {
-  transform: translateX(20px);
 }
 
 .profile-section {

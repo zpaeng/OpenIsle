@@ -6,6 +6,7 @@ import com.openisle.dto.MedalDto;
 import com.openisle.dto.PostMedalDto;
 import com.openisle.dto.SeedUserMedalDto;
 import com.openisle.dto.PioneerMedalDto;
+import com.openisle.dto.FeaturedMedalDto;
 import com.openisle.model.MedalType;
 import com.openisle.model.User;
 import com.openisle.repository.CommentRepository;
@@ -74,6 +75,23 @@ public class MedalService {
         postMedal.setSelected(selected == MedalType.POST);
         medals.add(postMedal);
 
+        FeaturedMedalDto featuredMedal = new FeaturedMedalDto();
+        featuredMedal.setIcon("https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/icons/achi_rss.png");
+        featuredMedal.setTitle("精选作者");
+        featuredMedal.setDescription("至少有1篇文章被收录为精选");
+        featuredMedal.setType(MedalType.FEATURED);
+        featuredMedal.setTargetFeaturedCount(1);
+        if (user != null) {
+            long count = postRepository.countByAuthor_IdAndRssExcludedFalse(user.getId());
+            featuredMedal.setCurrentFeaturedCount(count);
+            featuredMedal.setCompleted(count >= 1);
+        } else {
+            featuredMedal.setCurrentFeaturedCount(0);
+            featuredMedal.setCompleted(false);
+        }
+        featuredMedal.setSelected(selected == MedalType.FEATURED);
+        medals.add(featuredMedal);
+
         ContributorMedalDto contributorMedal = new ContributorMedalDto();
         contributorMedal.setIcon("https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/icons/achi_coder.png");
         contributorMedal.setTitle("贡献者");
@@ -141,6 +159,8 @@ public class MedalService {
             user.setDisplayMedal(MedalType.COMMENT);
         } else if (postRepository.countByAuthor_Id(user.getId()) >= POST_TARGET) {
             user.setDisplayMedal(MedalType.POST);
+        } else if (postRepository.countByAuthor_IdAndRssExcludedFalse(user.getId()) >= 1) {
+            user.setDisplayMedal(MedalType.FEATURED);
         } else if (contributorService.getContributionLines(user.getUsername()) >= CONTRIBUTION_TARGET) {
             user.setDisplayMedal(MedalType.CONTRIBUTOR);
         } else if (userRepository.countByCreatedAtBefore(user.getCreatedAt()) < PIONEER_LIMIT) {
