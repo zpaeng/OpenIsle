@@ -154,7 +154,8 @@ public class MessageService {
 
     private MessageConversation findOrCreateConversation(User user1, User user2) {
         log.info("Searching for existing conversation between {} and {}", user1.getUsername(), user2.getUsername());
-        return conversationRepository.findConversationByUsers(user1, user2)
+        return conversationRepository.findConversationsByUsers(user1, user2).stream()
+                .findFirst()
                 .orElseGet(() -> {
                     log.info("No existing conversation found. Creating a new one.");
                     MessageConversation conversation = new MessageConversation();
