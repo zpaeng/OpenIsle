@@ -61,9 +61,9 @@ import { ref, onMounted, onUnmounted, watch, onActivated } from 'vue';
 import { useRouter } from 'vue-router';
 import { getToken, fetchCurrentUser } from '~/utils/auth'
 import { toast } from '~/main'
-import { formatMessageTime } from '~/utils/messageTime'
 import { useWebSocket } from '~/composables/useWebSocket';
 import { useUnreadCount } from '~/composables/useUnreadCount';
+import TimeManager from '~/utils/time'
 
 const config = useRuntimeConfig()
 const conversations = ref([]);
@@ -108,7 +108,7 @@ function getOtherParticipant(conversation) {
 // 格式化时间
 function formatTime(timeString) {
   if (!timeString) return ''
-  return formatMessageTime(timeString)
+  return TimeManager.format(timeString)
 }
 
 // 头像加载失败处理

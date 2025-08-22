@@ -34,7 +34,7 @@
               <div class="message-text" v-html="renderMarkdown(msg.content)"></div>
             </div>
             <div class="message-timestamp">
-              {{ formatMessageTime(msg.createdAt) }}
+              {{ TimeManager.format(msg.createdAt) }}
             </div>
           </div>
         </div>
@@ -55,11 +55,11 @@ import { ref, onMounted, onUnmounted, nextTick, computed, watch, onActivated, on
 import { useRoute } from 'vue-router';
 import { getToken, fetchCurrentUser } from '~/utils/auth';
 import { toast } from '~/main';
-import { formatMessageTime } from '~/utils/messageTime';
 import { renderMarkdown } from '~/utils/markdown';
 import MessageEditor from '~/components/MessageEditor.vue';
 import { useWebSocket } from '~/composables/useWebSocket';
 import { useUnreadCount } from '~/composables/useUnreadCount';
+import TimeManager from '~/utils/time'
 
 const config = useRuntimeConfig();
 const route = useRoute();

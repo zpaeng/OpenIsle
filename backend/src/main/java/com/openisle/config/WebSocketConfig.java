@@ -2,6 +2,7 @@ package com.openisle.config;
 
 import com.openisle.service.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -25,6 +26,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    @Value("${app.website-url}")
+    private String websiteUrl;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -39,7 +42,25 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // Registers the "/ws" endpoint, enabling SockJS fallback options so that alternate transports may be used if WebSocket is not available.
-        registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS();
+        registry.addEndpoint("/ws")
+                // 安全改进：使用具体的允许源，而不是通配符
+                .setAllowedOrigins(
+                    "http://127.0.0.1:8080",
+                    "http://127.0.0.1:3000",
+                    "http://127.0.0.1:3001",
+                    "http://127.0.0.1",
+                    "http://localhost:8080",
+                    "http://localhost:3000",
+                    "http://localhost:3001",
+                    "http://localhost",
+                    "http://30.211.97.238:3000",
+                    "http://30.211.97.238",
+                    "http://192.168.7.98",
+                    "http://192.168.7.98:3000",
+                    websiteUrl,
+                    websiteUrl.replace("://www.", "://")
+                )
+                .withSockJS();
     }
 
     @Override
