@@ -27,15 +27,11 @@
           >
             <i class="fas fa-user-minus"></i>
             取消关注
-         </div>
-         <div
-           v-if="!isMine"
-           class="profile-page-header-subscribe-button"
-           @click="sendMessage"
-         >
-           <i class="fas fa-paper-plane"></i>
-           发私信
-         </div>
+          </div>
+          <div v-if="!isMine" class="profile-page-header-subscribe-button" @click="sendMessage">
+            <i class="fas fa-paper-plane"></i>
+            发私信
+          </div>
           <LevelProgress
             :exp="levelInfo.exp"
             :current-level="levelInfo.currentLevel"
@@ -558,14 +554,14 @@ const sendMessage = async () => {
         recipientId: user.value.id,
       }),
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    });
-    const result = await response.json();
-    router.push(`/messages/${result.conversationId}`);
+    })
+    const result = await response.json()
+    router.push(`/message-box/${result.conversationId}`)
   } catch (e) {
-    toast.error('无法发起私信');
-    console.error(e);
+    toast.error('无法发起私信')
+    console.error(e)
   }
-};
+}
 
 const gotoTag = (tag) => {
   const value = encodeURIComponent(tag.id ?? tag.name)

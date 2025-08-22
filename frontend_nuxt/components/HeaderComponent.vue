@@ -50,7 +50,9 @@
           <ToolTip v-if="isLogin" content="站内信" placement="bottom">
             <div class="messages-icon" @click="goToMessages">
               <i class="fas fa-envelope"></i>
-              <span v-if="unreadMessageCount > 0" class="unread-badge">{{ unreadMessageCount }}</span>
+              <span v-if="unreadMessageCount > 0" class="unread-badge">{{
+                unreadMessageCount
+              }}</span>
             </div>
           </ToolTip>
 
@@ -193,14 +195,14 @@ const refrechData = async () => {
 }
 
 const goToMessages = () => {
-  navigateTo('/messages');
-};
+  navigateTo('/message-box')
+}
 
 const headerMenuItems = computed(() => [
   { text: '设置', onClick: goToSettings },
   { text: '个人主页', onClick: goToProfile },
   { text: '退出', onClick: goToLogout },
-]);
+])
 
 /** 其余逻辑保持不变 */
 const iconClass = computed(() => {
@@ -226,7 +228,7 @@ onMounted(async () => {
   const updateUnread = async () => {
     if (authState.loggedIn) {
       // Initialize the unread count composable
-      fetchUnreadCount();
+      fetchUnreadCount()
     }
   }
 
