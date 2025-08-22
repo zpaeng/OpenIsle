@@ -27,7 +27,15 @@
           >
             <i class="fas fa-user-minus"></i>
             取消关注
-          </div>
+         </div>
+         <div
+           v-if="!isMine"
+           class="profile-page-header-subscribe-button"
+           @click="sendMessage"
+         >
+           <i class="fas fa-paper-plane"></i>
+           发私信
+         </div>
           <LevelProgress
             :exp="levelInfo.exp"
             :current-level="levelInfo.currentLevel"
@@ -536,6 +544,28 @@ const unsubscribeUser = async () => {
     toast.error('操作失败')
   }
 }
+
+const sendMessage = async () => {
+  const token = getToken()
+  if (!token) {
+    toast.error('请先登录')
+    return
+  }
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/messages/conversations`, {
+      method: 'POST',
+      body: JSON.stringify({
+        recipientId: user.value.id,
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    });
+    const result = await response.json();
+    router.push(`/messages/${result.conversationId}`);
+  } catch (e) {
+    toast.error('无法发起私信');
+    console.error(e);
+  }
+};
 
 const gotoTag = (tag) => {
   const value = encodeURIComponent(tag.id ?? tag.name)

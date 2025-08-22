@@ -92,7 +92,7 @@ public class SecurityConfig {
         cfg.setAllowedHeaders(List.of("*"));
         cfg.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", cfg);
+        source.registerCorsConfiguration("/**", cfg);
         return source;
     }
 
@@ -104,6 +104,7 @@ public class SecurityConfig {
             .exceptionHandling(eh -> eh.accessDeniedHandler(customAccessDeniedHandler))
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    .requestMatchers("/ws/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
@@ -172,7 +173,7 @@ public class SecurityConfig {
                         response.getWriter().write("{\"error\": \"Invalid or expired token\"}");
                         return;
                     }
-                } else if (!uri.startsWith("/api/auth") && !publicGet) {
+                } else if (!uri.startsWith("/api/auth") && !publicGet && !uri.startsWith("/ws")) {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json");
                     response.getWriter().write("{\"error\": \"Missing token\"}");
