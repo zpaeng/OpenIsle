@@ -2,6 +2,7 @@ import Vditor from 'vditor'
 import { getToken, authState } from './auth'
 import { searchUsers, fetchFollowings, fetchAdmins } from './user'
 import { tiebaEmoji } from './tiebaEmoji'
+import vditorPostCitation from './vditorPostCitation.js'
 
 export function getEditorTheme() {
   return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'classic'
@@ -79,6 +80,7 @@ export function createVditor(editorId, options = {}) {
             }))
           },
         },
+        vditorPostCitation(API_BASE_URL),
       ],
     },
     cdn: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/vditor',
