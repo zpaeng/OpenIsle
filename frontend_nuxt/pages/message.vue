@@ -724,6 +724,7 @@ onActivated(async () => {
   justify-content: space-between;
   align-items: center;
   backdrop-filter: var(--blur-10);
+  border-bottom: 1px solid var(--normal-border-color);
 }
 
 .message-page-header-right {
@@ -837,7 +838,6 @@ onActivated(async () => {
 .message-tabs {
   display: flex;
   flex-direction: row;
-  border-bottom: 1px solid var(--normal-border-color);
 }
 
 .message-tab-item {

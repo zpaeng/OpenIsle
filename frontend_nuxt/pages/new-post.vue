@@ -16,7 +16,7 @@
           <div class="post-clear" @click="clearPost"><i class="fa-solid fa-eraser"></i> 清空</div>
           <div class="ai-generate" @click="aiGenerate">
             <i class="fa-solid fa-robot"></i>
-            md格式优化
+            MD 格式优化
           </div>
           <div class="post-draft" @click="saveDraft">
             <i class="fa-solid fa-floppy-disk"></i>
