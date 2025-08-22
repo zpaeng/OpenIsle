@@ -54,28 +54,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         "https://www.staging.open-isle.com",
                         websiteUrl,
                         websiteUrl.replace("://www.", "://")
-                );
-
-        // ② SockJS 注册：要单独再配一次，且只能 exact，不支持 patterns
-        registry.addEndpoint("/api/ws")
-                .setAllowedOrigins(
-                        // 本地（端口要写死）
-                        "http://localhost:3000",
-                        "http://localhost:3001",
-                        "http://127.0.0.1:3000",
-                        "http://127.0.0.1:3001",
-                        "http://192.168.7.98",
-                        "http://192.168.7.98:3000",
-                        "http://30.211.97.238",
-                        "http://30.211.97.238:3000",
-                        // 线上
-                        "https://staging.open-isle.com",
-                        "https://www.staging.open-isle.com",
-                        websiteUrl,
-                        websiteUrl.replace("://www.", "://")
-                )                .withSockJS()
-                .setSessionCookieNeeded(false) // 避免强依赖 JSESSIONID
-                .setWebSocketEnabled(true);
+                ).withSockJS().setWebSocketEnabled(true).setSessionCookieNeeded(false);
     }
 
 
