@@ -22,8 +22,13 @@
         </div>
         <BaseTimeline :items="messages">
           <template #item="{ item }">
-            <div class="message-timestamp">
-              {{ TimeManager.format(item.createdAt) }}
+            <div class="message-header">
+              <div class="user-name">
+                {{ item.sender.username }}
+              </div>
+              <div class="message-timestamp">
+                {{ TimeManager.format(item.createdAt) }}
+              </div>
             </div>
             <div class="message-content">
               <div class="info-content-text" v-html="renderMarkdown(item.content)"></div>
@@ -448,8 +453,20 @@ onUnmounted(() => {
 .message-timestamp {
   font-size: 11px;
   color: var(--text-color-secondary);
-  margin-top: 5px;
   opacity: 0.6;
+}
+
+.message-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-color);
 }
 
 .message-item.sent {

@@ -97,7 +97,11 @@
               <div class="message-time">成员 {{ ch.memberCount }}</div>
             </div>
             <div class="last-message-row">
-              <div class="last-message">{{ ch.description }}</div>
+              <div class="last-message">
+                {{
+                  ch.lastMessage ? stripMarkdownLength(ch.lastMessage.content, 100) : ch.description
+                }}
+              </div>
             </div>
           </div>
         </div>
@@ -262,8 +266,6 @@ function goToConversation(id) {
 
 <style scoped>
 .messages-container {
-  margin: 0 auto;
-  padding: 20px;
 }
 
 .tabs {
@@ -291,6 +293,8 @@ function goToConversation(id) {
 
 .search-container {
   margin-bottom: 24px;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 .messages-header {
@@ -330,6 +334,8 @@ function goToConversation(id) {
 .conversation-item {
   display: flex;
   align-items: center;
+  margin-left: 20px;
+  margin-right: 20px;
   padding: 8px 10px;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -415,8 +421,9 @@ function goToConversation(id) {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .messages-container {
-    padding: 10px 10px;
+  .conversation-item {
+    margin-left: 10px;
+    margin-right: 10px;
   }
 
   .messages-title {

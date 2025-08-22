@@ -10,6 +10,7 @@ public class ChannelDto {
     private String name;
     private String description;
     private String avatar;
+    private MessageDto lastMessage;
     private long memberCount;
     private boolean joined;
     private long unreadCount;
