@@ -384,6 +384,12 @@ function goToConversation(id) {
   color: var(--text-color);
 }
 
+.member-count {
+  font-size: 12px;
+  color: gray;
+  flex-shrink: 0;
+}
+
 .message-time {
   font-size: 12px;
   color: gray;
