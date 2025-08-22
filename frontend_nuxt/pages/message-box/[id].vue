@@ -196,10 +196,14 @@ async function sendMessage(content, clearInput) {
     if (!response.ok) throw new Error('发送失败')
 
     const newMessage = await response.json()
-    messages.value.push(newMessage)
+    messages.value.push({
+      ...newMessage,
+      src: newMessage.sender.avatar,
+      iconClick: () => {
+        navigateTo(`/users/${newMessage.sender.id}`, { replace: true })
+      },
+    })
     clearInput()
-
-    // Use a more reliable scroll approach
     setTimeout(() => {
       scrollToBottom()
     }, 100)
