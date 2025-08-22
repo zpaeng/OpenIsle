@@ -94,7 +94,9 @@
                 {{ ch.name }}
                 <span v-if="ch.unreadCount > 0" class="unread-dot"></span>
               </div>
-              <div class="message-time">成员 {{ ch.memberCount }}</div>
+              <div class="message-time">
+                {{ formatTime(ch.lastMessage?.createdAt || ch.createdAt) }}
+              </div>
             </div>
             <div class="last-message-row">
               <div class="last-message">
@@ -102,6 +104,7 @@
                   ch.lastMessage ? stripMarkdownLength(ch.lastMessage.content, 100) : ch.description
                 }}
               </div>
+              <div class="member-count">成员 {{ ch.memberCount }}</div>
             </div>
           </div>
         </div>
