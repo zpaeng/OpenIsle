@@ -41,8 +41,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // Registers the "/ws" endpoint, enabling SockJS fallback options so that alternate transports may be used if WebSocket is not available.
-        registry.addEndpoint("/ws")
+        registry.addEndpoint("/api/ws")
                 // 安全改进：使用具体的允许源，而不是通配符
                 .setAllowedOrigins(
                     "http://127.0.0.1:8080",

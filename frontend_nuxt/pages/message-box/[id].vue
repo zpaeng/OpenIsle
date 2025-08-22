@@ -281,7 +281,13 @@ watch(isConnected, (newValue) => {
       subscription = subscribe(`/topic/conversation/${conversationId}`, (message) => {
         // 避免重复显示当前用户发送的消息
         if (message.sender.id !== currentUser.value.id) {
-          messages.value.push(message)
+          messages.value.push({
+            ...message,
+            src: message.sender.avatar,
+            iconClick: () => {
+              navigateTo(`/users/${message.sender.id}`, { replace: true })
+            },
+          })
           // 实时收到消息时自动标记为已读
           markConversationAsRead()
           setTimeout(() => {
