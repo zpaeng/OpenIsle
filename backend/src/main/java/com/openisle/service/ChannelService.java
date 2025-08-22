@@ -1,6 +1,9 @@
 package com.openisle.service;
 
 import com.openisle.dto.ChannelDto;
+import com.openisle.dto.MessageDto;
+import com.openisle.dto.UserSummaryDto;
+import com.openisle.model.Message;
 import com.openisle.model.MessageConversation;
 import com.openisle.model.MessageParticipant;
 import com.openisle.model.User;
@@ -54,6 +57,9 @@ public class ChannelService {
         dto.setName(channel.getName());
         dto.setDescription(channel.getDescription());
         dto.setAvatar(channel.getAvatar());
+        if (channel.getLastMessage() != null) {
+            dto.setLastMessage(toMessageDto(channel.getLastMessage()));
+        }
         dto.setMemberCount(channel.getParticipants().size());
         boolean joined = channel.getParticipants().stream()
                 .anyMatch(p -> p.getUser().getId().equals(userId));
@@ -71,6 +77,22 @@ public class ChannelService {
         } else {
             dto.setUnreadCount(0);
         }
+        return dto;
+    }
+
+    private MessageDto toMessageDto(Message message) {
+        MessageDto dto = new MessageDto();
+        dto.setId(message.getId());
+        dto.setContent(message.getContent());
+        dto.setConversationId(message.getConversation().getId());
+        dto.setCreatedAt(message.getCreatedAt());
+
+        UserSummaryDto userDto = new UserSummaryDto();
+        userDto.setId(message.getSender().getId());
+        userDto.setUsername(message.getSender().getUsername());
+        userDto.setAvatar(message.getSender().getAvatar());
+        dto.setSender(userDto);
+
         return dto;
     }
 }
