@@ -22,7 +22,7 @@
               {{ TimeManager.format(item.createdAt) }}
             </div>
             <div class="message-content">
-              <div class="message-text" v-html="renderMarkdown(item.content)"></div>
+              <div class="info-content-text" v-html="renderMarkdown(item.content)"></div>
             </div>
           </template>
         </BaseTimeline>
@@ -335,21 +335,22 @@ onUnmounted(() => {
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 80px); /* Adjust based on your header/footer height */
   margin: 0 auto;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  overflow: hidden;
-  background-color: var(--bg-color);
+  overflow: auto;
+  height: calc(100vh - var(--header-height));
   position: relative;
 }
 
 .chat-header {
   display: flex;
+  position: sticky;
+  top: 0;
+  z-index: 100;
   align-items: center;
   padding: 10px 20px;
-  border-bottom: 1px solid var(--border-color);
-  background-color: var(--bg-color-soft);
+  border-bottom: 1px solid var(--normal-border-color);
+  background-color: var(--background-color-blur);
+  backdrop-filter: var(--blur-10);
 }
 
 .back-button {
@@ -366,17 +367,13 @@ onUnmounted(() => {
 }
 
 .messages-list {
-  position: absolute;
-  top: 60px; /* Header height */
-  bottom: 250px; /* Increased space for input area */
-  left: 0;
-  right: 0;
   overflow-y: auto;
   padding: 20px;
-  padding-bottom: 40px; /* Extra padding at bottom */
+  padding-bottom: 100px;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  margin-bottom: 10px;
 }
 
 .load-more-container {
@@ -415,16 +412,6 @@ onUnmounted(() => {
   flex-direction: column;
 }
 
-.message-text {
-  font-size: 15px;
-  line-height: 1.5;
-  word-wrap: break-word;
-}
-
-.message-text :deep(p) {
-  margin: 0;
-}
-
 .message-timestamp {
   font-size: 11px;
   color: var(--text-color-secondary);
@@ -432,7 +419,6 @@ onUnmounted(() => {
   opacity: 0.6;
 }
 
-/* Sent messages */
 .message-item.sent {
   align-self: flex-end;
   flex-direction: row-reverse;
@@ -458,17 +444,7 @@ onUnmounted(() => {
 }
 
 .message-input-area {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  min-height: 200px;
-  max-height: 400px;
-  padding: 10px 20px;
-  border-top: 1px solid var(--border-color);
-  background-color: var(--bg-color);
-  box-sizing: border-box;
-  overflow: visible;
+  margin-left: 20px;
 }
 
 .loading-container,

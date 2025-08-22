@@ -47,9 +47,9 @@
             </div>
           </ToolTip>
 
-          <ToolTip v-if="isLogin" content="站内信" placement="bottom">
+          <ToolTip v-if="isLogin" content="站内信和频道" placement="bottom">
             <div class="messages-icon" @click="goToMessages">
-              <i class="fas fa-envelope"></i>
+              <i class="fas fa-comments"></i>
               <span v-if="unreadMessageCount > 0" class="unread-badge">{{
                 unreadMessageCount
               }}</span>

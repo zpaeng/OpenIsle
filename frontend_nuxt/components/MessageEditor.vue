@@ -147,7 +147,6 @@ export default {
 .message-editor-container {
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  margin-top: 20px;
 }
 
 .message-bottom-container {

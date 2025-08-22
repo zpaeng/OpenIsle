@@ -12,41 +12,39 @@
       <div class="empty-text">暂无会话</div>
     </div>
 
-    <div v-else class="conversations-list">
-      <div
-        v-for="convo in conversations"
-        :key="convo.id"
-        class="conversation-item"
-        @click="goToConversation(convo.id)"
-      >
-        <div class="conversation-avatar">
-          <img
-            :src="getOtherParticipant(convo)?.avatar || '/default-avatar.svg'"
-            :alt="getOtherParticipant(convo)?.username || '用户'"
-            class="avatar-img"
-            @error="handleAvatarError"
-          />
+    <div
+      v-for="convo in conversations"
+      :key="convo.id"
+      class="conversation-item"
+      @click="goToConversation(convo.id)"
+    >
+      <div class="conversation-avatar">
+        <img
+          :src="getOtherParticipant(convo)?.avatar || '/default-avatar.svg'"
+          :alt="getOtherParticipant(convo)?.username || '用户'"
+          class="avatar-img"
+          @error="handleAvatarError"
+        />
+      </div>
+
+      <div class="conversation-content">
+        <div class="conversation-header">
+          <div class="participant-name">
+            {{ getOtherParticipant(convo)?.username || '未知用户' }}
+          </div>
+          <div class="message-time">
+            {{ formatTime(convo.lastMessage?.createdAt || convo.createdAt) }}
+          </div>
         </div>
 
-        <div class="conversation-content">
-          <div class="conversation-header">
-            <div class="participant-name">
-              {{ getOtherParticipant(convo)?.username || '未知用户' }}
-            </div>
-            <div class="message-time">
-              {{ formatTime(convo.lastMessage?.createdAt || convo.createdAt) }}
-            </div>
+        <div class="last-message-row">
+          <div class="last-message">
+            {{
+              convo.lastMessage ? stripMarkdownLength(convo.lastMessage.content, 100) : '暂无消息'
+            }}
           </div>
-
-          <div class="last-message-row">
-            <div class="last-message">
-              {{
-                convo.lastMessage ? stripMarkdownLength(convo.lastMessage.content, 100) : '暂无消息'
-              }}
-            </div>
-            <div v-if="convo.unreadCount > 0" class="unread-count-badge">
-              {{ convo.unreadCount }}
-            </div>
+          <div v-if="convo.unreadCount > 0" class="unread-count-badge">
+            {{ convo.unreadCount }}
           </div>
         </div>
       </div>
@@ -55,7 +53,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch, onActivated } from 'vue'
+import { ref, onUnmounted, watch, onActivated } from 'vue'
 import { useRouter } from 'vue-router'
 import { getToken, fetchCurrentUser } from '~/utils/auth'
 import { toast } from '~/main'
@@ -244,13 +242,12 @@ function goToConversation(id) {
 .participant-name {
   font-size: 16px;
   font-weight: 600;
-  color: #2d3748;
-  truncate: true;
+  color: var(--text-color);
 }
 
 .message-time {
   font-size: 12px;
-  color: #a0aec0;
+  color: gray;
   flex-shrink: 0;
   margin-left: 12px;
 }
@@ -263,7 +260,7 @@ function goToConversation(id) {
 
 .last-message {
   font-size: 14px;
-  color: #4a5568;
+  color: gray;
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
