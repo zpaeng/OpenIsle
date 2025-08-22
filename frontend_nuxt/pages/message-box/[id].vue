@@ -1,10 +1,12 @@
 <template>
   <div class="chat-container">
-    <div v-if="!loading && otherParticipant" class="chat-header">
+    <div v-if="!loading" class="chat-header">
       <NuxtLink to="/message-box" class="back-button">
         <i class="fas fa-arrow-left"></i>
       </NuxtLink>
-      <h2 class="participant-name">{{ otherParticipant.username }}</h2>
+      <h2 class="participant-name">
+        {{ isChannel ? conversationName : otherParticipant?.username }}
+      </h2>
     </div>
 
     <div class="messages-list" ref="messagesListEl">
@@ -86,11 +88,13 @@ const currentPage = ref(0)
 const totalPages = ref(0)
 const loadingMore = ref(false)
 let scrollInterval = null
+const conversationName = ref('')
+const isChannel = ref(false)
 
 const hasMoreMessages = computed(() => currentPage.value < totalPages.value - 1)
 
 const otherParticipant = computed(() => {
-  if (!currentUser.value || participants.value.length === 0) {
+  if (isChannel.value || !currentUser.value || participants.value.length === 0) {
     return null
   }
   return participants.value.find((p) => p.id !== currentUser.value.id)
@@ -136,6 +140,8 @@ async function fetchMessages(page = 0) {
 
     if (page === 0) {
       participants.value = conversationData.participants
+      conversationName.value = conversationData.name
+      isChannel.value = conversationData.channel
     }
 
     // Since the backend sorts by descending, we need to reverse for correct chat order
@@ -182,27 +188,40 @@ async function loadMoreMessages() {
 
 async function sendMessage(content, clearInput) {
   if (!content.trim()) return
-
-  const recipient = otherParticipant.value
-  if (!recipient) {
-    toast.error('无法确定收信人')
-    return
-  }
-
   sending.value = true
   const token = getToken()
   try {
-    const response = await fetch(`${API_BASE_URL}/api/messages`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        recipientId: recipient.id,
-        content: content,
-      }),
-    })
+    let response
+    if (isChannel.value) {
+      response = await fetch(
+        `${API_BASE_URL}/api/messages/conversations/${conversationId}/messages`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ content }),
+        },
+      )
+    } else {
+      const recipient = otherParticipant.value
+      if (!recipient) {
+        toast.error('无法确定收信人')
+        return
+      }
+      response = await fetch(`${API_BASE_URL}/api/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          recipientId: recipient.id,
+          content: content,
+        }),
+      })
+    }
     if (!response.ok) throw new Error('发送失败')
 
     const newMessage = await response.json()

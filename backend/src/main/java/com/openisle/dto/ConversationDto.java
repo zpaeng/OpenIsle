@@ -10,6 +10,9 @@ import java.util.List;
 @Setter
 public class ConversationDto {
     private Long id;
+    private String name;
+    private boolean channel;
+    private String avatar;
     private MessageDto lastMessage;
     private List<UserSummaryDto> participants;
     private LocalDateTime createdAt;

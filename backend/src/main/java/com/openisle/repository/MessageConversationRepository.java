@@ -28,4 +28,8 @@ public interface MessageConversationRepository extends JpaRepository<MessageConv
            "WHERE p.user.id = :userId " +
            "ORDER BY COALESCE(lm.createdAt, c.createdAt) DESC")
     List<MessageConversation> findConversationsByUserIdOrderByLastMessageDesc(@Param("userId") Long userId);
+
+    List<MessageConversation> findByChannelTrue();
+
+    long countByChannelTrue();
 }
