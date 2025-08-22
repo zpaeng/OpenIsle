@@ -445,6 +445,7 @@ onUnmounted(() => {
 
 .message-input-area {
   margin-left: 20px;
+  margin-right: 20px;
 }
 
 .loading-container,
@@ -452,5 +453,16 @@ onUnmounted(() => {
   text-align: center;
   padding: 50px;
   color: var(--text-color-secondary);
+}
+
+@media (max-width: 768px) {
+  .messages-list {
+    padding: 10px;
+  }
+}
+
+.message-input-area {
+  margin-left: 10px;
+  margin-right: 10px;
 }
 </style>

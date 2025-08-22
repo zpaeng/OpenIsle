@@ -283,7 +283,7 @@ function goToConversation(id) {
 /* 响应式设计 */
 @media (max-width: 768px) {
   .messages-container {
-    padding: 16px 12px;
+    padding: 10px 10px;
   }
 
   .messages-title {
@@ -295,7 +295,7 @@ function goToConversation(id) {
   }
 
   .conversation-item {
-    padding: 12px 16px;
+    padding: 6px 8px;
   }
 
   .avatar-img {
@@ -313,36 +313,6 @@ function goToConversation(id) {
 
   .last-message {
     font-size: 13px;
-  }
-}
-
-@media (max-width: 480px) {
-  .messages-container {
-    padding: 12px 8px;
-  }
-
-  .conversations-list {
-    max-height: 400px;
-  }
-
-  .conversation-item {
-    padding: 10px 12px;
-  }
-
-  .avatar-img {
-    width: 36px;
-    height: 36px;
-  }
-
-  .conversation-avatar {
-    margin-right: 12px;
-  }
-}
-
-/* 大屏幕设备 */
-@media (min-width: 1024px) {
-  .conversations-list {
-    max-height: 700px;
   }
 }
 </style>
