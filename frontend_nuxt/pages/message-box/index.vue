@@ -9,7 +9,7 @@
     </div>
 
     <div v-if="!loading" class="search-container">
-      <SearchDropdown />
+      <SearchPersonDropdown />
     </div>
 
     <div v-if="!loading && conversations.length === 0" class="empty-container">
@@ -66,7 +66,7 @@ import { useWebSocket } from '~/composables/useWebSocket'
 import { useUnreadCount } from '~/composables/useUnreadCount'
 import TimeManager from '~/utils/time'
 import { stripMarkdownLength } from '~/utils/markdown'
-import SearchDropdown from '~/components/SearchDropdown.vue'
+import SearchPersonDropdown from '~/components/SearchPersonDropdown.vue'
 import BasePlaceholder from '~/components/BasePlaceholder.vue'
 
 const config = useRuntimeConfig()
