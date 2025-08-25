@@ -149,8 +149,20 @@ const copyInviteLink = async () => {
     if (res.ok) {
       const data = await res.json()
       const inviteLink = data.token ? `${WEBSITE_BASE_URL}/signup?invite_token=${data.token}` : ''
-      await navigator.clipboard.writeText(inviteLink)
-      toast.success('邀请链接已复制')
+      /** 
+       * navigator.clipboard在webkit中有点奇怪的行为
+       * https://stackoverflow.com/questions/62327358/javascript-clipboard-api-safari-ios-notallowederror-message
+       * https://webkit.org/blog/10247/new-webkit-features-in-safari-13-1/
+      */
+      setTimeout(() => {
+        navigator.clipboard.writeText(inviteLink)
+          .then(() => {
+            toast.success('邀请链接已复制')
+          })
+          .catch(() => {
+            toast.error('邀请链接复制失败')
+          })
+      }, 0)
     } else {
       const data = await res.json().catch(() => ({}))
       toast.error(data.error || '生成邀请链接失败')
