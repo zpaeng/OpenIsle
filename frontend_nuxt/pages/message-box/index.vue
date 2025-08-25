@@ -287,13 +287,13 @@ function goToConversation(id) {
 }
 
 .tab {
-  padding: 8px 16px;
+  padding: 10px 20px;
   cursor: pointer;
 }
 
 .tab.active {
-  font-weight: 600;
   border-bottom: 2px solid var(--primary-color);
+  color: var(--primary-color);
 }
 
 .loading-message {
