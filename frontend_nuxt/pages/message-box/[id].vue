@@ -1,5 +1,13 @@
 <template>
   <div class="chat-container">
+    <div class="window-controls">
+      <button v-if="!isFloat" @click="shrink" class="control-btn">
+        <i class="fas fa-window-minimize"></i>
+      </button>
+      <button v-else @click="expand" class="control-btn">
+        <i class="fas fa-expand"></i>
+      </button>
+    </div>
     <div v-if="!loading" class="chat-header">
       <NuxtLink to="/message-box" class="back-button">
         <i class="fas fa-arrow-left"></i>
@@ -73,9 +81,11 @@ import { useChannelsUnreadCount } from '~/composables/useChannelsUnreadCount'
 import TimeManager from '~/utils/time'
 import BaseTimeline from '~/components/BaseTimeline.vue'
 import BasePlaceholder from '~/components/BasePlaceholder.vue'
+import { openMessageFloat } from '~/composables/useMessageFloat'
 
 const config = useRuntimeConfig()
 const route = useRoute()
+const router = useRouter()
 const API_BASE_URL = config.public.apiBaseUrl
 const { connect, disconnect, subscribe, isConnected } = useWebSocket()
 const { fetchUnreadCount: refreshGlobalUnreadCount } = useUnreadCount()
@@ -97,6 +107,7 @@ const loadingMore = ref(false)
 let scrollInterval = null
 const conversationName = ref('')
 const isChannel = ref(false)
+const isFloat = computed(() => route.query.float === '1')
 
 const hasMoreMessages = computed(() => currentPage.value < totalPages.value - 1)
 
@@ -113,6 +124,24 @@ function isSentByCurrentUser(message) {
 
 function handleAvatarError(event) {
   event.target.src = '/default-avatar.svg'
+}
+
+function shrink() {
+  openMessageFloat(route.fullPath)
+  router.push('/')
+}
+
+function expand() {
+  const base = route.fullPath.replace(/(\?|&)float=1/, '')
+  window.top.location.href = base
+}
+
+function openUser(id) {
+  if (isFloat.value) {
+    window.top.location.href = `/users/${id}`
+  } else {
+    navigateTo(`/users/${id}`, { replace: true })
+  }
 }
 
 // No changes needed here, as renderMarkdown is now imported.
@@ -156,7 +185,7 @@ async function fetchMessages(page = 0) {
       ...item,
       src: item.sender.avatar,
       iconClick: () => {
-        navigateTo(`/users/${item.sender.id}`, { replace: true })
+        openUser(item.sender.id)
       },
     }))
 
@@ -236,7 +265,7 @@ async function sendMessage(content, clearInput) {
       ...newMessage,
       src: newMessage.sender.avatar,
       iconClick: () => {
-        navigateTo(`/users/${newMessage.sender.id}`, { replace: true })
+        openUser(newMessage.sender.id)
       },
     })
     clearInput()
@@ -322,7 +351,7 @@ watch(isConnected, (newValue) => {
             ...message,
             src: message.sender.avatar,
             iconClick: () => {
-              navigateTo(`/users/${message.sender.id}`, { replace: true })
+              openUser(message.sender.id)
             },
           })
           // 实时收到消息时自动标记为已读
@@ -386,6 +415,21 @@ onUnmounted(() => {
   overflow: auto;
   height: calc(100vh - var(--header-height));
   position: relative;
+}
+
+.window-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+.control-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-color-primary);
+  margin-left: 4px;
 }
 
 .chat-header {
