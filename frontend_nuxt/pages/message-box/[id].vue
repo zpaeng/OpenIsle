@@ -43,7 +43,7 @@
               :content-id="item.id"
               @update:modelValue="(v) => (item.reactions = v)"
             >
-              <div class="reply-btn" @click="setReply(item)">回复</div>
+              <i class="fas fa-reply reply-btn" @click="setReply(item)"> 写个回复...</i>
             </ReactionsGroup>
           </template>
         </BaseTimeline>
@@ -552,7 +552,7 @@ onUnmounted(() => {
 
 .reply-preview {
   padding: 5px 10px;
-  border-left: 2px solid var(--primary-color);
+  border-left: 5px solid var(--primary-color);
   margin-bottom: 5px;
   font-size: 13px;
 }
@@ -566,6 +566,7 @@ onUnmounted(() => {
   cursor: pointer;
   padding: 4px;
   opacity: 0.6;
+  font-size: 12px;
 }
 
 .reply-btn:hover {
@@ -575,7 +576,7 @@ onUnmounted(() => {
 .active-reply {
   background-color: var(--bg-color-soft);
   padding: 5px 10px;
-  border-left: 3px solid var(--primary-color);
+  border-left: 5px solid var(--primary-color);
   margin-bottom: 5px;
   font-size: 13px;
 }
