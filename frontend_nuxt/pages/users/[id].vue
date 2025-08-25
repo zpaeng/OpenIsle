@@ -328,7 +328,7 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import AchievementList from '~/components/AchievementList.vue'
 import BasePlaceholder from '~/components/BasePlaceholder.vue'
 import BaseTimeline from '~/components/BaseTimeline.vue'
@@ -346,7 +346,6 @@ definePageMeta({
   alias: ['/users/:id/'],
 })
 const route = useRoute()
-const router = useRouter()
 const username = route.params.id
 
 const user = ref({})
@@ -407,7 +406,7 @@ const fetchUser = async () => {
     user.value = data
     subscribed.value = !!data.subscribed
   } else if (res.status === 404) {
-    router.replace('/404')
+    navigateTo('/404')
   }
 }
 
@@ -558,7 +557,7 @@ const sendMessage = async () => {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     })
     const result = await response.json()
-    router.push(`/message-box/${result.conversationId}`)
+    navigateTo(`/message-box/${result.conversationId}`)
   } catch (e) {
     toast.error('无法发起私信')
     console.error(e)
@@ -592,7 +591,7 @@ const init = async () => {
 onMounted(init)
 
 watch(selectedTab, async (val) => {
-  // router.replace({ query: { ...route.query, tab: val } })
+  // navigateTo({ query: { ...route.query, tab: val } }, { replace: true })
   if (val === 'timeline' && timelineItems.value.length === 0) {
     await loadTimeline()
   } else if (val === 'following' && followers.value.length === 0 && followings.value.length === 0) {

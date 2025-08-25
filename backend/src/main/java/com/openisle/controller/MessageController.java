@@ -5,7 +5,6 @@ import com.openisle.dto.ConversationDto;
 import com.openisle.dto.CreateConversationRequest;
 import com.openisle.dto.CreateConversationResponse;
 import com.openisle.dto.MessageDto;
-import com.openisle.dto.UserSummaryDto;
 import com.openisle.model.Message;
 import com.openisle.model.MessageConversation;
 import com.openisle.model.User;
@@ -55,16 +54,16 @@ public class MessageController {
 
     @PostMapping
     public ResponseEntity<MessageDto> sendMessage(@RequestBody MessageRequest req, Authentication auth) {
-        Message message = messageService.sendMessage(getCurrentUserId(auth), req.getRecipientId(), req.getContent());
-        return ResponseEntity.ok(toDto(message));
+        Message message = messageService.sendMessage(getCurrentUserId(auth), req.getRecipientId(), req.getContent(), req.getReplyToId());
+        return ResponseEntity.ok(messageService.toDto(message));
     }
 
     @PostMapping("/conversations/{conversationId}/messages")
     public ResponseEntity<MessageDto> sendMessageToConversation(@PathVariable Long conversationId,
                                                                 @RequestBody ChannelMessageRequest req,
                                                                 Authentication auth) {
-        Message message = messageService.sendMessageToConversation(getCurrentUserId(auth), conversationId, req.getContent());
-        return ResponseEntity.ok(toDto(message));
+        Message message = messageService.sendMessageToConversation(getCurrentUserId(auth), conversationId, req.getContent(), req.getReplyToId());
+        return ResponseEntity.ok(messageService.toDto(message));
     }
 
     @PostMapping("/conversations/{conversationId}/read")
@@ -79,23 +78,6 @@ public class MessageController {
         return ResponseEntity.ok(new CreateConversationResponse(conversation.getId()));
     }
 
-    private MessageDto toDto(Message message) {
-        MessageDto dto = new MessageDto();
-        dto.setId(message.getId());
-        dto.setContent(message.getContent());
-        dto.setCreatedAt(message.getCreatedAt());
-
-        dto.setConversationId(message.getConversation().getId());
-
-        UserSummaryDto senderDto = new UserSummaryDto();
-        senderDto.setId(message.getSender().getId());
-        senderDto.setUsername(message.getSender().getUsername());
-        senderDto.setAvatar(message.getSender().getAvatar());
-        dto.setSender(senderDto);
-
-        return dto;
-    }
-
     @GetMapping("/unread-count")
     public ResponseEntity<Long> getUnreadCount(Authentication auth) {
         return ResponseEntity.ok(messageService.getUnreadMessageCount(getCurrentUserId(auth)));
@@ -105,6 +87,7 @@ public class MessageController {
     static class MessageRequest {
         private Long recipientId;
         private String content;
+        private Long replyToId;
 
         public Long getRecipientId() {
             return recipientId;
@@ -121,10 +104,19 @@ public class MessageController {
         public void setContent(String content) {
             this.content = content;
         }
+
+        public Long getReplyToId() {
+            return replyToId;
+        }
+
+        public void setReplyToId(Long replyToId) {
+            this.replyToId = replyToId;
+        }
     }
 
     static class ChannelMessageRequest {
         private String content;
+        private Long replyToId;
 
         public String getContent() {
             return content;
@@ -132,6 +124,14 @@ public class MessageController {
 
         public void setContent(String content) {
             this.content = content;
+        }
+
+        public Long getReplyToId() {
+            return replyToId;
+        }
+
+        public void setReplyToId(Long replyToId) {
+            this.replyToId = replyToId;
         }
     }
 }

@@ -57,4 +57,17 @@ public class ReactionController {
         pointService.awardForReactionOfComment(auth.getName(), commentId);
         return ResponseEntity.ok(dto);
     }
+
+    @PostMapping("/messages/{messageId}/reactions")
+    public ResponseEntity<ReactionDto> reactToMessage(@PathVariable Long messageId,
+                                                      @RequestBody ReactionRequest req,
+                                                      Authentication auth) {
+        Reaction reaction = reactionService.reactToMessage(auth.getName(), messageId, req.getType());
+        if (reaction == null) {
+            return ResponseEntity.noContent().build();
+        }
+        ReactionDto dto = reactionMapper.toDto(reaction);
+        dto.setReward(levelService.awardForReaction(auth.getName()));
+        return ResponseEntity.ok(dto);
+    }
 }
