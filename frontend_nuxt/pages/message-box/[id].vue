@@ -633,6 +633,10 @@ function goBack() {
 }
 
 @media (max-height: 200px) {
+  .messages-list,
+  .message-input-area {
+    display: none;
+  }
 }
 
 @media (max-width: 768px) {

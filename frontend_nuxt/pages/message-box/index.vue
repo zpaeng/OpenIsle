@@ -1,6 +1,9 @@
 <template>
   <div class="messages-container">
-    <div class="page-title"><i class="fas fa-comments"></i>选择聊天</div>
+    <div class="page-title">
+      <i class="fas fa-comments"></i>
+      <span class="page-title-text">选择聊天</span>
+    </div>
     <div v-if="!isFloatMode" class="float-control">
       <i class="fas fa-compress" @click="minimize" title="最小化"></i>
     </div>
@@ -347,7 +350,18 @@ function minimize() {
 }
 
 .page-title {
+  padding: 12px;
   display: none;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.page-title-text {
+  margin-left: 10px;
+}
+
+.page-title-text:hover {
+  text-decoration: underline;
 }
 
 .messages-title {
