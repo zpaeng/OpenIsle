@@ -1,7 +1,8 @@
 <template>
   <div class="messages-container">
+    <div class="page-title"><i class="fas fa-comments"></i>选择聊天</div>
     <div v-if="!isFloatMode" class="float-control">
-      <i class="fas fa-window-minimize" @click="minimize"></i>
+      <i class="fas fa-compress" @click="minimize" title="最小化"></i>
     </div>
     <div class="tabs">
       <div :class="['tab', { active: activeTab === 'messages' }]" @click="activeTab = 'messages'">
@@ -21,7 +22,7 @@
         <div class="error-text">{{ error }}</div>
       </div>
 
-      <div v-if="!loading" class="search-container">
+      <div v-if="!loading && !isFloatMode" class="search-container">
         <SearchPersonDropdown />
       </div>
 
@@ -146,8 +147,7 @@ let subscription = null
 const activeTab = ref('messages')
 const channels = ref([])
 const loadingChannels = ref(false)
-const route = useRoute()
-const isFloatMode = computed(() => route.query.float !== undefined)
+const isFloatMode = computed(() => route.query.float === '1')
 const floatRoute = useState('messageFloatRoute')
 
 async function fetchConversations() {
@@ -230,7 +230,11 @@ async function goToChannel(id) {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
     })
-    navigateTo(`/message-box/${id}`)
+    if (isFloatMode.value) {
+      navigateTo(`/message-box/${id}?float=1`)
+    } else {
+      navigateTo(`/message-box/${id}`)
+    }
   } catch (e) {
     toast.error(e.message)
   }
@@ -279,7 +283,11 @@ onUnmounted(() => {
 })
 
 function goToConversation(id) {
-  navigateTo(`/message-box/${id}`)
+  if (isFloatMode.value) {
+    navigateTo(`/message-box/${id}?float=1`)
+  } else {
+    navigateTo(`/message-box/${id}`)
+  }
 }
 
 function minimize() {
@@ -290,11 +298,15 @@ function minimize() {
 
 <style scoped>
 .messages-container {
+  position: relative;
 }
 
 .float-control {
+  position: absolute;
+  top: 0;
+  right: 0;
   text-align: right;
-  padding: 8px 12px;
+  padding: 12px 12px;
 }
 
 .float-control i {
@@ -332,6 +344,10 @@ function minimize() {
 
 .messages-header {
   margin-bottom: 24px;
+}
+
+.page-title {
+  display: none;
 }
 
 .messages-title {
@@ -458,7 +474,21 @@ function minimize() {
   margin-left: 4px;
 }
 
-/* 响应式设计 */
+@media (max-height: 200px) {
+  .page-title {
+    display: block;
+  }
+
+  .tabs,
+  .loading-message,
+  .error-container,
+  .search-container,
+  .empty-container,
+  .conversation-item {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
   .conversation-item {
     margin-left: 10px;

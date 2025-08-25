@@ -125,6 +125,7 @@
 
 <script setup>
 import { computed, onMounted, onBeforeUnmount, nextTick, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import ArticleCategory from '~/components/ArticleCategory.vue'
 import ArticleTags from '~/components/ArticleTags.vue'
 import CategorySelect from '~/components/CategorySelect.vue'

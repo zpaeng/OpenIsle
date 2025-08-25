@@ -2,15 +2,15 @@
   <div class="chat-container" :class="{ float: isFloatMode }">
     <div v-if="!loading" class="chat-header">
       <div class="header-main">
-        <NuxtLink to="/message-box" class="back-button">
+        <div class="back-button" @click="goBack">
           <i class="fas fa-arrow-left"></i>
-        </NuxtLink>
+        </div>
         <h2 class="participant-name">
           {{ isChannel ? conversationName : otherParticipant?.username }}
         </h2>
       </div>
-      <div v-if="!isFloatMode" class="header-actions" @click="minimize">
-        <i class="fas fa-window-minimize"></i>
+      <div v-if="!isFloatMode" class="float-control">
+        <i class="fas fa-compress" @click="minimize" title="最小化"></i>
       </div>
     </div>
 
@@ -415,10 +415,19 @@ function minimize() {
 }
 
 function openUser(id) {
-  if (isFloatMode.value && typeof window !== 'undefined') {
-    window.top.location.href = `/users/${id}`
+  if (isFloatMode.value) {
+    // 先不处理...
+    // navigateTo(`/users/${id}?float=1`)
   } else {
     navigateTo(`/users/${id}`, { replace: true })
+  }
+}
+
+function goBack() {
+  if (isFloatMode.value) {
+    navigateTo('/message-box?float=1')
+  } else {
+    navigateTo('/message-box')
   }
 }
 </script>
@@ -455,7 +464,16 @@ function openUser(id) {
   align-items: center;
 }
 
-.header-actions i {
+.float-control {
+  position: absolute;
+  top: 0;
+  right: 0;
+  text-align: right;
+  padding: 12px 12px;
+  cursor: pointer;
+}
+
+.float-control i {
   cursor: pointer;
 }
 
@@ -573,12 +591,6 @@ function openUser(id) {
   color: var(--text-color-secondary);
 }
 
-@media (max-width: 768px) {
-  .messages-list {
-    padding: 10px;
-  }
-}
-
 .message-input-area {
   margin-left: 10px;
   margin-right: 10px;
@@ -618,5 +630,14 @@ function openUser(id) {
 .close-reply {
   margin-left: 8px;
   cursor: pointer;
+}
+
+@media (max-height: 200px) {
+}
+
+@media (max-width: 768px) {
+  .messages-list {
+    padding: 10px;
+  }
 }
 </style>

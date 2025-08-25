@@ -30,6 +30,7 @@ function expand() {
   right: 0;
   width: 400px;
   height: 60vh;
+  /* height: 80px; */
   max-height: 90vh;
   background-color: var(--background-color);
   border: 1px solid var(--normal-border-color);
@@ -48,18 +49,10 @@ function expand() {
   position: absolute;
   top: 4px;
   right: 8px;
+  padding: 6px;
 }
 
 .float-actions i {
   cursor: pointer;
-}
-
-@media (max-width: 480px) {
-  .message-float-window {
-    width: 100%;
-    right: 0;
-    left: 0;
-    height: 100vh;
-  }
 }
 </style>
