@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div class="header-container">
+    <div v-if="!isFloatMode" class="header-container">
       <HeaderComponent
         ref="header"
         @toggle-menu="menuVisible = !menuVisible"
@@ -9,19 +9,28 @@
     </div>
 
     <div class="main-container">
-      <div class="menu-container" v-click-outside="handleMenuOutside">
+      <div v-if="!isFloatMode" class="menu-container" v-click-outside="handleMenuOutside">
         <MenuComponent :visible="!hideMenu && menuVisible" @item-click="menuVisible = false" />
       </div>
-      <div class="content" :class="{ 'menu-open': menuVisible && !hideMenu }">
+      <div
+        class="content"
+        :class="{ 'menu-open': menuVisible && !hideMenu && !isFloatMode }"
+        :style="isFloatMode ? { paddingTop: '0px', minHeight: '100vh' } : {}"
+      >
         <NuxtPage keepalive />
       </div>
 
-      <div v-if="showNewPostIcon && isMobile" class="app-new-post-icon" @click="goToNewPost">
+      <div
+        v-if="showNewPostIcon && isMobile && !isFloatMode"
+        class="app-new-post-icon"
+        @click="goToNewPost"
+      >
         <i class="fas fa-edit"></i>
       </div>
     </div>
     <GlobalPopups />
     <ConfirmDialog />
+    <MessageFloatWindow v-if="!isFloatMode" />
   </div>
 </template>
 
@@ -30,6 +39,7 @@ import HeaderComponent from '~/components/HeaderComponent.vue'
 import MenuComponent from '~/components/MenuComponent.vue'
 import GlobalPopups from '~/components/GlobalPopups.vue'
 import ConfirmDialog from '~/components/ConfirmDialog.vue'
+import MessageFloatWindow from '~/components/MessageFloatWindow.vue'
 import { useIsMobile } from '~/utils/screen'
 
 const isMobile = useIsMobile()
@@ -52,6 +62,7 @@ const hideMenu = computed(() => {
 })
 
 const header = useTemplateRef('header')
+const isFloatMode = computed(() => useRoute().query.float !== undefined)
 
 onMounted(() => {
   if (typeof window !== 'undefined') {

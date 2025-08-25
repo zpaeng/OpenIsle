@@ -1,5 +1,8 @@
 <template>
   <div class="messages-container">
+    <div v-if="!isFloatMode" class="float-control">
+      <i class="fas fa-window-minimize" @click="minimize"></i>
+    </div>
     <div class="tabs">
       <div :class="['tab', { active: activeTab === 'messages' }]" @click="activeTab = 'messages'">
         站内信
@@ -114,8 +117,8 @@
 </template>
 
 <script setup>
-import { ref, onUnmounted, watch, onActivated } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onUnmounted, watch, onActivated, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { getToken, fetchCurrentUser } from '~/utils/auth'
 import { toast } from '~/main'
 import { useWebSocket } from '~/composables/useWebSocket'
@@ -142,6 +145,9 @@ let subscription = null
 const activeTab = ref('messages')
 const channels = ref([])
 const loadingChannels = ref(false)
+const route = useRoute()
+const isFloatMode = computed(() => route.query.float !== undefined)
+const floatRoute = useState('messageFloatRoute')
 
 async function fetchConversations() {
   const token = getToken()
@@ -274,10 +280,24 @@ onUnmounted(() => {
 function goToConversation(id) {
   router.push(`/message-box/${id}`)
 }
+
+function minimize() {
+  floatRoute.value = route.fullPath
+  navigateTo('/')
+}
 </script>
 
 <style scoped>
 .messages-container {
+}
+
+.float-control {
+  text-align: right;
+  padding: 8px 12px;
+}
+
+.float-control i {
+  cursor: pointer;
 }
 
 .tabs {
