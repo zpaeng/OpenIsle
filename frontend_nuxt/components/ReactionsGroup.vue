@@ -138,7 +138,9 @@ const toggleReaction = async (type) => {
   const url =
     props.contentType === 'post'
       ? `${API_BASE_URL}/api/posts/${props.contentId}/reactions`
-      : `${API_BASE_URL}/api/comments/${props.contentId}/reactions`
+      : props.contentType === 'comment'
+        ? `${API_BASE_URL}/api/comments/${props.contentId}/reactions`
+        : `${API_BASE_URL}/api/messages/${props.contentId}/reactions`
 
   // optimistic update
   const existingIdx = reactions.value.findIndex(

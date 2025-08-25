@@ -19,6 +19,9 @@ public class ReactionMapper {
         if (reaction.getComment() != null) {
             dto.setCommentId(reaction.getComment().getId());
         }
+        if (reaction.getMessage() != null) {
+            dto.setMessageId(reaction.getMessage().getId());
+        }
         dto.setReward(0);
         return dto;
     }

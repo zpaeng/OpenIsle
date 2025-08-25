@@ -5,6 +5,7 @@ import com.openisle.model.Post;
 import com.openisle.model.Reaction;
 import com.openisle.model.ReactionType;
 import com.openisle.model.User;
+import com.openisle.model.Message;
 import com.openisle.service.ReactionService;
 import com.openisle.service.LevelService;
 import com.openisle.mapper.ReactionMapper;
@@ -76,6 +77,27 @@ class ReactionControllerTest {
                         .principal(new UsernamePasswordAuthenticationToken("u2", "p")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.commentId").value(2));
+    }
+
+    @Test
+    void reactToMessage() throws Exception {
+        User user = new User();
+        user.setUsername("u3");
+        Message message = new Message();
+        message.setId(3L);
+        Reaction reaction = new Reaction();
+        reaction.setId(3L);
+        reaction.setUser(user);
+        reaction.setMessage(message);
+        reaction.setType(ReactionType.LIKE);
+        Mockito.when(reactionService.reactToMessage(eq("u3"), eq(3L), eq(ReactionType.LIKE))).thenReturn(reaction);
+
+        mockMvc.perform(post("/api/messages/3/reactions")
+                        .contentType("application/json")
+                        .content("{\"type\":\"LIKE\"}")
+                        .principal(new UsernamePasswordAuthenticationToken("u3", "p")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.messageId").value(3));
     }
 
     @Test

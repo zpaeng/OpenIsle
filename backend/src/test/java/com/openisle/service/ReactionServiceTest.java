@@ -15,9 +15,10 @@ class ReactionServiceTest {
         UserRepository userRepo = mock(UserRepository.class);
         PostRepository postRepo = mock(PostRepository.class);
         CommentRepository commentRepo = mock(CommentRepository.class);
+        MessageRepository messageRepo = mock(MessageRepository.class);
         NotificationService notif = mock(NotificationService.class);
         EmailSender email = mock(EmailSender.class);
-        ReactionService service = new ReactionService(reactionRepo, userRepo, postRepo, commentRepo, notif, email);
+        ReactionService service = new ReactionService(reactionRepo, userRepo, postRepo, commentRepo, messageRepo, notif, email);
         org.springframework.test.util.ReflectionTestUtils.setField(service, "websiteUrl", "https://ex.com");
 
         User user = new User();
