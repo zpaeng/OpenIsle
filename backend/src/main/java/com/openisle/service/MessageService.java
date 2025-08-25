@@ -4,14 +4,18 @@ import com.openisle.model.Message;
 import com.openisle.model.MessageConversation;
 import com.openisle.model.MessageParticipant;
 import com.openisle.model.User;
+import com.openisle.model.Reaction;
 import com.openisle.repository.MessageConversationRepository;
 import com.openisle.repository.MessageParticipantRepository;
 import com.openisle.repository.MessageRepository;
 import com.openisle.repository.UserRepository;
+import com.openisle.repository.ReactionRepository;
 import com.openisle.dto.ConversationDetailDto;
 import com.openisle.dto.ConversationDto;
 import com.openisle.dto.MessageDto;
+import com.openisle.dto.ReactionDto;
 import com.openisle.dto.UserSummaryDto;
+import com.openisle.mapper.ReactionMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,9 +38,11 @@ public class MessageService {
     private final MessageParticipantRepository participantRepository;
     private final UserRepository userRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final ReactionRepository reactionRepository;
+    private final ReactionMapper reactionMapper;
 
     @Transactional
-    public Message sendMessage(Long senderId, Long recipientId, String content) {
+    public Message sendMessage(Long senderId, Long recipientId, String content, Long replyToId) {
         log.info("Attempting to send message from user {} to user {}", senderId, recipientId);
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new IllegalArgumentException("Sender not found"));
@@ -51,6 +57,11 @@ public class MessageService {
         message.setConversation(conversation);
         message.setSender(sender);
         message.setContent(content);
+        if (replyToId != null) {
+            Message replyTo = messageRepository.findById(replyToId)
+                    .orElseThrow(() -> new IllegalArgumentException("Message not found"));
+            message.setReplyTo(replyTo);
+        }
         message = messageRepository.save(message);
         log.info("Message saved with ID: {}", message.getId());
 
@@ -83,7 +94,7 @@ public class MessageService {
     }
 
     @Transactional
-    public Message sendMessageToConversation(Long senderId, Long conversationId, String content) {
+    public Message sendMessageToConversation(Long senderId, Long conversationId, String content, Long replyToId) {
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new IllegalArgumentException("Sender not found"));
         MessageConversation conversation = conversationRepository.findById(conversationId)
@@ -102,6 +113,11 @@ public class MessageService {
         message.setConversation(conversation);
         message.setSender(sender);
         message.setContent(content);
+        if (replyToId != null) {
+            Message replyTo = messageRepository.findById(replyToId)
+                    .orElseThrow(() -> new IllegalArgumentException("Message not found"));
+            message.setReplyTo(replyTo);
+        }
         message = messageRepository.save(message);
 
         conversation.setLastMessage(message);
@@ -128,7 +144,7 @@ public class MessageService {
         return message;
     }
 
-    private MessageDto toDto(Message message) {
+    public MessageDto toDto(Message message) {
         MessageDto dto = new MessageDto();
         dto.setId(message.getId());
         dto.setContent(message.getContent());
@@ -140,6 +156,25 @@ public class MessageService {
         userSummaryDto.setUsername(message.getSender().getUsername());
         userSummaryDto.setAvatar(message.getSender().getAvatar());
         dto.setSender(userSummaryDto);
+
+        if (message.getReplyTo() != null) {
+            Message reply = message.getReplyTo();
+            MessageDto replyDto = new MessageDto();
+            replyDto.setId(reply.getId());
+            replyDto.setContent(reply.getContent());
+            UserSummaryDto replySender = new UserSummaryDto();
+            replySender.setId(reply.getSender().getId());
+            replySender.setUsername(reply.getSender().getUsername());
+            replySender.setAvatar(reply.getSender().getAvatar());
+            replyDto.setSender(replySender);
+            dto.setReplyTo(replyDto);
+        }
+
+        java.util.List<Reaction> reactions = reactionRepository.findByMessage(message);
+        java.util.List<ReactionDto> reactionDtos = reactions.stream()
+                .map(reactionMapper::toDto)
+                .collect(Collectors.toList());
+        dto.setReactions(reactionDtos);
 
         return dto;
     }

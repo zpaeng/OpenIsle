@@ -260,7 +260,6 @@ import { getMedalTitle } from '~/utils/medal'
 import { toast } from '~/main'
 import { getToken, authState } from '~/utils/auth'
 import TimeManager from '~/utils/time'
-import { useRouter } from 'vue-router'
 import { useIsMobile } from '~/utils/screen'
 import Dropdown from '~/components/Dropdown.vue'
 import { ClientOnly } from '#components'
@@ -272,7 +271,6 @@ const API_BASE_URL = config.public.apiBaseUrl
 
 const route = useRoute()
 const postId = route.params.id
-const router = useRouter()
 
 const title = ref('')
 const author = ref('')

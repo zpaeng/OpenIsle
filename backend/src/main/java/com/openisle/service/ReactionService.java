@@ -6,10 +6,12 @@ import com.openisle.model.Reaction;
 import com.openisle.model.ReactionType;
 import com.openisle.model.User;
 import com.openisle.model.NotificationType;
+import com.openisle.model.Message;
 import com.openisle.repository.CommentRepository;
 import com.openisle.repository.PostRepository;
 import com.openisle.repository.ReactionRepository;
 import com.openisle.repository.UserRepository;
+import com.openisle.repository.MessageRepository;
 import com.openisle.service.NotificationService;
 import com.openisle.service.EmailSender;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class ReactionService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final MessageRepository messageRepository;
     private final NotificationService notificationService;
     private final EmailSender emailSender;
 
@@ -74,6 +77,26 @@ public class ReactionService {
         if (!user.getId().equals(comment.getAuthor().getId())) {
             notificationService.createNotification(comment.getAuthor(), NotificationType.REACTION, comment.getPost(), comment, null, user, type, null);
         }
+        return reaction;
+    }
+
+    @Transactional
+    public Reaction reactToMessage(String username, Long messageId, ReactionType type) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new IllegalArgumentException("Message not found"));
+        java.util.Optional<Reaction> existing =
+                reactionRepository.findByUserAndMessageAndType(user, message, type);
+        if (existing.isPresent()) {
+            reactionRepository.delete(existing.get());
+            return null;
+        }
+        Reaction reaction = new Reaction();
+        reaction.setUser(user);
+        reaction.setMessage(message);
+        reaction.setType(type);
+        reaction = reactionRepository.save(reaction);
         return reaction;
     }
 

@@ -4,7 +4,7 @@ import com.openisle.model.ReactionType;
 import lombok.Data;
 
 /**
- * DTO representing a reaction on a post or comment.
+ * DTO representing a reaction on a post, comment or message.
  */
 @Data
 public class ReactionDto {
@@ -13,6 +13,7 @@ public class ReactionDto {
     private String user;
     private Long postId;
     private Long commentId;
+    private Long messageId;
     private int reward;
 }
 

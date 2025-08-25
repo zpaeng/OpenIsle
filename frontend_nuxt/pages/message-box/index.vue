@@ -1,5 +1,12 @@
 <template>
   <div class="messages-container">
+    <div class="page-title">
+      <i class="fas fa-comments"></i>
+      <span class="page-title-text">选择聊天</span>
+    </div>
+    <div v-if="!isFloatMode" class="float-control">
+      <i class="fas fa-compress" @click="minimize" title="最小化"></i>
+    </div>
     <div class="tabs">
       <div :class="['tab', { active: activeTab === 'messages' }]" @click="activeTab = 'messages'">
         站内信
@@ -18,7 +25,7 @@
         <div class="error-text">{{ error }}</div>
       </div>
 
-      <div v-if="!loading" class="search-container">
+      <div v-if="!loading && !isFloatMode" class="search-container">
         <SearchPersonDropdown />
       </div>
 
@@ -114,8 +121,8 @@
 </template>
 
 <script setup>
-import { ref, onUnmounted, watch, onActivated } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onUnmounted, watch, onActivated, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { getToken, fetchCurrentUser } from '~/utils/auth'
 import { toast } from '~/main'
 import { useWebSocket } from '~/composables/useWebSocket'
@@ -130,7 +137,8 @@ const config = useRuntimeConfig()
 const conversations = ref([])
 const loading = ref(true)
 const error = ref(null)
-const router = useRouter()
+
+const route = useRoute()
 const currentUser = ref(null)
 const API_BASE_URL = config.public.apiBaseUrl
 const { connect, disconnect, subscribe, isConnected } = useWebSocket()
@@ -142,6 +150,8 @@ let subscription = null
 const activeTab = ref('messages')
 const channels = ref([])
 const loadingChannels = ref(false)
+const isFloatMode = computed(() => route.query.float === '1')
+const floatRoute = useState('messageFloatRoute')
 
 async function fetchConversations() {
   const token = getToken()
@@ -223,7 +233,11 @@ async function goToChannel(id) {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
     })
-    router.push(`/message-box/${id}`)
+    if (isFloatMode.value) {
+      navigateTo(`/message-box/${id}?float=1`)
+    } else {
+      navigateTo(`/message-box/${id}`)
+    }
   } catch (e) {
     toast.error(e.message)
   }
@@ -272,12 +286,34 @@ onUnmounted(() => {
 })
 
 function goToConversation(id) {
-  router.push(`/message-box/${id}`)
+  if (isFloatMode.value) {
+    navigateTo(`/message-box/${id}?float=1`)
+  } else {
+    navigateTo(`/message-box/${id}`)
+  }
+}
+
+function minimize() {
+  floatRoute.value = route.fullPath
+  navigateTo('/')
 }
 </script>
 
 <style scoped>
 .messages-container {
+  position: relative;
+}
+
+.float-control {
+  position: absolute;
+  top: 0;
+  right: 0;
+  text-align: right;
+  padding: 12px 12px;
+}
+
+.float-control i {
+  cursor: pointer;
 }
 
 .tabs {
@@ -311,6 +347,21 @@ function goToConversation(id) {
 
 .messages-header {
   margin-bottom: 24px;
+}
+
+.page-title {
+  padding: 12px;
+  display: none;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.page-title-text {
+  margin-left: 10px;
+}
+
+.page-title-text:hover {
+  text-decoration: underline;
 }
 
 .messages-title {
@@ -437,7 +488,21 @@ function goToConversation(id) {
   margin-left: 4px;
 }
 
-/* 响应式设计 */
+@media (max-height: 200px) {
+  .page-title {
+    display: block;
+  }
+
+  .tabs,
+  .loading-message,
+  .error-container,
+  .search-container,
+  .empty-container,
+  .conversation-item {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
   .conversation-item {
     margin-left: 10px;

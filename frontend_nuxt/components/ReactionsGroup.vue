@@ -19,7 +19,7 @@
           </div>
 
           <div class="reactions-viewer-item placeholder" @click="openPanel">
-            <i class="far fa-smile"></i>
+            <i class="far fa-smile reactions-viewer-item-placeholder-icon"></i>
             <!-- <span class="reactions-viewer-item-placeholder-text">点击以表态</span> -->
           </div>
         </template>
@@ -37,7 +37,11 @@
       </div>
     </div>
     <div class="make-reaction-container">
-      <div class="make-reaction-item like-reaction" @click="toggleReaction('LIKE')">
+      <div
+        v-if="props.contentType !== 'message'"
+        class="make-reaction-item like-reaction"
+        @click="toggleReaction('LIKE')"
+      >
         <i v-if="!userReacted('LIKE')" class="far fa-heart"></i>
         <i v-else class="fas fa-heart"></i>
         <span class="reactions-count" v-if="likeCount">{{ likeCount }}</span>
@@ -138,7 +142,9 @@ const toggleReaction = async (type) => {
   const url =
     props.contentType === 'post'
       ? `${API_BASE_URL}/api/posts/${props.contentId}/reactions`
-      : `${API_BASE_URL}/api/comments/${props.contentId}/reactions`
+      : props.contentType === 'comment'
+        ? `${API_BASE_URL}/api/comments/${props.contentId}/reactions`
+        : `${API_BASE_URL}/api/messages/${props.contentId}/reactions`
 
   // optimistic update
   const existingIdx = reactions.value.findIndex(
@@ -234,6 +240,10 @@ onMounted(async () => {
 
 .reactions-viewer-item {
   font-size: 16px;
+}
+
+.reactions-viewer-item-placeholder-icon {
+  opacity: 0.5;
 }
 
 .reactions-viewer-item-placeholder-text {

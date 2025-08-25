@@ -1,12 +1,17 @@
 <template>
-  <div class="chat-container">
+  <div class="chat-container" :class="{ float: isFloatMode }">
     <div v-if="!loading" class="chat-header">
-      <NuxtLink to="/message-box" class="back-button">
-        <i class="fas fa-arrow-left"></i>
-      </NuxtLink>
-      <h2 class="participant-name">
-        {{ isChannel ? conversationName : otherParticipant?.username }}
-      </h2>
+      <div class="header-main">
+        <div class="back-button" @click="goBack">
+          <i class="fas fa-arrow-left"></i>
+        </div>
+        <h2 class="participant-name">
+          {{ isChannel ? conversationName : otherParticipant?.username }}
+        </h2>
+      </div>
+      <div v-if="!isFloatMode" class="float-control">
+        <i class="fas fa-compress" @click="minimize" title="最小化"></i>
+      </div>
     </div>
 
     <div class="messages-list" ref="messagesListEl">
@@ -30,9 +35,21 @@
                 {{ TimeManager.format(item.createdAt) }}
               </div>
             </div>
+            <div v-if="item.replyTo" class="reply-preview">
+              <div class="reply-author">{{ item.replyTo.sender.username }}</div>
+              <div class="reply-content" v-html="renderMarkdown(item.replyTo.content)"></div>
+            </div>
             <div class="message-content">
               <div class="info-content-text" v-html="renderMarkdown(item.content)"></div>
             </div>
+            <ReactionsGroup
+              :model-value="item.reactions"
+              content-type="message"
+              :content-id="item.id"
+              @update:modelValue="(v) => (item.reactions = v)"
+            >
+              <i class="fas fa-reply reply-btn" @click="setReply(item)"> 写个回复...</i>
+            </ReactionsGroup>
           </template>
         </BaseTimeline>
         <div class="empty-container">
@@ -46,6 +63,11 @@
     </div>
 
     <div class="message-input-area">
+      <div v-if="replyTo" class="active-reply">
+        正在回复 {{ replyTo.sender.username }}:
+        {{ stripMarkdownLength(replyTo.content, 50) }}
+        <i class="fas fa-times close-reply" @click="replyTo = null"></i>
+      </div>
       <MessageEditor :loading="sending" @submit="sendMessage" />
     </div>
   </div>
@@ -65,8 +87,9 @@ import {
 import { useRoute } from 'vue-router'
 import { getToken, fetchCurrentUser } from '~/utils/auth'
 import { toast } from '~/main'
-import { renderMarkdown } from '~/utils/markdown'
+import { renderMarkdown, stripMarkdownLength } from '~/utils/markdown'
 import MessageEditor from '~/components/MessageEditor.vue'
+import ReactionsGroup from '~/components/ReactionsGroup.vue'
 import { useWebSocket } from '~/composables/useWebSocket'
 import { useUnreadCount } from '~/composables/useUnreadCount'
 import { useChannelsUnreadCount } from '~/composables/useChannelsUnreadCount'
@@ -97,6 +120,9 @@ const loadingMore = ref(false)
 let scrollInterval = null
 const conversationName = ref('')
 const isChannel = ref(false)
+const isFloatMode = computed(() => route.query.float !== undefined)
+const floatRoute = useState('messageFloatRoute')
+const replyTo = ref(null)
 
 const hasMoreMessages = computed(() => currentPage.value < totalPages.value - 1)
 
@@ -113,6 +139,10 @@ function isSentByCurrentUser(message) {
 
 function handleAvatarError(event) {
   event.target.src = '/default-avatar.svg'
+}
+
+function setReply(message) {
+  replyTo.value = message
 }
 
 // No changes needed here, as renderMarkdown is now imported.
@@ -156,7 +186,7 @@ async function fetchMessages(page = 0) {
       ...item,
       src: item.sender.avatar,
       iconClick: () => {
-        navigateTo(`/users/${item.sender.id}`, { replace: true })
+        openUser(item.sender.id)
       },
     }))
 
@@ -208,7 +238,7 @@ async function sendMessage(content, clearInput) {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ content }),
+          body: JSON.stringify({ content, replyToId: replyTo.value?.id }),
         },
       )
     } else {
@@ -226,6 +256,7 @@ async function sendMessage(content, clearInput) {
         body: JSON.stringify({
           recipientId: recipient.id,
           content: content,
+          replyToId: replyTo.value?.id,
         }),
       })
     }
@@ -236,10 +267,11 @@ async function sendMessage(content, clearInput) {
       ...newMessage,
       src: newMessage.sender.avatar,
       iconClick: () => {
-        navigateTo(`/users/${newMessage.sender.id}`, { replace: true })
+        openUser(newMessage.sender.id)
       },
     })
     clearInput()
+    replyTo.value = null
     setTimeout(() => {
       scrollToBottom()
     }, 100)
@@ -322,7 +354,7 @@ watch(isConnected, (newValue) => {
             ...message,
             src: message.sender.avatar,
             iconClick: () => {
-              navigateTo(`/users/${message.sender.id}`, { replace: true })
+              openUser(message.sender.id)
             },
           })
           // 实时收到消息时自动标记为已读
@@ -376,6 +408,28 @@ onUnmounted(() => {
   }
   disconnect()
 })
+
+function minimize() {
+  floatRoute.value = route.fullPath
+  navigateTo('/')
+}
+
+function openUser(id) {
+  if (isFloatMode.value) {
+    // 先不处理...
+    // navigateTo(`/users/${id}?float=1`)
+  } else {
+    navigateTo(`/users/${id}`, { replace: true })
+  }
+}
+
+function goBack() {
+  if (isFloatMode.value) {
+    navigateTo('/message-box?float=1')
+  } else {
+    navigateTo('/message-box')
+  }
+}
 </script>
 
 <style scoped>
@@ -388,8 +442,13 @@ onUnmounted(() => {
   position: relative;
 }
 
+.chat-container.float {
+  height: 100vh;
+}
+
 .chat-header {
   display: flex;
+  justify-content: space-between;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -398,6 +457,24 @@ onUnmounted(() => {
   border-bottom: 1px solid var(--normal-border-color);
   background-color: var(--background-color-blur);
   backdrop-filter: var(--blur-10);
+}
+
+.header-main {
+  display: flex;
+  align-items: center;
+}
+
+.float-control {
+  position: absolute;
+  top: 0;
+  right: 0;
+  text-align: right;
+  padding: 12px 12px;
+  cursor: pointer;
+}
+
+.float-control i {
+  cursor: pointer;
 }
 
 .back-button {
@@ -514,14 +591,57 @@ onUnmounted(() => {
   color: var(--text-color-secondary);
 }
 
+.message-input-area {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.reply-preview {
+  padding: 5px 10px;
+  border-left: 5px solid var(--primary-color);
+  margin-bottom: 5px;
+  font-size: 13px;
+}
+
+.reply-author {
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.reply-btn {
+  cursor: pointer;
+  padding: 4px;
+  opacity: 0.6;
+  font-size: 12px;
+}
+
+.reply-btn:hover {
+  opacity: 1;
+}
+
+.active-reply {
+  background-color: var(--bg-color-soft);
+  padding: 5px 10px;
+  border-left: 5px solid var(--primary-color);
+  margin-bottom: 5px;
+  font-size: 13px;
+}
+
+.close-reply {
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+@media (max-height: 200px) {
+  .messages-list,
+  .message-input-area {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
   .messages-list {
     padding: 10px;
   }
-}
-
-.message-input-area {
-  margin-left: 10px;
-  margin-right: 10px;
 }
 </style>
