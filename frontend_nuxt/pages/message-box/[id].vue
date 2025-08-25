@@ -30,9 +30,21 @@
                 {{ TimeManager.format(item.createdAt) }}
               </div>
             </div>
+            <div v-if="item.replyTo" class="reply-preview">
+              <div class="reply-author">{{ item.replyTo.sender.username }}</div>
+              <div class="reply-content" v-html="renderMarkdown(item.replyTo.content)"></div>
+            </div>
             <div class="message-content">
               <div class="info-content-text" v-html="renderMarkdown(item.content)"></div>
             </div>
+            <ReactionsGroup
+              :model-value="item.reactions"
+              content-type="message"
+              :content-id="item.id"
+              @update:modelValue="(v) => (item.reactions = v)"
+            >
+              <div class="reply-btn" @click="setReply(item)">回复</div>
+            </ReactionsGroup>
           </template>
         </BaseTimeline>
         <div class="empty-container">
@@ -46,6 +58,11 @@
     </div>
 
     <div class="message-input-area">
+      <div v-if="replyTo" class="active-reply">
+        正在回复 {{ replyTo.sender.username }}:
+        {{ stripMarkdownLength(replyTo.content, 50) }}
+        <i class="fas fa-times close-reply" @click="replyTo = null"></i>
+      </div>
       <MessageEditor :loading="sending" @submit="sendMessage" />
     </div>
   </div>
@@ -65,8 +82,9 @@ import {
 import { useRoute } from 'vue-router'
 import { getToken, fetchCurrentUser } from '~/utils/auth'
 import { toast } from '~/main'
-import { renderMarkdown } from '~/utils/markdown'
+import { renderMarkdown, stripMarkdownLength } from '~/utils/markdown'
 import MessageEditor from '~/components/MessageEditor.vue'
+import ReactionsGroup from '~/components/ReactionsGroup.vue'
 import { useWebSocket } from '~/composables/useWebSocket'
 import { useUnreadCount } from '~/composables/useUnreadCount'
 import { useChannelsUnreadCount } from '~/composables/useChannelsUnreadCount'
@@ -97,6 +115,7 @@ const loadingMore = ref(false)
 let scrollInterval = null
 const conversationName = ref('')
 const isChannel = ref(false)
+const replyTo = ref(null)
 
 const hasMoreMessages = computed(() => currentPage.value < totalPages.value - 1)
 
@@ -113,6 +132,10 @@ function isSentByCurrentUser(message) {
 
 function handleAvatarError(event) {
   event.target.src = '/default-avatar.svg'
+}
+
+function setReply(message) {
+  replyTo.value = message
 }
 
 // No changes needed here, as renderMarkdown is now imported.
@@ -208,7 +231,7 @@ async function sendMessage(content, clearInput) {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ content }),
+          body: JSON.stringify({ content, replyToId: replyTo.value?.id }),
         },
       )
     } else {
@@ -226,6 +249,7 @@ async function sendMessage(content, clearInput) {
         body: JSON.stringify({
           recipientId: recipient.id,
           content: content,
+          replyToId: replyTo.value?.id,
         }),
       })
     }
@@ -240,6 +264,7 @@ async function sendMessage(content, clearInput) {
       },
     })
     clearInput()
+    replyTo.value = null
     setTimeout(() => {
       scrollToBottom()
     }, 100)
@@ -523,5 +548,40 @@ onUnmounted(() => {
 .message-input-area {
   margin-left: 10px;
   margin-right: 10px;
+}
+
+.reply-preview {
+  padding: 5px 10px;
+  border-left: 2px solid var(--primary-color);
+  margin-bottom: 5px;
+  font-size: 13px;
+}
+
+.reply-author {
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.reply-btn {
+  cursor: pointer;
+  padding: 4px;
+  opacity: 0.6;
+}
+
+.reply-btn:hover {
+  opacity: 1;
+}
+
+.active-reply {
+  background-color: var(--bg-color-soft);
+  padding: 5px 10px;
+  border-left: 3px solid var(--primary-color);
+  margin-bottom: 5px;
+  font-size: 13px;
+}
+
+.close-reply {
+  margin-left: 8px;
+  cursor: pointer;
 }
 </style>
