@@ -1,5 +1,13 @@
 <template>
   <div class="messages-container">
+    <div class="window-controls">
+      <button v-if="!isFloat" @click="shrink" class="control-btn">
+        <i class="fas fa-window-minimize"></i>
+      </button>
+      <button v-else @click="expand" class="control-btn">
+        <i class="fas fa-expand"></i>
+      </button>
+    </div>
     <div class="tabs">
       <div :class="['tab', { active: activeTab === 'messages' }]" @click="activeTab = 'messages'">
         站内信
@@ -114,8 +122,8 @@
 </template>
 
 <script setup>
-import { ref, onUnmounted, watch, onActivated } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onUnmounted, watch, onActivated, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { getToken, fetchCurrentUser } from '~/utils/auth'
 import { toast } from '~/main'
 import { useWebSocket } from '~/composables/useWebSocket'
@@ -125,12 +133,15 @@ import TimeManager from '~/utils/time'
 import { stripMarkdownLength } from '~/utils/markdown'
 import SearchPersonDropdown from '~/components/SearchPersonDropdown.vue'
 import BasePlaceholder from '~/components/BasePlaceholder.vue'
+import { openMessageFloat } from '~/composables/useMessageFloat'
 
 const config = useRuntimeConfig()
 const conversations = ref([])
 const loading = ref(true)
 const error = ref(null)
 const router = useRouter()
+const route = useRoute()
+const isFloat = computed(() => route.query.float === '1')
 const currentUser = ref(null)
 const API_BASE_URL = config.public.apiBaseUrl
 const { connect, disconnect, subscribe, isConnected } = useWebSocket()
@@ -142,6 +153,16 @@ let subscription = null
 const activeTab = ref('messages')
 const channels = ref([])
 const loadingChannels = ref(false)
+
+function shrink() {
+  openMessageFloat(route.fullPath)
+  router.push('/')
+}
+
+function expand() {
+  const base = route.fullPath.replace(/(\?|&)float=1/, '')
+  window.top.location.href = base
+}
 
 async function fetchConversations() {
   const token = getToken()
@@ -278,6 +299,21 @@ function goToConversation(id) {
 
 <style scoped>
 .messages-container {
+  position: relative;
+}
+.window-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+.control-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-color-primary);
+  margin-left: 4px;
 }
 
 .tabs {
