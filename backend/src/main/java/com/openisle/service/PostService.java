@@ -67,6 +67,7 @@ public class PostService {
     private final TaskScheduler taskScheduler;
     private final EmailSender emailSender;
     private final ApplicationContext applicationContext;
+    private final PointService pointService;
     private final ConcurrentMap<Long, ScheduledFuture<?>> scheduledFinalizations = new ConcurrentHashMap<>();
     @Value("${app.website-url:https://www.open-isle.com}")
     private String websiteUrl;
@@ -89,6 +90,7 @@ public class PostService {
                        TaskScheduler taskScheduler,
                        EmailSender emailSender,
                        ApplicationContext applicationContext,
+                       PointService pointService,
                        @Value("${app.post.publish-mode:DIRECT}") PublishMode publishMode) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
@@ -107,6 +109,7 @@ public class PostService {
         this.taskScheduler = taskScheduler;
         this.emailSender = emailSender;
         this.applicationContext = applicationContext;
+        this.pointService = pointService;
         this.publishMode = publishMode;
     }
 
@@ -146,7 +149,10 @@ public class PostService {
     public Post includeInRss(Long id) {
         Post post = postRepository.findById(id).orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
         post.setRssExcluded(false);
-        return postRepository.save(post);
+        post = postRepository.save(post);
+        notificationService.createNotification(post.getAuthor(), NotificationType.POST_FEATURED, post, null, null, null, null, null);
+        pointService.awardForFeatured(post.getAuthor().getUsername(), post.getId());
+        return post;
     }
 
     public Post createPost(String username,
@@ -458,6 +464,34 @@ public class PostService {
         return paginate(sortByPinnedAndCreated(posts), page, pageSize);
     }
 
+    public List<Post> listFeaturedPosts(List<Long> categoryIds,
+                                        List<Long> tagIds,
+                                        Integer page,
+                                        Integer pageSize) {
+        List<Post> posts;
+        boolean hasCategories = categoryIds != null && !categoryIds.isEmpty();
+        boolean hasTags = tagIds != null && !tagIds.isEmpty();
+
+        if (hasCategories && hasTags) {
+            posts = listPostsByCategoriesAndTags(categoryIds, tagIds, null, null);
+        } else if (hasCategories) {
+            posts = listPostsByCategories(categoryIds, null, null);
+        } else if (hasTags) {
+            posts = listPostsByTags(tagIds, null, null);
+        } else {
+            posts = listPosts();
+        }
+
+        // 仅保留 getRssExcluded 为 0 且不为空
+        // 若字段类型是 Boolean（包装类型），0 等价于 false：
+        posts = posts.stream()
+                .filter(p -> p.getRssExcluded() != null && !p.getRssExcluded())
+                .toList();
+
+        return paginate(sortByPinnedAndCreated(posts), page, pageSize);
+    }
+
+
     public List<Post> listPendingPosts() {
         return postRepository.findByStatus(PostStatus.PENDING);
     }
@@ -579,7 +613,9 @@ public class PostService {
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
-        if (!user.getId().equals(post.getAuthor().getId()) && user.getRole() != Role.ADMIN) {
+        User author = post.getAuthor();
+        boolean adminDeleting = !user.getId().equals(author.getId()) && user.getRole() == Role.ADMIN;
+        if (!user.getId().equals(author.getId()) && user.getRole() != Role.ADMIN) {
             throw new IllegalArgumentException("Unauthorized");
         }
         for (Comment c : commentRepository.findByPostAndParentIsNullOrderByCreatedAtAsc(post)) {
@@ -596,7 +632,12 @@ public class PostService {
                 future.cancel(false);
             }
         }
+        String title = post.getTitle();
         postRepository.delete(post);
+        if (adminDeleting) {
+            notificationService.createNotification(author, NotificationType.POST_DELETED,
+                    null, null, null, user, null, title);
+        }
     }
 
     public java.util.List<Post> getPostsByIds(java.util.List<Long> ids) {

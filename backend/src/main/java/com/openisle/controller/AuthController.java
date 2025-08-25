@@ -47,13 +47,14 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid captcha"));
         }
         if (req.getInviteToken() != null && !req.getInviteToken().isEmpty()) {
-            if (!inviteService.validate(req.getInviteToken())) {
+            InviteService.InviteValidateResult result = inviteService.validate(req.getInviteToken());
+            if (!result.isValidate()) {
                 return ResponseEntity.badRequest().body(Map.of("error", "邀请码使用次数过多"));
             }
             try {
                 User user = userService.registerWithInvite(
                         req.getUsername(), req.getEmail(), req.getPassword());
-                inviteService.consume(req.getInviteToken());
+                inviteService.consume(req.getInviteToken(), user.getUsername());
                 emailService.sendEmail(user.getEmail(), "在网站填写验证码以验证", "您的验证码是 " + user.getVerificationCode());
                 return ResponseEntity.ok(Map.of(
                         "token", jwtService.generateToken(user.getUsername()),
@@ -144,7 +145,8 @@ public class AuthController {
     @PostMapping("/google")
     public ResponseEntity<?> loginWithGoogle(@RequestBody GoogleLoginRequest req) {
         boolean viaInvite = req.getInviteToken() != null && !req.getInviteToken().isEmpty();
-        if (viaInvite && !inviteService.validate(req.getInviteToken())) {
+        InviteService.InviteValidateResult inviteValidateResult = inviteService.validate(req.getInviteToken());
+        if (viaInvite && !inviteValidateResult.isValidate()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid invite token"));
         }
         Optional<AuthResult> resultOpt = googleAuthService.authenticate(
@@ -154,7 +156,7 @@ public class AuthController {
         if (resultOpt.isPresent()) {
             AuthResult result = resultOpt.get();
             if (viaInvite && result.isNewUser()) {
-                inviteService.consume(req.getInviteToken());
+                inviteService.consume(req.getInviteToken(), inviteValidateResult.getInviteToken().getInviter().getUsername());
                 return ResponseEntity.ok(Map.of(
                         "token", jwtService.generateToken(result.getUser().getUsername()),
                         "reason_code", "INVITE_APPROVED"
@@ -218,7 +220,8 @@ public class AuthController {
     @PostMapping("/github")
     public ResponseEntity<?> loginWithGithub(@RequestBody GithubLoginRequest req) {
         boolean viaInvite = req.getInviteToken() != null && !req.getInviteToken().isEmpty();
-        if (viaInvite && !inviteService.validate(req.getInviteToken())) {
+        InviteService.InviteValidateResult inviteValidateResult = inviteService.validate(req.getInviteToken());
+        if (viaInvite && !inviteValidateResult.isValidate()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid invite token"));
         }
         Optional<AuthResult> resultOpt = githubAuthService.authenticate(
@@ -229,7 +232,7 @@ public class AuthController {
         if (resultOpt.isPresent()) {
             AuthResult result = resultOpt.get();
             if (viaInvite && result.isNewUser()) {
-                inviteService.consume(req.getInviteToken());
+                inviteService.consume(req.getInviteToken(), inviteValidateResult.getInviteToken().getInviter().getUsername());
                 return ResponseEntity.ok(Map.of(
                         "token", jwtService.generateToken(result.getUser().getUsername()),
                         "reason_code", "INVITE_APPROVED"
@@ -265,7 +268,8 @@ public class AuthController {
     @PostMapping("/discord")
     public ResponseEntity<?> loginWithDiscord(@RequestBody DiscordLoginRequest req) {
         boolean viaInvite = req.getInviteToken() != null && !req.getInviteToken().isEmpty();
-        if (viaInvite && !inviteService.validate(req.getInviteToken())) {
+        InviteService.InviteValidateResult inviteValidateResult = inviteService.validate(req.getInviteToken());
+        if (viaInvite && !inviteValidateResult.isValidate()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid invite token"));
         }
         Optional<AuthResult> resultOpt = discordAuthService.authenticate(
@@ -276,7 +280,7 @@ public class AuthController {
         if (resultOpt.isPresent()) {
             AuthResult result = resultOpt.get();
             if (viaInvite && result.isNewUser()) {
-                inviteService.consume(req.getInviteToken());
+                inviteService.consume(req.getInviteToken(), inviteValidateResult.getInviteToken().getInviter().getUsername());
                 return ResponseEntity.ok(Map.of(
                         "token", jwtService.generateToken(result.getUser().getUsername()),
                         "reason_code", "INVITE_APPROVED"
@@ -311,7 +315,8 @@ public class AuthController {
     @PostMapping("/twitter")
     public ResponseEntity<?> loginWithTwitter(@RequestBody TwitterLoginRequest req) {
         boolean viaInvite = req.getInviteToken() != null && !req.getInviteToken().isEmpty();
-        if (viaInvite && !inviteService.validate(req.getInviteToken())) {
+        InviteService.InviteValidateResult inviteValidateResult = inviteService.validate(req.getInviteToken());
+        if (viaInvite && !inviteValidateResult.isValidate()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid invite token"));
         }
         Optional<AuthResult> resultOpt = twitterAuthService.authenticate(
@@ -323,7 +328,7 @@ public class AuthController {
         if (resultOpt.isPresent()) {
             AuthResult result = resultOpt.get();
             if (viaInvite && result.isNewUser()) {
-                inviteService.consume(req.getInviteToken());
+                inviteService.consume(req.getInviteToken(), inviteValidateResult.getInviteToken().getInviter().getUsername());
                 return ResponseEntity.ok(Map.of(
                         "token", jwtService.generateToken(result.getUser().getUsername()),
                         "reason_code", "INVITE_APPROVED"

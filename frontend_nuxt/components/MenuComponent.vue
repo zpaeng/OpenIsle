@@ -106,7 +106,7 @@
 
         <div class="menu-section">
           <div class="section-header" @click="tagOpen = !tagOpen">
-            <span>tag</span>
+            <span>标签</span>
             <i :class="tagOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
           </div>
           <div v-if="tagOpen" class="section-items">
@@ -262,7 +262,7 @@ const gotoTag = (t) => {
   top: var(--header-height);
   width: 220px;
   background-color: var(--app-menu-background-color);
-  height: calc(100vh - 20px - var(--header-height));
+  height: calc(100vh - var(--header-height));
   border-right: 1px solid var(--menu-border-color);
   display: flex;
   flex-direction: column;
@@ -348,6 +348,7 @@ const gotoTag = (t) => {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .menu-section {

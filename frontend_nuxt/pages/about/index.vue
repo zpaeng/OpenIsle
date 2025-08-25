@@ -98,9 +98,7 @@ export default {
 }
 
 .about-tabs {
-  position: sticky;
   top: calc(var(--header-height) + 1px);
-  z-index: 200;
   background-color: var(--background-color-blur);
   display: flex;
   flex-direction: row;

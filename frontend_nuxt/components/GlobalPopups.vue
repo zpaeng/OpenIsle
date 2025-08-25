@@ -7,6 +7,7 @@
       @close="closeMilkTeaPopup"
     />
     <NotificationSettingPopup :visible="showNotificationPopup" @close="closeNotificationPopup" />
+    <MessagePopup :visible="showMessagePopup" @close="closeMessagePopup" />
     <MedalPopup :visible="showMedalPopup" :medals="newMedals" @close="closeMedalPopup" />
 
     <ActivityPopup
@@ -22,6 +23,7 @@
 import ActivityPopup from '~/components/ActivityPopup.vue'
 import MedalPopup from '~/components/MedalPopup.vue'
 import NotificationSettingPopup from '~/components/NotificationSettingPopup.vue'
+import MessagePopup from '~/components/MessagePopup.vue'
 import { authState } from '~/utils/auth'
 
 const config = useRuntimeConfig()
@@ -33,6 +35,7 @@ const milkTeaIcon = ref('')
 const inviteCodeIcon = ref('')
 
 const showNotificationPopup = ref(false)
+const showMessagePopup = ref(false)
 const showMedalPopup = ref(false)
 const newMedals = ref([])
 
@@ -43,6 +46,9 @@ onMounted(async () => {
   await checkInviteCodeActivity()
   if (showInviteCodePopup.value) return
 
+  await checkMessageFeature()
+  if (showMessagePopup.value) return
+
   await checkNotificationSetting()
   if (showNotificationPopup.value) return
 
@@ -50,7 +56,7 @@ onMounted(async () => {
 })
 
 const checkMilkTeaActivity = async () => {
-  if (!process.client) return
+  if (!import.meta.client) return
   if (localStorage.getItem('milkTeaActivityPopupShown')) return
   try {
     const res = await fetch(`${API_BASE_URL}/api/activities`)
@@ -68,7 +74,7 @@ const checkMilkTeaActivity = async () => {
 }
 
 const checkInviteCodeActivity = async () => {
-  if (!process.client) return
+  if (!import.meta.client) return
   if (localStorage.getItem('inviteCodeActivityPopupShown')) return
   try {
     const res = await fetch(`${API_BASE_URL}/api/activities`)
@@ -86,32 +92,42 @@ const checkInviteCodeActivity = async () => {
 }
 
 const closeInviteCodePopup = () => {
-  if (!process.client) return
+  if (!import.meta.client) return
   localStorage.setItem('inviteCodeActivityPopupShown', 'true')
   showInviteCodePopup.value = false
 }
 
 const closeMilkTeaPopup = () => {
-  if (!process.client) return
+  if (!import.meta.client) return
   localStorage.setItem('milkTeaActivityPopupShown', 'true')
   showMilkTeaPopup.value = false
-  checkNotificationSetting()
+}
+
+const checkMessageFeature = async () => {
+  if (!import.meta.client) return
+  if (!authState.loggedIn) return
+  if (localStorage.getItem('messageFeaturePopupShown')) return
+  showMessagePopup.value = true
+}
+const closeMessagePopup = () => {
+  if (!import.meta.client) return
+  localStorage.setItem('messageFeaturePopupShown', 'true')
+  showMessagePopup.value = false
 }
 
 const checkNotificationSetting = async () => {
-  if (!process.client) return
+  if (!import.meta.client) return
   if (!authState.loggedIn) return
   if (localStorage.getItem('notificationSettingPopupShown')) return
   showNotificationPopup.value = true
 }
 const closeNotificationPopup = () => {
-  if (!process.client) return
+  if (!import.meta.client) return
   localStorage.setItem('notificationSettingPopupShown', 'true')
   showNotificationPopup.value = false
-  checkNewMedals()
 }
 const checkNewMedals = async () => {
-  if (!process.client) return
+  if (!import.meta.client) return
   if (!authState.loggedIn || !authState.userId) return
   try {
     const res = await fetch(`${API_BASE_URL}/api/medals?userId=${authState.userId}`)
@@ -129,7 +145,7 @@ const checkNewMedals = async () => {
   }
 }
 const closeMedalPopup = () => {
-  if (!process.client) return
+  if (!import.meta.client) return
   const seen = new Set(JSON.parse(localStorage.getItem('seenMedals') || '[]'))
   newMedals.value.forEach((m) => seen.add(m.type))
   localStorage.setItem('seenMedals', JSON.stringify([...seen]))

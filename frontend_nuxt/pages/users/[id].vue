@@ -12,21 +12,27 @@
         <div class="profile-page-header-user-info">
           <div class="profile-page-header-user-info-name">{{ user.username }}</div>
           <div class="profile-page-header-user-info-description">{{ user.introduction }}</div>
-          <div
-            v-if="!isMine && !subscribed"
-            class="profile-page-header-subscribe-button"
-            @click="subscribeUser"
-          >
-            <i class="fas fa-user-plus"></i>
-            关注
-          </div>
-          <div
-            v-if="!isMine && subscribed"
-            class="profile-page-header-unsubscribe-button"
-            @click="unsubscribeUser"
-          >
-            <i class="fas fa-user-minus"></i>
-            取消关注
+          <div class="profile-page-header-user-info-buttons">
+            <div
+              v-if="!isMine && !subscribed"
+              class="profile-page-header-subscribe-button"
+              @click="subscribeUser"
+            >
+              <i class="fas fa-user-plus"></i>
+              关注
+            </div>
+            <div
+              v-if="!isMine && subscribed"
+              class="profile-page-header-unsubscribe-button"
+              @click="unsubscribeUser"
+            >
+              <i class="fas fa-user-minus"></i>
+              取消关注
+            </div>
+            <div v-if="!isMine" class="profile-page-header-subscribe-button" @click="sendMessage">
+              <i class="fas fa-paper-plane"></i>
+              发私信
+            </div>
           </div>
           <LevelProgress
             :exp="levelInfo.exp"
@@ -537,6 +543,28 @@ const unsubscribeUser = async () => {
   }
 }
 
+const sendMessage = async () => {
+  const token = getToken()
+  if (!token) {
+    toast.error('请先登录')
+    return
+  }
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/messages/conversations`, {
+      method: 'POST',
+      body: JSON.stringify({
+        recipientId: user.value.id,
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    })
+    const result = await response.json()
+    router.push(`/message-box/${result.conversationId}`)
+  } catch (e) {
+    toast.error('无法发起私信')
+    console.error(e)
+  }
+}
+
 const gotoTag = (tag) => {
   const value = encodeURIComponent(tag.id ?? tag.name)
   navigateTo({ path: '/', query: { tags: value } }, { replace: true })
@@ -612,6 +640,12 @@ watch(selectedTab, async (val) => {
 .profile-page-header-user-info-description {
   font-size: 20px;
   color: #666;
+}
+
+.profile-page-header-user-info-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
 }
 
 .profile-page-header-subscribe-button {

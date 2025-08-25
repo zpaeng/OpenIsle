@@ -6,7 +6,10 @@
           <button class="menu-btn" ref="menuBtn" @click="$emit('toggle-menu')">
             <i class="fas fa-bars"></i>
           </button>
-          <span v-if="isMobile && unreadCount > 0" class="menu-unread-dot"></span>
+          <span
+            v-if="isMobile && (unreadMessageCount > 0 || hasChannelUnread)"
+            class="menu-unread-dot"
+          ></span>
         </div>
         <NuxtLink class="logo-container" :to="`/`" @click="refrechData">
           <img
@@ -47,6 +50,16 @@
             </div>
           </ToolTip>
 
+          <ToolTip v-if="isLogin" content="站内信和频道" placement="bottom">
+            <div class="messages-icon" @click="goToMessages">
+              <i class="fas fa-comments"></i>
+              <span v-if="unreadMessageCount > 0" class="unread-badge">{{
+                unreadMessageCount
+              }}</span>
+              <span v-else-if="hasChannelUnread" class="unread-dot"></span>
+            </div>
+          </ToolTip>
+
           <DropdownMenu v-if="isLogin" ref="userMenu" :items="headerMenuItems">
             <template #trigger>
               <div class="avatar-container">
@@ -75,7 +88,8 @@ import DropdownMenu from '~/components/DropdownMenu.vue'
 import ToolTip from '~/components/ToolTip.vue'
 import SearchDropdown from '~/components/SearchDropdown.vue'
 import { authState, clearToken, loadCurrentUser } from '~/utils/auth'
-import { fetchUnreadCount, notificationState } from '~/utils/notification'
+import { useUnreadCount } from '~/composables/useUnreadCount'
+import { useChannelsUnreadCount } from '~/composables/useChannelsUnreadCount'
 import { useIsMobile } from '~/utils/screen'
 import { themeState, cycleTheme, ThemeMode } from '~/utils/theme'
 import { toast } from '~/main'
@@ -93,7 +107,8 @@ const props = defineProps({
 
 const isLogin = computed(() => authState.loggedIn)
 const isMobile = useIsMobile()
-const unreadCount = computed(() => notificationState.unreadCount)
+const { count: unreadMessageCount, fetchUnreadCount } = useUnreadCount()
+const { hasUnread: hasChannelUnread, fetchChannelUnread } = useChannelsUnreadCount()
 const avatar = ref('')
 const showSearch = ref(false)
 const searchDropdown = ref(null)
@@ -182,8 +197,11 @@ const goToNewPost = () => {
 }
 
 const refrechData = async () => {
-  await fetchUnreadCount()
   window.dispatchEvent(new Event('refresh-home'))
+}
+
+const goToMessages = () => {
+  navigateTo('/message-box')
 }
 
 const headerMenuItems = computed(() => [
@@ -215,9 +233,10 @@ onMounted(async () => {
   }
   const updateUnread = async () => {
     if (authState.loggedIn) {
-      await fetchUnreadCount()
+      fetchUnreadCount()
+      fetchChannelUnread()
     } else {
-      notificationState.unreadCount = 0
+      fetchChannelUnread()
     }
   }
 
@@ -226,7 +245,7 @@ onMounted(async () => {
 
   watch(
     () => authState.loggedIn,
-    async () => {
+    async (isLoggedIn) => {
       await updateAvatar()
       await updateUnread()
     },
@@ -379,9 +398,37 @@ onMounted(async () => {
 }
 
 .rss-icon,
-.new-post-icon {
+.new-post-icon,
+.messages-icon {
   font-size: 18px;
   cursor: pointer;
+  position: relative;
+}
+
+.unread-badge {
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  background-color: #ff4d4f;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 5px;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+  min-width: 16px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.unread-dot {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ff4d4f;
 }
 
 .rss-icon {

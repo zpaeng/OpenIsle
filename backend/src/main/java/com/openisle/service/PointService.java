@@ -1,7 +1,6 @@
 package com.openisle.service;
 
-import com.openisle.model.PointLog;
-import com.openisle.model.User;
+import com.openisle.model.*;
 import com.openisle.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,19 +15,28 @@ public class PointService {
     private final PointLogRepository pointLogRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final PointHistoryRepository pointHistoryRepository;
 
-    public int awardForPost(String userName) {
+    public int awardForPost(String userName, Long postId) {
         User user = userRepository.findByUsername(userName).orElseThrow();
         PointLog log = getTodayLog(user);
         if (log.getPostCount() > 1) return 0;
         log.setPostCount(log.getPostCount() + 1);
         pointLogRepository.save(log);
-        return addPoint(user, 30);
+        Post post = postRepository.findById(postId).orElseThrow();
+        return addPoint(user, 30, PointHistoryType.POST, post, null, null);
     }
 
-    public int awardForInvite(String userName) {
+    public int awardForInvite(String userName, String inviteeName) {
         User user = userRepository.findByUsername(userName).orElseThrow();
-        return addPoint(user, 500);
+        User invitee = userRepository.findByUsername(inviteeName).orElseThrow();
+        return addPoint(user, 500, PointHistoryType.INVITE, null, null, invitee);
+    }
+
+    public int awardForFeatured(String userName, Long postId) {
+        User user = userRepository.findByUsername(userName).orElseThrow();
+        Post post = postRepository.findById(postId).orElseThrow();
+        return addPoint(user, 500, PointHistoryType.FEATURE, post, null, null);
     }
 
     private PointLog getTodayLog(User user) {
@@ -45,20 +53,41 @@ public class PointService {
                 });
     }
 
-    private int addPoint(User user, int amount) {
+    private int addPoint(User user, int amount, PointHistoryType type,
+                         Post post, Comment comment, User fromUser) {
+        if (pointHistoryRepository.countByUser(user) == 0) {
+            recordHistory(user, PointHistoryType.SYSTEM_ONLINE, 0, null, null, null);
+        }
         user.setPoint(user.getPoint() + amount);
         userRepository.save(user);
+        recordHistory(user, type, amount, post, comment, fromUser);
         return amount;
+    }
+
+    private void recordHistory(User user, PointHistoryType type, int amount,
+                               Post post, Comment comment, User fromUser) {
+        PointHistory history = new PointHistory();
+        history.setUser(user);
+        history.setType(type);
+        history.setAmount(amount);
+        history.setBalance(user.getPoint());
+        history.setPost(post);
+        history.setComment(comment);
+        history.setFromUser(fromUser);
+        history.setCreatedAt(java.time.LocalDateTime.now());
+        pointHistoryRepository.save(history);
     }
 
     // 同时为评论者和发帖人增加积分，返回值为评论者增加的积分数
     // 注意需要考虑发帖和回复是同一人的场景
-    public int awardForComment(String commenterName, Long postId) {
+    public int awardForComment(String commenterName, Long postId, Long commentId) {
         // 标记评论者是否已达到积分奖励上限
         boolean isTheRewardCapped = false;
 
         // 根据帖子id找到发帖人
-        User poster = postRepository.findById(postId).orElseThrow().getAuthor();
+        Post post = postRepository.findById(postId).orElseThrow();
+        User poster = post.getAuthor();
+        Comment comment = commentRepository.findById(commentId).orElseThrow();
 
         // 获取评论者的加分日志
         User commenter = userRepository.findByUsername(commenterName).orElseThrow();
@@ -74,15 +103,15 @@ public class PointService {
             } else {
                 log.setCommentCount(log.getCommentCount() + 1);
                 pointLogRepository.save(log);
-                return addPoint(commenter, 10);
+                return addPoint(commenter, 10, PointHistoryType.COMMENT, post, comment, null);
             }
         } else {
-            addPoint(poster, 10);
+            addPoint(poster, 10, PointHistoryType.COMMENT, post, comment, commenter);
             // 如果发帖人与评论者不是同一个，则根据是否达到积分上限来判断评论者加分情况
             if (isTheRewardCapped) {
                 return 0;
             } else {
-                return addPoint(commenter, 10);
+                return addPoint(commenter, 10, PointHistoryType.COMMENT, post, comment, null);
             }
         }
     }
@@ -101,7 +130,8 @@ public class PointService {
         }
 
         // 如果不是同一个，则为发帖人加分
-        return addPoint(poster, 10);
+        Post post = postRepository.findById(postId).orElseThrow();
+        return addPoint(poster, 10, PointHistoryType.POST_LIKED, post, null, reactioner);
     }
 
     // 考虑点赞者和评论者是同一个的情况
@@ -118,7 +148,17 @@ public class PointService {
         }
 
         // 如果不是同一个，则为发帖人加分
-        return addPoint(commenter, 10);
+        Comment comment = commentRepository.findById(commentId).orElseThrow();
+        Post post = comment.getPost();
+        return addPoint(commenter, 10, PointHistoryType.COMMENT_LIKED, post, comment, reactioner);
+    }
+
+    public java.util.List<PointHistory> listHistory(String userName) {
+        User user = userRepository.findByUsername(userName).orElseThrow();
+        if (pointHistoryRepository.countByUser(user) == 0) {
+            recordHistory(user, PointHistoryType.SYSTEM_ONLINE, 0, null, null, null);
+        }
+        return pointHistoryRepository.findByUserOrderByIdDesc(user);
     }
 
 }

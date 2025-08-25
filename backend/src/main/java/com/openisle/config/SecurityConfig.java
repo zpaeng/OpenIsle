@@ -99,11 +99,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults())         // 让 Spring 自带 CorsFilter 处理预检
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(Customizer.withDefaults())
+                .headers(h -> h.frameOptions(f -> f.sameOrigin()))
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(eh -> eh.accessDeniedHandler(customAccessDeniedHandler))
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    .requestMatchers("/api/ws/**", "/api/sockjs/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
@@ -119,6 +121,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/api/reaction-types").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/activities/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/sitemap.xml").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/channels").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/rss").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/point-goods").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/point-goods").permitAll()
@@ -154,7 +157,7 @@ public class SecurityConfig {
                         uri.startsWith("/api/search") || uri.startsWith("/api/users") ||
                          uri.startsWith("/api/reaction-types") || uri.startsWith("/api/config") ||
                          uri.startsWith("/api/activities") || uri.startsWith("/api/push/public-key") ||
-                                uri.startsWith("/api/point-goods") ||
+                                uri.startsWith("/api/point-goods") || uri.startsWith("/api/channels") ||
                          uri.startsWith("/api/sitemap.xml") || uri.startsWith("/api/medals") ||
                          uri.startsWith("/api/rss"));
 
@@ -172,7 +175,8 @@ public class SecurityConfig {
                         response.getWriter().write("{\"error\": \"Invalid or expired token\"}");
                         return;
                     }
-                } else if (!uri.startsWith("/api/auth") && !publicGet) {
+                } else if (!uri.startsWith("/api/auth") && !publicGet
+                        && !uri.startsWith("/api/ws") && !uri.startsWith("/api/sockjs")) {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json");
                     response.getWriter().write("{\"error\": \"Missing token\"}");
