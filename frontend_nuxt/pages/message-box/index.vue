@@ -115,7 +115,6 @@
 
 <script setup>
 import { ref, onUnmounted, watch, onActivated } from 'vue'
-import { useRouter } from 'vue-router'
 import { getToken, fetchCurrentUser } from '~/utils/auth'
 import { toast } from '~/main'
 import { useWebSocket } from '~/composables/useWebSocket'
@@ -130,7 +129,6 @@ const config = useRuntimeConfig()
 const conversations = ref([])
 const loading = ref(true)
 const error = ref(null)
-const router = useRouter()
 const currentUser = ref(null)
 const API_BASE_URL = config.public.apiBaseUrl
 const { connect, disconnect, subscribe, isConnected } = useWebSocket()
@@ -223,7 +221,7 @@ async function goToChannel(id) {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
     })
-    router.push(`/message-box/${id}`)
+    navigateTo(`/message-box/${id}`)
   } catch (e) {
     toast.error(e.message)
   }
@@ -272,7 +270,7 @@ onUnmounted(() => {
 })
 
 function goToConversation(id) {
-  router.push(`/message-box/${id}`)
+  navigateTo(`/message-box/${id}`)
 }
 </script>
 
