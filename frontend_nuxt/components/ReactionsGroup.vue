@@ -9,7 +9,7 @@
       >
         <template v-if="displayedReactions.length">
           <div v-for="r in displayedReactions" :key="r.type" class="reactions-viewer-item">
-            {{ reactionEmojiMap[r.type] }}
+            <img :src="reactionEmojiMap[r.type]" class="emoji" alt="emoji" />
           </div>
           <div class="reactions-count">{{ totalCount }}</div>
         </template>
@@ -40,7 +40,9 @@
         @click="toggleReaction(t)"
         :class="{ selected: userReacted(t) }"
       >
-        {{ reactionEmojiMap[t] }}<span v-if="counts[t]">{{ counts[t] }}</span>
+        <img :src="reactionEmojiMap[t]" class="emoji" alt="emoji" /><span v-if="counts[t]">{{
+          counts[t]
+        }}</span>
       </div>
     </div>
   </div>

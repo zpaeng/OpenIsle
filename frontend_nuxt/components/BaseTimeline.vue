@@ -8,7 +8,7 @@
       >
         <img v-if="item.src" :src="item.src" class="timeline-img" alt="timeline item" />
         <i v-else-if="item.icon" :class="item.icon"></i>
-        <span v-else-if="item.emoji" class="timeline-emoji">{{ item.emoji }}</span>
+        <img v-else-if="item.emoji" :src="item.emoji" class="timeline-emoji" alt="emoji" />
       </div>
       <div class="timeline-content">
         <slot name="item" :item="item">{{ item.content }}</slot>
@@ -74,8 +74,9 @@ export default {
 }
 
 .timeline-emoji {
-  font-size: 20px;
-  line-height: 1;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
 }
 
 .timeline-item::before {
