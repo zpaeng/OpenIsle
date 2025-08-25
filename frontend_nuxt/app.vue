@@ -22,7 +22,6 @@
     </div>
     <GlobalPopups />
     <ConfirmDialog />
-    <ChatFloating />
   </div>
 </template>
 
@@ -31,7 +30,6 @@ import HeaderComponent from '~/components/HeaderComponent.vue'
 import MenuComponent from '~/components/MenuComponent.vue'
 import GlobalPopups from '~/components/GlobalPopups.vue'
 import ConfirmDialog from '~/components/ConfirmDialog.vue'
-import ChatFloating from '~/components/ChatFloating.vue'
 import { useIsMobile } from '~/utils/screen'
 
 const isMobile = useIsMobile()

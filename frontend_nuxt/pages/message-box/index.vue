@@ -1,9 +1,5 @@
 <template>
   <div class="messages-container">
-    <div class="chat-controls">
-      <i v-if="!isFloat" class="fas fa-window-minimize control-icon" @click="minimizeChat"></i>
-      <i v-else class="fas fa-expand control-icon" @click="maximizeChat"></i>
-    </div>
     <div class="tabs">
       <div :class="['tab', { active: activeTab === 'messages' }]" @click="activeTab = 'messages'">
         站内信
@@ -118,8 +114,8 @@
 </template>
 
 <script setup>
-import { ref, onUnmounted, watch, onActivated, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { ref, onUnmounted, watch, onActivated } from 'vue'
 import { getToken, fetchCurrentUser } from '~/utils/auth'
 import { toast } from '~/main'
 import { useWebSocket } from '~/composables/useWebSocket'
@@ -143,10 +139,6 @@ const { fetchUnreadCount: refreshGlobalUnreadCount } = useUnreadCount()
 const { fetchChannelUnread: refreshChannelUnread, setFromList: setChannelUnreadFromList } =
   useChannelsUnreadCount()
 let subscription = null
-
-const chatFloating = useState('chatFloating', () => false)
-const chatPath = useState('chatPath', () => '/message-box')
-const isFloat = computed(() => route.query.float === '1')
 
 const activeTab = ref('messages')
 const channels = ref([])
@@ -238,24 +230,6 @@ async function goToChannel(id) {
   }
 }
 
-function minimizeChat() {
-  chatPath.value = route.fullPath
-  chatFloating.value = true
-  navigateTo('/')
-}
-
-function maximizeChat() {
-  if (window.parent) {
-    window.parent.postMessage(
-      {
-        type: 'maximize-chat',
-        path: route.fullPath.replace('?float=1', '').replace('&float=1', ''),
-      },
-      '*',
-    )
-  }
-}
-
 onActivated(async () => {
   loading.value = true
   currentUser.value = await fetchCurrentUser()
@@ -305,7 +279,6 @@ function goToConversation(id) {
 
 <style scoped>
 .messages-container {
-  position: relative;
 }
 
 .tabs {
@@ -463,18 +436,6 @@ function goToConversation(id) {
   background-color: #f56c6c;
   border-radius: 50%;
   margin-left: 4px;
-}
-
-.chat-controls {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-  z-index: 10;
-}
-
-.control-icon {
-  font-size: 16px;
 }
 
 /* 响应式设计 */
