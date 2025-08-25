@@ -7,6 +7,10 @@
       <h2 class="participant-name">
         {{ isChannel ? conversationName : otherParticipant?.username }}
       </h2>
+      <div class="chat-controls">
+        <i v-if="!isFloat" class="fas fa-window-minimize control-icon" @click="minimizeChat"></i>
+        <i v-else class="fas fa-expand control-icon" @click="maximizeChat"></i>
+      </div>
     </div>
 
     <div class="messages-list" ref="messagesListEl">
@@ -82,6 +86,10 @@ const { fetchUnreadCount: refreshGlobalUnreadCount } = useUnreadCount()
 const { fetchChannelUnread: refreshChannelUnread } = useChannelsUnreadCount()
 let subscription = null
 
+const chatFloating = useState('chatFloating', () => false)
+const chatPath = useState('chatPath', () => '/message-box')
+const isFloat = computed(() => route.query.float === '1')
+
 const messages = ref([])
 const participants = ref([])
 const loading = ref(true)
@@ -113,6 +121,24 @@ function isSentByCurrentUser(message) {
 
 function handleAvatarError(event) {
   event.target.src = '/default-avatar.svg'
+}
+
+function minimizeChat() {
+  chatPath.value = route.fullPath
+  chatFloating.value = true
+  navigateTo('/')
+}
+
+function maximizeChat() {
+  if (window.parent) {
+    window.parent.postMessage(
+      {
+        type: 'maximize-chat',
+        path: route.fullPath.replace('?float=1', '').replace('&float=1', ''),
+      },
+      '*',
+    )
+  }
 }
 
 // No changes needed here, as renderMarkdown is now imported.
@@ -411,6 +437,7 @@ onUnmounted(() => {
   font-size: 18px;
   font-weight: 600;
   margin: 0;
+  flex: 1;
 }
 
 .messages-list {
@@ -523,5 +550,16 @@ onUnmounted(() => {
 .message-input-area {
   margin-left: 10px;
   margin-right: 10px;
+}
+
+.chat-controls {
+  margin-left: auto;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.control-icon {
+  font-size: 16px;
 }
 </style>
