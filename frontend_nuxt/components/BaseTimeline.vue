@@ -1,5 +1,5 @@
 <template>
-  <div class="timeline">
+  <div class="timeline" :class="{ 'hover-enabled': hover }">
     <div class="timeline-item" v-for="(item, idx) in items" :key="idx">
       <div
         class="timeline-icon"
@@ -22,6 +22,7 @@ export default {
   name: 'BaseTimeline',
   props: {
     items: { type: Array, default: () => [] },
+    hover: { type: Boolean, default: false },
   },
 }
 </script>
@@ -41,7 +42,7 @@ export default {
   margin-top: 10px;
 }
 
-.timeline-item:hover {
+.hover-enabled .timeline-item:hover {
   background-color: var(--menu-selected-background-color);
   transition: background-color 0.2s;
   border-radius: 10px;
