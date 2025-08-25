@@ -1,17 +1,7 @@
 import { authState, getToken } from '~/utils/auth'
 
-async function getPost(apiBaseUrl, id) {
-  return await fetch(`${apiBaseUrl}/api/posts/${id}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${getToken()}`,
-    },
-  })
-}
-
 async function searchPost(apiBaseUrl, keyword) {
-  return await fetch(`${apiBaseUrl}/api/search/global?keyword=${keyword}`, {
+  return await fetch(`${apiBaseUrl}/api/search/posts/title?keyword=${keyword}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -31,15 +21,10 @@ export default (apiBaseUrl) => {
           const body = await response.json()
           let value = ''
           return (
-            body
-              ?.filter((item) => item.type === 'comment' || item.type === 'post')
-              .map((item) => ({
-                value:
-                  item.type === 'comment'
-                    ? `[${item.text}](posts/${item.postId}#comment-${item.id})`
-                    : `[${item.text}](posts/${item.id})`,
-                html: `<div>${item.text}</div>`,
-              })) ?? []
+            body.map((item) => ({
+              value: `[${item.title}](/posts/${item.id})`,
+              html: `<div>${item.title}</div>`,
+            })) ?? []
           )
         } else {
           return []
