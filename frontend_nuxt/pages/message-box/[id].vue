@@ -1,12 +1,17 @@
 <template>
-  <div class="chat-container">
+  <div class="chat-container" :class="{ float: isFloatMode }">
     <div v-if="!loading" class="chat-header">
-      <NuxtLink to="/message-box" class="back-button">
-        <i class="fas fa-arrow-left"></i>
-      </NuxtLink>
-      <h2 class="participant-name">
-        {{ isChannel ? conversationName : otherParticipant?.username }}
-      </h2>
+      <div class="header-main">
+        <NuxtLink to="/message-box" class="back-button">
+          <i class="fas fa-arrow-left"></i>
+        </NuxtLink>
+        <h2 class="participant-name">
+          {{ isChannel ? conversationName : otherParticipant?.username }}
+        </h2>
+      </div>
+      <div v-if="!isFloatMode" class="header-actions" @click="minimize">
+        <i class="fas fa-window-minimize"></i>
+      </div>
     </div>
 
     <div class="messages-list" ref="messagesListEl">
@@ -115,6 +120,8 @@ const loadingMore = ref(false)
 let scrollInterval = null
 const conversationName = ref('')
 const isChannel = ref(false)
+const isFloatMode = computed(() => route.query.float !== undefined)
+const floatRoute = useState('messageFloatRoute')
 const replyTo = ref(null)
 
 const hasMoreMessages = computed(() => currentPage.value < totalPages.value - 1)
@@ -179,7 +186,7 @@ async function fetchMessages(page = 0) {
       ...item,
       src: item.sender.avatar,
       iconClick: () => {
-        navigateTo(`/users/${item.sender.id}`, { replace: true })
+        openUser(item.sender.id)
       },
     }))
 
@@ -260,7 +267,7 @@ async function sendMessage(content, clearInput) {
       ...newMessage,
       src: newMessage.sender.avatar,
       iconClick: () => {
-        navigateTo(`/users/${newMessage.sender.id}`, { replace: true })
+        openUser(newMessage.sender.id)
       },
     })
     clearInput()
@@ -347,7 +354,7 @@ watch(isConnected, (newValue) => {
             ...message,
             src: message.sender.avatar,
             iconClick: () => {
-              navigateTo(`/users/${message.sender.id}`, { replace: true })
+              openUser(message.sender.id)
             },
           })
           // 实时收到消息时自动标记为已读
@@ -401,6 +408,19 @@ onUnmounted(() => {
   }
   disconnect()
 })
+
+function minimize() {
+  floatRoute.value = route.fullPath
+  navigateTo('/')
+}
+
+function openUser(id) {
+  if (isFloatMode.value && typeof window !== 'undefined') {
+    window.top.location.href = `/users/${id}`
+  } else {
+    navigateTo(`/users/${id}`, { replace: true })
+  }
+}
 </script>
 
 <style scoped>
@@ -413,8 +433,13 @@ onUnmounted(() => {
   position: relative;
 }
 
+.chat-container.float {
+  height: 100vh;
+}
+
 .chat-header {
   display: flex;
+  justify-content: space-between;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -423,6 +448,15 @@ onUnmounted(() => {
   border-bottom: 1px solid var(--normal-border-color);
   background-color: var(--background-color-blur);
   backdrop-filter: var(--blur-10);
+}
+
+.header-main {
+  display: flex;
+  align-items: center;
+}
+
+.header-actions i {
+  cursor: pointer;
 }
 
 .back-button {
