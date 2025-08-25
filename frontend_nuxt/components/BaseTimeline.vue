@@ -1,5 +1,5 @@
 <template>
-  <div class="timeline">
+  <div class="timeline" :class="{ 'hover-enabled': hover }">
     <div class="timeline-item" v-for="(item, idx) in items" :key="idx">
       <div
         class="timeline-icon"
@@ -8,7 +8,7 @@
       >
         <img v-if="item.src" :src="item.src" class="timeline-img" alt="timeline item" />
         <i v-else-if="item.icon" :class="item.icon"></i>
-        <span v-else-if="item.emoji" class="timeline-emoji">{{ item.emoji }}</span>
+        <img v-else-if="item.emoji" :src="item.emoji" class="timeline-emoji" alt="emoji" />
       </div>
       <div class="timeline-content">
         <slot name="item" :item="item">{{ item.content }}</slot>
@@ -22,6 +22,7 @@ export default {
   name: 'BaseTimeline',
   props: {
     items: { type: Array, default: () => [] },
+    hover: { type: Boolean, default: false },
   },
 }
 </script>
@@ -41,7 +42,7 @@ export default {
   margin-top: 10px;
 }
 
-.timeline-item:hover {
+.hover-enabled .timeline-item:hover {
   background-color: var(--menu-selected-background-color);
   transition: background-color 0.2s;
   border-radius: 10px;
@@ -73,8 +74,9 @@ export default {
 }
 
 .timeline-emoji {
-  font-size: 20px;
-  line-height: 1;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
 }
 
 .timeline-item::before {

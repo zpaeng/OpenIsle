@@ -3,20 +3,37 @@
     <div class="reactions-viewer">
       <div
         class="reactions-viewer-item-container"
-        @click="openPanel"
         @mouseenter="cancelHide"
         @mouseleave="scheduleHide"
       >
-        <template v-if="displayedReactions.length">
-          <div v-for="r in displayedReactions" :key="r.type" class="reactions-viewer-item">
-            {{ reactionEmojiMap[r.type] }}
+        <template v-if="reactions.length < 4">
+          <div
+            v-for="r in displayedReactions"
+            :key="r.type"
+            class="reactions-viewer-single-item"
+            :class="{ selected: userReacted(r.type) }"
+            @click="toggleReaction(r.type)"
+          >
+            <img :src="reactionEmojiMap[r.type]" class="emoji" alt="emoji" />
+            <div>{{ counts[r.type] }}</div>
+          </div>
+
+          <div class="reactions-viewer-item placeholder" @click="openPanel">
+            <i class="far fa-smile"></i>
+            <!-- <span class="reactions-viewer-item-placeholder-text">点击以表态</span> -->
+          </div>
+        </template>
+        <template v-else-if="displayedReactions.length">
+          <div
+            v-for="r in displayedReactions"
+            :key="r.type"
+            class="reactions-viewer-item"
+            @click="openPanel"
+          >
+            <img :src="reactionEmojiMap[r.type]" class="emoji" alt="emoji" />
           </div>
           <div class="reactions-count">{{ totalCount }}</div>
         </template>
-        <div v-else class="reactions-viewer-item placeholder">
-          <i class="far fa-smile"></i>
-          <span class="reactions-viewer-item-placeholder-text">点击以表态</span>
-        </div>
       </div>
     </div>
     <div class="make-reaction-container">
@@ -40,7 +57,9 @@
         @click="toggleReaction(t)"
         :class="{ selected: userReacted(t) }"
       >
-        {{ reactionEmojiMap[t] }}<span v-if="counts[t]">{{ counts[t] }}</span>
+        <img :src="reactionEmojiMap[t]" class="emoji" alt="emoji" /><span v-if="counts[t]">{{
+          counts[t]
+        }}</span>
       </div>
     </div>
   </div>
@@ -217,13 +236,6 @@ onMounted(async () => {
   font-size: 16px;
 }
 
-.reactions-viewer-item.placeholder {
-  opacity: 0.5;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
 .reactions-viewer-item-placeholder-text {
   font-size: 14px;
   padding-left: 5px;
@@ -262,18 +274,16 @@ onMounted(async () => {
 
 .reactions-panel {
   position: absolute;
-  bottom: 40px;
-  left: -20px;
+  bottom: 50px;
   background-color: var(--background-color);
   border: 1px solid var(--normal-border-color);
-  border-radius: 5px;
-  padding: 5px;
-  max-width: 240px;
+  border-radius: 20px;
+  padding: 5px 10px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   z-index: 10;
-  gap: 2px;
+  gap: 5px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
 }
 
@@ -285,6 +295,27 @@ onMounted(async () => {
   flex-direction: row;
   align-items: center;
   gap: 2px;
+}
+
+.reactions-viewer-item.placeholder,
+.reactions-viewer-single-item {
+  display: flex;
+  cursor: pointer;
+  flex-direction: row;
+  padding: 2px 10px;
+  gap: 5px;
+  border: 1px solid var(--normal-border-color);
+  border-radius: 10px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: var(--text-color);
+  align-items: center;
+}
+
+.reactions-viewer-item.placeholder,
+.reactions-viewer-single-item.selected {
+  background-color: var(--menu-selected-background-color);
 }
 
 .reaction-option.selected {

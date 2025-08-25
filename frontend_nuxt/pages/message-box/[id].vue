@@ -20,7 +20,7 @@
             {{ loadingMore ? '加载中...' : '查看更多消息' }}
           </div>
         </div>
-        <BaseTimeline :items="messages">
+        <BaseTimeline :items="messages" hover>
           <template #item="{ item }">
             <div class="message-header">
               <div class="user-name">

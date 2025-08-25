@@ -652,6 +652,10 @@ const sanitizeDescription = (text) => stripMarkdown(text)
 }
 
 @container home-page (max-width: 768px) {
+  .topic-item-container {
+    margin-left: 0px;
+    gap: 0px;
+  }
   .article-main-container,
   .header-item.main-item {
     width: calc(70% - 20px);
@@ -709,6 +713,16 @@ const sanitizeDescription = (text) => stripMarkdown(text)
 
   .topic-container {
     position: initial;
+    padding: 0;
+  }
+
+  .topic-item {
+    padding: 10px 20px;
+  }
+
+  .topic-select-container {
+    margin-left: 10px;
+    margin-top: 10px;
   }
 }
 </style>
