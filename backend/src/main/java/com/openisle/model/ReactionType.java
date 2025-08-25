@@ -6,7 +6,9 @@ package com.openisle.model;
 public enum ReactionType {
     LIKE,
     DISLIKE,
+    SMILE,
     RECOMMEND,
+    CONGRATULATIONS,
     ANGRY,
     FLUSHED,
     STAR_STRUCK,
@@ -26,5 +28,5 @@ public enum ReactionType {
     CHINA,
     USA,
     JAPAN,
-    KOREA
+    KOREA,
 }

@@ -7,8 +7,10 @@ const toCdnUrl = (emoji) => {
 
 export const reactionEmojiMap = {
   LIKE: toCdnUrl('❤️'),
+  SMILE: toCdnUrl('😁'),
   DISLIKE: toCdnUrl('👎'),
   RECOMMEND: toCdnUrl('👏'),
+  CONGRATULATIONS: toCdnUrl('🎉'),
   ANGRY: toCdnUrl('😡'),
   FLUSHED: toCdnUrl('😳'),
   STAR_STRUCK: toCdnUrl('🤩'),
