@@ -8,5 +8,7 @@ public enum PointHistoryType {
     INVITE,
     FEATURE,
     SYSTEM_ONLINE,
-    REDEEM
+    REDEEM,
+    LOTTERY_JOIN,
+    LOTTERY_REWARD
 }
