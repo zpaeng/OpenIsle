@@ -106,7 +106,7 @@ const md = new MarkdownIt({
 
 md.use(mentionPlugin)
 md.use(tiebaEmojiPlugin)
-md.use(linkPlugin) // 添加链接插件
+md.use(linkPlugin)
 
 export function renderMarkdown(text) {
   return md.render(text || '')

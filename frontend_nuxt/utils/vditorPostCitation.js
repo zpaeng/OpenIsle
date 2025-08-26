@@ -10,7 +10,7 @@ async function searchPost(apiBaseUrl, keyword) {
   })
 }
 
-export default (apiBaseUrl) => {
+export default (apiBaseUrl, websiteBaseUrl) => {
   return {
     key: '#',
     hint: async (keyword) => {
@@ -22,8 +22,8 @@ export default (apiBaseUrl) => {
           let value = ''
           return (
             body.map((item) => ({
-              value: `[${item.title}](/posts/${item.id})`,
-              html: `<div>${item.title}</div>`,
+              value: `[🔗${item.title}](${websiteBaseUrl}/posts/${item.id})`,
+              html: `<div><i class="fas fa-link"></i> ${item.title}</div>`,
             })) ?? []
           )
         } else {
