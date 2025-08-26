@@ -6,7 +6,7 @@
         @mouseenter="cancelHide"
         @mouseleave="scheduleHide"
       >
-        <template v-if="counts.length < 4">
+        <template v-if="Object.keys(counts).length < 4">
           <div
             v-for="r in displayedReactions"
             :key="r.type"
