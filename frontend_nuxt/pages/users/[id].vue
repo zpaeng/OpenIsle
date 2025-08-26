@@ -945,6 +945,10 @@ watch(selectedTab, async (val) => {
 .follow-container {
 }
 
+.favorites-container {
+  padding: 10px;
+}
+
 .follow-tabs {
   display: flex;
   flex-direction: row;
