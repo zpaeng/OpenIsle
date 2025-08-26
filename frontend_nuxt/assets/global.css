@@ -139,6 +139,9 @@ body {
   margin-bottom: 0.8em;
 }
 
+.info-content-text video {
+  max-width: 100%;
+}
 .info-content-text {
   word-break: break-word;
   max-width: 100%;

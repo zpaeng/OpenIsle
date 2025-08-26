@@ -1,5 +1,11 @@
+// markdown.js
 import hljs from 'highlight.js/lib/common'
+import MarkdownIt from 'markdown-it'
+import sanitizeHtml from 'sanitize-html'
+import { toast } from '../main'
+import { tiebaEmoji } from './tiebaEmoji'
 
+// 动态切换 hljs 主题（保持你原有逻辑）
 if (typeof window !== 'undefined') {
   const theme =
     document.documentElement.dataset.theme ||
@@ -10,10 +16,8 @@ if (typeof window !== 'undefined') {
     import('highlight.js/styles/atom-one-light.css')
   }
 }
-import MarkdownIt from 'markdown-it'
-import { toast } from '../main'
-import { tiebaEmoji } from './tiebaEmoji'
 
+/** @section 自定义插件：@mention */
 function mentionPlugin(md) {
   const mentionReg = /^@\[([^\]]+)\]/
   function mention(state, silent) {
@@ -27,6 +31,7 @@ function mentionPlugin(md) {
         ['href', `/users/${match[1]}`],
         ['target', '_blank'],
         ['class', 'mention-link'],
+        ['rel', 'noopener noreferrer'],
       ]
       const text = state.push('text', '', 0)
       text.content = `@${match[1]}`
@@ -38,6 +43,7 @@ function mentionPlugin(md) {
   md.inline.ruler.before('emphasis', 'mention', mention)
 }
 
+/** @section 自定义插件：贴吧表情 :tieba123: */
 function tiebaEmojiPlugin(md) {
   md.renderer.rules['tieba-emoji'] = (tokens, idx) => {
     const name = tokens[idx].content
@@ -60,7 +66,7 @@ function tiebaEmojiPlugin(md) {
   })
 }
 
-// 链接在新窗口打开
+/** @section 链接外开 */
 function linkPlugin(md) {
   const defaultRender =
     md.renderer.rules.link_open ||
@@ -74,7 +80,6 @@ function linkPlugin(md) {
 
     if (hrefIndex >= 0) {
       const href = token.attrs[hrefIndex][1]
-      // 如果是外部链接，添加 target="_blank" 和 rel="noopener noreferrer"
       if (href.startsWith('http://') || href.startsWith('https://')) {
         token.attrPush(['target', '_blank'])
         token.attrPush(['rel', 'noopener noreferrer'])
@@ -85,8 +90,9 @@ function linkPlugin(md) {
   }
 }
 
+/** @section MarkdownIt 实例：开启 HTML，但配合强净化 */
 const md = new MarkdownIt({
-  html: false,
+  html: true, // ⭐ 允许行内 HTML（为 <video> 服务）
   linkify: true,
   breaks: true,
   highlight: (str, lang) => {
@@ -100,6 +106,7 @@ const md = new MarkdownIt({
       .trim()
       .split('\n')
       .map(() => `<div class="line-number"></div>`)
+    // 保留你原有的 CodeBlock + 复制按钮 + 行号结构
     return `<pre class="code-block"><button class="copy-code-btn">Copy</button><div class="line-numbers">${lineNumbers.join('')}</div><code class="hljs language-${lang || ''}">${code.trim()}</code></pre>`
   },
 })
@@ -108,8 +115,96 @@ md.use(mentionPlugin)
 md.use(tiebaEmojiPlugin)
 md.use(linkPlugin)
 
+/** @section sanitize-html 配置：只白名单需要的标签/属性/类名 */
+const SANITIZE_CFG = {
+  // 允许的标签（包含你代码块里用到的 button/div）
+  allowedTags: [
+    'a',
+    'p',
+    'div',
+    'span',
+    'pre',
+    'code',
+    'button',
+    'img',
+    'br',
+    'hr',
+    'blockquote',
+    'strong',
+    'em',
+    'ul',
+    'ol',
+    'li',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
+    'table',
+    'thead',
+    'tbody',
+    'tr',
+    'td',
+    'th',
+    'video',
+    'source',
+  ],
+  // 允许的属性
+  allowedAttributes: {
+    a: ['href', 'name', 'target', 'rel', 'class'],
+    img: ['src', 'alt', 'title', 'width', 'height', 'class'],
+    div: ['class'],
+    span: ['class'],
+    pre: ['class'],
+    code: ['class'],
+    button: ['class'],
+    video: [
+      'controls',
+      'autoplay',
+      'muted',
+      'loop',
+      'playsinline',
+      'poster',
+      'preload',
+      'width',
+      'height',
+      'crossorigin',
+    ],
+    source: ['src', 'type'],
+  },
+  // 允许的类名（保留你的样式钩子）
+  allowedClasses: {
+    a: ['mention-link'],
+    img: ['emoji'],
+    pre: ['code-block'],
+    div: ['line-numbers', 'line-number'],
+    code: ['hljs', /^language-/],
+    button: ['copy-code-btn'],
+  },
+  // 允许的协议（视频可能是 blob: / data:）
+  allowedSchemes: ['http', 'https', 'data', 'blob'],
+  allowProtocolRelative: false,
+  // 统一移除所有 on* 事件、style 等（默认就会清理）
+  transformTags: {
+    // 没写 controls 的 video，强制加上（避免静默自动播放）
+    video: (tagName, attribs) => {
+      const attrs = { ...attribs }
+      if (!('controls' in attrs)) attrs.controls = 'controls'
+      // 安全建议：若允许 autoplay，默认要求 muted
+      if ('autoplay' in attrs && !('muted' in attrs)) {
+        attrs.muted = 'muted'
+      }
+      return { tagName, attribs: attrs }
+    },
+  },
+}
+
+/** @section 渲染 & 事件 */
 export function renderMarkdown(text) {
-  return md.render(text || '')
+  const raw = md.render(text || '')
+  // ⭐ 核心：对最终 HTML 进行一次净化
+  return sanitizeHtml(raw, SANITIZE_CFG)
 }
 
 export function handleMarkdownClick(e) {
@@ -124,20 +219,16 @@ export function handleMarkdownClick(e) {
   }
 }
 
+/** @section 纯文本提取（保持你原有“统一正则法”） */
 export function stripMarkdown(text) {
   const html = md.render(text || '')
-
-  // 统一使用正则表达式方法，确保服务端和客户端行为一致
   let plainText = html.replace(/<[^>]+>/g, '')
-
-  // 标准化空白字符处理
   plainText = plainText
-    .replace(/\r\n/g, '\n') // Windows换行符转为Unix格式
-    .replace(/\r/g, '\n') // 旧Mac换行符转为Unix格式
-    .replace(/[ \t]+/g, ' ') // 合并空格和制表符为单个空格
-    .replace(/\n{3,}/g, '\n\n') // 最多保留两个连续换行（一个空行）
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
     .trim()
-
   return plainText
 }
 
@@ -146,6 +237,5 @@ export function stripMarkdownLength(text, length) {
   if (!length || plain.length <= length) {
     return plain
   }
-  // 截断并加省略号
   return plain.slice(0, length) + '...'
 }
