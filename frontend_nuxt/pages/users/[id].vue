@@ -339,7 +339,9 @@
               </template>
             </BaseTimeline>
           </div>
-          <div v-else class="summary-empty">暂无收藏文章</div>
+          <div v-else>
+            <BasePlaceholder text="暂无收藏文章" icon="fas fa-inbox" />
+          </div>
         </div>
 
         <div v-else-if="selectedTab === 'achievements'" class="achievements-container">
