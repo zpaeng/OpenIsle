@@ -66,6 +66,18 @@
             />
           </div>
         </div>
+        <div class="prize-point-row">
+          <span class="prize-row-title">参与所需积分</span>
+          <div class="prize-count-input">
+            <input
+              class="prize-count-input-field"
+              type="number"
+              v-model.number="pointCost"
+              min="0"
+              max="100"
+            />
+          </div>
+        </div>
         <div class="prize-time-row">
           <span class="prize-row-title">抽奖结束时间</span>
           <client-only>
@@ -105,6 +117,7 @@ const showPrizeCropper = ref(false)
 const prizeName = ref('')
 const prizeCount = ref(1)
 const prizeDescription = ref('')
+const pointCost = ref(0)
 const endTime = ref(null)
 const startTime = ref(null)
 const dateConfig = { enableTime: true, time_24hr: true, dateFormat: 'Y-m-d H:i' }
@@ -131,6 +144,11 @@ const onPrizeCropped = ({ file, url }) => {
 
 watch(prizeCount, (val) => {
   if (!val || val < 1) prizeCount.value = 1
+})
+
+watch(pointCost, (val) => {
+  if (val === undefined || val === null || val < 0) pointCost.value = 0
+  if (val > 100) pointCost.value = 100
 })
 
 const loadDraft = async () => {
@@ -168,6 +186,7 @@ const clearPost = async () => {
   showPrizeCropper.value = false
   prizeDescription.value = ''
   prizeCount.value = 1
+  pointCost.value = 0
   endTime.value = null
   startTime.value = null
 
@@ -315,6 +334,10 @@ const submitPost = async () => {
       toast.error('请选择抽奖结束时间')
       return
     }
+    if (pointCost.value < 0 || pointCost.value > 100) {
+      toast.error('参与积分需在0到100之间')
+      return
+    }
   }
   try {
     const token = getToken()
@@ -354,6 +377,7 @@ const submitPost = async () => {
         prizeDescription: postType.value === 'LOTTERY' ? prizeDescription.value : undefined,
         startTime:
           postType.value === 'LOTTERY' ? new Date(startTime.value).toISOString() : undefined,
+        pointCost: postType.value === 'LOTTERY' ? pointCost.value : undefined,
         // 将时间转换为 UTC+8.5 时区 todo: 需要优化
         endTime:
           postType.value === 'LOTTERY'

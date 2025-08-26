@@ -146,6 +146,24 @@
               <template v-else-if="item.type === 'REDEEM'">
                 兑换商品，消耗 {{ -item.amount }} 积分
               </template>
+              <template v-else-if="item.type === 'LOTTERY_JOIN'">
+                参与抽奖帖
+                <NuxtLink :to="`/posts/${item.postId}`" class="timeline-link">{{
+                  item.postTitle
+                }}</NuxtLink>
+                ，消耗 {{ -item.amount }} 积分
+              </template>
+              <template v-else-if="item.type === 'LOTTERY_REWARD'">
+                你的抽奖帖
+                <NuxtLink :to="`/posts/${item.postId}`" class="timeline-link">{{
+                  item.postTitle
+                }}</NuxtLink>
+                被
+                <NuxtLink :to="`/users/${item.fromUserId}`" class="timeline-link">{{
+                  item.fromUserName
+                }}</NuxtLink>
+                参与，获得 {{ item.amount }} 积分
+              </template>
               <template v-else-if="item.type === 'SYSTEM_ONLINE'"> 积分历史系统上线 </template>
               <i class="fas fa-coins"></i> 你目前的积分是 {{ item.balance }}
             </div>

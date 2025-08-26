@@ -26,6 +26,9 @@ public class LotteryPost extends Post {
     @Column(nullable = false)
     private int prizeCount;
 
+    @Column(nullable = false)
+    private int pointCost;
+
     @Column
     private LocalDateTime startTime;
 

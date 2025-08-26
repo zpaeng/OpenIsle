@@ -41,7 +41,8 @@ public class PostController {
         Post post = postService.createPost(auth.getName(), req.getCategoryId(),
                 req.getTitle(), req.getContent(), req.getTagIds(),
                 req.getType(), req.getPrizeDescription(), req.getPrizeIcon(),
-                req.getPrizeCount(), req.getStartTime(), req.getEndTime());
+                req.getPrizeCount(), req.getPointCost(),
+                req.getStartTime(), req.getEndTime());
         draftService.deleteDraft(auth.getName());
         PostDetailDto dto = postMapper.toDetailDto(post, auth.getName());
         dto.setReward(levelService.awardForPost(auth.getName()));
