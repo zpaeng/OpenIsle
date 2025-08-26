@@ -1,6 +1,6 @@
 <template>
   <div v-if="floatRoute" class="message-float-window" :style="{ height: floatHeight }">
-    <iframe :src="iframeSrc" frameborder="0"></iframe>
+    <iframe :src="iframeSrc" frameborder="0" ref="iframeRef" @load="injectBaseTag"></iframe>
 
     <div class="float-actions">
       <i
@@ -29,6 +29,7 @@ const DEFAULT_HEIGHT = '60vh'
 const MINI_HEIGHT = '45px'
 const floatHeight = ref(DEFAULT_HEIGHT)
 
+const iframeRef = ref(null)
 const iframeSrc = computed(() => {
   if (!floatRoute.value) return ''
   return floatRoute.value + (floatRoute.value.includes('?') ? '&' : '?') + 'float=1'
@@ -47,6 +48,17 @@ function expand() {
   const target = floatRoute.value
   floatRoute.value = null
   navigateTo(target)
+}
+
+function injectBaseTag() {
+  if (!iframeRef.value) return
+
+  const iframeDoc = iframeRef.value.contentDocument || iframeRef.value.contentWindow.document
+  if (iframeDoc && !iframeDoc.querySelector('base')) {
+    const base = iframeDoc.createElement('base')
+    base.target = '_top'
+    iframeDoc.head.appendChild(base)
+  }
 }
 
 // 当浮窗重新出现时，恢复默认高度
@@ -72,7 +84,8 @@ watch(
   z-index: 2000;
   display: flex;
   flex-direction: column;
-  transition: height 0.25s ease; /* 平滑过渡 */
+  transition: height 0.25s ease;
+  /* 平滑过渡 */
 }
 
 .message-float-window iframe {
