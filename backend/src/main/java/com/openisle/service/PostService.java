@@ -164,6 +164,7 @@ public class PostService {
                            String prizeDescription,
                            String prizeIcon,
                            Integer prizeCount,
+                           Integer pointCost,
                            LocalDateTime startTime,
                            LocalDateTime endTime) {
         long recent = postRepository.countByAuthorAfter(username,
@@ -188,10 +189,14 @@ public class PostService {
         PostType actualType = type != null ? type : PostType.NORMAL;
         Post post;
         if (actualType == PostType.LOTTERY) {
+            if (pointCost != null && (pointCost < 0 || pointCost > 100)) {
+                throw new IllegalArgumentException("pointCost must be between 0 and 100");
+            }
             LotteryPost lp = new LotteryPost();
             lp.setPrizeDescription(prizeDescription);
             lp.setPrizeIcon(prizeIcon);
             lp.setPrizeCount(prizeCount != null ? prizeCount : 0);
+            lp.setPointCost(pointCost != null ? pointCost : 0);
             lp.setStartTime(startTime);
             lp.setEndTime(endTime);
             post = lp;
@@ -250,8 +255,10 @@ public class PostService {
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
-        post.getParticipants().add(user);
-        lotteryPostRepository.save(post);
+        if (post.getParticipants().add(user)) {
+            pointService.processLotteryJoin(user, post);
+            lotteryPostRepository.save(post);
+        }
     }
 
     @Transactional

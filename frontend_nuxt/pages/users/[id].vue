@@ -95,6 +95,13 @@
           <div class="profile-tabs-item-label">关注</div>
         </div>
         <div
+          :class="['profile-tabs-item', { selected: selectedTab === 'favorites' }]"
+          @click="selectedTab = 'favorites'"
+        >
+          <i class="fas fa-bookmark"></i>
+          <div class="profile-tabs-item-label">收藏</div>
+        </div>
+        <div
           :class="['profile-tabs-item', { selected: selectedTab === 'achievements' }]"
           @click="selectedTab = 'achievements'"
         >
@@ -318,6 +325,23 @@
           </div>
         </div>
 
+        <div v-else-if="selectedTab === 'favorites'" class="favorites-container">
+          <div v-if="favoritePosts.length > 0">
+            <BaseTimeline :items="favoritePosts">
+              <template #item="{ item }">
+                <NuxtLink :to="`/posts/${item.post.id}`" class="timeline-link">
+                  {{ item.post.title }}
+                </NuxtLink>
+                <div class="timeline-snippet">
+                  {{ stripMarkdown(item.post.snippet) }}
+                </div>
+                <div class="timeline-date">{{ formatDate(item.post.createdAt) }}</div>
+              </template>
+            </BaseTimeline>
+          </div>
+          <div v-else class="summary-empty">暂无收藏文章</div>
+        </div>
+
         <div v-else-if="selectedTab === 'achievements'" class="achievements-container">
           <AchievementList :medals="medals" :can-select="isMine" />
         </div>
@@ -352,6 +376,7 @@ const user = ref({})
 const hotPosts = ref([])
 const hotReplies = ref([])
 const hotTags = ref([])
+const favoritePosts = ref([])
 const timelineItems = ref([])
 const timelineFilter = ref('all')
 const filteredTimelineItems = computed(() => {
@@ -369,7 +394,7 @@ const subscribed = ref(false)
 const isLoading = ref(true)
 const tabLoading = ref(false)
 const selectedTab = ref(
-  ['summary', 'timeline', 'following', 'achievements'].includes(route.query.tab)
+  ['summary', 'timeline', 'following', 'favorites', 'achievements'].includes(route.query.tab)
     ? route.query.tab
     : 'summary',
 )
@@ -472,6 +497,16 @@ const fetchFollowUsers = async () => {
   followings.value = followingRes.ok ? await followingRes.json() : []
 }
 
+const fetchFavorites = async () => {
+  const res = await fetch(`${API_BASE_URL}/api/users/${username}/subscribed-posts`)
+  if (res.ok) {
+    const data = await res.json()
+    favoritePosts.value = data.map((p) => ({ icon: 'fas fa-bookmark', post: p }))
+  } else {
+    favoritePosts.value = []
+  }
+}
+
 const loadSummary = async () => {
   tabLoading.value = true
   await fetchSummary()
@@ -487,6 +522,12 @@ const loadTimeline = async () => {
 const loadFollow = async () => {
   tabLoading.value = true
   await fetchFollowUsers()
+  tabLoading.value = false
+}
+
+const loadFavorites = async () => {
+  tabLoading.value = true
+  await fetchFavorites()
   tabLoading.value = false
 }
 
@@ -578,6 +619,8 @@ const init = async () => {
       await loadTimeline()
     } else if (selectedTab.value === 'following') {
       await loadFollow()
+    } else if (selectedTab.value === 'favorites') {
+      await loadFavorites()
     } else if (selectedTab.value === 'achievements') {
       await loadAchievements()
     }
@@ -596,6 +639,8 @@ watch(selectedTab, async (val) => {
     await loadTimeline()
   } else if (val === 'following' && followers.value.length === 0 && followings.value.length === 0) {
     await loadFollow()
+  } else if (val === 'favorites' && favoritePosts.value.length === 0) {
+    await loadFavorites()
   } else if (val === 'achievements' && medals.value.length === 0) {
     await loadAchievements()
   }
@@ -898,6 +943,10 @@ watch(selectedTab, async (val) => {
 }
 
 .follow-container {
+}
+
+.favorites-container {
+  padding: 10px;
 }
 
 .follow-tabs {

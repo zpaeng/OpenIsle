@@ -9,14 +9,12 @@
         title="收起至 100px"
         @click="collapseToMini"
       ></i>
-      <!-- 回弹：60vh -->
       <i
         class="fas fa-chevron-up"
         v-if="floatHeight !== DEFAULT_HEIGHT"
         title="回弹至 60vh"
         @click="reboundToDefault"
       ></i>
-      <!-- 全屏打开（原有逻辑） -->
       <i class="fas fa-expand" title="在页面中打开" @click="expand"></i>
     </div>
   </div>
@@ -61,7 +59,6 @@ function injectBaseTag() {
   }
 }
 
-// 当浮窗重新出现时，恢复默认高度
 watch(
   () => floatRoute.value,
   (v) => {
@@ -76,7 +73,6 @@ watch(
   bottom: 0;
   right: 0;
   width: 400px;
-  /* 高度由内联样式绑定控制：60vh / 100px */
   max-height: 90vh;
   background-color: var(--background-color);
   border: 1px solid var(--normal-border-color);

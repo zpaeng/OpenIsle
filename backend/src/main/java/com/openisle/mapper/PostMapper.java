@@ -86,6 +86,7 @@ public class PostMapper {
             l.setPrizeDescription(lp.getPrizeDescription());
             l.setPrizeIcon(lp.getPrizeIcon());
             l.setPrizeCount(lp.getPrizeCount());
+            l.setPointCost(lp.getPointCost());
             l.setStartTime(lp.getStartTime());
             l.setEndTime(lp.getEndTime());
             l.setParticipants(lp.getParticipants().stream().map(userMapper::toAuthorDto).collect(Collectors.toList()));

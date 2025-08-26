@@ -16,6 +16,7 @@ export function createVditor(editorId, options = {}) {
   const { placeholder = '', preview = {}, input, after } = options
   const config = useRuntimeConfig()
   const API_BASE_URL = config.public.apiBaseUrl
+  const WEBSITE_BASE_URL = config.public.websiteBaseUrl
 
   const fetchMentions = async (value) => {
     if (!value) {
@@ -80,7 +81,7 @@ export function createVditor(editorId, options = {}) {
             }))
           },
         },
-        vditorPostCitation(API_BASE_URL),
+        vditorPostCitation(API_BASE_URL, WEBSITE_BASE_URL),
       ],
     },
     cdn: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/vditor',

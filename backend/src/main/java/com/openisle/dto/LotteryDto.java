@@ -10,6 +10,7 @@ public class LotteryDto {
     private String prizeDescription;
     private String prizeIcon;
     private int prizeCount;
+    private int pointCost;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private List<AuthorDto> participants;

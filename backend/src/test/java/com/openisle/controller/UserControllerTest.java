@@ -137,6 +137,30 @@ class UserControllerTest {
     }
 
     @Test
+    void listSubscribedPosts() throws Exception {
+        User user = new User();
+        user.setUsername("bob");
+        com.openisle.model.Category cat = new com.openisle.model.Category();
+        cat.setName("tech");
+        com.openisle.model.Post post = new com.openisle.model.Post();
+        post.setId(6L);
+        post.setTitle("fav");
+        post.setCreatedAt(java.time.LocalDateTime.now());
+        post.setCategory(cat);
+        post.setAuthor(user);
+        Mockito.when(userService.findByIdentifier("bob")).thenReturn(Optional.of(user));
+        Mockito.when(subscriptionService.getSubscribedPosts("bob")).thenReturn(java.util.List.of(post));
+        PostMetaDto meta = new PostMetaDto();
+        meta.setId(6L);
+        meta.setTitle("fav");
+        Mockito.when(userMapper.toMetaDto(post)).thenReturn(meta);
+
+        mockMvc.perform(get("/api/users/bob/subscribed-posts"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("fav"));
+    }
+
+    @Test
     void listUserReplies() throws Exception {
         User user = new User();
         user.setUsername("bob");

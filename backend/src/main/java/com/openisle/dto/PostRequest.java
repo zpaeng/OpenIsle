@@ -23,6 +23,7 @@ public class PostRequest {
     private String prizeDescription;
     private String prizeIcon;
     private Integer prizeCount;
+    private Integer pointCost;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 }

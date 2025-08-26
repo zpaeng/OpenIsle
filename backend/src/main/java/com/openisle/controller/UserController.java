@@ -105,6 +105,17 @@ public class UserController {
                 .collect(java.util.stream.Collectors.toList());
     }
 
+    @GetMapping("/{identifier}/subscribed-posts")
+    public java.util.List<PostMetaDto> subscribedPosts(@PathVariable("identifier") String identifier,
+                                                       @RequestParam(value = "limit", required = false) Integer limit) {
+        int l = limit != null ? limit : defaultPostsLimit;
+        User user = userService.findByIdentifier(identifier).orElseThrow();
+        return subscriptionService.getSubscribedPosts(user.getUsername()).stream()
+                .limit(l)
+                .map(userMapper::toMetaDto)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
     @GetMapping("/{identifier}/replies")
     public java.util.List<CommentInfoDto> userReplies(@PathVariable("identifier") String identifier,
                                                       @RequestParam(value = "limit", required = false) Integer limit) {

@@ -2,6 +2,7 @@ package com.openisle.service;
 
 import com.openisle.model.*;
 import com.openisle.repository.*;
+import com.openisle.exception.FieldException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +38,17 @@ public class PointService {
         User user = userRepository.findByUsername(userName).orElseThrow();
         Post post = postRepository.findById(postId).orElseThrow();
         return addPoint(user, 500, PointHistoryType.FEATURE, post, null, null);
+    }
+
+    public void processLotteryJoin(User participant, LotteryPost post) {
+        int cost = post.getPointCost();
+        if (cost > 0) {
+            if (participant.getPoint() < cost) {
+                throw new FieldException("point", "积分不足");
+            }
+            addPoint(participant, -cost, PointHistoryType.LOTTERY_JOIN, post, null, post.getAuthor());
+            addPoint(post.getAuthor(), cost, PointHistoryType.LOTTERY_REWARD, post, null, participant);
+        }
     }
 
     private PointLog getTodayLog(User user) {

@@ -119,7 +119,9 @@
                   class="join-prize-button"
                   @click="joinLottery"
                 >
-                  <div class="join-prize-button-text">参与抽奖</div>
+                  <div class="join-prize-button-text">
+                    参与抽奖 <i class="fas fa-coins"></i> {{ lottery.pointCost }}
+                  </div>
                 </div>
                 <div v-else-if="hasJoined" class="join-prize-button-disabled">
                   <div class="join-prize-button-text">已参与</div>
@@ -134,7 +136,9 @@
               class="join-prize-button"
               @click="joinLottery"
             >
-              <div class="join-prize-button-text">参与抽奖</div>
+              <div class="join-prize-button-text">
+                参与抽奖 <i class="fas fa-coins"></i> {{ lottery.pointCost }}
+              </div>
             </div>
             <div v-else-if="hasJoined" class="join-prize-button-disabled">
               <div class="join-prize-button-text">已参与</div>
@@ -810,11 +814,12 @@ const joinLottery = async () => {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
   })
+  const data = await res.json().catch(() => ({}))
   if (res.ok) {
     toast.success('已参与抽奖')
     await refreshPost()
   } else {
-    toast.error('操作失败')
+    toast.error(data.error || '操作失败')
   }
 }
 
@@ -894,7 +899,7 @@ onMounted(async () => {
 })
 </script>
 
-<style>
+<style scoped>
 .post-page-container {
   background-color: var(--background-color);
   display: flex;

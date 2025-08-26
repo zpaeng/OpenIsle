@@ -8,7 +8,7 @@
       <i class="fas fa-compress" @click="minimize" title="最小化"></i>
     </div>
     <div class="tabs">
-      <div :class="['tab', { active: activeTab === 'messages' }]" @click="activeTab = 'messages'">
+      <div :class="['tab', { active: activeTab === 'messages' }]" @click="switchToMessage">
         站内信
       </div>
       <div :class="['tab', { active: activeTab === 'channels' }]" @click="switchToChannels">
@@ -147,7 +147,7 @@ const { fetchChannelUnread: refreshChannelUnread, setFromList: setChannelUnreadF
   useChannelsUnreadCount()
 let subscription = null
 
-const activeTab = ref('messages')
+const activeTab = ref('channels')
 const channels = ref([])
 const loadingChannels = ref(false)
 const isFloatMode = computed(() => route.query.float === '1')
@@ -159,6 +159,7 @@ async function fetchConversations() {
     toast.error('请先登录')
     return
   }
+  loading.value = true
   try {
     const response = await fetch(`${API_BASE_URL}/api/messages/conversations`, {
       method: 'GET',
@@ -215,11 +216,14 @@ async function fetchChannels() {
   }
 }
 
+function switchToMessage() {
+  activeTab.value = 'messages'
+  fetchConversations()
+}
+
 function switchToChannels() {
   activeTab.value = 'channels'
-  if (channels.value.length === 0) {
-    fetchChannels()
-  }
+  fetchChannels()
 }
 
 async function goToChannel(id) {
@@ -244,12 +248,15 @@ async function goToChannel(id) {
 }
 
 onActivated(async () => {
-  loading.value = true
   currentUser.value = await fetchCurrentUser()
 
   if (currentUser.value) {
-    await fetchConversations()
-    refreshGlobalUnreadCount() // Refresh global count when entering the list
+    if (activeTab.value === 'messages') {
+      await fetchConversations()
+    } else {
+      await fetchChannels()
+    }
+    refreshGlobalUnreadCount()
     refreshChannelUnread()
     const token = getToken()
     if (token && !isConnected.value) {
