@@ -119,7 +119,9 @@
                   class="join-prize-button"
                   @click="joinLottery"
                 >
-                  <div class="join-prize-button-text">参与抽奖（{{ lottery.pointCost }}积分）</div>
+                  <div class="join-prize-button-text">
+                    参与抽奖 <i class="fas fa-coins"></i> {{ lottery.pointCost }}
+                  </div>
                 </div>
                 <div v-else-if="hasJoined" class="join-prize-button-disabled">
                   <div class="join-prize-button-text">已参与</div>
@@ -134,7 +136,9 @@
               class="join-prize-button"
               @click="joinLottery"
             >
-              <div class="join-prize-button-text">参与抽奖（{{ lottery.pointCost }}积分）</div>
+              <div class="join-prize-button-text">
+                参与抽奖 <i class="fas fa-coins"></i> {{ lottery.pointCost }}
+              </div>
             </div>
             <div v-else-if="hasJoined" class="join-prize-button-disabled">
               <div class="join-prize-button-text">已参与</div>

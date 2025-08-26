@@ -219,6 +219,8 @@ const iconMap = {
   SYSTEM_ONLINE: 'fas fa-clock',
   REDEEM: 'fas fa-gift',
   FEATURE: 'fas fa-star',
+  LOTTERY_JOIN: 'fas fa-ticket-alt',
+  LOTTERY_REWARD: 'fas fa-ticket-alt',
 }
 
 onMounted(async () => {
