@@ -94,7 +94,7 @@
         </div>
       </div>
 
-      <div v-if="lottery" class="prize-container">
+      <div v-if="lottery" class="post-prize-container">
         <div class="prize-content">
           <div class="prize-info">
             <div class="prize-info-left">
@@ -899,7 +899,7 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
+<style>
 .post-page-container {
   background-color: var(--background-color);
   display: flex;
@@ -1267,7 +1267,7 @@ onMounted(async () => {
   position: relative;
 }
 
-.prize-container {
+.post-prize-container {
   margin-top: 20px;
   display: flex;
   flex-direction: column;
