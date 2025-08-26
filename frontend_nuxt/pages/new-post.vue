@@ -498,6 +498,8 @@ const submitPost = async () => {
   display: flex;
   flex-direction: column;
   gap: 20px;
+
+  margin-bottom: 200px;
 }
 
 .prize-row-title {

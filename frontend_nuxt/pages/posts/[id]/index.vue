@@ -894,7 +894,7 @@ onMounted(async () => {
 })
 </script>
 
-<style>
+<style scoped>
 .post-page-container {
   background-color: var(--background-color);
   display: flex;
