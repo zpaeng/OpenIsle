@@ -107,6 +107,11 @@ public class SubscriptionService {
         return commentSubRepo.findByComment(c).stream().map(CommentSubscription::getUser).toList();
     }
 
+    public List<Post> getSubscribedPosts(String username) {
+        User user = userRepo.findByUsername(username).orElseThrow();
+        return postSubRepo.findByUser(user).stream().map(PostSubscription::getPost).toList();
+    }
+
 
     public long countSubscribers(String username) {
         User user = userRepo.findByUsername(username).orElseThrow();
