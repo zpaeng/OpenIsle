@@ -92,7 +92,7 @@ function linkPlugin(md) {
 
 /** @section MarkdownIt 实例：开启 HTML，但配合强净化 */
 const md = new MarkdownIt({
-  html: true, // ⭐ 允许行内 HTML（为 <video> 服务）
+  html: true,
   linkify: true,
   breaks: true,
   highlight: (str, lang) => {
@@ -106,9 +106,14 @@ const md = new MarkdownIt({
       .trim()
       .split('\n')
       .map(() => `<div class="line-number"></div>`)
-    // 保留你原有的 CodeBlock + 复制按钮 + 行号结构
     return `<pre class="code-block"><button class="copy-code-btn">Copy</button><div class="line-numbers">${lineNumbers.join('')}</div><code class="hljs language-${lang || ''}">${code.trim()}</code></pre>`
   },
+})
+
+const md2TextRender = new MarkdownIt({
+  html: true,
+  linkify: true,
+  breaks: true,
 })
 
 md.use(mentionPlugin)
@@ -221,7 +226,7 @@ export function handleMarkdownClick(e) {
 
 /** @section 纯文本提取（保持你原有“统一正则法”） */
 export function stripMarkdown(text) {
-  const html = md.render(text || '')
+  const html = md2TextRender.render(text || '')
   let plainText = html.replace(/<[^>]+>/g, '')
   plainText = plainText
     .replace(/\r\n/g, '\n')
