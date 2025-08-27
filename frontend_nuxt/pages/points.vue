@@ -185,13 +185,6 @@ import BasePlaceholder from '~/components/BasePlaceholder.vue'
 import { stripMarkdownLength } from '~/utils/markdown'
 import TimeManager from '~/utils/time'
 import BaseTabs from '~/components/BaseTabs.vue'
-import { LineChart } from 'echarts/charts'
-import { GridComponent, TooltipComponent } from 'echarts/components'
-import { use } from 'echarts/core'
-import { CanvasRenderer } from 'echarts/renderers'
-import VChart from 'vue-echarts'
-
-use([LineChart, GridComponent, TooltipComponent, CanvasRenderer])
 
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
@@ -248,9 +241,10 @@ const loadTrend = async () => {
     const values = data.map((d) => d.value)
     trendOption.value = {
       tooltip: { trigger: 'axis' },
-      xAxis: { type: 'category', data: dates },
+      xAxis: { type: 'category', data: dates, boundaryGap: false },
       yAxis: { type: 'value' },
       series: [{ type: 'line', areaStyle: {}, smooth: true, data: values }],
+      dataZoom: [{ type: 'slider', start: 80 }, { type: 'inside' }],
     }
   }
 }
