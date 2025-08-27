@@ -114,6 +114,14 @@ public class NotificationService {
         return n;
     }
 
+    public void deleteReactionNotification(User fromUser, Post post, Comment comment, ReactionType reactionType) {
+        if (post != null) {
+            notificationRepository.deleteByTypeAndFromUserAndPostAndReactionType(NotificationType.REACTION, fromUser, post, reactionType);
+        } else if (comment != null) {
+            notificationRepository.deleteByTypeAndFromUserAndCommentAndReactionType(NotificationType.REACTION, fromUser, comment, reactionType);
+        }
+    }
+
     /**
      * Create notifications for all admins when a user submits a register request.
      * Old register request notifications from the same applicant are removed first.
