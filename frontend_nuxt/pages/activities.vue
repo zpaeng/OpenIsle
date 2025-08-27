@@ -7,7 +7,7 @@
     <div class="activity-list-page-card" v-for="a in activities" :key="a.id">
       <div class="activity-list-page-card-normal">
         <div v-if="a.icon" class="activity-card-normal-left">
-          <img :src="a.icon" alt="avatar" class="activity-card-left-avatar-img" />
+          <BaseImage :src="a.icon" alt="avatar" class="activity-card-left-avatar-img" />
         </div>
         <div class="activity-card-normal-right">
           <div class="activity-card-normal-right-header">

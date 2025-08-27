@@ -25,7 +25,7 @@
             {{ loadingMore ? '加载中...' : '查看更多消息' }}
           </div>
         </div>
-        <BaseTimeline :items="messages" hover>
+        <BaseTimeline :items="messages">
           <template #item="{ item }">
             <div class="message-header">
               <div class="user-name">
@@ -35,7 +35,7 @@
                 {{ TimeManager.format(item.createdAt) }}
               </div>
             </div>
-            <div v-if="item.replyTo" class="reply-preview">
+            <div v-if="item.replyTo" class="reply-preview info-content-text">
               <div class="reply-author">{{ item.replyTo.sender.username }}</div>
               <div class="reply-content" v-html="renderMarkdown(item.replyTo.content)"></div>
             </div>
@@ -597,10 +597,11 @@ function goBack() {
 }
 
 .reply-preview {
-  padding: 5px 10px;
+  padding: 10px;
   border-left: 5px solid var(--primary-color);
   margin-bottom: 5px;
   font-size: 13px;
+  background-color: var(--menu-selected-background-color);
 }
 
 .reply-author {

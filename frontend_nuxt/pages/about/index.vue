@@ -1,30 +1,23 @@
 <template>
   <div class="about-page">
-    <div class="about-tabs">
-      <div
-        v-for="tab in tabs"
-        :key="tab.name"
-        :class="['about-tabs-item', { selected: selectedTab === tab.name }]"
-        @click="selectTab(tab.name)"
-      >
-        <div class="about-tabs-item-label">{{ tab.label }}</div>
+    <BaseTabs v-model="selectedTab" :tabs="tabs">
+      <div class="about-loading" v-if="isFetching">
+        <l-hatch-spinner size="100" stroke="10" speed="1" color="var(--primary-color)" />
       </div>
-    </div>
-    <div class="about-loading" v-if="isFetching">
-      <l-hatch-spinner size="100" stroke="10" speed="1" color="var(--primary-color)" />
-    </div>
-    <div
-      v-else
-      class="about-content"
-      v-html="renderMarkdown(content)"
-      @click="handleContentClick"
-    ></div>
+      <div
+        v-else
+        class="about-content"
+        v-html="renderMarkdown(content)"
+        @click="handleContentClick"
+      ></div>
+    </BaseTabs>
   </div>
 </template>
 
 <script>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { handleMarkdownClick, renderMarkdown } from '~/utils/markdown'
+import BaseTabs from '~/components/BaseTabs.vue'
 
 export default {
   name: 'AboutPageView',
@@ -32,27 +25,27 @@ export default {
     const isFetching = ref(false)
     const tabs = [
       {
-        name: 'about',
+        key: 'about',
         label: '关于',
         file: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/about/about.md',
       },
       {
-        name: 'agreement',
+        key: 'agreement',
         label: '用户协议',
         file: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/about/agreement.md',
       },
       {
-        name: 'guideline',
+        key: 'guideline',
         label: '创作准则',
         file: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/about/guideline.md',
       },
       {
-        name: 'privacy',
+        key: 'privacy',
         label: '隐私政策',
         file: 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/about/privacy.md',
       },
     ]
-    const selectedTab = ref(tabs[0].name)
+    const selectedTab = ref(tabs[0].key)
     const content = ref('')
 
     const loadContent = async (file) => {
@@ -71,21 +64,20 @@ export default {
       }
     }
 
-    const selectTab = (name) => {
-      selectedTab.value = name
-      const tab = tabs.find((t) => t.name === name)
-      if (tab) loadContent(tab.file)
-    }
-
     onMounted(() => {
       loadContent(tabs[0].file)
+    })
+
+    watch(selectedTab, (name) => {
+      const tab = tabs.find((t) => t.key === name)
+      if (tab) loadContent(tab.file)
     })
 
     const handleContentClick = (e) => {
       handleMarkdownClick(e)
     }
 
-    return { tabs, selectedTab, content, renderMarkdown, selectTab, isFetching, handleContentClick }
+    return { tabs, selectedTab, content, renderMarkdown, isFetching, handleContentClick }
   },
 }
 </script>
@@ -95,28 +87,6 @@ export default {
   max-width: var(--page-max-width);
   background-color: var(--background-color);
   margin: 0 auto;
-}
-
-.about-tabs {
-  top: calc(var(--header-height) + 1px);
-  background-color: var(--background-color-blur);
-  display: flex;
-  flex-direction: row;
-  border-bottom: 1px solid var(--normal-border-color);
-  margin-bottom: 20px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.about-tabs-item {
-  padding: 10px 20px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.about-tabs-item.selected {
-  color: var(--primary-color);
-  border-bottom: 2px solid var(--primary-color);
 }
 
 .about-content {

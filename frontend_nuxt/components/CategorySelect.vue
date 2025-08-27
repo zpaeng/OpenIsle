@@ -9,7 +9,7 @@
       <div class="option-container">
         <div class="option-main">
           <template v-if="option.icon">
-            <img
+            <BaseImage
               v-if="isImageIcon(option.icon)"
               :src="option.icon"
               class="option-icon"

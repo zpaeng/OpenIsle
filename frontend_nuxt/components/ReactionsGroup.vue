@@ -14,7 +14,7 @@
             :class="{ selected: userReacted(r.type) }"
             @click="toggleReaction(r.type)"
           >
-            <img :src="reactionEmojiMap[r.type]" class="emoji" alt="emoji" />
+            <BaseImage :src="reactionEmojiMap[r.type]" class="emoji" alt="emoji" />
             <div>{{ counts[r.type] }}</div>
           </div>
 
@@ -30,7 +30,7 @@
             class="reactions-viewer-item"
             @click="openPanel"
           >
-            <img :src="reactionEmojiMap[r.type]" class="emoji" alt="emoji" />
+            <BaseImage :src="reactionEmojiMap[r.type]" class="emoji" alt="emoji" />
           </div>
           <div class="reactions-count">{{ totalCount }}</div>
         </template>
@@ -61,7 +61,7 @@
         @click="toggleReaction(t)"
         :class="{ selected: userReacted(t) }"
       >
-        <img :src="reactionEmojiMap[t]" class="emoji" alt="emoji" /><span v-if="counts[t]">{{
+        <BaseImage :src="reactionEmojiMap[t]" class="emoji" alt="emoji" /><span v-if="counts[t]">{{
           counts[t]
         }}</span>
       </div>

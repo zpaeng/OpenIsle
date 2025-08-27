@@ -1,7 +1,7 @@
 <template>
   <div class="article-category-container" v-if="category">
     <div class="article-info-item" @click="gotoCategory">
-      <img
+      <BaseImage
         v-if="category.smallIcon"
         class="article-info-item-img"
         :src="category.smallIcon"

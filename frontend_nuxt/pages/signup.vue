@@ -70,19 +70,35 @@
 
     <div class="other-signup-page-content">
       <div class="signup-page-button" @click="signupWithGoogle">
-        <img class="signup-page-button-icon" src="~/assets/icons/google.svg" alt="Google Logo" />
+        <BaseImage
+          class="signup-page-button-icon"
+          src="~/assets/icons/google.svg"
+          alt="Google Logo"
+        />
         <div class="signup-page-button-text">Google 注册</div>
       </div>
       <div class="signup-page-button" @click="signupWithGithub">
-        <img class="signup-page-button-icon" src="~/assets/icons/github.svg" alt="GitHub Logo" />
+        <BaseImage
+          class="signup-page-button-icon"
+          src="~/assets/icons/github.svg"
+          alt="GitHub Logo"
+        />
         <div class="signup-page-button-text">GitHub 注册</div>
       </div>
       <div class="signup-page-button" @click="signupWithDiscord">
-        <img class="signup-page-button-icon" src="~/assets/icons/discord.svg" alt="Discord Logo" />
+        <BaseImage
+          class="signup-page-button-icon"
+          src="~/assets/icons/discord.svg"
+          alt="Discord Logo"
+        />
         <div class="signup-page-button-text">Discord 注册</div>
       </div>
       <div class="signup-page-button" @click="signupWithTwitter">
-        <img class="signup-page-button-icon" src="~/assets/icons/twitter.svg" alt="Twitter Logo" />
+        <BaseImage
+          class="signup-page-button-icon"
+          src="~/assets/icons/twitter.svg"
+          alt="Twitter Logo"
+        />
         <div class="signup-page-button-text">Twitter 注册</div>
       </div>
     </div>

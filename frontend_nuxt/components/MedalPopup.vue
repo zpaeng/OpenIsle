@@ -4,7 +4,7 @@
       <div class="medal-popup-title">恭喜你获得以下勋章</div>
       <div class="medal-popup-list">
         <div v-for="medal in medals" :key="medal.type" class="medal-popup-item">
-          <img :src="medal.icon" :alt="medal.title" class="medal-popup-item-icon" />
+          <BaseImage :src="medal.icon" :alt="medal.title" class="medal-popup-item-icon" />
           <div class="medal-popup-item-title">{{ medal.title }}</div>
         </div>
       </div>

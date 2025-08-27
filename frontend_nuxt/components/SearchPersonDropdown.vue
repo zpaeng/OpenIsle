@@ -24,7 +24,7 @@
       </template>
       <template #option="{ option }">
         <div class="search-option-item">
-          <img
+          <BaseImage
             :src="option.avatar || '/default-avatar.svg'"
             class="avatar"
             @error="handleAvatarError"

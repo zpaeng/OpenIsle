@@ -47,7 +47,7 @@
       <div class="info-content-container author-info-container">
         <div class="user-avatar-container" @click="gotoProfile">
           <div class="user-avatar-item">
-            <img class="user-avatar-item-img" :src="author.avatar" alt="avatar" />
+            <BaseImage class="user-avatar-item-img" :src="author.avatar" alt="avatar" />
           </div>
           <div v-if="isMobile" class="info-content-header">
             <div class="user-name">
@@ -99,7 +99,7 @@
           <div class="prize-info">
             <div class="prize-info-left">
               <div class="prize-icon">
-                <img
+                <BaseImage
                   class="prize-icon-img"
                   v-if="lottery.prizeIcon"
                   :src="lottery.prizeIcon"
@@ -146,7 +146,7 @@
           </div>
         </div>
         <div class="prize-member-container">
-          <img
+          <BaseImage
             v-for="p in lotteryParticipants"
             :key="p.id"
             class="prize-member-avatar"
@@ -157,7 +157,7 @@
           <div v-if="lotteryEnded && lotteryWinners.length" class="prize-member-winner">
             <i class="fas fa-medal medal-icon"></i>
             <span class="prize-member-winner-name">获奖者: </span>
-            <img
+            <BaseImage
               v-for="w in lotteryWinners"
               :key="w.id"
               class="prize-member-avatar"

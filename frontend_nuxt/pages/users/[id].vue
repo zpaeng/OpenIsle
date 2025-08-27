@@ -7,7 +7,7 @@
     <div v-else>
       <div class="profile-page-header">
         <div class="profile-page-header-avatar">
-          <img :src="user.avatar" alt="avatar" class="profile-page-header-avatar-img" />
+          <BaseImage :src="user.avatar" alt="avatar" class="profile-page-header-avatar-img" />
         </div>
         <div class="profile-page-header-user-info">
           <div class="profile-page-header-user-info-name">{{ user.username }}</div>
@@ -72,280 +72,246 @@
         </div>
       </div>
 
-      <div class="profile-tabs">
-        <div
-          :class="['profile-tabs-item', { selected: selectedTab === 'summary' }]"
-          @click="selectedTab = 'summary'"
-        >
-          <i class="fas fa-chart-line"></i>
-          <div class="profile-tabs-item-label">总结</div>
+      <BaseTabs v-model="selectedTab" :tabs="tabs">
+        <div v-if="tabLoading" class="tab-loading">
+          <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)" />
         </div>
-        <div
-          :class="['profile-tabs-item', { selected: selectedTab === 'timeline' }]"
-          @click="selectedTab = 'timeline'"
-        >
-          <i class="fas fa-clock"></i>
-          <div class="profile-tabs-item-label">时间线</div>
-        </div>
-        <div
-          :class="['profile-tabs-item', { selected: selectedTab === 'following' }]"
-          @click="selectedTab = 'following'"
-        >
-          <i class="fas fa-user-plus"></i>
-          <div class="profile-tabs-item-label">关注</div>
-        </div>
-        <div
-          :class="['profile-tabs-item', { selected: selectedTab === 'favorites' }]"
-          @click="selectedTab = 'favorites'"
-        >
-          <i class="fas fa-bookmark"></i>
-          <div class="profile-tabs-item-label">收藏</div>
-        </div>
-        <div
-          :class="['profile-tabs-item', { selected: selectedTab === 'achievements' }]"
-          @click="selectedTab = 'achievements'"
-        >
-          <i class="fas fa-medal"></i>
-          <div class="profile-tabs-item-label">勋章</div>
-        </div>
-      </div>
-
-      <div v-if="tabLoading" class="tab-loading">
-        <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)" />
-      </div>
-      <template v-else>
-        <div v-if="selectedTab === 'summary'" class="profile-summary">
-          <div class="total-summary">
-            <div class="summary-title">统计信息</div>
-            <div class="total-summary-content">
-              <div class="total-summary-item">
-                <div class="total-summary-item-label">访问天数</div>
-                <div class="total-summary-item-value">{{ user.visitedDays }}</div>
+        <template v-else>
+          <div v-if="selectedTab === 'summary'" class="profile-summary">
+            <div class="total-summary">
+              <div class="summary-title">统计信息</div>
+              <div class="total-summary-content">
+                <div class="total-summary-item">
+                  <div class="total-summary-item-label">访问天数</div>
+                  <div class="total-summary-item-value">{{ user.visitedDays }}</div>
+                </div>
+                <div class="total-summary-item">
+                  <div class="total-summary-item-label">已读帖子</div>
+                  <div class="total-summary-item-value">{{ user.readPosts }}</div>
+                </div>
+                <div class="total-summary-item">
+                  <div class="total-summary-item-label">已送出的💗</div>
+                  <div class="total-summary-item-value">{{ user.likesSent }}</div>
+                </div>
+                <div class="total-summary-item">
+                  <div class="total-summary-item-label">已收到的💗</div>
+                  <div class="total-summary-item-value">{{ user.likesReceived }}</div>
+                </div>
               </div>
-              <div class="total-summary-item">
-                <div class="total-summary-item-label">已读帖子</div>
-                <div class="total-summary-item-value">{{ user.readPosts }}</div>
+            </div>
+            <div class="summary-divider">
+              <div class="hot-reply">
+                <div class="summary-title">热门回复</div>
+                <div class="summary-content" v-if="hotReplies.length > 0">
+                  <BaseTimeline :items="hotReplies">
+                    <template #item="{ item }">
+                      在
+                      <NuxtLink :to="`/posts/${item.comment.post.id}`" class="timeline-link">
+                        {{ item.comment.post.title }}
+                      </NuxtLink>
+                      <template v-if="item.comment.parentComment">
+                        下对
+                        <NuxtLink
+                          :to="`/posts/${item.comment.post.id}#comment-${item.comment.parentComment.id}`"
+                          class="timeline-link"
+                        >
+                          {{ stripMarkdownLength(item.comment.parentComment.content, 200) }}
+                        </NuxtLink>
+                        回复了
+                      </template>
+                      <template v-else> 下评论了 </template>
+                      <NuxtLink
+                        :to="`/posts/${item.comment.post.id}#comment-${item.comment.id}`"
+                        class="timeline-link"
+                      >
+                        {{ stripMarkdownLength(item.comment.content, 200) }}
+                      </NuxtLink>
+                      <div class="timeline-date">
+                        {{ formatDate(item.comment.createdAt) }}
+                      </div>
+                    </template>
+                  </BaseTimeline>
+                </div>
+                <div v-else>
+                  <div class="summary-empty">暂无热门回复</div>
+                </div>
               </div>
-              <div class="total-summary-item">
-                <div class="total-summary-item-label">已送出的💗</div>
-                <div class="total-summary-item-value">{{ user.likesSent }}</div>
+              <div class="hot-topic">
+                <div class="summary-title">热门话题</div>
+                <div class="summary-content" v-if="hotPosts.length > 0">
+                  <BaseTimeline :items="hotPosts">
+                    <template #item="{ item }">
+                      <NuxtLink :to="`/posts/${item.post.id}`" class="timeline-link">
+                        {{ item.post.title }}
+                      </NuxtLink>
+                      <div class="timeline-snippet">
+                        {{ stripMarkdown(item.post.snippet) }}
+                      </div>
+                      <div class="timeline-date">
+                        {{ formatDate(item.post.createdAt) }}
+                      </div>
+                    </template>
+                  </BaseTimeline>
+                </div>
+                <div v-else>
+                  <div class="summary-empty">暂无热门话题</div>
+                </div>
               </div>
-              <div class="total-summary-item">
-                <div class="total-summary-item-label">已收到的💗</div>
-                <div class="total-summary-item-value">{{ user.likesReceived }}</div>
+              <div class="hot-tag">
+                <div class="summary-title">TA创建的tag</div>
+                <div class="summary-content" v-if="hotTags.length > 0">
+                  <BaseTimeline :items="hotTags">
+                    <template #item="{ item }">
+                      <span class="timeline-link" @click="gotoTag(item.tag)">
+                        {{ item.tag.name }}<span v-if="item.tag.count"> x{{ item.tag.count }}</span>
+                      </span>
+                      <div class="timeline-snippet" v-if="item.tag.description">
+                        {{ item.tag.description }}
+                      </div>
+                      <div class="timeline-date">
+                        {{ formatDate(item.tag.createdAt) }}
+                      </div>
+                    </template>
+                  </BaseTimeline>
+                </div>
+                <div v-else>
+                  <div class="summary-empty">暂无标签</div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="summary-divider">
-            <div class="hot-reply">
-              <div class="summary-title">热门回复</div>
-              <div class="summary-content" v-if="hotReplies.length > 0">
-                <BaseTimeline :items="hotReplies">
-                  <template #item="{ item }">
+
+          <div v-else-if="selectedTab === 'timeline'" class="profile-timeline">
+            <div class="timeline-tabs">
+              <div
+                :class="['timeline-tab-item', { selected: timelineFilter === 'all' }]"
+                @click="timelineFilter = 'all'"
+              >
+                全部
+              </div>
+              <div
+                :class="['timeline-tab-item', { selected: timelineFilter === 'articles' }]"
+                @click="timelineFilter = 'articles'"
+              >
+                文章
+              </div>
+              <div
+                :class="['timeline-tab-item', { selected: timelineFilter === 'comments' }]"
+                @click="timelineFilter = 'comments'"
+              >
+                评论和回复
+              </div>
+            </div>
+            <BasePlaceholder
+              v-if="filteredTimelineItems.length === 0"
+              text="暂无时间线"
+              icon="fas fa-inbox"
+            />
+            <div class="timeline-list">
+              <BaseTimeline :items="filteredTimelineItems">
+                <template #item="{ item }">
+                  <template v-if="item.type === 'post'">
+                    发布了文章
+                    <NuxtLink :to="`/posts/${item.post.id}`" class="timeline-link">
+                      {{ item.post.title }}
+                    </NuxtLink>
+                    <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
+                  </template>
+                  <template v-else-if="item.type === 'comment'">
                     在
                     <NuxtLink :to="`/posts/${item.comment.post.id}`" class="timeline-link">
                       {{ item.comment.post.title }}
                     </NuxtLink>
-                    <template v-if="item.comment.parentComment">
-                      下对
-                      <NuxtLink
-                        :to="`/posts/${item.comment.post.id}#comment-${item.comment.parentComment.id}`"
-                        class="timeline-link"
-                      >
-                        {{ stripMarkdownLength(item.comment.parentComment.content, 200) }}
-                      </NuxtLink>
-                      回复了
-                    </template>
-                    <template v-else> 下评论了 </template>
+                    下评论了
                     <NuxtLink
                       :to="`/posts/${item.comment.post.id}#comment-${item.comment.id}`"
                       class="timeline-link"
                     >
                       {{ stripMarkdownLength(item.comment.content, 200) }}
                     </NuxtLink>
-                    <div class="timeline-date">
-                      {{ formatDate(item.comment.createdAt) }}
-                    </div>
+                    <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
                   </template>
-                </BaseTimeline>
-              </div>
-              <div v-else>
-                <div class="summary-empty">暂无热门回复</div>
-              </div>
-            </div>
-            <div class="hot-topic">
-              <div class="summary-title">热门话题</div>
-              <div class="summary-content" v-if="hotPosts.length > 0">
-                <BaseTimeline :items="hotPosts">
-                  <template #item="{ item }">
-                    <NuxtLink :to="`/posts/${item.post.id}`" class="timeline-link">
-                      {{ item.post.title }}
+                  <template v-else-if="item.type === 'reply'">
+                    在
+                    <NuxtLink :to="`/posts/${item.comment.post.id}`" class="timeline-link">
+                      {{ item.comment.post.title }}
                     </NuxtLink>
-                    <div class="timeline-snippet">
-                      {{ stripMarkdown(item.post.snippet) }}
-                    </div>
-                    <div class="timeline-date">
-                      {{ formatDate(item.post.createdAt) }}
-                    </div>
+                    下对
+                    <NuxtLink
+                      :to="`/posts/${item.comment.post.id}#comment-${item.comment.parentComment.id}`"
+                      class="timeline-link"
+                    >
+                      {{ stripMarkdownLength(item.comment.parentComment.content, 200) }}
+                    </NuxtLink>
+                    回复了
+                    <NuxtLink
+                      :to="`/posts/${item.comment.post.id}#comment-${item.comment.id}`"
+                      class="timeline-link"
+                    >
+                      {{ stripMarkdownLength(item.comment.content, 200) }}
+                    </NuxtLink>
+                    <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
                   </template>
-                </BaseTimeline>
-              </div>
-              <div v-else>
-                <div class="summary-empty">暂无热门话题</div>
-              </div>
-            </div>
-            <div class="hot-tag">
-              <div class="summary-title">TA创建的tag</div>
-              <div class="summary-content" v-if="hotTags.length > 0">
-                <BaseTimeline :items="hotTags">
-                  <template #item="{ item }">
+                  <template v-else-if="item.type === 'tag'">
+                    创建了标签
                     <span class="timeline-link" @click="gotoTag(item.tag)">
                       {{ item.tag.name }}<span v-if="item.tag.count"> x{{ item.tag.count }}</span>
                     </span>
                     <div class="timeline-snippet" v-if="item.tag.description">
                       {{ item.tag.description }}
                     </div>
-                    <div class="timeline-date">
-                      {{ formatDate(item.tag.createdAt) }}
-                    </div>
+                    <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
                   </template>
-                </BaseTimeline>
-              </div>
-              <div v-else>
-                <div class="summary-empty">暂无标签</div>
-              </div>
+                </template>
+              </BaseTimeline>
             </div>
           </div>
-        </div>
 
-        <div v-else-if="selectedTab === 'timeline'" class="profile-timeline">
-          <div class="timeline-tabs">
-            <div
-              :class="['timeline-tab-item', { selected: timelineFilter === 'all' }]"
-              @click="timelineFilter = 'all'"
-            >
-              全部
+          <div v-else-if="selectedTab === 'following'" class="follow-container">
+            <div class="follow-tabs">
+              <div
+                :class="['follow-tab-item', { selected: followTab === 'followers' }]"
+                @click="followTab = 'followers'"
+              >
+                关注者
+              </div>
+              <div
+                :class="['follow-tab-item', { selected: followTab === 'following' }]"
+                @click="followTab = 'following'"
+              >
+                正在关注
+              </div>
             </div>
-            <div
-              :class="['timeline-tab-item', { selected: timelineFilter === 'articles' }]"
-              @click="timelineFilter = 'articles'"
-            >
-              文章
-            </div>
-            <div
-              :class="['timeline-tab-item', { selected: timelineFilter === 'comments' }]"
-              @click="timelineFilter = 'comments'"
-            >
-              评论和回复
+            <div class="follow-list">
+              <UserList v-if="followTab === 'followers'" :users="followers" />
+              <UserList v-else :users="followings" />
             </div>
           </div>
-          <BasePlaceholder
-            v-if="filteredTimelineItems.length === 0"
-            text="暂无时间线"
-            icon="fas fa-inbox"
-          />
-          <div class="timeline-list">
-            <BaseTimeline :items="filteredTimelineItems">
-              <template #item="{ item }">
-                <template v-if="item.type === 'post'">
-                  发布了文章
+
+          <div v-else-if="selectedTab === 'favorites'" class="favorites-container">
+            <div v-if="favoritePosts.length > 0">
+              <BaseTimeline :items="favoritePosts">
+                <template #item="{ item }">
                   <NuxtLink :to="`/posts/${item.post.id}`" class="timeline-link">
                     {{ item.post.title }}
                   </NuxtLink>
-                  <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
-                </template>
-                <template v-else-if="item.type === 'comment'">
-                  在
-                  <NuxtLink :to="`/posts/${item.comment.post.id}`" class="timeline-link">
-                    {{ item.comment.post.title }}
-                  </NuxtLink>
-                  下评论了
-                  <NuxtLink
-                    :to="`/posts/${item.comment.post.id}#comment-${item.comment.id}`"
-                    class="timeline-link"
-                  >
-                    {{ stripMarkdownLength(item.comment.content, 200) }}
-                  </NuxtLink>
-                  <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
-                </template>
-                <template v-else-if="item.type === 'reply'">
-                  在
-                  <NuxtLink :to="`/posts/${item.comment.post.id}`" class="timeline-link">
-                    {{ item.comment.post.title }}
-                  </NuxtLink>
-                  下对
-                  <NuxtLink
-                    :to="`/posts/${item.comment.post.id}#comment-${item.comment.parentComment.id}`"
-                    class="timeline-link"
-                  >
-                    {{ stripMarkdownLength(item.comment.parentComment.content, 200) }}
-                  </NuxtLink>
-                  回复了
-                  <NuxtLink
-                    :to="`/posts/${item.comment.post.id}#comment-${item.comment.id}`"
-                    class="timeline-link"
-                  >
-                    {{ stripMarkdownLength(item.comment.content, 200) }}
-                  </NuxtLink>
-                  <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
-                </template>
-                <template v-else-if="item.type === 'tag'">
-                  创建了标签
-                  <span class="timeline-link" @click="gotoTag(item.tag)">
-                    {{ item.tag.name }}<span v-if="item.tag.count"> x{{ item.tag.count }}</span>
-                  </span>
-                  <div class="timeline-snippet" v-if="item.tag.description">
-                    {{ item.tag.description }}
+                  <div class="timeline-snippet">
+                    {{ stripMarkdown(item.post.snippet) }}
                   </div>
-                  <div class="timeline-date">{{ formatDate(item.createdAt) }}</div>
+                  <div class="timeline-date">{{ formatDate(item.post.createdAt) }}</div>
                 </template>
-              </template>
-            </BaseTimeline>
-          </div>
-        </div>
-
-        <div v-else-if="selectedTab === 'following'" class="follow-container">
-          <div class="follow-tabs">
-            <div
-              :class="['follow-tab-item', { selected: followTab === 'followers' }]"
-              @click="followTab = 'followers'"
-            >
-              关注者
+              </BaseTimeline>
             </div>
-            <div
-              :class="['follow-tab-item', { selected: followTab === 'following' }]"
-              @click="followTab = 'following'"
-            >
-              正在关注
+            <div v-else>
+              <BasePlaceholder text="暂无收藏文章" icon="fas fa-inbox" />
             </div>
           </div>
-          <div class="follow-list">
-            <UserList v-if="followTab === 'followers'" :users="followers" />
-            <UserList v-else :users="followings" />
-          </div>
-        </div>
 
-        <div v-else-if="selectedTab === 'favorites'" class="favorites-container">
-          <div v-if="favoritePosts.length > 0">
-            <BaseTimeline :items="favoritePosts">
-              <template #item="{ item }">
-                <NuxtLink :to="`/posts/${item.post.id}`" class="timeline-link">
-                  {{ item.post.title }}
-                </NuxtLink>
-                <div class="timeline-snippet">
-                  {{ stripMarkdown(item.post.snippet) }}
-                </div>
-                <div class="timeline-date">{{ formatDate(item.post.createdAt) }}</div>
-              </template>
-            </BaseTimeline>
+          <div v-else-if="selectedTab === 'achievements'" class="achievements-container">
+            <AchievementList :medals="medals" :can-select="isMine" />
           </div>
-          <div v-else class="summary-empty">暂无收藏文章</div>
-        </div>
-
-        <div v-else-if="selectedTab === 'achievements'" class="achievements-container">
-          <AchievementList :medals="medals" :can-select="isMine" />
-        </div>
-      </template>
+        </template>
+      </BaseTabs>
     </div>
   </div>
 </template>
@@ -356,6 +322,7 @@ import { useRoute } from 'vue-router'
 import AchievementList from '~/components/AchievementList.vue'
 import BasePlaceholder from '~/components/BasePlaceholder.vue'
 import BaseTimeline from '~/components/BaseTimeline.vue'
+import BaseTabs from '~/components/BaseTabs.vue'
 import LevelProgress from '~/components/LevelProgress.vue'
 import UserList from '~/components/UserList.vue'
 import { toast } from '~/main'
@@ -398,6 +365,13 @@ const selectedTab = ref(
     ? route.query.tab
     : 'summary',
 )
+const tabs = [
+  { key: 'summary', label: '总结', icon: 'fas fa-chart-line' },
+  { key: 'timeline', label: '时间线', icon: 'fas fa-clock' },
+  { key: 'following', label: '关注', icon: 'fas fa-user-plus' },
+  { key: 'favorites', label: '收藏', icon: 'fas fa-bookmark' },
+  { key: 'achievements', label: '勋章', icon: 'fas fa-medal' },
+]
 const followTab = ref('followers')
 
 const levelInfo = computed(() => {
@@ -794,7 +768,7 @@ watch(selectedTab, async (val) => {
   font-size: 14px;
 }
 
-.profile-tabs {
+:deep(.base-tabs-header) {
   position: sticky;
   top: calc(var(--header-height) + 1px);
   z-index: 200;
@@ -808,7 +782,7 @@ watch(selectedTab, async (val) => {
   backdrop-filter: var(--blur-10);
 }
 
-.profile-tabs-item {
+:deep(.base-tabs-item) {
   display: flex;
   flex: 0 0 auto;
   flex-direction: row;
@@ -821,7 +795,7 @@ watch(selectedTab, async (val) => {
   white-space: nowrap;
 }
 
-.profile-tabs-item.selected {
+:deep(.base-tabs-item.selected) {
   color: var(--primary-color);
   border-bottom: 2px solid var(--primary-color);
 }
@@ -980,7 +954,7 @@ watch(selectedTab, async (val) => {
     height: 100px;
   }
 
-  .profile-tabs-item {
+  :deep(.base-tabs-item) {
     width: 100px;
   }
 

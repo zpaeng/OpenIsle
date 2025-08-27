@@ -48,7 +48,7 @@ function tiebaEmojiPlugin(md) {
   md.renderer.rules['tieba-emoji'] = (tokens, idx) => {
     const name = tokens[idx].content
     const file = tiebaEmoji[name]
-    return `<img class="emoji" src="${file}" alt="${name}">`
+    return `<BaseImage class="emoji" src="${file}" alt="${name}">`
   }
   md.inline.ruler.before('emphasis', 'tieba-emoji', (state, silent) => {
     const pos = state.pos
