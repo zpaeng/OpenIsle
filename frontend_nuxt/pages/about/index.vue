@@ -1,29 +1,29 @@
 <template>
   <div class="about-page">
-    <MultiTabs
-      :tabs="tabs"
-      v-model="selectedTab"
-      header-class="about-tabs"
-      item-class="about-tabs-item"
-      label-class="about-tabs-item-label"
-    >
-      <template #default>
-        <div class="about-loading" v-if="isFetching">
-          <l-hatch-spinner size="100" stroke="10" speed="1" color="var(--primary-color)" />
-        </div>
-        <div
-          v-else
-          class="about-content"
-          v-html="renderMarkdown(content)"
-          @click="handleContentClick"
-        ></div>
-      </template>
-    </MultiTabs>
+    <div class="about-tabs">
+      <div
+        v-for="tab in tabs"
+        :key="tab.name"
+        :class="['about-tabs-item', { selected: selectedTab === tab.name }]"
+        @click="selectTab(tab.name)"
+      >
+        <div class="about-tabs-item-label">{{ tab.label }}</div>
+      </div>
+    </div>
+    <div class="about-loading" v-if="isFetching">
+      <l-hatch-spinner size="100" stroke="10" speed="1" color="var(--primary-color)" />
+    </div>
+    <div
+      v-else
+      class="about-content"
+      v-html="renderMarkdown(content)"
+      @click="handleContentClick"
+    ></div>
   </div>
 </template>
 
 <script>
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import { handleMarkdownClick, renderMarkdown } from '~/utils/markdown'
 
 export default {
@@ -71,21 +71,21 @@ export default {
       }
     }
 
-    watch(selectedTab, (name) => {
+    const selectTab = (name) => {
+      selectedTab.value = name
       const tab = tabs.find((t) => t.name === name)
       if (tab) loadContent(tab.file)
-    })
+    }
 
     onMounted(() => {
-      const first = tabs[0]
-      if (first) loadContent(first.file)
+      loadContent(tabs[0].file)
     })
 
     const handleContentClick = (e) => {
       handleMarkdownClick(e)
     }
 
-    return { tabs, selectedTab, content, renderMarkdown, isFetching, handleContentClick }
+    return { tabs, selectedTab, content, renderMarkdown, selectTab, isFetching, handleContentClick }
   },
 }
 </script>
