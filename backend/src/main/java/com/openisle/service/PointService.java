@@ -7,6 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -171,6 +175,27 @@ public class PointService {
             recordHistory(user, PointHistoryType.SYSTEM_ONLINE, 0, null, null, null);
         }
         return pointHistoryRepository.findByUserOrderByIdDesc(user);
+    }
+
+    public List<Map<String, Object>> trend(String userName, int days) {
+        if (days < 1) days = 1;
+        User user = userRepository.findByUsername(userName).orElseThrow();
+        LocalDate end = LocalDate.now();
+        LocalDate start = end.minusDays(days - 1L);
+        var histories = pointHistoryRepository.findByUserAndCreatedAtAfterOrderByCreatedAtDesc(
+                user, start.atStartOfDay());
+        int idx = 0;
+        int balance = user.getPoint();
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (LocalDate day = end; !day.isBefore(start); day = day.minusDays(1)) {
+            result.add(Map.of("date", day.toString(), "value", balance));
+            while (idx < histories.size() && histories.get(idx).getCreatedAt().toLocalDate().isEqual(day)) {
+                balance -= histories.get(idx).getAmount();
+                idx++;
+            }
+        }
+        Collections.reverse(result);
+        return result;
     }
 
 }
