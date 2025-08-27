@@ -12,6 +12,13 @@
             </div>
           </section>
 
+          <section class="trend" v-if="trendOption">
+            <div class="section-title">积分走势</div>
+            <ClientOnly>
+              <VChart :option="trendOption" :autoresize="true" style="height: 300px" />
+            </ClientOnly>
+          </section>
+
           <div class="loading-points-container" v-if="isLoading">
             <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
           </div>
@@ -178,6 +185,13 @@ import BasePlaceholder from '~/components/BasePlaceholder.vue'
 import { stripMarkdownLength } from '~/utils/markdown'
 import TimeManager from '~/utils/time'
 import BaseTabs from '~/components/BaseTabs.vue'
+import { LineChart } from 'echarts/charts'
+import { GridComponent, TooltipComponent } from 'echarts/components'
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import VChart from 'vue-echarts'
+
+use([LineChart, GridComponent, TooltipComponent, CanvasRenderer])
 
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
@@ -192,6 +206,7 @@ const isLoading = ref(false)
 const histories = ref([])
 const historyLoading = ref(false)
 const historyLoaded = ref(false)
+const trendOption = ref(null)
 
 const pointRules = [
   '发帖：每天前两次，每次 30 积分',
@@ -221,13 +236,34 @@ const iconMap = {
   LOTTERY_REWARD: 'fas fa-ticket-alt',
 }
 
+const loadTrend = async () => {
+  if (!authState.loggedIn) return
+  const token = getToken()
+  const res = await fetch(`${API_BASE_URL}/api/point-histories/trend?days=30`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (res.ok) {
+    const data = await res.json()
+    const dates = data.map((d) => d.date)
+    const values = data.map((d) => d.value)
+    trendOption.value = {
+      tooltip: { trigger: 'axis' },
+      xAxis: { type: 'category', data: dates },
+      yAxis: { type: 'value' },
+      series: [{ type: 'line', areaStyle: {}, smooth: true, data: values }],
+    }
+  }
+}
+
 onMounted(async () => {
   isLoading.value = true
   if (authState.loggedIn) {
     const user = await fetchCurrentUser()
     point.value = user ? user.point : null
+    await Promise.all([loadGoods(), loadTrend()])
+  } else {
+    await loadGoods()
   }
-  await loadGoods()
   isLoading.value = false
 })
 
@@ -363,7 +399,8 @@ const submitRedeem = async () => {
 }
 
 .rules,
-.goods {
+.goods,
+.trend {
   margin-top: 20px;
 }
 
