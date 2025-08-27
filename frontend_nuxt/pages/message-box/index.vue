@@ -7,13 +7,14 @@
     <div v-if="!isFloatMode" class="float-control">
       <i class="fas fa-compress" @click="minimize" title="最小化"></i>
     </div>
-    <BaseTabs
-      v-model="activeTab"
-      :tabs="tabs"
-      class="tabs"
-      item-class="tab"
-      active-class="active"
-    />
+    <div class="tabs">
+      <div :class="['tab', { active: activeTab === 'messages' }]" @click="switchToMessage">
+        站内信
+      </div>
+      <div :class="['tab', { active: activeTab === 'channels' }]" @click="switchToChannels">
+        频道
+      </div>
+    </div>
 
     <div v-if="activeTab === 'messages'">
       <div v-if="loading" class="loading-message">
@@ -131,7 +132,6 @@ import TimeManager from '~/utils/time'
 import { stripMarkdownLength } from '~/utils/markdown'
 import SearchPersonDropdown from '~/components/SearchPersonDropdown.vue'
 import BasePlaceholder from '~/components/BasePlaceholder.vue'
-import BaseTabs from '~/components/BaseTabs.vue'
 
 const config = useRuntimeConfig()
 const conversations = ref([])
@@ -146,23 +146,12 @@ const { fetchUnreadCount: refreshGlobalUnreadCount } = useUnreadCount()
 const { fetchChannelUnread: refreshChannelUnread, setFromList: setChannelUnreadFromList } =
   useChannelsUnreadCount()
 let subscription = null
-const tabs = [
-  { name: 'messages', label: '站内信' },
-  { name: 'channels', label: '频道' },
-]
+
 const activeTab = ref('channels')
 const channels = ref([])
 const loadingChannels = ref(false)
 const isFloatMode = computed(() => route.query.float === '1')
 const floatRoute = useState('messageFloatRoute')
-
-watch(activeTab, (tab) => {
-  if (tab === 'messages') {
-    fetchConversations()
-  } else {
-    fetchChannels()
-  }
-})
 
 async function fetchConversations() {
   const token = getToken()
@@ -225,6 +214,16 @@ async function fetchChannels() {
   } finally {
     loadingChannels.value = false
   }
+}
+
+function switchToMessage() {
+  activeTab.value = 'messages'
+  fetchConversations()
+}
+
+function switchToChannels() {
+  activeTab.value = 'channels'
+  fetchChannels()
 }
 
 async function goToChannel(id) {

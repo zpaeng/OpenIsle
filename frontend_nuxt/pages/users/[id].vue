@@ -72,18 +72,43 @@
         </div>
       </div>
 
-      <BaseTabs
-        v-model="selectedTab"
-        :tabs="profileTabs"
-        class="profile-tabs"
-        item-class="profile-tabs-item"
-        active-class="selected"
-      >
-        <template #tab="{ tab }">
-          <i :class="tab.icon"></i>
-          <div class="profile-tabs-item-label">{{ tab.label }}</div>
-        </template>
-      </BaseTabs>
+      <div class="profile-tabs">
+        <div
+          :class="['profile-tabs-item', { selected: selectedTab === 'summary' }]"
+          @click="selectedTab = 'summary'"
+        >
+          <i class="fas fa-chart-line"></i>
+          <div class="profile-tabs-item-label">总结</div>
+        </div>
+        <div
+          :class="['profile-tabs-item', { selected: selectedTab === 'timeline' }]"
+          @click="selectedTab = 'timeline'"
+        >
+          <i class="fas fa-clock"></i>
+          <div class="profile-tabs-item-label">时间线</div>
+        </div>
+        <div
+          :class="['profile-tabs-item', { selected: selectedTab === 'following' }]"
+          @click="selectedTab = 'following'"
+        >
+          <i class="fas fa-user-plus"></i>
+          <div class="profile-tabs-item-label">关注</div>
+        </div>
+        <div
+          :class="['profile-tabs-item', { selected: selectedTab === 'favorites' }]"
+          @click="selectedTab = 'favorites'"
+        >
+          <i class="fas fa-bookmark"></i>
+          <div class="profile-tabs-item-label">收藏</div>
+        </div>
+        <div
+          :class="['profile-tabs-item', { selected: selectedTab === 'achievements' }]"
+          @click="selectedTab = 'achievements'"
+        >
+          <i class="fas fa-medal"></i>
+          <div class="profile-tabs-item-label">勋章</div>
+        </div>
+      </div>
 
       <div v-if="tabLoading" class="tab-loading">
         <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)" />
@@ -194,13 +219,26 @@
         </div>
 
         <div v-else-if="selectedTab === 'timeline'" class="profile-timeline">
-          <BaseTabs
-            v-model="timelineFilter"
-            :tabs="timelineTabs"
-            class="timeline-tabs"
-            item-class="timeline-tab-item"
-            active-class="selected"
-          />
+          <div class="timeline-tabs">
+            <div
+              :class="['timeline-tab-item', { selected: timelineFilter === 'all' }]"
+              @click="timelineFilter = 'all'"
+            >
+              全部
+            </div>
+            <div
+              :class="['timeline-tab-item', { selected: timelineFilter === 'articles' }]"
+              @click="timelineFilter = 'articles'"
+            >
+              文章
+            </div>
+            <div
+              :class="['timeline-tab-item', { selected: timelineFilter === 'comments' }]"
+              @click="timelineFilter = 'comments'"
+            >
+              评论和回复
+            </div>
+          </div>
           <BasePlaceholder
             v-if="filteredTimelineItems.length === 0"
             text="暂无时间线"
@@ -267,13 +305,20 @@
         </div>
 
         <div v-else-if="selectedTab === 'following'" class="follow-container">
-          <BaseTabs
-            v-model="followTab"
-            :tabs="followTabs"
-            class="follow-tabs"
-            item-class="follow-tab-item"
-            active-class="selected"
-          />
+          <div class="follow-tabs">
+            <div
+              :class="['follow-tab-item', { selected: followTab === 'followers' }]"
+              @click="followTab = 'followers'"
+            >
+              关注者
+            </div>
+            <div
+              :class="['follow-tab-item', { selected: followTab === 'following' }]"
+              @click="followTab = 'following'"
+            >
+              正在关注
+            </div>
+          </div>
           <div class="follow-list">
             <UserList v-if="followTab === 'followers'" :users="followers" />
             <UserList v-else :users="followings" />
@@ -320,7 +365,6 @@ import { authState, getToken } from '~/utils/auth'
 import { prevLevelExp } from '~/utils/level'
 import { stripMarkdown, stripMarkdownLength } from '~/utils/markdown'
 import TimeManager from '~/utils/time'
-import BaseTabs from '~/components/BaseTabs.vue'
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
 
@@ -336,22 +380,6 @@ const hotReplies = ref([])
 const hotTags = ref([])
 const favoritePosts = ref([])
 const timelineItems = ref([])
-const profileTabs = [
-  { name: 'summary', label: '总结', icon: 'fas fa-chart-line' },
-  { name: 'timeline', label: '时间线', icon: 'fas fa-clock' },
-  { name: 'following', label: '关注', icon: 'fas fa-user-plus' },
-  { name: 'favorites', label: '收藏', icon: 'fas fa-bookmark' },
-  { name: 'achievements', label: '勋章', icon: 'fas fa-medal' },
-]
-const timelineTabs = [
-  { name: 'all', label: '全部' },
-  { name: 'articles', label: '文章' },
-  { name: 'comments', label: '评论和回复' },
-]
-const followTabs = [
-  { name: 'followers', label: '关注者' },
-  { name: 'following', label: '正在关注' },
-]
 const timelineFilter = ref('all')
 const filteredTimelineItems = computed(() => {
   if (timelineFilter.value === 'articles') {

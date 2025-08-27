@@ -1,16 +1,15 @@
 <template>
   <div class="about-page">
-    <BaseTabs
-      v-model="selectedTab"
-      :tabs="tabs"
-      class="about-tabs"
-      item-class="about-tabs-item"
-      active-class="selected"
-    >
-      <template #tab="{ tab }">
+    <div class="about-tabs">
+      <div
+        v-for="tab in tabs"
+        :key="tab.name"
+        :class="['about-tabs-item', { selected: selectedTab === tab.name }]"
+        @click="selectTab(tab.name)"
+      >
         <div class="about-tabs-item-label">{{ tab.label }}</div>
-      </template>
-    </BaseTabs>
+      </div>
+    </div>
     <div class="about-loading" v-if="isFetching">
       <l-hatch-spinner size="100" stroke="10" speed="1" color="var(--primary-color)" />
     </div>
@@ -24,13 +23,11 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue'
-import BaseTabs from '~/components/BaseTabs.vue'
+import { onMounted, ref } from 'vue'
 import { handleMarkdownClick, renderMarkdown } from '~/utils/markdown'
 
 export default {
   name: 'AboutPageView',
-  components: { BaseTabs },
   setup() {
     const isFetching = ref(false)
     const tabs = [
@@ -74,20 +71,21 @@ export default {
       }
     }
 
-    watch(
-      selectedTab,
-      (name) => {
-        const tab = tabs.find((t) => t.name === name)
-        if (tab) loadContent(tab.file)
-      },
-      { immediate: true },
-    )
+    const selectTab = (name) => {
+      selectedTab.value = name
+      const tab = tabs.find((t) => t.name === name)
+      if (tab) loadContent(tab.file)
+    }
+
+    onMounted(() => {
+      loadContent(tabs[0].file)
+    })
 
     const handleContentClick = (e) => {
       handleMarkdownClick(e)
     }
 
-    return { tabs, selectedTab, content, renderMarkdown, isFetching, handleContentClick }
+    return { tabs, selectedTab, content, renderMarkdown, selectTab, isFetching, handleContentClick }
   },
 }
 </script>

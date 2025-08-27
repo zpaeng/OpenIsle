@@ -1,12 +1,19 @@
 <template>
   <div class="point-mall-page">
-    <BaseTabs
-      v-model="selectedTab"
-      :tabs="pointTabs"
-      class="point-tabs"
-      item-class="point-tab-item"
-      active-class="selected"
-    />
+    <div class="point-tabs">
+      <div
+        :class="['point-tab-item', { selected: selectedTab === 'mall' }]"
+        @click="selectedTab = 'mall'"
+      >
+        积分兑换
+      </div>
+      <div
+        :class="['point-tab-item', { selected: selectedTab === 'history' }]"
+        @click="selectedTab = 'history'"
+      >
+        积分历史
+      </div>
+    </div>
 
     <template v-if="selectedTab === 'mall'">
       <div class="point-mall-page-content">
@@ -177,14 +184,10 @@ import BaseTimeline from '~/components/BaseTimeline.vue'
 import BasePlaceholder from '~/components/BasePlaceholder.vue'
 import { stripMarkdownLength } from '~/utils/markdown'
 import TimeManager from '~/utils/time'
-import BaseTabs from '~/components/BaseTabs.vue'
 
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
-const pointTabs = [
-  { name: 'mall', label: '积分兑换' },
-  { name: 'history', label: '积分历史' },
-]
+
 const selectedTab = ref('mall')
 const point = ref(null)
 const isLoading = ref(false)
