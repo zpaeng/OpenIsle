@@ -46,7 +46,6 @@ function onError() {
 
 <style scoped>
 .base-image {
-  display: block;
   transition:
     filter 0.35s ease,
     transform 0.35s ease,
@@ -55,8 +54,8 @@ function onError() {
 }
 
 .base-image-ph {
-  filter: blur(10px) saturate(0.85);
-  transform: scale(1.02);
+  filter: blur(20px);
+  transform: scale(0.5);
 }
 
 .base-image.is-loaded {
