@@ -1,26 +1,13 @@
 <template>
   <div class="message-page">
     <div class="message-page-header">
-      <div class="message-tabs">
-        <div
-          :class="['message-tab-item', { selected: selectedTab === 'all' }]"
-          @click="selectedTab = 'all'"
-        >
-          消息
-        </div>
-        <div
-          :class="['message-tab-item', { selected: selectedTab === 'unread' }]"
-          @click="selectedTab = 'unread'"
-        >
-          未读
-        </div>
-        <div
-          :class="['message-tab-item', { selected: selectedTab === 'control' }]"
-          @click="selectedTab = 'control'"
-        >
-          消息设置
-        </div>
-      </div>
+      <BaseTabs
+        v-model="selectedTab"
+        :tabs="messageTabs"
+        class="message-tabs"
+        item-class="message-tab-item"
+        active-class="selected"
+      />
 
       <div class="message-page-header-right">
         <div class="message-page-header-right-item" @click="markAllRead">
@@ -562,10 +549,16 @@ import {
 } from '~/utils/notification'
 import TimeManager from '~/utils/time'
 import BaseSwitch from '~/components/BaseSwitch.vue'
+import BaseTabs from '~/components/BaseTabs.vue'
 
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
 const route = useRoute()
+const messageTabs = [
+  { name: 'all', label: '消息' },
+  { name: 'unread', label: '未读' },
+  { name: 'control', label: '消息设置' },
+]
 const selectedTab = ref(
   ['all', 'unread', 'control'].includes(route.query.tab) ? route.query.tab : 'unread',
 )
