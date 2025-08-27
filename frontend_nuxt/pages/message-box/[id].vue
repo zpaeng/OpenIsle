@@ -492,6 +492,7 @@ function goBack() {
 
 .messages-list {
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 20px;
   padding-bottom: 100px;
   display: flex;
@@ -597,6 +598,7 @@ function goBack() {
 }
 
 .reply-preview {
+  margin-top: 10px;
   padding: 10px;
   border-left: 5px solid var(--primary-color);
   margin-bottom: 5px;

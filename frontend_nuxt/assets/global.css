@@ -18,7 +18,7 @@
   --background-color-blur: rgba(255, 255, 255, 0.57);
   --menu-border-color: lightgray;
   --normal-border-color: lightgray;
-  --menu-selected-background-color: rgba(228, 228, 228, 0.884);
+  --menu-selected-background-color: rgba(242, 242, 242, 0.884);
   --menu-text-color: black;
   --scroller-background-color: rgba(130, 175, 180, 0.5);
   /* --normal-background-color: rgb(241, 241, 241); */
@@ -142,6 +142,7 @@ body {
 .info-content-text video {
   max-width: 100%;
 }
+
 .info-content-text {
   word-break: break-word;
   max-width: 100%;

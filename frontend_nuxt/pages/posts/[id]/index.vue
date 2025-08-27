@@ -1225,7 +1225,6 @@ onMounted(async () => {
 .info-content-text {
   font-size: 16px;
   line-height: 1.5;
-  width: 100%;
 }
 
 .article-footer-container {
