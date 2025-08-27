@@ -16,6 +16,7 @@
         @click="reboundToDefault"
       ></i>
       <i class="fas fa-expand" title="在页面中打开" @click="expand"></i>
+      <i class="fas fa-times" title="关闭" @click="close"></i>
     </div>
   </div>
 </template>
@@ -46,6 +47,10 @@ function expand() {
   const target = floatRoute.value
   floatRoute.value = null
   navigateTo(target)
+}
+
+function close() {
+  floatRoute.value = null
 }
 
 function injectBaseTag() {
