@@ -88,7 +88,7 @@
               class="article-member-avatar-item"
               :to="`/users/${member.id}`"
             >
-              <img class="article-member-avatar-item-img" :src="member.avatar" alt="avatar" />
+              <BaseImage class="article-member-avatar-item-img" :src="member.avatar" alt="avatar" />
             </NuxtLink>
           </div>
 
