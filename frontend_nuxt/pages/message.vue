@@ -701,19 +701,6 @@ onActivated(async () => {
   overflow-x: hidden;
 }
 
-.message-page :deep(.base-tabs-header) {
-  position: sticky;
-  top: 1px;
-  z-index: 200;
-  background-color: var(--background-color-blur);
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  backdrop-filter: var(--blur-10);
-  border-bottom: 1px solid var(--normal-border-color);
-}
-
 .message-page-header-right {
   display: flex;
   flex-direction: row;

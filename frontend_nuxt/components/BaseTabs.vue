@@ -54,6 +54,7 @@ function onTouchEnd(e) {
   display: flex;
   border-bottom: 1px solid var(--normal-border-color);
   align-items: center;
+  flex-direction: row;
 }
 
 .base-tabs-items {

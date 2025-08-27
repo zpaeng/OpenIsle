@@ -89,28 +89,6 @@ export default {
   margin: 0 auto;
 }
 
-:deep(.base-tabs-header) {
-  top: calc(var(--header-height) + 1px);
-  background-color: var(--background-color-blur);
-  display: flex;
-  flex-direction: row;
-  border-bottom: 1px solid var(--normal-border-color);
-  margin-bottom: 20px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-:deep(.base-tabs-item) {
-  padding: 10px 20px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-:deep(.base-tabs-item.selected) {
-  color: var(--primary-color);
-  border-bottom: 2px solid var(--primary-color);
-}
-
 .about-content {
   line-height: 1.6;
   padding: 20px;
