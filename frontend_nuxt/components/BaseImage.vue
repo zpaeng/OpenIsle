@@ -59,7 +59,7 @@ function onError() {
 }
 
 .base-image.is-loaded {
-  filter: none;
+  /* Allow filters from parent classes (e.g. grayscale for unfinished medals) */
   transform: none;
   opacity: 1;
 }
