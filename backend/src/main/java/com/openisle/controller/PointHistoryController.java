@@ -7,9 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -24,5 +26,11 @@ public class PointHistoryController {
         return pointService.listHistory(auth.getName()).stream()
                 .map(pointHistoryMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping("/trend")
+    public List<Map<String, Object>> trend(Authentication auth,
+                                          @RequestParam(value = "days", defaultValue = "30") int days) {
+        return pointService.trend(auth.getName(), days);
     }
 }
