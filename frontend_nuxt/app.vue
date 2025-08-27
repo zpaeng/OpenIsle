@@ -138,7 +138,7 @@ const goToNewPost = () => {
   height: 60px;
   border-radius: 50%;
   position: fixed;
-  bottom: 40px;
+  bottom: 70px;
   right: 20px;
   font-size: 20px;
   cursor: pointer;
