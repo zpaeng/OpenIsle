@@ -8,7 +8,7 @@
   >
     <!-- <div class="user-avatar-container">
       <div class="user-avatar-item">
-        <img class="user-avatar-item-img" :src="comment.avatar" alt="avatar" />
+        <BaseImage class="user-avatar-item-img" :src="comment.avatar" alt="avatar" />
       </div>
     </div>   -->
     <div class="info-content">

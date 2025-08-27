@@ -9,7 +9,7 @@
       ]"
       @click="selectMedal(medal)"
     >
-      <img
+      <BaseImage
         :src="medal.icon"
         :alt="medal.title"
         :class="['achievements-list-item-icon', { not_completed: !medal.completed }]"

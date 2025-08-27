@@ -36,19 +36,35 @@
 
     <div class="other-login-page-content">
       <div class="login-page-button" @click="loginWithGoogle">
-        <img class="login-page-button-icon" src="../assets/icons/google.svg" alt="Google Logo" />
+        <BaseImage
+          class="login-page-button-icon"
+          src="../assets/icons/google.svg"
+          alt="Google Logo"
+        />
         <div class="login-page-button-text">Google 登录</div>
       </div>
       <div class="login-page-button" @click="loginWithGithub">
-        <img class="login-page-button-icon" src="../assets/icons/github.svg" alt="GitHub Logo" />
+        <BaseImage
+          class="login-page-button-icon"
+          src="../assets/icons/github.svg"
+          alt="GitHub Logo"
+        />
         <div class="login-page-button-text">GitHub 登录</div>
       </div>
       <div class="login-page-button" @click="loginWithDiscord">
-        <img class="login-page-button-icon" src="../assets/icons/discord.svg" alt="Discord Logo" />
+        <BaseImage
+          class="login-page-button-icon"
+          src="../assets/icons/discord.svg"
+          alt="Discord Logo"
+        />
         <div class="login-page-button-text">Discord 登录</div>
       </div>
       <div class="login-page-button" @click="loginWithTwitter">
-        <img class="login-page-button-icon" src="../assets/icons/twitter.svg" alt="Twitter Logo" />
+        <BaseImage
+          class="login-page-button-icon"
+          src="../assets/icons/twitter.svg"
+          alt="Twitter Logo"
+        />
         <div class="login-page-button-text">Twitter 登录</div>
       </div>
     </div>

@@ -6,9 +6,9 @@
         :class="{ clickable: !!item.iconClick }"
         @click="item.iconClick && item.iconClick()"
       >
-        <img v-if="item.src" :src="item.src" class="timeline-img" alt="timeline item" />
+        <BaseImage v-if="item.src" :src="item.src" class="timeline-img" alt="timeline item" />
         <i v-else-if="item.icon" :class="item.icon"></i>
-        <img v-else-if="item.emoji" :src="item.emoji" class="timeline-emoji" alt="emoji" />
+        <BaseImage v-else-if="item.emoji" :src="item.emoji" class="timeline-emoji" alt="emoji" />
       </div>
       <div class="timeline-content">
         <slot name="item" :item="item">{{ item.content }}</slot>

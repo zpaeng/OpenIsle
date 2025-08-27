@@ -6,7 +6,7 @@
       :key="tag.id || tag.name"
       @click="gotoTag(tag)"
     >
-      <img
+      <BaseImage
         v-if="tag.smallIcon"
         class="article-info-item-img"
         :src="tag.smallIcon"

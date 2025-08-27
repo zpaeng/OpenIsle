@@ -41,7 +41,7 @@ public class RssController {
 
     // 兼容 Markdown/HTML 两类图片写法（用于 enclosure）
     private static final Pattern MD_IMAGE = Pattern.compile("!\\[[^\\]]*\\]\\(([^)]+)\\)");
-    private static final Pattern HTML_IMAGE = Pattern.compile("<img[^>]+src=[\"']?([^\"'>]+)[\"']?[^>]*>");
+    private static final Pattern HTML_IMAGE = Pattern.compile("<BaseImage[^>]+src=[\"']?([^\"'>]+)[\"']?[^>]*>");
 
     private static final DateTimeFormatter RFC1123 = DateTimeFormatter.RFC_1123_DATE_TIME;
 

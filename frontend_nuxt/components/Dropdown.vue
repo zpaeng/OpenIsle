@@ -13,7 +13,7 @@
             <template v-for="(label, idx) in selectedLabels" :key="label.id">
               <div class="selected-label">
                 <template v-if="label.icon">
-                  <img
+                  <BaseImage
                     v-if="isImageIcon(label.icon)"
                     :src="label.icon"
                     class="option-icon"
@@ -32,7 +32,7 @@
           <span v-if="selectedLabels.length">
             <div class="selected-label">
               <template v-if="selectedLabels[0].icon">
-                <img
+                <BaseImage
                   v-if="isImageIcon(selectedLabels[0].icon)"
                   :src="selectedLabels[0].icon"
                   class="option-icon"
@@ -69,7 +69,12 @@
         >
           <slot name="option" :option="o" :isSelected="isSelected(o.id)">
             <template v-if="o.icon">
-              <img v-if="isImageIcon(o.icon)" :src="o.icon" class="option-icon" :alt="o.name" />
+              <BaseImage
+                v-if="isImageIcon(o.icon)"
+                :src="o.icon"
+                class="option-icon"
+                :alt="o.name"
+              />
               <i v-else :class="['option-icon', o.icon]"></i>
             </template>
             <span>{{ o.name }}</span>
@@ -100,7 +105,12 @@
             >
               <slot name="option" :option="o" :isSelected="isSelected(o.id)">
                 <template v-if="o.icon">
-                  <img v-if="isImageIcon(o.icon)" :src="o.icon" class="option-icon" :alt="o.name" />
+                  <BaseImage
+                    v-if="isImageIcon(o.icon)"
+                    :src="o.icon"
+                    class="option-icon"
+                    :alt="o.name"
+                  />
                   <i v-else :class="['option-icon', o.icon]"></i>
                 </template>
                 <span>{{ o.name }}</span>

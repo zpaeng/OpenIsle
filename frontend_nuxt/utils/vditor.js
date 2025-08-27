@@ -77,7 +77,7 @@ export function createVditor(editorId, options = {}) {
             const list = await fetchMentions(key)
             return list.map((u) => ({
               value: `@[${u.username}]`,
-              html: `<img src="${u.avatar}" /> @${u.username}`,
+              html: `<BaseImage src="${u.avatar}" /> @${u.username}`,
             }))
           },
         },

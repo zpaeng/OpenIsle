@@ -41,7 +41,7 @@
         @click="goToConversation(convo.id)"
       >
         <div class="conversation-avatar">
-          <img
+          <BaseImage
             :src="getOtherParticipant(convo)?.avatar || '/default-avatar.svg'"
             :alt="getOtherParticipant(convo)?.username || '用户'"
             class="avatar-img"
@@ -88,7 +88,7 @@
           @click="goToChannel(ch.id)"
         >
           <div class="conversation-avatar">
-            <img
+            <BaseImage
               :src="ch.avatar || '/default-avatar.svg'"
               :alt="ch.name"
               class="avatar-img"

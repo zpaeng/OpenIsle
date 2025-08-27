@@ -1,13 +1,14 @@
 <template>
   <NuxtImg
-    v-bind="attrs"
+    v-bind="passAttrs"
     :src="src"
     :alt="alt"
     loading="lazy"
     :placeholder="placeholder"
     placeholder-class="base-image-ph"
     @load="onLoad"
-    :class="['base-image', attrs.class, { 'is-loaded': loaded }]"
+    @error="onError"
+    :class="['base-image', passAttrs.class, { 'is-loaded': loaded }]"
   />
 </template>
 
@@ -21,25 +22,46 @@ const props = defineProps({
 })
 
 const attrs = useAttrs()
+
+const passAttrs = computed(() => {
+  const { placeholder, ...rest } = attrs
+  return rest
+})
+
 const loaded = ref(false)
 const img = useImage()
-const placeholder = computed(() => img(props.src, { w: 16, h: 16, f: 'webp', q: 40, blur: 2 }))
+
+const placeholder = computed(() => {
+  if (!props.src) return undefined
+  return img(props.src, { w: 16, h: 16, f: 'webp', q: 20, blur: 1 })
+})
 
 function onLoad() {
+  loaded.value = true
+}
+function onError() {
   loaded.value = true
 }
 </script>
 
 <style scoped>
 .base-image {
-  opacity: 0;
-  transition: opacity 0.25s;
+  display: block;
+  transition:
+    filter 0.35s ease,
+    transform 0.35s ease,
+    opacity 0.35s ease;
+  opacity: 0.92;
 }
+
+.base-image-ph {
+  filter: blur(10px) saturate(0.85);
+  transform: scale(1.02);
+}
+
 .base-image.is-loaded {
+  filter: none;
+  transform: none;
   opacity: 1;
-}
-:deep(img.base-image-ph) {
-  filter: blur(10px);
-  transform: scale(1.03);
 }
 </style>

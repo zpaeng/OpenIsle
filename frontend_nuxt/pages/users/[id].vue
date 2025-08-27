@@ -7,7 +7,7 @@
     <div v-else>
       <div class="profile-page-header">
         <div class="profile-page-header-avatar">
-          <img :src="user.avatar" alt="avatar" class="profile-page-header-avatar-img" />
+          <BaseImage :src="user.avatar" alt="avatar" class="profile-page-header-avatar-img" />
         </div>
         <div class="profile-page-header-user-info">
           <div class="profile-page-header-user-info-name">{{ user.username }}</div>

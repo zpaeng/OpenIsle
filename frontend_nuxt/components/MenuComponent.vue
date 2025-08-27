@@ -88,7 +88,7 @@
               @click="gotoCategory(c)"
             >
               <template v-if="c.smallIcon || c.icon">
-                <img
+                <BaseImage
                   v-if="isImageIcon(c.smallIcon || c.icon)"
                   :src="c.smallIcon || c.icon"
                   class="section-item-icon"
@@ -114,7 +114,7 @@
               <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
             </div>
             <div v-else v-for="t in tagData" :key="t.id" class="section-item" @click="gotoTag(t)">
-              <img
+              <BaseImage
                 v-if="isImageIcon(t.smallIcon || t.icon)"
                 :src="t.smallIcon || t.icon"
                 class="section-item-icon"

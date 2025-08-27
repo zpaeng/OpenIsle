@@ -39,7 +39,7 @@
 
         <section class="goods">
           <div class="goods-item" v-for="(good, idx) in goods" :key="idx">
-            <img class="goods-item-image" :src="good.image" alt="good.name" />
+            <BaseImage class="goods-item-image" :src="good.image" alt="good.name" />
             <div class="goods-item-name">{{ good.name }}</div>
             <div class="goods-item-cost">
               <i class="fas fa-coins"></i>
