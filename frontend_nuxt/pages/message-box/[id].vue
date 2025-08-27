@@ -113,16 +113,22 @@ const error = ref(null)
 const conversationId = route.params.id
 const currentUser = ref(null)
 const messagesListEl = ref(null)
-let lastMessageEl = null
 const currentPage = ref(0)
 const totalPages = ref(0)
 const loadingMore = ref(false)
-let scrollInterval = null
 const conversationName = ref('')
 const isChannel = ref(false)
 const isFloatMode = computed(() => route.query.float !== undefined)
 const floatRoute = useState('messageFloatRoute')
 const replyTo = ref(null)
+
+const isUserNearBottom = ref(true)
+function updateNearBottom() {
+  const el = messagesListEl.value
+  if (!el) return
+  const threshold = 40 // px
+  isUserNearBottom.value = el.scrollHeight - el.scrollTop - el.clientHeight <= threshold
+}
 
 const hasMoreMessages = computed(() => currentPage.value < totalPages.value - 1)
 
@@ -133,20 +139,37 @@ const otherParticipant = computed(() => {
   return participants.value.find((p) => p.id !== currentUser.value.id)
 })
 
-function isSentByCurrentUser(message) {
-  return message.sender.id === currentUser.value?.id
-}
-
-function handleAvatarError(event) {
-  event.target.src = '/default-avatar.svg'
-}
-
 function setReply(message) {
   replyTo.value = message
 }
 
-// No changes needed here, as renderMarkdown is now imported.
-// The old function is removed.
+/** 改造：滚动函数 —— smooth & instant */
+function scrollToBottomSmooth() {
+  const el = messagesListEl.value
+  if (!el) return
+  // 优先使用原生 smooth，失败则降级
+  try {
+    el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+  } catch {
+    // 降级：简易动画
+    const start = el.scrollTop
+    const end = el.scrollHeight
+    const duration = 200
+    const startTs = performance.now()
+    function step(now) {
+      const p = Math.min(1, (now - startTs) / duration)
+      el.scrollTop = start + (end - start) * p
+      if (p < 1) requestAnimationFrame(step)
+    }
+    requestAnimationFrame(step)
+  }
+}
+
+function scrollToBottomInstant() {
+  const el = messagesListEl.value
+  if (!el) return
+  el.scrollTop = el.scrollHeight
+}
 
 async function fetchMessages(page = 0) {
   if (page === 0) {
@@ -181,7 +204,6 @@ async function fetchMessages(page = 0) {
       isChannel.value = conversationData.channel
     }
 
-    // Since the backend sorts by descending, we need to reverse for correct chat order
     const newMessages = pageData.content.reverse().map((item) => ({
       ...item,
       src: item.sender.avatar,
@@ -202,12 +224,16 @@ async function fetchMessages(page = 0) {
     currentPage.value = pageData.number
     totalPages.value = pageData.totalPages
 
-    // Scrolling is now fully handled by the watcher
     await nextTick()
     if (page > 0 && list) {
+      // 加载更多：保持原视口位置
       const newScrollHeight = list.scrollHeight
       list.scrollTop = newScrollHeight - oldScrollHeight
+    } else if (page === 0) {
+      // 首次加载：定位到底部（不用动画，避免“闪动感”）
+      scrollToBottomInstant()
     }
+    updateNearBottom()
   } catch (e) {
     error.value = e.message
     toast.error(e.message)
@@ -272,9 +298,10 @@ async function sendMessage(content, clearInput) {
     })
     clearInput()
     replyTo.value = null
-    setTimeout(() => {
-      scrollToBottom()
-    }, 100)
+
+    await nextTick()
+    // 仅“发送消息成功后”才平滑滚动到底部
+    scrollToBottomSmooth()
   } catch (e) {
     toast.error(e.message)
   } finally {
@@ -290,7 +317,6 @@ async function markConversationAsRead() {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
     })
-    // After marking as read, refresh the global unread count
     refreshGlobalUnreadCount()
     refreshChannelUnread()
   } catch (e) {
@@ -298,37 +324,12 @@ async function markConversationAsRead() {
   }
 }
 
-function scrollToBottom() {
-  if (messagesListEl.value) {
-    const element = messagesListEl.value
-    // 強制滾動到底部，使用 smooth 行為確保視覺效果
-    element.scrollTop = element.scrollHeight
-
-    // 再次確認滾動位置
-    setTimeout(() => {
-      if (element.scrollTop < element.scrollHeight - element.clientHeight) {
-        element.scrollTop = element.scrollHeight
-      }
-    }, 50)
-  }
-}
-
-watch(
-  messages,
-  async (newMessages) => {
-    if (newMessages.length === 0) return
-
-    await nextTick()
-
-    // Simple, reliable scroll to bottom
-    setTimeout(() => {
-      scrollToBottom()
-    }, 100)
-  },
-  { deep: true },
-)
-
 onMounted(async () => {
+  // 监听列表滚动，实时感知是否接近底部
+  if (messagesListEl.value) {
+    messagesListEl.value.addEventListener('scroll', updateNearBottom, { passive: true })
+  }
+
   currentUser.value = await fetchCurrentUser()
   if (currentUser.value) {
     await fetchMessages(0)
@@ -345,9 +346,8 @@ onMounted(async () => {
 
 watch(isConnected, (newValue) => {
   if (newValue) {
-    // 等待一小段时间确保连接稳定
     setTimeout(() => {
-      subscription = subscribe(`/topic/conversation/${conversationId}`, (message) => {
+      subscription = subscribe(`/topic/conversation/${conversationId}`, async (message) => {
         // 避免重复显示当前用户发送的消息
         if (message.sender.id !== currentUser.value.id) {
           messages.value.push({
@@ -357,11 +357,10 @@ watch(isConnected, (newValue) => {
               openUser(message.sender.id)
             },
           })
-          // 实时收到消息时自动标记为已读
+          // 收到消息后只标记已读，不强制滚动（符合“非发送不拉底”）
           markConversationAsRead()
-          setTimeout(() => {
-            scrollToBottom()
-          }, 100)
+          await nextTick()
+          updateNearBottom()
         }
       })
     }, 500)
@@ -369,23 +368,12 @@ watch(isConnected, (newValue) => {
 })
 
 onActivated(async () => {
-  // This will be called every time the component is activated (navigated to)
+  // 返回页面时：刷新数据与已读，不做强制滚动，保持用户当前位置
   if (currentUser.value) {
     await fetchMessages(0)
     await markConversationAsRead()
-
-    // 確保滾動到底部 - 使用多重延遲策略
     await nextTick()
-    setTimeout(() => {
-      scrollToBottom()
-    }, 100)
-    setTimeout(() => {
-      scrollToBottom()
-    }, 300)
-    setTimeout(() => {
-      scrollToBottom()
-    }, 500)
-
+    updateNearBottom()
     if (!isConnected.value) {
       const token = getToken()
       if (token) connect(token)
@@ -405,6 +393,9 @@ onUnmounted(() => {
   if (subscription) {
     subscription.unsubscribe()
     subscription = null
+  }
+  if (messagesListEl.value) {
+    messagesListEl.value.removeEventListener('scroll', updateNearBottom)
   }
   disconnect()
 })
