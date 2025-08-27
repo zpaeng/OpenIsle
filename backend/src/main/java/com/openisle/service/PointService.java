@@ -150,6 +150,16 @@ public class PointService {
         return addPoint(poster, 10, PointHistoryType.POST_LIKED, post, null, reactioner);
     }
 
+    public int deductForReactionOfPost(String reactionerName, Long postId) {
+        User poster = postRepository.findById(postId).orElseThrow().getAuthor();
+        User reactioner = userRepository.findByUsername(reactionerName).orElseThrow();
+        if (poster.getId().equals(reactioner.getId())) {
+            return 0;
+        }
+        Post post = postRepository.findById(postId).orElseThrow();
+        return addPoint(poster, -10, PointHistoryType.POST_LIKE_CANCELLED, post, null, reactioner);
+    }
+
     // 考虑点赞者和评论者是同一个的情况
     public int awardForReactionOfComment(String reactionerName, Long commentId) {
         // 根据帖子id找到评论者
@@ -167,6 +177,17 @@ public class PointService {
         Comment comment = commentRepository.findById(commentId).orElseThrow();
         Post post = comment.getPost();
         return addPoint(commenter, 10, PointHistoryType.COMMENT_LIKED, post, comment, reactioner);
+    }
+
+    public int deductForReactionOfComment(String reactionerName, Long commentId) {
+        User commenter = commentRepository.findById(commentId).orElseThrow().getAuthor();
+        User reactioner = userRepository.findByUsername(reactionerName).orElseThrow();
+        if (commenter.getId().equals(reactioner.getId())) {
+            return 0;
+        }
+        Comment comment = commentRepository.findById(commentId).orElseThrow();
+        Post post = comment.getPost();
+        return addPoint(commenter, -10, PointHistoryType.COMMENT_LIKE_CANCELLED, post, comment, reactioner);
     }
 
     public java.util.List<PointHistory> listHistory(String userName) {

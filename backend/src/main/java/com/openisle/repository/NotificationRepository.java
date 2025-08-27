@@ -5,6 +5,7 @@ import com.openisle.model.User;
 import com.openisle.model.Post;
 import com.openisle.model.Comment;
 import com.openisle.model.NotificationType;
+import com.openisle.model.ReactionType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,4 +30,8 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     List<Notification> findByTypeAndFromUser(NotificationType type, User fromUser);
 
     void deleteByTypeAndFromUserAndPost(NotificationType type, User fromUser, Post post);
+
+    void deleteByTypeAndFromUserAndPostAndReactionType(NotificationType type, User fromUser, Post post, ReactionType reactionType);
+
+    void deleteByTypeAndFromUserAndCommentAndReactionType(NotificationType type, User fromUser, Comment comment, ReactionType reactionType);
 }

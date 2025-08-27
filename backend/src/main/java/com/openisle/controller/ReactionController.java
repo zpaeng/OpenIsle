@@ -36,6 +36,7 @@ public class ReactionController {
                                                    Authentication auth) {
         Reaction reaction = reactionService.reactToPost(auth.getName(), postId, req.getType());
         if (reaction == null) {
+            pointService.deductForReactionOfPost(auth.getName(), postId);
             return ResponseEntity.noContent().build();
         }
         ReactionDto dto = reactionMapper.toDto(reaction);
@@ -50,6 +51,7 @@ public class ReactionController {
                                                       Authentication auth) {
         Reaction reaction = reactionService.reactToComment(auth.getName(), commentId, req.getType());
         if (reaction == null) {
+            pointService.deductForReactionOfComment(auth.getName(), commentId);
             return ResponseEntity.noContent().build();
         }
         ReactionDto dto = reactionMapper.toDto(reaction);

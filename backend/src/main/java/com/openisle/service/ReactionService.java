@@ -42,6 +42,7 @@ public class ReactionService {
         java.util.Optional<Reaction> existing =
                 reactionRepository.findByUserAndPostAndType(user, post, type);
         if (existing.isPresent()) {
+            notificationService.deleteReactionNotification(user, post, null, type);
             reactionRepository.delete(existing.get());
             return null;
         }
@@ -65,6 +66,7 @@ public class ReactionService {
         java.util.Optional<Reaction> existing =
                 reactionRepository.findByUserAndCommentAndType(user, comment, type);
         if (existing.isPresent()) {
+            notificationService.deleteReactionNotification(user, null, comment, type);
             reactionRepository.delete(existing.get());
             return null;
         }
