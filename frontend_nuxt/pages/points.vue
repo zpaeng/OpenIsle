@@ -104,6 +104,31 @@
                     ，获得{{ item.amount }}积分
                   </template>
                 </template>
+                <template v-else-if="item.type === 'POST_LIKE_CANCELLED' && item.fromUserId">
+                  你的帖子
+                  <NuxtLink :to="`/posts/${item.postId}`" class="timeline-link">
+                    {{ item.postTitle }}
+                  </NuxtLink>
+                  被
+                  <NuxtLink :to="`/users/${item.fromUserId}`" class="timeline-link">
+                    {{ item.fromUserName }}
+                  </NuxtLink>
+                  取消点赞，扣除{{ -item.amount }}积分
+                </template>
+                <template v-else-if="item.type === 'COMMENT_LIKE_CANCELLED' && item.fromUserId">
+                  你的评论
+                  <NuxtLink
+                    :to="`/posts/${item.postId}#comment-${item.commentId}`"
+                    class="timeline-link"
+                  >
+                    {{ stripMarkdownLength(item.commentContent, 100) }}
+                  </NuxtLink>
+                  被
+                  <NuxtLink :to="`/users/${item.fromUserId}`" class="timeline-link">
+                    {{ item.fromUserName }}
+                  </NuxtLink>
+                  取消点赞，扣除{{ -item.amount }}积分
+                </template>
                 <template v-else-if="item.type === 'POST_LIKED' && item.fromUserId">
                   帖子
                   <NuxtLink :to="`/posts/${item.postId}`" class="timeline-link">{{
@@ -227,6 +252,8 @@ const iconMap = {
   FEATURE: 'fas fa-star',
   LOTTERY_JOIN: 'fas fa-ticket-alt',
   LOTTERY_REWARD: 'fas fa-ticket-alt',
+  POST_LIKE_CANCELLED: 'fas fa-thumbs-down',
+  COMMENT_LIKE_CANCELLED: 'fas fa-thumbs-down',
 }
 
 const loadTrend = async () => {
