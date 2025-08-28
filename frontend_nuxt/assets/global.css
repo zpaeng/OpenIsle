@@ -162,6 +162,7 @@ body {
   border-radius: 4px;
   line-height: 1.5;
   position: relative;
+  white-space: break-spaces;
 }
 
 .info-content-text pre .line-numbers {
@@ -188,7 +189,6 @@ body {
   font-family: 'Maple Mono', monospace;
   font-size: 13px;
   border-radius: 4px;
-  white-space: break-spaces;
   background-color: var(--code-highlight-background-color);
   color: var(--text-color);
 }
