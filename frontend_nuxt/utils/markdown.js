@@ -96,6 +96,9 @@ const md = new MarkdownIt({
   linkify: true,
   breaks: true,
   highlight: (str, lang) => {
+    if (lang === 'mermaid') {
+      return `<pre class="mermaid">${str}</pre>`
+    }
     let code = ''
     if (lang && hljs.getLanguage(lang)) {
       code = hljs.highlight(str, { language: lang, ignoreIllegals: true }).value
@@ -182,7 +185,7 @@ const SANITIZE_CFG = {
   allowedClasses: {
     a: ['mention-link'],
     img: ['emoji'],
-    pre: ['code-block'],
+    pre: ['code-block', 'mermaid'],
     div: ['line-numbers', 'line-number'],
     code: ['hljs', /^language-/],
     button: ['copy-code-btn'],
@@ -208,8 +211,15 @@ const SANITIZE_CFG = {
 /** @section 渲染 & 事件 */
 export function renderMarkdown(text) {
   const raw = md.render(text || '')
-  // ⭐ 核心：对最终 HTML 进行一次净化
-  return sanitizeHtml(raw, SANITIZE_CFG)
+  const html = sanitizeHtml(raw, SANITIZE_CFG)
+  if (typeof window !== 'undefined') {
+    setTimeout(async () => {
+      const mermaid = await import('mermaid')
+      mermaid.default.initialize({ startOnLoad: false })
+      mermaid.default.run({ nodes: document.querySelectorAll('.mermaid') })
+    })
+  }
+  return html
 }
 
 export function handleMarkdownClick(e) {
