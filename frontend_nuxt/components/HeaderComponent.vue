@@ -63,7 +63,7 @@
           <DropdownMenu v-if="isLogin" ref="userMenu" :items="headerMenuItems">
             <template #trigger>
               <div class="avatar-container">
-                <BaseImage class="avatar-img" :src="avatar" alt="avatar" />
+                <img class="avatar-img" :src="avatar" alt="avatar" />
                 <i class="fas fa-caret-down dropdown-icon"></i>
               </div>
             </template>

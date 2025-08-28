@@ -2,7 +2,7 @@
   <div v-if="show" class="cropper-modal">
     <div class="cropper-body">
       <div class="cropper-wrapper">
-        <BaseImage ref="image" :src="src" alt="to crop" />
+        <img ref="image" :src="src" alt="to crop" />
       </div>
       <div class="cropper-actions">
         <button class="cropper-btn" @click="$emit('close')">取消</button>
