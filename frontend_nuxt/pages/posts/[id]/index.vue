@@ -411,7 +411,7 @@ const gatherPostItems = () => {
   }
 }
 
-const mapComment = (c, parentUserName = '', parentUserAvatar = '', level = 0) => ({
+const mapComment = (c, parentUserName = '', parentUserAvatar = '', parentUserId = '', level = 0) => ({
   id: c.id,
   userName: c.author.username,
   medal: c.author.displayMedal,
@@ -421,12 +421,13 @@ const mapComment = (c, parentUserName = '', parentUserAvatar = '', level = 0) =>
   text: c.content,
   reactions: c.reactions || [],
   pinned: Boolean(c.pinned ?? c.pinnedAt ?? c.pinned_at),
-  reply: (c.replies || []).map((r) => mapComment(r, c.author.username, c.author.avatar, level + 1)),
+  reply: (c.replies || []).map((r) => mapComment(r, c.author.username, c.author.avatar, c.author.id, level + 1)),
   openReplies: level === 0,
   src: c.author.avatar,
-  iconClick: () => navigateTo(`/users/${c.author.id}`, { replace: true }),
+  iconClick: () => navigateTo(`/users/${c.author.id}`),
   parentUserName: parentUserName,
   parentUserAvatar: parentUserAvatar,
+  parentUserClick: parentUserId ? () => navigateTo(`/users/${parentUserId}`) : null,
 })
 
 const getTop = (el) => {

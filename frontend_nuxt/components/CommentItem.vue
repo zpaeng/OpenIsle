@@ -26,7 +26,8 @@
           <span v-if="level >= 2" class="reply-item">
             <i class="fas fa-reply reply-icon"></i>
             <span class="reply-info">
-              <img :src="comment.parentUserAvatar || '/default-avatar.svg'" alt="" class="reply-avatar">
+              <BaseImage class="reply-avatar"  :src="comment.parentUserAvatar || '/default-avatar.svg'" alt="avatar"
+              @click="comment.parentUserClick && comment.parentUserClick()" />
               <span class="reply-user-name">{{ comment.parentUserName }}</span>
             </span>
           </span>
@@ -391,6 +392,7 @@ const handleContentClick = (e) => {
   height: 20px;
   border-radius: 50%;
   margin-right: 5px;
+  cursor: pointer;
 }
 
 .reply-icon {
