@@ -85,6 +85,30 @@
           </client-only>
         </div>
       </div>
+      <div v-if="postType === 'POLL'" class="poll-section">
+        <div class="poll-question-row">
+          <span class="poll-row-title">投票问题</span>
+          <BaseInput v-model="pollQuestion" placeholder="请输入投票问题" />
+        </div>
+        <div class="poll-options-row">
+          <span class="poll-row-title">投票选项</span>
+          <div class="poll-option-item" v-for="(opt, idx) in pollOptions" :key="idx">
+            <BaseInput v-model="pollOptions[idx]" placeholder="选项内容" />
+            <i
+              v-if="pollOptions.length > 2"
+              class="fa-solid fa-xmark remove-option-icon"
+              @click="removeOption(idx)"
+            ></i>
+          </div>
+          <div class="add-option" @click="addOption">添加选项</div>
+        </div>
+        <div class="poll-time-row">
+          <span class="poll-row-title">投票结束时间</span>
+          <client-only>
+            <flat-pickr v-model="endTime" :config="dateConfig" class="time-picker" />
+          </client-only>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -120,6 +144,8 @@ const prizeDescription = ref('')
 const pointCost = ref(0)
 const endTime = ref(null)
 const startTime = ref(null)
+const pollQuestion = ref('')
+const pollOptions = ref(['', ''])
 const dateConfig = { enableTime: true, time_24hr: true, dateFormat: 'Y-m-d H:i' }
 const isWaitingPosting = ref(false)
 const isAiLoading = ref(false)
@@ -150,6 +176,14 @@ watch(pointCost, (val) => {
   if (val === undefined || val === null || val < 0) pointCost.value = 0
   if (val > 100) pointCost.value = 100
 })
+
+const addOption = () => {
+  pollOptions.value.push('')
+}
+
+const removeOption = (idx) => {
+  if (pollOptions.value.length > 2) pollOptions.value.splice(idx, 1)
+}
 
 const loadDraft = async () => {
   const token = getToken()
@@ -189,6 +223,8 @@ const clearPost = async () => {
   pointCost.value = 0
   endTime.value = null
   startTime.value = null
+  pollQuestion.value = ''
+  pollOptions.value = ['', '']
 
   // 删除草稿
   const token = getToken()
@@ -339,6 +375,20 @@ const submitPost = async () => {
       return
     }
   }
+  if (postType.value === 'POLL') {
+    if (!pollQuestion.value.trim()) {
+      toast.error('请输入投票问题')
+      return
+    }
+    if (pollOptions.value.length < 2 || pollOptions.value.some((o) => !o.trim())) {
+      toast.error('请填写至少两个投票选项')
+      return
+    }
+    if (!endTime.value) {
+      toast.error('请选择投票结束时间')
+      return
+    }
+  }
   try {
     const token = getToken()
     await ensureTags(token)
@@ -375,12 +425,14 @@ const submitPost = async () => {
         prizeName: postType.value === 'LOTTERY' ? prizeName.value : undefined,
         prizeCount: postType.value === 'LOTTERY' ? prizeCount.value : undefined,
         prizeDescription: postType.value === 'LOTTERY' ? prizeDescription.value : undefined,
+        question: postType.value === 'POLL' ? pollQuestion.value : undefined,
+        options: postType.value === 'POLL' ? pollOptions.value : undefined,
         startTime:
           postType.value === 'LOTTERY' ? new Date(startTime.value).toISOString() : undefined,
         pointCost: postType.value === 'LOTTERY' ? pointCost.value : undefined,
         // 将时间转换为 UTC+8.5 时区 todo: 需要优化
         endTime:
-          postType.value === 'LOTTERY'
+          postType.value === 'LOTTERY' || postType.value === 'POLL'
             ? new Date(new Date(endTime.value).getTime() + 8.02 * 60 * 60 * 1000).toISOString()
             : undefined,
       }),
@@ -517,7 +569,8 @@ const submitPost = async () => {
   padding-bottom: 50px;
 }
 
-.lottery-section {
+.lottery-section,
+.poll-section {
   margin-top: 20px;
   display: flex;
   flex-direction: column;
@@ -526,7 +579,8 @@ const submitPost = async () => {
   margin-bottom: 200px;
 }
 
-.prize-row-title {
+.prize-row-title,
+.poll-row-title {
   font-size: 16px;
   color: var(--text-color);
   font-weight: bold;
@@ -610,6 +664,31 @@ const submitPost = async () => {
   margin-left: 10px;
   font-size: 16px;
   color: var(--text-color);
+}
+
+.poll-option-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.remove-option-icon {
+  cursor: pointer;
+}
+
+.add-option {
+  color: var(--primary-color);
+  cursor: pointer;
+  width: fit-content;
+  margin-top: 5px;
+}
+
+.poll-options-row,
+.poll-question-row,
+.poll-time-row {
+  display: flex;
+  flex-direction: column;
 }
 
 .prize-count-input-field {

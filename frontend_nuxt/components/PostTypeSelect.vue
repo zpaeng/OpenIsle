@@ -33,6 +33,7 @@ export default {
       return [
         { id: 'NORMAL', name: '普通帖子', icon: 'fa-regular fa-file' },
         { id: 'LOTTERY', name: '抽奖帖子', icon: 'fa-solid fa-gift' },
+        { id: 'POLL', name: '投票帖子', icon: 'fa-solid fa-square-poll-vertical' },
       ]
     }
 
