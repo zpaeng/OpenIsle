@@ -58,6 +58,8 @@ cp open-isle.env.example open-isle.env
 
 > Step3 前端部署
 
+**⚠️ 环境要求：Node.js 版本最低 20.0.0（因为 Nuxt 框架要求）**
+
 前端可以依赖本机部署的后端，也可以直接调用线上的后端接口
 
 ```shell
