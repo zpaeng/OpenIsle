@@ -72,9 +72,9 @@
               <i v-if="article.type === 'LOTTERY'" class="fa-solid fa-gift lottery-icon"></i>
               {{ article.title }}
             </NuxtLink>
-            <div class="article-item-description main-item">
+            <NuxtLink class="article-item-description main-item" :to="`/posts/${article.id}`">
               {{ sanitizeDescription(article.description) }}
-            </div>
+            </NuxtLink>
             <div class="article-info-container main-item">
               <ArticleCategory :category="article.category" />
               <ArticleTags :tags="article.tags" />
@@ -527,15 +527,18 @@ const sanitizeDescription = (text) => stripMarkdown(text)
 
 .article-item-title {
   margin-top: 10px;
-  font-size: 20px;
+  font-size: 18px;
   text-decoration: none;
   color: var(--text-color);
   max-width: 100%;
+  font-weight: bold;
+  transition: color 0.2s ease;
 }
 
 .article-item-title:hover {
   color: var(--primary-color);
   text-decoration: underline;
+  transition: color 0.2s ease;
 }
 
 .pinned-icon,
@@ -547,13 +550,23 @@ const sanitizeDescription = (text) => stripMarkdown(text)
 .article-item-description {
   max-width: 100%;
   margin-top: 10px;
-  font-size: 14px;
-  color: gray;
+  font-size: 13px;
+  color: rgba(140, 140, 140, 0.888);
   display: -webkit-box;
   line-clamp: 3;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  letter-spacing: 0.01em;
+  font-weight: 400;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.article-item-description:hover {
+  color: var(--primary-color);
+  cursor: pointer;
+  transition: color 0.2s ease;
 }
 
 .article-info-container {
