@@ -23,9 +23,12 @@
             >{{ getMedalTitle(comment.medal) }}</NuxtLink
           >
           <i v-if="comment.pinned" class="fas fa-thumbtack pin-icon"></i>
-          <span v-if="level >= 2">
+          <span v-if="level >= 2" class="reply-item">
             <i class="fas fa-reply reply-icon"></i>
-            <span class="user-name reply-user-name">{{ comment.parentUserName }}</span>
+            <span class="reply-info">
+              <img :src="comment.parentUserAvatar || '/default-avatar.svg'" alt="" class="reply-avatar">
+              <span class="reply-user-name">{{ comment.parentUserName }}</span>
+            </span>
           </span>
           <div class="post-time">{{ comment.time }}</div>
         </div>
@@ -250,6 +253,7 @@ const submitReply = async (parentUserName, text, clear) => {
         medal: data.author.displayMedal,
         text: data.content,
         parentUserName: parentUserName,
+        parentUserAvatar: props.comment.avatar,
         reactions: [],
         reply: (data.replies || []).map((r) => ({
           id: r.id,
@@ -376,7 +380,21 @@ const handleContentClick = (e) => {
   justify-content: space-between;
 }
 
+.reply-item, .reply-info {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.reply-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
 .reply-icon {
+  color: var(--primary-color);
   margin-right: 10px;
   margin-left: 10px;
   opacity: 0.5;
