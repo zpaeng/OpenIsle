@@ -9,8 +9,10 @@ import com.openisle.model.Category;
 import com.openisle.model.Comment;
 import com.openisle.model.NotificationType;
 import com.openisle.model.LotteryPost;
+import com.openisle.model.PollPost;
 import com.openisle.repository.PostRepository;
 import com.openisle.repository.LotteryPostRepository;
+import com.openisle.repository.PollPostRepository;
 import com.openisle.repository.UserRepository;
 import com.openisle.repository.CategoryRepository;
 import com.openisle.repository.TagRepository;
@@ -54,6 +56,7 @@ public class PostService {
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
     private final LotteryPostRepository lotteryPostRepository;
+    private final PollPostRepository pollPostRepository;
     private PublishMode publishMode;
     private final NotificationService notificationService;
     private final SubscriptionService subscriptionService;
@@ -78,6 +81,7 @@ public class PostService {
                        CategoryRepository categoryRepository,
                        TagRepository tagRepository,
                        LotteryPostRepository lotteryPostRepository,
+                       PollPostRepository pollPostRepository,
                        NotificationService notificationService,
                        SubscriptionService subscriptionService,
                        CommentService commentService,
@@ -97,6 +101,7 @@ public class PostService {
         this.categoryRepository = categoryRepository;
         this.tagRepository = tagRepository;
         this.lotteryPostRepository = lotteryPostRepository;
+        this.pollPostRepository = pollPostRepository;
         this.notificationService = notificationService;
         this.subscriptionService = subscriptionService;
         this.commentService = commentService;
@@ -166,7 +171,9 @@ public class PostService {
                            Integer prizeCount,
                            Integer pointCost,
                            LocalDateTime startTime,
-                           LocalDateTime endTime) {
+                           LocalDateTime endTime,
+                           String question,
+                           java.util.List<String> options) {
         long recent = postRepository.countByAuthorAfter(username,
                 java.time.LocalDateTime.now().minusMinutes(5));
         if (recent >= 1) {
@@ -200,6 +207,15 @@ public class PostService {
             lp.setStartTime(startTime);
             lp.setEndTime(endTime);
             post = lp;
+        } else if (actualType == PostType.POLL) {
+            if (options == null || options.size() < 2) {
+                throw new IllegalArgumentException("At least two options required");
+            }
+            PollPost pp = new PollPost();
+            pp.setQuestion(question);
+            pp.setOptions(options);
+            pp.setEndTime(endTime);
+            post = pp;
         } else {
             post = new Post();
         }
@@ -212,6 +228,8 @@ public class PostService {
         post.setStatus(publishMode == PublishMode.REVIEW ? PostStatus.PENDING : PostStatus.PUBLISHED);
         if (post instanceof LotteryPost) {
             post = lotteryPostRepository.save((LotteryPost) post);
+        } else if (post instanceof PollPost) {
+            post = pollPostRepository.save((PollPost) post);
         } else {
             post = postRepository.save(post);
         }
@@ -259,6 +277,31 @@ public class PostService {
             pointService.processLotteryJoin(user, post);
             lotteryPostRepository.save(post);
         }
+    }
+
+    public PollPost getPoll(Long postId) {
+        return pollPostRepository.findById(postId)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
+    }
+
+    @Transactional
+    public PollPost votePoll(Long postId, String username, int optionIndex) {
+        PollPost post = pollPostRepository.findById(postId)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
+        if (post.getEndTime() != null && post.getEndTime().isBefore(LocalDateTime.now())) {
+            throw new IllegalStateException("Poll has ended");
+        }
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
+        if (post.getParticipants().contains(user)) {
+            throw new IllegalArgumentException("User already voted");
+        }
+        if (optionIndex < 0 || optionIndex >= post.getOptions().size()) {
+            throw new IllegalArgumentException("Invalid option");
+        }
+        post.getParticipants().add(user);
+        post.getVotes().merge(optionIndex, 1, Integer::sum);
+        return pollPostRepository.save(post);
     }
 
     @Transactional
