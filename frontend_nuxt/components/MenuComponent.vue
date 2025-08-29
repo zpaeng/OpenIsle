@@ -279,12 +279,20 @@ const gotoTag = (t) => {
   padding: 10px 10px 0 10px;
 }
 
+.menu-item-container {
+  border-bottom: 1px solid var(--menu-border-color);
+}
+
+.menu-item:last-child {
+  margin-bottom: 5px;
+}
+
 /* .menu-item-container { */
 /**/
 /* } */
 
 .menu-item {
-  padding: 4px 10px;
+  padding: 6px 12px;
   text-decoration: none;
   color: var(--menu-text-color);
   border-radius: 10px;
@@ -298,7 +306,7 @@ const gotoTag = (t) => {
 }
 
 .menu-item-text {
-  font-size: 16px;
+  font-size: 14px;
   text-decoration: none;
   color: var(--menu-text-color);
 }
@@ -352,16 +360,17 @@ const gotoTag = (t) => {
 }
 
 .menu-section {
-  margin-top: 10px;
+  border-bottom: 1px solid var(--menu-border-color);
+  padding-bottom: 5px;
 }
 
 .section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-weight: bold;
-  opacity: 0.5;
-  padding: 4px 10px;
+  font-size: 14px;
+  padding: 6px 12px 0 12px;
+  color: var(--menu-text-color);
   cursor: pointer;
 }
 
@@ -373,7 +382,7 @@ const gotoTag = (t) => {
 }
 
 .section-item {
-  padding: 4px 10px;
+  padding: 6px 12px;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -393,6 +402,8 @@ const gotoTag = (t) => {
 }
 
 .section-item-text {
+  font-size: 14px;
+  text-decoration: none;
   color: var(--menu-text-color);
 }
 

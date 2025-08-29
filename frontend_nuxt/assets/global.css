@@ -19,7 +19,7 @@
   --menu-border-color: lightgray;
   --normal-border-color: lightgray;
   --menu-selected-background-color: rgba(242, 242, 242, 0.884);
-  --menu-text-color: black;
+  --menu-text-color: rgb(99, 99, 99);
   --scroller-background-color: rgba(130, 175, 180, 0.5);
   /* --normal-background-color: rgb(241, 241, 241); */
   --normal-background-color: white;
