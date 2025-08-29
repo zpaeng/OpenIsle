@@ -3,6 +3,7 @@ package com.openisle.controller;
 import com.openisle.dto.PostDetailDto;
 import com.openisle.dto.PostRequest;
 import com.openisle.dto.PostSummaryDto;
+import com.openisle.dto.PollDto;
 import com.openisle.mapper.PostMapper;
 import com.openisle.model.Post;
 import com.openisle.service.*;
@@ -42,7 +43,8 @@ public class PostController {
                 req.getTitle(), req.getContent(), req.getTagIds(),
                 req.getType(), req.getPrizeDescription(), req.getPrizeIcon(),
                 req.getPrizeCount(), req.getPointCost(),
-                req.getStartTime(), req.getEndTime());
+                req.getStartTime(), req.getEndTime(),
+                req.getQuestion(), req.getOptions());
         draftService.deleteDraft(auth.getName());
         PostDetailDto dto = postMapper.toDetailDto(post, auth.getName());
         dto.setReward(levelService.awardForPost(auth.getName()));
@@ -83,6 +85,17 @@ public class PostController {
     @PostMapping("/{id}/lottery/join")
     public ResponseEntity<Void> joinLottery(@PathVariable Long id, Authentication auth) {
         postService.joinLottery(id, auth.getName());
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/poll/progress")
+    public ResponseEntity<PollDto> pollProgress(@PathVariable Long id) {
+        return ResponseEntity.ok(postMapper.toSummaryDto(postService.getPoll(id)).getPoll());
+    }
+
+    @PostMapping("/{id}/poll/vote")
+    public ResponseEntity<Void> vote(@PathVariable Long id, @RequestParam("option") int option, Authentication auth) {
+        postService.votePoll(id, auth.getName(), option);
         return ResponseEntity.ok().build();
     }
 

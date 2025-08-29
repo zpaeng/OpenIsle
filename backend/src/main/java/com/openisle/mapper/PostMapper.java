@@ -5,9 +5,11 @@ import com.openisle.dto.PostDetailDto;
 import com.openisle.dto.PostSummaryDto;
 import com.openisle.dto.ReactionDto;
 import com.openisle.dto.LotteryDto;
+import com.openisle.dto.PollDto;
 import com.openisle.model.CommentSort;
 import com.openisle.model.Post;
 import com.openisle.model.LotteryPost;
+import com.openisle.model.PollPost;
 import com.openisle.model.User;
 import com.openisle.service.CommentService;
 import com.openisle.service.ReactionService;
@@ -92,6 +94,16 @@ public class PostMapper {
             l.setParticipants(lp.getParticipants().stream().map(userMapper::toAuthorDto).collect(Collectors.toList()));
             l.setWinners(lp.getWinners().stream().map(userMapper::toAuthorDto).collect(Collectors.toList()));
             dto.setLottery(l);
+        }
+
+        if (post instanceof PollPost pp) {
+            PollDto p = new PollDto();
+            p.setQuestion(pp.getQuestion());
+            p.setOptions(pp.getOptions());
+            p.setVotes(pp.getVotes());
+            p.setEndTime(pp.getEndTime());
+            p.setParticipants(pp.getParticipants().stream().map(userMapper::toAuthorDto).collect(Collectors.toList()));
+            dto.setPoll(p);
         }
     }
 }
