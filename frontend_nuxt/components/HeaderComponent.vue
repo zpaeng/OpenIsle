@@ -4,7 +4,7 @@
       <div class="header-content-left">
         <div v-if="showMenuBtn" class="menu-btn-wrapper">
           <button class="menu-btn" ref="menuBtn" @click="$emit('toggle-menu')">
-            <i class="fas fa-bars"></i>
+            <i class="fas fa-bars micon"></i>
           </button>
           <span
             v-if="isMobile && (unreadMessageCount > 0 || hasChannelUnread)"
@@ -318,6 +318,10 @@ onMounted(async () => {
   gap: 20px;
 }
 
+.micon {
+  margin-left: 10px;
+}
+
 .menu-btn {
   font-size: 24px;
   background: none;
@@ -370,6 +374,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   cursor: pointer;
+  margin-right: 10px;
 }
 
 .avatar-img {
