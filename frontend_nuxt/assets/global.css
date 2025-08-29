@@ -50,7 +50,7 @@
   --menu-border-color: #555;
   --normal-border-color: #555;
   --menu-selected-background-color: rgba(255, 255, 255, 0.1);
-  --menu-text-color: white;
+  --menu-text-color: rgb(173, 173, 173);
   /* --normal-background-color: #000000; */
   --normal-background-color: #333;
   --lottery-background-color: #4e4e4e;

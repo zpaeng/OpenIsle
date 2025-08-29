@@ -279,6 +279,15 @@ const gotoTag = (t) => {
   padding: 10px 10px 0 10px;
 }
 
+.menu-content::-webkit-scrollbar {
+  display: none;
+}
+
+.menu-content {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 .menu-item-container {
   border-bottom: 1px solid var(--menu-border-color);
 }
