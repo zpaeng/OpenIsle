@@ -171,6 +171,38 @@
           </div>
         </div>
       </div>
+      <div v-if="poll" class="post-poll-container">
+        <div class="poll-question">{{ poll.question }}</div>
+        <div class="poll-options">
+          <div v-for="(opt, idx) in poll.options" :key="idx" class="poll-option">
+            <div class="poll-option-text">{{ opt }}</div>
+            <div class="poll-option-progress">
+              <div
+                class="poll-option-progress-bar"
+                :style="{ width: pollPercentages[idx] + '%' }"
+              ></div>
+              <div class="poll-option-progress-info">{{ pollVotes[idx] || 0 }} 票</div>
+            </div>
+            <div
+              v-if="loggedIn && !hasVoted && !pollEnded"
+              class="poll-vote-button"
+              @click="voteOption(idx)"
+            >
+              投票
+            </div>
+          </div>
+        </div>
+        <div v-if="pollParticipants.length" class="poll-participants">
+          <BaseImage
+            v-for="p in pollParticipants"
+            :key="p.id"
+            class="poll-participant-avatar"
+            :src="p.avatar"
+            alt="avatar"
+            @click="gotoUser(p.id)"
+          />
+        </div>
+      </div>
 
       <div v-if="closed" class="post-close-container">该帖子已关闭，内容仅供阅读，无法进行互动</div>
 
@@ -325,6 +357,7 @@ const loggedIn = computed(() => authState.loggedIn)
 const isAdmin = computed(() => authState.role === 'ADMIN')
 const isAuthor = computed(() => authState.username === author.value.username)
 const lottery = ref(null)
+const poll = ref(null)
 const countdown = ref('00:00:00')
 let countdownTimer = null
 const lotteryParticipants = computed(() => lottery.value?.participants || [])
@@ -337,12 +370,36 @@ const hasJoined = computed(() => {
   if (!loggedIn.value) return false
   return lotteryParticipants.value.some((p) => p.id === Number(authState.userId))
 })
+const pollParticipants = computed(() => poll.value?.participants || [])
+const pollVotes = computed(() => poll.value?.votes || {})
+const totalPollVotes = computed(() => Object.values(pollVotes.value).reduce((a, b) => a + b, 0))
+const pollPercentages = computed(() =>
+  poll.value
+    ? poll.value.options.map((_, idx) => {
+        const c = pollVotes.value[idx] || 0
+        return totalPollVotes.value ? ((c / totalPollVotes.value) * 100).toFixed(1) : 0
+      })
+    : [],
+)
+const pollEnded = computed(() => {
+  if (!poll.value || !poll.value.endTime) return false
+  return new Date(poll.value.endTime).getTime() <= Date.now()
+})
+const hasVoted = computed(() => {
+  if (!loggedIn.value) return false
+  return pollParticipants.value.some((p) => p.id === Number(authState.userId))
+})
+const currentEndTime = computed(() => {
+  if (lottery.value && lottery.value.endTime) return lottery.value.endTime
+  if (poll.value && poll.value.endTime) return poll.value.endTime
+  return null
+})
 const updateCountdown = () => {
-  if (!lottery.value || !lottery.value.endTime) {
+  if (!currentEndTime.value) {
     countdown.value = '00:00:00'
     return
   }
-  const diff = new Date(lottery.value.endTime).getTime() - Date.now()
+  const diff = new Date(currentEndTime.value).getTime() - Date.now()
   if (diff <= 0) {
     countdown.value = '00:00:00'
     if (countdownTimer) {
@@ -523,7 +580,9 @@ watchEffect(() => {
   rssExcluded.value = data.rssExcluded
   postTime.value = TimeManager.format(data.createdAt)
   lottery.value = data.lottery || null
-  if (lottery.value && lottery.value.endTime) startCountdown()
+  poll.value = data.poll || null
+  if ((lottery.value && lottery.value.endTime) || (poll.value && poll.value.endTime))
+    startCountdown()
 })
 
 // 404 客户端跳转
@@ -827,6 +886,25 @@ const joinLottery = async () => {
   const data = await res.json().catch(() => ({}))
   if (res.ok) {
     toast.success('已参与抽奖')
+    await refreshPost()
+  } else {
+    toast.error(data.error || '操作失败')
+  }
+}
+
+const voteOption = async (idx) => {
+  const token = getToken()
+  if (!token) {
+    toast.error('请先登录')
+    return
+  }
+  const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/poll/vote?option=${idx}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  const data = await res.json().catch(() => ({}))
+  if (res.ok) {
+    toast.success('投票成功')
     await refreshPost()
   } else {
     toast.error(data.error || '操作失败')
@@ -1284,6 +1362,68 @@ onMounted(async () => {
   background-color: var(--lottery-background-color);
   border-radius: 10px;
   padding: 10px;
+}
+
+.post-poll-container {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: var(--lottery-background-color);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.poll-question {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.poll-option {
+  margin-bottom: 10px;
+}
+
+.poll-option-progress {
+  position: relative;
+  background-color: var(--border-color);
+  height: 20px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.poll-option-progress-bar {
+  background-color: var(--primary-color);
+  height: 100%;
+}
+
+.poll-option-progress-info {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  line-height: 20px;
+  color: #fff;
+}
+
+.poll-vote-button {
+  margin-top: 5px;
+  color: var(--primary-color);
+  cursor: pointer;
+  width: fit-content;
+}
+
+.poll-participants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.poll-participant-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
 }
 
 .prize-info {
