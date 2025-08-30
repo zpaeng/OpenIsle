@@ -210,7 +210,7 @@
                 >
                   <input
                     type="radio"
-                    :checked="true"
+                    :checked="false"
                     name="poll-option"
                     class="poll-option-input"
                   />
