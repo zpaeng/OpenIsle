@@ -174,7 +174,31 @@
       <div v-if="poll" class="post-poll-container">
         <div class="poll-top-container">
           <div class="poll-options-container">
-            <div v-if="showPollResult" class="poll-question"></div>
+            <div class="poll-question">{{ poll.question }}</div>
+            <div v-if="showPollResult">
+              <div v-for="(opt, idx) in poll.options" :key="idx" class="poll-option-result">
+                <div class="poll-option-text">{{ opt }}</div>
+                <div class="poll-option-progress">
+                  <div
+                    class="poll-option-progress-bar"
+                    :style="{ width: pollPercentages[idx] + '%' }"
+                  ></div>
+                  <div class="poll-option-progress-info">
+                    {{ pollPercentages[idx] }}% ({{ pollVotes[idx] || 0 }})
+                  </div>
+                </div>
+                <div class="poll-participants">
+                  <BaseImage
+                    v-for="p in pollOptionParticipants[idx] || []"
+                    :key="p.id"
+                    class="poll-participant-avatar"
+                    :src="p.avatar"
+                    alt="avatar"
+                    @click="gotoUser(p.id)"
+                  />
+                </div>
+              </div>
+            </div>
             <div v-else>
               <div
                 v-for="(opt, idx) in poll.options"
@@ -188,19 +212,21 @@
             </div>
           </div>
           <div class="poll-info">
-            <div class="total-votes">100</div>
+            <div class="total-votes">{{ pollParticipants.length }}</div>
             <div class="total-votes-title">投票人</div>
           </div>
         </div>
         <div class="poll-bottom-container">
-          <div v-if="showPollResult" class="poll-option-button">
+          <div v-if="showPollResult" class="poll-option-button" @click="showPollResult = false">
             <i class="fas fa-chevron-left"></i> 投票
           </div>
-          <div v-else class="poll-option-button"><i class="fas fa-chart-bar"></i> 结果</div>
+          <div v-else class="poll-option-button" @click="showPollResult = true">
+            <i class="fas fa-chart-bar"></i> 结果
+          </div>
 
           <div class="poll-left-time">
             <div class="poll-left-time-title">离结束还有</div>
-            <div class="poll-left-time-value">12:00:00</div>
+            <div class="poll-left-time-value">{{ countdown }}</div>
           </div>
         </div>
       </div>
@@ -373,6 +399,7 @@ const hasJoined = computed(() => {
   return lotteryParticipants.value.some((p) => p.id === Number(authState.userId))
 })
 const pollParticipants = computed(() => poll.value?.participants || [])
+const pollOptionParticipants = computed(() => poll.value?.optionParticipants || {})
 const pollVotes = computed(() => poll.value?.votes || {})
 const totalPollVotes = computed(() => Object.values(pollVotes.value).reduce((a, b) => a + b, 0))
 const pollPercentages = computed(() =>
@@ -390,6 +417,9 @@ const pollEnded = computed(() => {
 const hasVoted = computed(() => {
   if (!loggedIn.value) return false
   return pollParticipants.value.some((p) => p.id === Number(authState.userId))
+})
+watch([hasVoted, pollEnded], ([voted, ended]) => {
+  if (voted || ended) showPollResult.value = true
 })
 const currentEndTime = computed(() => {
   if (lottery.value && lottery.value.endTime) return lottery.value.endTime
@@ -908,6 +938,7 @@ const voteOption = async (idx) => {
   if (res.ok) {
     toast.success('投票成功')
     await refreshPost()
+    showPollResult.value = true
   } else {
     toast.error(data.error || '操作失败')
   }
@@ -1291,6 +1322,11 @@ onMounted(async () => {
   cursor: pointer;
   display: flex;
   align-items: center;
+}
+
+.poll-option-result {
+  margin-bottom: 10px;
+  margin-right: 10px;
 }
 
 .poll-option-input {
