@@ -171,71 +171,81 @@
           </div>
         </div>
       </div>
-      <div v-if="poll" class="post-poll-container">
-        <div class="poll-top-container">
-          <div class="poll-options-container">
-            <div v-if="showPollResult || pollEnded">
-              <div v-for="(opt, idx) in poll.options" :key="idx" class="poll-option-result">
-                <div class="poll-option-info-container">
-                  <div class="poll-option-text">{{ opt }}</div>
-                  <div class="poll-option-progress-info">
-                    {{ pollPercentages[idx] }}% ({{ pollVotes[idx] || 0 }}人已投票)
+      <ClientOnly>
+        <div v-if="poll" class="post-poll-container">
+          <div class="poll-top-container">
+            <div class="poll-options-container">
+              <div v-if="showPollResult || pollEnded || hasVoted">
+                <div v-for="(opt, idx) in poll.options" :key="idx" class="poll-option-result">
+                  <div class="poll-option-info-container">
+                    <div class="poll-option-text">{{ opt }}</div>
+                    <div class="poll-option-progress-info">
+                      {{ pollPercentages[idx] }}% ({{ pollVotes[idx] || 0 }}人已投票)
+                    </div>
+                  </div>
+                  <div class="poll-option-progress">
+                    <div
+                      class="poll-option-progress-bar"
+                      :style="{ width: pollPercentages[idx] + '%' }"
+                    ></div>
+                  </div>
+                  <div class="poll-participants">
+                    <BaseImage
+                      v-for="p in pollOptionParticipants[idx] || []"
+                      :key="p.id"
+                      class="poll-participant-avatar"
+                      :src="p.avatar"
+                      alt="avatar"
+                      @click="gotoUser(p.id)"
+                    />
                   </div>
                 </div>
-                <div class="poll-option-progress">
-                  <div
-                    class="poll-option-progress-bar"
-                    :style="{ width: pollPercentages[idx] + '%' }"
-                  ></div>
-                </div>
-                <div class="poll-participants">
-                  <BaseImage
-                    v-for="p in pollOptionParticipants[idx] || []"
-                    :key="p.id"
-                    class="poll-participant-avatar"
-                    :src="p.avatar"
-                    alt="avatar"
-                    @click="gotoUser(p.id)"
+              </div>
+              <div v-else>
+                <div
+                  v-for="(opt, idx) in poll.options"
+                  :key="idx"
+                  class="poll-option"
+                  @click="voteOption(idx)"
+                >
+                  <input
+                    type="radio"
+                    :checked="true"
+                    name="poll-option"
+                    class="poll-option-input"
                   />
+                  <span class="poll-option-text">{{ opt }}</span>
                 </div>
               </div>
             </div>
-            <div v-else>
-              <div
-                v-for="(opt, idx) in poll.options"
-                :key="idx"
-                class="poll-option"
-                @click="voteOption(idx)"
-              >
-                <input type="radio" :checked="true" name="poll-option" class="poll-option-input" />
-                <span class="poll-option-text">{{ opt }}</span>
-              </div>
+            <div class="poll-info">
+              <div class="total-votes">{{ pollParticipants.length }}</div>
+              <div class="total-votes-title">投票人</div>
             </div>
           </div>
-          <div class="poll-info">
-            <div class="total-votes">{{ pollParticipants.length }}</div>
-            <div class="total-votes-title">投票人</div>
+          <div class="poll-bottom-container">
+            <div
+              v-if="showPollResult && !pollEnded && !hasVoted"
+              class="poll-option-button"
+              @click="showPollResult = false"
+            >
+              <i class="fas fa-chevron-left"></i> 投票
+            </div>
+            <div
+              v-else-if="!pollEnded && !hasVoted"
+              class="poll-option-button"
+              @click="showPollResult = true"
+            >
+              <i class="fas fa-chart-bar"></i> 结果
+            </div>
+
+            <div class="poll-left-time">
+              <div class="poll-left-time-title">离结束还有</div>
+              <div class="poll-left-time-value">{{ countdown }}</div>
+            </div>
           </div>
         </div>
-        <div class="poll-bottom-container">
-          <div
-            v-if="showPollResult && !pollEnded"
-            class="poll-option-button"
-            @click="showPollResult = false"
-          >
-            <i class="fas fa-chevron-left"></i> 投票
-          </div>
-          <div v-else-if="!pollEnded" class="poll-option-button" @click="showPollResult = true">
-            <i class="fas fa-chart-bar"></i> 结果
-          </div>
-
-          <div class="poll-left-time">
-            <div class="poll-left-time-title">离结束还有</div>
-            <div class="poll-left-time-value">{{ countdown }}</div>
-          </div>
-        </div>
-      </div>
-
+      </ClientOnly>
       <div v-if="closed" class="post-close-container">该帖子已关闭，内容仅供阅读，无法进行互动</div>
 
       <ClientOnly>
