@@ -10,6 +10,7 @@ import com.openisle.model.Comment;
 import com.openisle.model.NotificationType;
 import com.openisle.model.LotteryPost;
 import com.openisle.model.PollPost;
+import com.openisle.model.PollParticipant;
 import com.openisle.repository.PostRepository;
 import com.openisle.repository.LotteryPostRepository;
 import com.openisle.repository.PollPostRepository;
@@ -293,13 +294,19 @@ public class PostService {
         }
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
-        if (post.getParticipants().contains(user)) {
+        boolean alreadyVoted = post.getParticipants().stream()
+                .anyMatch(p -> p.getUser().equals(user));
+        if (alreadyVoted) {
             throw new IllegalArgumentException("User already voted");
         }
         if (optionIndex < 0 || optionIndex >= post.getOptions().size()) {
             throw new IllegalArgumentException("Invalid option");
         }
-        post.getParticipants().add(user);
+        PollParticipant participant = new PollParticipant();
+        participant.setPost(post);
+        participant.setUser(user);
+        participant.setOptionIndex(optionIndex);
+        post.getParticipants().add(participant);
         post.getVotes().merge(optionIndex, 1, Integer::sum);
         return pollPostRepository.save(post);
     }
