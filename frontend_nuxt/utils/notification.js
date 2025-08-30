@@ -25,6 +25,9 @@ const iconMap = {
   POINT_REDEEM: 'fas fa-gift',
   LOTTERY_WIN: 'fas fa-trophy',
   LOTTERY_DRAW: 'fas fa-bullhorn',
+  POLL_VOTE: 'fas fa-square-poll-vertical',
+  POLL_RESULT_OWNER: 'fas fa-flag-checkered',
+  POLL_RESULT_PARTICIPANT: 'fas fa-flag-checkered',
   MENTION: 'fas fa-at',
   POST_DELETED: 'fas fa-trash',
   POST_FEATURED: 'fas fa-star',
@@ -200,6 +203,21 @@ function createFetchNotifications() {
             },
           })
         } else if (n.type === 'LOTTERY_WIN' || n.type === 'LOTTERY_DRAW') {
+          arr.push({
+            ...n,
+            icon: iconMap[n.type],
+            iconClick: () => {
+              if (n.post) {
+                markNotificationRead(n.id)
+                navigateTo(`/posts/${n.post.id}`)
+              }
+            },
+          })
+        } else if (
+          n.type === 'POLL_VOTE' ||
+          n.type === 'POLL_RESULT_OWNER' ||
+          n.type === 'POLL_RESULT_PARTICIPANT'
+        ) {
           arr.push({
             ...n,
             icon: iconMap[n.type],

@@ -135,6 +135,15 @@ public class PostService {
         for (LotteryPost lp : lotteryPostRepository.findByEndTimeBeforeAndWinnersIsEmpty(now)) {
             applicationContext.getBean(PostService.class).finalizeLottery(lp.getId());
         }
+        for (PollPost pp : pollPostRepository.findByEndTimeAfterAndResultAnnouncedFalse(now)) {
+            ScheduledFuture<?> future = taskScheduler.schedule(
+                    () -> applicationContext.getBean(PostService.class).finalizePoll(pp.getId()),
+                    java.util.Date.from(pp.getEndTime().atZone(ZoneId.systemDefault()).toInstant()));
+            scheduledFinalizations.put(pp.getId(), future);
+        }
+        for (PollPost pp : pollPostRepository.findByEndTimeBeforeAndResultAnnouncedFalse(now)) {
+            applicationContext.getBean(PostService.class).finalizePoll(pp.getId());
+        }
     }
 
     public PublishMode getPublishMode() {
@@ -177,7 +186,6 @@ public class PostService {
                            Integer pointCost,
                            LocalDateTime startTime,
                            LocalDateTime endTime,
-                           String question,
                            java.util.List<String> options) {
         long recent = postRepository.countByAuthorAfter(username,
                 java.time.LocalDateTime.now().minusMinutes(5));
@@ -217,7 +225,6 @@ public class PostService {
                 throw new IllegalArgumentException("At least two options required");
             }
             PollPost pp = new PollPost();
-            pp.setQuestion(question);
             pp.setOptions(options);
             pp.setEndTime(endTime);
             post = pp;
@@ -269,6 +276,11 @@ public class PostService {
                     () -> applicationContext.getBean(PostService.class).finalizeLottery(lp.getId()),
                     java.util.Date.from(lp.getEndTime().atZone(ZoneId.systemDefault()).toInstant()));
             scheduledFinalizations.put(lp.getId(), future);
+        } else if (post instanceof PollPost pp && pp.getEndTime() != null) {
+            ScheduledFuture<?> future = taskScheduler.schedule(
+                    () -> applicationContext.getBean(PostService.class).finalizePoll(pp.getId()),
+                    java.util.Date.from(pp.getEndTime().atZone(ZoneId.systemDefault()).toInstant()));
+            scheduledFinalizations.put(pp.getId(), future);
         }
         return post;
     }
@@ -311,7 +323,29 @@ public class PostService {
         vote.setUser(user);
         vote.setOptionIndex(optionIndex);
         pollVoteRepository.save(vote);
-        return pollPostRepository.save(post);
+        PollPost saved = pollPostRepository.save(post);
+        if (post.getAuthor() != null && !post.getAuthor().getId().equals(user.getId())) {
+            notificationService.createNotification(post.getAuthor(), NotificationType.POLL_VOTE, post, null, null, user, null, null);
+        }
+        return saved;
+    }
+
+    @Transactional
+    public void finalizePoll(Long postId) {
+        scheduledFinalizations.remove(postId);
+        pollPostRepository.findById(postId).ifPresent(pp -> {
+            if (pp.isResultAnnounced()) {
+                return;
+            }
+            pp.setResultAnnounced(true);
+            pollPostRepository.save(pp);
+            if (pp.getAuthor() != null) {
+                notificationService.createNotification(pp.getAuthor(), NotificationType.POLL_RESULT_OWNER, pp, null, null, null, null, null);
+            }
+            for (User participant : pp.getParticipants()) {
+                notificationService.createNotification(participant, NotificationType.POLL_RESULT_PARTICIPANT, pp, null, null, null, null, null);
+            }
+        });
     }
 
     @Transactional

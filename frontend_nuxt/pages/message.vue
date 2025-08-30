@@ -195,6 +195,44 @@
                       已开奖
                     </NotificationContainer>
                   </template>
+                  <template v-else-if="item.type === 'POLL_VOTE'">
+                    <NotificationContainer :item="item" :markRead="markRead">
+                      有用户参与了你的投票贴
+                      <NuxtLink
+                        class="notif-content-text"
+                        @click="markRead(item.id)"
+                        :to="`/posts/${item.post.id}`"
+                      >
+                        {{ stripMarkdownLength(item.post.title, 100) }}
+                      </NuxtLink>
+                    </NotificationContainer>
+                  </template>
+                  <template v-else-if="item.type === 'POLL_RESULT_OWNER'">
+                    <NotificationContainer :item="item" :markRead="markRead">
+                      你的投票帖
+                      <NuxtLink
+                        class="notif-content-text"
+                        @click="markRead(item.id)"
+                        :to="`/posts/${item.post.id}`"
+                      >
+                        {{ stripMarkdownLength(item.post.title, 100) }}
+                      </NuxtLink>
+                      已出结果
+                    </NotificationContainer>
+                  </template>
+                  <template v-else-if="item.type === 'POLL_RESULT_PARTICIPANT'">
+                    <NotificationContainer :item="item" :markRead="markRead">
+                      你参与的投票帖
+                      <NuxtLink
+                        class="notif-content-text"
+                        @click="markRead(item.id)"
+                        :to="`/posts/${item.post.id}`"
+                      >
+                        {{ stripMarkdownLength(item.post.title, 100) }}
+                      </NuxtLink>
+                      已出结果
+                    </NotificationContainer>
+                  </template>
                   <template v-else-if="item.type === 'POST_UPDATED'">
                     <NotificationContainer :item="item" :markRead="markRead">
                       您关注的帖子

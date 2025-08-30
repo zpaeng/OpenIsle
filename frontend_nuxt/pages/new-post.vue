@@ -35,95 +35,21 @@
           </div>
         </div>
       </div>
-      <div v-if="postType === 'LOTTERY'" class="lottery-section">
-        <AvatarCropper
-          :src="tempPrizeIcon"
-          :show="showPrizeCropper"
-          @close="showPrizeCropper = false"
-          @crop="onPrizeCropped"
-        />
-        <div class="prize-row">
-          <span class="prize-row-title">奖品图片</span>
-          <label class="prize-container">
-            <BaseImage v-if="prizeIcon" :src="prizeIcon" class="prize-preview" alt="prize" />
-            <i v-else class="fa-solid fa-image default-prize-icon"></i>
-            <div class="prize-overlay">上传奖品图片</div>
-            <input type="file" class="prize-input" accept="image/*" @change="onPrizeIconChange" />
-          </label>
-        </div>
-        <div class="prize-name-row">
-          <span class="prize-row-title">奖品描述</span>
-          <BaseInput v-model="prizeDescription" placeholder="奖品描述" />
-        </div>
-        <div class="prize-count-row">
-          <span class="prize-row-title">奖品数量</span>
-          <div class="prize-count-input">
-            <input
-              class="prize-count-input-field"
-              type="number"
-              v-model.number="prizeCount"
-              min="1"
-            />
-          </div>
-        </div>
-        <div class="prize-point-row">
-          <span class="prize-row-title">参与所需积分</span>
-          <div class="prize-count-input">
-            <input
-              class="prize-count-input-field"
-              type="number"
-              v-model.number="pointCost"
-              min="0"
-              max="100"
-            />
-          </div>
-        </div>
-        <div class="prize-time-row">
-          <span class="prize-row-title">抽奖结束时间</span>
-          <client-only>
-            <flat-pickr v-model="endTime" :config="dateConfig" class="time-picker" />
-          </client-only>
-        </div>
-      </div>
-      <div v-if="postType === 'POLL'" class="poll-section">
-        <div class="poll-question-row">
-          <span class="poll-row-title">投票问题</span>
-          <BaseInput v-model="pollQuestion" placeholder="请输入投票问题" />
-        </div>
-        <div class="poll-options-row">
-          <span class="poll-row-title">投票选项</span>
-          <div class="poll-option-item" v-for="(opt, idx) in pollOptions" :key="idx">
-            <BaseInput v-model="pollOptions[idx]" placeholder="选项内容" />
-            <i
-              v-if="pollOptions.length > 2"
-              class="fa-solid fa-xmark remove-option-icon"
-              @click="removeOption(idx)"
-            ></i>
-          </div>
-          <div class="add-option" @click="addOption">添加选项</div>
-        </div>
-        <div class="poll-time-row">
-          <span class="poll-row-title">投票结束时间</span>
-          <client-only>
-            <flat-pickr v-model="endTime" :config="dateConfig" class="time-picker" />
-          </client-only>
-        </div>
-      </div>
+      <LotteryForm v-if="postType === 'LOTTERY'" :data="lottery" />
+      <PollForm v-if="postType === 'POLL'" :data="poll" />
     </div>
   </div>
 </template>
 
 <script setup>
-import 'flatpickr/dist/flatpickr.css'
-import { computed, onMounted, ref, watch } from 'vue'
-import FlatPickr from 'vue-flatpickr-component'
-import AvatarCropper from '~/components/AvatarCropper.vue'
-import BaseInput from '~/components/BaseInput.vue'
+import { computed, onMounted, ref, reactive } from 'vue'
 import CategorySelect from '~/components/CategorySelect.vue'
 import LoginOverlay from '~/components/LoginOverlay.vue'
 import PostEditor from '~/components/PostEditor.vue'
 import PostTypeSelect from '~/components/PostTypeSelect.vue'
 import TagSelect from '~/components/TagSelect.vue'
+import LotteryForm from '~/components/LotteryForm.vue'
+import PollForm from '~/components/PollForm.vue'
 import { toast } from '~/main'
 import { authState, getToken } from '~/utils/auth'
 const config = useRuntimeConfig()
@@ -134,56 +60,25 @@ const content = ref('')
 const selectedCategory = ref('')
 const selectedTags = ref([])
 const postType = ref('NORMAL')
-const prizeIcon = ref('')
-const prizeIconFile = ref(null)
-const tempPrizeIcon = ref('')
-const showPrizeCropper = ref(false)
-const prizeName = ref('')
-const prizeCount = ref(1)
-const prizeDescription = ref('')
-const pointCost = ref(0)
-const endTime = ref(null)
+const lottery = reactive({
+  prizeIcon: '',
+  prizeIconFile: null,
+  tempPrizeIcon: '',
+  showPrizeCropper: false,
+  prizeName: '',
+  prizeDescription: '',
+  prizeCount: 1,
+  pointCost: 0,
+  endTime: null,
+})
+const poll = reactive({
+  options: ['', ''],
+  endTime: null,
+})
 const startTime = ref(null)
-const pollQuestion = ref('')
-const pollOptions = ref(['', ''])
-const dateConfig = { enableTime: true, time_24hr: true, dateFormat: 'Y-m-d H:i' }
 const isWaitingPosting = ref(false)
 const isAiLoading = ref(false)
 const isLogin = computed(() => authState.loggedIn)
-
-const onPrizeIconChange = (e) => {
-  const file = e.target.files[0]
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = () => {
-      tempPrizeIcon.value = reader.result
-      showPrizeCropper.value = true
-    }
-    reader.readAsDataURL(file)
-  }
-}
-
-const onPrizeCropped = ({ file, url }) => {
-  prizeIconFile.value = file
-  prizeIcon.value = url
-}
-
-watch(prizeCount, (val) => {
-  if (!val || val < 1) prizeCount.value = 1
-})
-
-watch(pointCost, (val) => {
-  if (val === undefined || val === null || val < 0) pointCost.value = 0
-  if (val > 100) pointCost.value = 100
-})
-
-const addOption = () => {
-  pollOptions.value.push('')
-}
-
-const removeOption = (idx) => {
-  if (pollOptions.value.length > 2) pollOptions.value.splice(idx, 1)
-}
 
 const loadDraft = async () => {
   const token = getToken()
@@ -214,17 +109,18 @@ const clearPost = async () => {
   selectedCategory.value = ''
   selectedTags.value = []
   postType.value = 'NORMAL'
-  prizeIcon.value = ''
-  prizeIconFile.value = null
-  tempPrizeIcon.value = ''
-  showPrizeCropper.value = false
-  prizeDescription.value = ''
-  prizeCount.value = 1
-  pointCost.value = 0
-  endTime.value = null
+  lottery.prizeIcon = ''
+  lottery.prizeIconFile = null
+  lottery.tempPrizeIcon = ''
+  lottery.showPrizeCropper = false
+  lottery.prizeName = ''
+  lottery.prizeDescription = ''
+  lottery.prizeCount = 1
+  lottery.pointCost = 0
+  lottery.endTime = null
   startTime.value = null
-  pollQuestion.value = ''
-  pollOptions.value = ['', '']
+  poll.options = ['', '']
+  poll.endTime = null
 
   // 删除草稿
   const token = getToken()
@@ -354,37 +250,33 @@ const submitPost = async () => {
     return
   }
   if (postType.value === 'LOTTERY') {
-    if (!prizeIcon.value) {
+    if (!lottery.prizeIcon) {
       toast.error('请上传奖品图片')
       return
     }
-    if (!prizeCount.value || prizeCount.value < 1) {
+    if (!lottery.prizeCount || lottery.prizeCount < 1) {
       toast.error('奖品数量必须大于0')
       return
     }
-    if (!prizeDescription.value) {
+    if (!lottery.prizeDescription) {
       toast.error('请输入奖品描述')
       return
     }
-    if (!endTime.value) {
+    if (!lottery.endTime) {
       toast.error('请选择抽奖结束时间')
       return
     }
-    if (pointCost.value < 0 || pointCost.value > 100) {
+    if (lottery.pointCost < 0 || lottery.pointCost > 100) {
       toast.error('参与积分需在0到100之间')
       return
     }
   }
   if (postType.value === 'POLL') {
-    if (!pollQuestion.value.trim()) {
-      toast.error('请输入投票问题')
-      return
-    }
-    if (pollOptions.value.length < 2 || pollOptions.value.some((o) => !o.trim())) {
+    if (poll.options.length < 2 || poll.options.some((o) => !o.trim())) {
       toast.error('请填写至少两个投票选项')
       return
     }
-    if (!endTime.value) {
+    if (!poll.endTime) {
       toast.error('请选择投票结束时间')
       return
     }
@@ -393,10 +285,10 @@ const submitPost = async () => {
     const token = getToken()
     await ensureTags(token)
     isWaitingPosting.value = true
-    let prizeIconUrl = prizeIcon.value
-    if (postType.value === 'LOTTERY' && prizeIconFile.value) {
+    let prizeIconUrl = lottery.prizeIcon
+    if (postType.value === 'LOTTERY' && lottery.prizeIconFile) {
       const form = new FormData()
-      form.append('file', prizeIconFile.value)
+      form.append('file', lottery.prizeIconFile)
       const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
@@ -422,19 +314,20 @@ const submitPost = async () => {
         tagIds: selectedTags.value,
         type: postType.value,
         prizeIcon: postType.value === 'LOTTERY' ? prizeIconUrl : undefined,
-        prizeName: postType.value === 'LOTTERY' ? prizeName.value : undefined,
-        prizeCount: postType.value === 'LOTTERY' ? prizeCount.value : undefined,
-        prizeDescription: postType.value === 'LOTTERY' ? prizeDescription.value : undefined,
-        question: postType.value === 'POLL' ? pollQuestion.value : undefined,
-        options: postType.value === 'POLL' ? pollOptions.value : undefined,
+        prizeName: postType.value === 'LOTTERY' ? lottery.prizeName : undefined,
+        prizeCount: postType.value === 'LOTTERY' ? lottery.prizeCount : undefined,
+        prizeDescription: postType.value === 'LOTTERY' ? lottery.prizeDescription : undefined,
+        options: postType.value === 'POLL' ? poll.options : undefined,
         startTime:
           postType.value === 'LOTTERY' ? new Date(startTime.value).toISOString() : undefined,
-        pointCost: postType.value === 'LOTTERY' ? pointCost.value : undefined,
+        pointCost: postType.value === 'LOTTERY' ? lottery.pointCost : undefined,
         // 将时间转换为 UTC+8.5 时区 todo: 需要优化
         endTime:
-          postType.value === 'LOTTERY' || postType.value === 'POLL'
-            ? new Date(new Date(endTime.value).getTime() + 8.02 * 60 * 60 * 1000).toISOString()
-            : undefined,
+          postType.value === 'LOTTERY'
+            ? new Date(new Date(lottery.endTime).getTime() + 8.02 * 60 * 60 * 1000).toISOString()
+            : postType.value === 'POLL'
+              ? new Date(new Date(poll.endTime).getTime() + 8.02 * 60 * 60 * 1000).toISOString()
+              : undefined,
       }),
     })
     const data = await res.json()
@@ -567,150 +460,6 @@ const submitPost = async () => {
   flex-wrap: wrap;
   margin-top: 20px;
   padding-bottom: 50px;
-}
-
-.lottery-section,
-.poll-section {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-
-  margin-bottom: 200px;
-}
-
-.prize-row-title,
-.poll-row-title {
-  font-size: 16px;
-  color: var(--text-color);
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.prize-row {
-  display: flex;
-  flex-direction: column;
-}
-
-.prize-name-row {
-  display: flex;
-  flex-direction: column;
-}
-
-.prize-container {
-  position: relative;
-  width: 100px;
-  height: 100px;
-  border-radius: 10px;
-  overflow: hidden;
-  cursor: pointer;
-  background-color: var(--lottery-background-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.default-prize-icon {
-  font-size: 30px;
-  opacity: 0.1;
-  color: var(--text-color);
-}
-
-.prize-preview {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.prize-input {
-  display: none;
-}
-
-.prize-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.prize-container:hover .prize-overlay {
-  opacity: 1;
-}
-
-.prize-count-row,
-.prize-time-row {
-  display: flex;
-  flex-direction: column;
-}
-
-.prize-count-input {
-  display: flex;
-  align-items: center;
-}
-
-.prize-name-input {
-  height: 30px;
-  border-radius: 5px;
-  border: 1px solid var(--border-color);
-  padding: 0 10px;
-  margin-left: 10px;
-  font-size: 16px;
-  color: var(--text-color);
-}
-
-.poll-option-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.remove-option-icon {
-  cursor: pointer;
-}
-
-.add-option {
-  color: var(--primary-color);
-  cursor: pointer;
-  width: fit-content;
-  margin-top: 5px;
-}
-
-.poll-options-row,
-.poll-question-row,
-.poll-time-row {
-  display: flex;
-  flex-direction: column;
-}
-
-.prize-count-input-field {
-  width: 50px;
-  height: 30px;
-  border-radius: 5px;
-  border: 1px solid var(--border-color);
-  padding: 0 10px;
-  font-size: 16px;
-  color: var(--text-color);
-  background-color: var(--lottery-background-color);
-}
-
-.time-picker {
-  max-width: 200px;
-  height: 30px;
-  background-color: var(--lottery-background-color);
-  border-radius: 5px;
-  border: 1px solid var(--border-color);
-  padding: 0 10px;
-  font-size: 16px;
-  color: var(--text-color);
 }
 
 @media (max-width: 768px) {

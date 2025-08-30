@@ -8,7 +8,6 @@ import java.util.Map;
 
 @Data
 public class PollDto {
-    private String question;
     private List<String> options;
     private Map<Integer, Integer> votes;
     private LocalDateTime endTime;

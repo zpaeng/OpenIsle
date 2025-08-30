@@ -15,10 +15,6 @@ import java.util.*;
 @NoArgsConstructor
 @PrimaryKeyJoinColumn(name = "post_id")
 public class PollPost extends Post {
-
-    @Column(nullable = false)
-    private String question;
-
     @ElementCollection
     @CollectionTable(name = "poll_post_options", joinColumns = @JoinColumn(name = "post_id"))
     @Column(name = "option_text")
@@ -38,4 +34,7 @@ public class PollPost extends Post {
 
     @Column
     private LocalDateTime endTime;
+
+    @Column
+    private boolean resultAnnounced = false;
 }
