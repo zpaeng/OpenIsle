@@ -30,8 +30,11 @@ public class PollPost extends Post {
     @Column(name = "vote_count")
     private Map<Integer, Integer> votes = new HashMap<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<PollParticipant> participants = new HashSet<>();
+    @ManyToMany
+    @JoinTable(name = "poll_participants",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<User> participants = new HashSet<>();
 
     @Column
     private LocalDateTime endTime;

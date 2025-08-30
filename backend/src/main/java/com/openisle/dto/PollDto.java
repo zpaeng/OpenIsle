@@ -12,5 +12,5 @@ public class PollDto {
     private List<String> options;
     private Map<Integer, Integer> votes;
     private LocalDateTime endTime;
-    private Map<Integer, List<AuthorDto>> participants;
+    private List<AuthorDto> participants;
 }

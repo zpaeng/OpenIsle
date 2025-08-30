@@ -6,12 +6,10 @@ import com.openisle.dto.PostSummaryDto;
 import com.openisle.dto.ReactionDto;
 import com.openisle.dto.LotteryDto;
 import com.openisle.dto.PollDto;
-import com.openisle.dto.AuthorDto;
 import com.openisle.model.CommentSort;
 import com.openisle.model.Post;
 import com.openisle.model.LotteryPost;
 import com.openisle.model.PollPost;
-import com.openisle.model.PollParticipant;
 import com.openisle.model.User;
 import com.openisle.service.CommentService;
 import com.openisle.service.ReactionService;
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /** Mapper responsible for converting posts into DTOs. */
@@ -105,10 +102,7 @@ public class PostMapper {
             p.setOptions(pp.getOptions());
             p.setVotes(pp.getVotes());
             p.setEndTime(pp.getEndTime());
-            Map<Integer, List<AuthorDto>> participants = pp.getParticipants().stream()
-                    .collect(Collectors.groupingBy(PollParticipant::getOptionIndex,
-                            Collectors.mapping(ppart -> userMapper.toAuthorDto(ppart.getUser()), Collectors.toList())));
-            p.setParticipants(participants);
+            p.setParticipants(pp.getParticipants().stream().map(userMapper::toAuthorDto).collect(Collectors.toList()));
             dto.setPoll(p);
         }
     }
