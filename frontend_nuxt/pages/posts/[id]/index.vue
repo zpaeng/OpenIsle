@@ -172,35 +172,36 @@
         </div>
       </div>
       <div v-if="poll" class="post-poll-container">
-        <div class="poll-question">{{ poll.question }}</div>
-        <div class="poll-options">
-          <div v-for="(opt, idx) in poll.options" :key="idx" class="poll-option">
-            <div class="poll-option-text">{{ opt }}</div>
-            <div class="poll-option-progress">
+        <div class="poll-top-container">
+          <div class="poll-options-container">
+            <div v-if="showPollResult" class="poll-question"></div>
+            <div v-else>
               <div
-                class="poll-option-progress-bar"
-                :style="{ width: pollPercentages[idx] + '%' }"
-              ></div>
-              <div class="poll-option-progress-info">{{ pollVotes[idx] || 0 }} 票</div>
-            </div>
-            <div
-              v-if="loggedIn && !hasVoted && !pollEnded"
-              class="poll-vote-button"
-              @click="voteOption(idx)"
-            >
-              投票
+                v-for="(opt, idx) in poll.options"
+                :key="idx"
+                class="poll-option"
+                @click="voteOption(idx)"
+              >
+                <input type="radio" :checked="true" name="poll-option" class="poll-option-input" />
+                <span class="poll-option-text">{{ opt }}</span>
+              </div>
             </div>
           </div>
+          <div class="poll-info">
+            <div class="total-votes">100</div>
+            <div class="total-votes-title">投票人</div>
+          </div>
         </div>
-        <div v-if="pollParticipants.length" class="poll-participants">
-          <BaseImage
-            v-for="p in pollParticipants"
-            :key="p.id"
-            class="poll-participant-avatar"
-            :src="p.avatar"
-            alt="avatar"
-            @click="gotoUser(p.id)"
-          />
+        <div class="poll-bottom-container">
+          <div v-if="showPollResult" class="poll-option-button">
+            <i class="fas fa-chevron-left"></i> 投票
+          </div>
+          <div v-else class="poll-option-button"><i class="fas fa-chart-bar"></i> 结果</div>
+
+          <div class="poll-left-time">
+            <div class="poll-left-time-title">离结束还有</div>
+            <div class="poll-left-time-value">12:00:00</div>
+          </div>
         </div>
       </div>
 
@@ -358,6 +359,7 @@ const isAdmin = computed(() => authState.role === 'ADMIN')
 const isAuthor = computed(() => authState.username === author.value.username)
 const lottery = ref(null)
 const poll = ref(null)
+const showPollResult = ref(false)
 const countdown = ref('00:00:00')
 let countdownTimer = null
 const lotteryParticipants = computed(() => lottery.value?.participants || [])
@@ -1239,6 +1241,88 @@ onMounted(async () => {
   cursor: pointer;
 }
 
+.poll-option-button {
+  color: var(--text-color);
+  padding: 5px 10px;
+  border-radius: 8px;
+  background-color: rgb(218, 218, 218);
+  cursor: pointer;
+  width: fit-content;
+}
+
+.poll-top-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-bottom: 1px solid var(--normal-border-color);
+}
+
+.poll-options-container {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  flex: 4;
+}
+
+.poll-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+  border-left: 1px solid var(--normal-border-color);
+}
+
+.total-votes {
+  font-size: 40px;
+  font-weight: bold;
+  opacity: 0.8;
+}
+
+.total-votes-title {
+  font-size: 18px;
+  opacity: 0.5;
+}
+
+.poll-option {
+  margin-bottom: 10px;
+  margin-right: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.poll-option-input {
+  margin-right: 10px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-color);
+  border-radius: 50%;
+  border: 2px solid var(--primary-color);
+}
+
+.poll-option-text {
+  font-size: 16px;
+}
+
+.poll-bottom-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.poll-left-time {
+  display: flex;
+  flex-direction: row;
+}
+
+.poll-left-time-title {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
 .action-menu-icon {
   cursor: pointer;
   font-size: 18px;
@@ -1379,10 +1463,6 @@ onMounted(async () => {
   margin-bottom: 10px;
 }
 
-.poll-option {
-  margin-bottom: 10px;
-}
-
 .poll-option-progress {
   position: relative;
   background-color: var(--border-color);
@@ -1477,12 +1557,14 @@ onMounted(async () => {
   margin-left: 10px;
 }
 
+.poll-left-time-title,
 .prize-end-time-title {
   font-size: 13px;
   opacity: 0.7;
   margin-right: 5px;
 }
 
+.poll-left-time-value,
 .prize-end-time-value {
   font-size: 13px;
   font-weight: bold;
