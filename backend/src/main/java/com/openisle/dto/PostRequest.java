@@ -27,7 +27,6 @@ public class PostRequest {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     // fields for poll posts
-    private String question;
     private List<String> options;
 }
 

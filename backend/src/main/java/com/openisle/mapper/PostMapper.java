@@ -103,7 +103,6 @@ public class PostMapper {
 
         if (post instanceof PollPost pp) {
             PollDto p = new PollDto();
-            p.setQuestion(pp.getQuestion());
             p.setOptions(pp.getOptions());
             p.setVotes(pp.getVotes());
             p.setEndTime(pp.getEndTime());

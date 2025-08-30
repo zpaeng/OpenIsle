@@ -146,7 +146,7 @@ class PostServiceTest {
 
         assertThrows(RateLimitException.class,
                 () -> service.createPost("alice", 1L, "t", "c", List.of(1L),
-                        null, null, null, null, null, null, null));
+                        null, null, null, null, null, null, null, null));
     }
 
     @Test

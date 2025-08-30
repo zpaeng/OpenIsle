@@ -40,6 +40,12 @@ public enum NotificationType {
     LOTTERY_WIN,
     /** Your lottery post was drawn */
     LOTTERY_DRAW,
+    /** Someone participated in your poll */
+    POLL_VOTE,
+    /** Your poll post has concluded */
+    POLL_RESULT_OWNER,
+    /** A poll you participated in has concluded */
+    POLL_RESULT_PARTICIPANT,
     /** Your post was featured */
     POST_FEATURED,
     /** You were mentioned in a post or comment */
