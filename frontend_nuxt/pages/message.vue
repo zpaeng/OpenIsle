@@ -714,6 +714,12 @@ const formatType = (t) => {
       return '帖子被删除'
     case 'POST_FEATURED':
       return '文章被精选'
+    case 'POLL_VOTE':
+      return '有人参与你的投票'
+    case 'POLL_RESULT_OWNER':
+      return '发布的投票结果已公布'
+    case 'POLL_RESULT_PARTICIPANT':
+      return '参与的投票结果已公布'
     default:
       return t
   }
