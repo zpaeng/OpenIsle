@@ -10,6 +10,7 @@ import com.openisle.model.Comment;
 import com.openisle.model.NotificationType;
 import com.openisle.model.LotteryPost;
 import com.openisle.model.PollPost;
+import com.openisle.model.PollVote;
 import com.openisle.repository.PostRepository;
 import com.openisle.repository.LotteryPostRepository;
 import com.openisle.repository.PollPostRepository;
@@ -22,6 +23,7 @@ import com.openisle.repository.CommentRepository;
 import com.openisle.repository.ReactionRepository;
 import com.openisle.repository.PostSubscriptionRepository;
 import com.openisle.repository.NotificationRepository;
+import com.openisle.repository.PollVoteRepository;
 import com.openisle.model.Role;
 import com.openisle.exception.RateLimitException;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +59,7 @@ public class PostService {
     private final TagRepository tagRepository;
     private final LotteryPostRepository lotteryPostRepository;
     private final PollPostRepository pollPostRepository;
+    private final PollVoteRepository pollVoteRepository;
     private PublishMode publishMode;
     private final NotificationService notificationService;
     private final SubscriptionService subscriptionService;
@@ -82,6 +85,7 @@ public class PostService {
                        TagRepository tagRepository,
                        LotteryPostRepository lotteryPostRepository,
                        PollPostRepository pollPostRepository,
+                       PollVoteRepository pollVoteRepository,
                        NotificationService notificationService,
                        SubscriptionService subscriptionService,
                        CommentService commentService,
@@ -102,6 +106,7 @@ public class PostService {
         this.tagRepository = tagRepository;
         this.lotteryPostRepository = lotteryPostRepository;
         this.pollPostRepository = pollPostRepository;
+        this.pollVoteRepository = pollVoteRepository;
         this.notificationService = notificationService;
         this.subscriptionService = subscriptionService;
         this.commentService = commentService;
@@ -301,6 +306,11 @@ public class PostService {
         }
         post.getParticipants().add(user);
         post.getVotes().merge(optionIndex, 1, Integer::sum);
+        PollVote vote = new PollVote();
+        vote.setPost(post);
+        vote.setUser(user);
+        vote.setOptionIndex(optionIndex);
+        pollVoteRepository.save(vote);
         return pollPostRepository.save(post);
     }
 

@@ -6,19 +6,23 @@ import com.openisle.dto.PostSummaryDto;
 import com.openisle.dto.ReactionDto;
 import com.openisle.dto.LotteryDto;
 import com.openisle.dto.PollDto;
+import com.openisle.dto.AuthorDto;
 import com.openisle.model.CommentSort;
 import com.openisle.model.Post;
 import com.openisle.model.LotteryPost;
 import com.openisle.model.PollPost;
 import com.openisle.model.User;
+import com.openisle.model.PollVote;
 import com.openisle.service.CommentService;
 import com.openisle.service.ReactionService;
 import com.openisle.service.SubscriptionService;
+import com.openisle.repository.PollVoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /** Mapper responsible for converting posts into DTOs. */
@@ -34,6 +38,7 @@ public class PostMapper {
     private final UserMapper userMapper;
     private final TagMapper tagMapper;
     private final CategoryMapper categoryMapper;
+    private final PollVoteRepository pollVoteRepository;
 
     public PostSummaryDto toSummaryDto(Post post) {
         PostSummaryDto dto = new PostSummaryDto();
@@ -103,6 +108,10 @@ public class PostMapper {
             p.setVotes(pp.getVotes());
             p.setEndTime(pp.getEndTime());
             p.setParticipants(pp.getParticipants().stream().map(userMapper::toAuthorDto).collect(Collectors.toList()));
+            Map<Integer, List<AuthorDto>> optionParticipants = pollVoteRepository.findByPostId(pp.getId()).stream()
+                    .collect(Collectors.groupingBy(PollVote::getOptionIndex,
+                            Collectors.mapping(v -> userMapper.toAuthorDto(v.getUser()), Collectors.toList())));
+            p.setOptionParticipants(optionParticipants);
             dto.setPoll(p);
         }
     }
