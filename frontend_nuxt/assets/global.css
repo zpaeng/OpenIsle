@@ -34,6 +34,7 @@
   --page-max-width-mobile: 900px;
   --article-info-background-color: #f0f0f0;
   --activity-card-background-color: #fafafa;
+  --poll-option-button-background-color: rgb(218, 218, 218);
 }
 
 [data-theme='dark'] {
@@ -61,6 +62,7 @@
   --blockquote-text-color: #999;
   --article-info-background-color: #747373;
   --activity-card-background-color: #585858;
+  --poll-option-button-background-color: #3a3a3a;
 }
 
 :root[data-frosted='off'] {

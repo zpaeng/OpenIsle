@@ -1291,7 +1291,7 @@ onMounted(async () => {
   color: var(--text-color);
   padding: 5px 10px;
   border-radius: 8px;
-  background-color: rgb(218, 218, 218);
+  background-color: var(--poll-option-button-background-color);
   cursor: pointer;
   width: fit-content;
 }
