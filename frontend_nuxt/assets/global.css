@@ -93,7 +93,7 @@ body {
 
 .vditor-toolbar--pin {
   top: calc(var(--header-height) + 1px) !important;
-  z-index: 2000;
+  z-index: 20;
 }
 
 .vditor-panel {
