@@ -19,10 +19,8 @@
       </client-only>
     </div>
     <div class="poll-multiple-row">
-      <label class="poll-row-title">
-        <input type="checkbox" v-model="data.multiple" class="multiple-checkbox" />
-        多选
-      </label>
+      <span class="poll-row-title">多选</span>
+      <BaseSwitch v-model="data.multiple" />
     </div>
   </div>
 </template>
@@ -31,6 +29,7 @@
 import 'flatpickr/dist/flatpickr.css'
 import FlatPickr from 'vue-flatpickr-component'
 import BaseInput from '~/components/BaseInput.vue'
+import BaseSwitch from '~/components/BaseSwitch.vue'
 
 const props = defineProps({
   data: {
@@ -89,9 +88,7 @@ const removeOption = (idx) => {
 .poll-multiple-row {
   display: flex;
   align-items: center;
-}
-.multiple-checkbox {
-  margin-right: 5px;
+  gap: 10px;
 }
 .time-picker {
   max-width: 200px;
