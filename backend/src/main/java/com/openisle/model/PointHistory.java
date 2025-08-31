@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
@@ -13,6 +15,8 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @Table(name = "point_histories")
+@SQLDelete(sql = "UPDATE point_histories SET deleted_at = CURRENT_TIMESTAMP(6) WHERE id = ?")
+@Where(clause = "deleted_at IS NULL")
 public class PointHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,4 +50,7 @@ public class PointHistory {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 }
