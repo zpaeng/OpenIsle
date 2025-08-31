@@ -59,10 +59,25 @@
               v-for="(opt, idx) in poll.options"
               :key="idx"
               class="poll-option"
-              @click="voteOption(idx)"
+              @click="selectOption(idx)"
             >
-              <input type="radio" :checked="false" name="poll-option" class="poll-option-input" />
+              <input
+                type="radio"
+                :checked="selectedOption === idx"
+                name="poll-option"
+                class="poll-option-input"
+              />
               <span class="poll-option-text">{{ opt }}</span>
+            </div>
+
+            <div class="single-selection-container">
+              <div class="single-selection-title">
+                <i class="fas fa-info-circle info-icon"></i>
+                该投票为单选
+              </div>
+              <div class="join-poll-button" @click="submitSinglePoll">
+                <i class="fas fa-plus"></i> 加入投票
+              </div>
             </div>
           </template>
         </div>
@@ -196,6 +211,18 @@ const voteOption = async (idx) => {
   } else {
     toast.error(data.error || '操作失败')
   }
+}
+
+const selectedOption = ref(null)
+const selectOption = (idx) => {
+  selectedOption.value = idx
+}
+const submitSinglePoll = async () => {
+  if (selectedOption.value === null) {
+    toast.error('请选择一个选项')
+    return
+  }
+  await voteOption(selectedOption.value)
 }
 
 const selectedOptions = ref([])
@@ -368,14 +395,16 @@ const submitMultiPoll = async () => {
   color: var(--text-color);
 }
 
-.multi-selection-container {
+.multi-selection-container,
+.single-selection-container {
   padding: 20px 15px 20px 5px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
 
-.multi-selection-title {
+.multi-selection-title,
+.single-selection-title {
   font-size: 13px;
   color: var(--text-color);
 }
