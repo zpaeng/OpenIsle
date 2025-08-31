@@ -94,157 +94,9 @@
         </div>
       </div>
 
-      <div v-if="lottery" class="post-prize-container">
-        <div class="prize-content">
-          <div class="prize-info">
-            <div class="prize-info-left">
-              <div class="prize-icon">
-                <BaseImage
-                  class="prize-icon-img"
-                  v-if="lottery.prizeIcon"
-                  :src="lottery.prizeIcon"
-                  alt="prize"
-                />
-                <i v-else class="fa-solid fa-gift default-prize-icon"></i>
-              </div>
-              <div class="prize-name">{{ lottery.prizeDescription }}</div>
-              <div class="prize-count">x {{ lottery.prizeCount }}</div>
-            </div>
-            <div class="prize-end-time prize-info-right">
-              <div v-if="!isMobile" class="prize-end-time-title">离结束还有</div>
-              <div class="prize-end-time-value">{{ countdown }}</div>
-              <div v-if="!isMobile" class="join-prize-button-container-desktop">
-                <div
-                  v-if="loggedIn && !hasJoined && !lotteryEnded"
-                  class="join-prize-button"
-                  @click="joinLottery"
-                >
-                  <div class="join-prize-button-text">
-                    参与抽奖 <i class="fas fa-coins"></i> {{ lottery.pointCost }}
-                  </div>
-                </div>
-                <div v-else-if="hasJoined" class="join-prize-button-disabled">
-                  <div class="join-prize-button-text">已参与</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="isMobile" class="join-prize-button-container-mobile">
-            <div
-              v-if="loggedIn && !hasJoined && !lotteryEnded"
-              class="join-prize-button"
-              @click="joinLottery"
-            >
-              <div class="join-prize-button-text">
-                参与抽奖 <i class="fas fa-coins"></i> {{ lottery.pointCost }}
-              </div>
-            </div>
-            <div v-else-if="hasJoined" class="join-prize-button-disabled">
-              <div class="join-prize-button-text">已参与</div>
-            </div>
-          </div>
-        </div>
-        <div class="prize-member-container">
-          <BaseImage
-            v-for="p in lotteryParticipants"
-            :key="p.id"
-            class="prize-member-avatar"
-            :src="p.avatar"
-            alt="avatar"
-            @click="gotoUser(p.id)"
-          />
-          <div v-if="lotteryEnded && lotteryWinners.length" class="prize-member-winner">
-            <i class="fas fa-medal medal-icon"></i>
-            <span class="prize-member-winner-name">获奖者: </span>
-            <BaseImage
-              v-for="w in lotteryWinners"
-              :key="w.id"
-              class="prize-member-avatar"
-              :src="w.avatar"
-              alt="avatar"
-              @click="gotoUser(w.id)"
-            />
-            <div v-if="lotteryWinners.length === 1" class="prize-member-winner-name">
-              {{ lotteryWinners[0].username }}
-            </div>
-          </div>
-        </div>
-      </div>
+      <PostLottery v-if="lottery" :lottery="lottery" :post-id="postId" @refresh="refreshPost" />
       <ClientOnly>
-        <div v-if="poll" class="post-poll-container">
-          <div class="poll-top-container">
-            <div class="poll-options-container">
-              <div v-if="showPollResult || pollEnded || hasVoted">
-                <div v-for="(opt, idx) in poll.options" :key="idx" class="poll-option-result">
-                  <div class="poll-option-info-container">
-                    <div class="poll-option-text">{{ opt }}</div>
-                    <div class="poll-option-progress-info">
-                      {{ pollPercentages[idx] }}% ({{ pollVotes[idx] || 0 }}人已投票)
-                    </div>
-                  </div>
-                  <div class="poll-option-progress">
-                    <div
-                      class="poll-option-progress-bar"
-                      :style="{ width: pollPercentages[idx] + '%' }"
-                    ></div>
-                  </div>
-                  <div class="poll-participants">
-                    <BaseImage
-                      v-for="p in pollOptionParticipants[idx] || []"
-                      :key="p.id"
-                      class="poll-participant-avatar"
-                      :src="p.avatar"
-                      alt="avatar"
-                      @click="gotoUser(p.id)"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div v-else>
-                <div
-                  v-for="(opt, idx) in poll.options"
-                  :key="idx"
-                  class="poll-option"
-                  @click="voteOption(idx)"
-                >
-                  <input
-                    type="radio"
-                    :checked="false"
-                    name="poll-option"
-                    class="poll-option-input"
-                  />
-                  <span class="poll-option-text">{{ opt }}</span>
-                </div>
-              </div>
-            </div>
-            <div class="poll-info">
-              <div class="total-votes">{{ pollParticipants.length }}</div>
-              <div class="total-votes-title">投票人</div>
-            </div>
-          </div>
-          <div class="poll-bottom-container">
-            <div
-              v-if="showPollResult && !pollEnded && !hasVoted"
-              class="poll-option-button"
-              @click="showPollResult = false"
-            >
-              <i class="fas fa-chevron-left"></i> 投票
-            </div>
-            <div
-              v-else-if="!pollEnded && !hasVoted"
-              class="poll-option-button"
-              @click="showPollResult = true"
-            >
-              <i class="fas fa-chart-bar"></i> 结果
-            </div>
-
-            <div class="poll-left-time">
-              <div class="poll-left-time-title">离结束还有</div>
-              <div class="poll-left-time-value">{{ countdown }}</div>
-            </div>
-          </div>
-        </div>
+        <PostPoll v-if="poll" :poll="poll" :post-id="postId" @refresh="refreshPost" />
       </ClientOnly>
       <div v-if="closed" class="post-close-container">该帖子已关闭，内容仅供阅读，无法进行互动</div>
 
@@ -333,6 +185,8 @@ import ArticleTags from '~/components/ArticleTags.vue'
 import ArticleCategory from '~/components/ArticleCategory.vue'
 import ReactionsGroup from '~/components/ReactionsGroup.vue'
 import DropdownMenu from '~/components/DropdownMenu.vue'
+import PostLottery from '~/components/PostLottery.vue'
+import PostPoll from '~/components/PostPoll.vue'
 import { renderMarkdown, handleMarkdownClick, stripMarkdownLength } from '~/utils/markdown'
 import { getMedalTitle } from '~/utils/medal'
 import { toast } from '~/main'
@@ -388,7 +242,6 @@ useHead(() => ({
 if (import.meta.client) {
   onBeforeUnmount(() => {
     window.removeEventListener('scroll', updateCurrentIndex)
-    if (countdownTimer) clearInterval(countdownTimer)
   })
 }
 
@@ -400,73 +253,6 @@ const isAdmin = computed(() => authState.role === 'ADMIN')
 const isAuthor = computed(() => authState.username === author.value.username)
 const lottery = ref(null)
 const poll = ref(null)
-const showPollResult = ref(false)
-const countdown = ref('00:00:00')
-let countdownTimer = null
-const lotteryParticipants = computed(() => lottery.value?.participants || [])
-const lotteryWinners = computed(() => lottery.value?.winners || [])
-const lotteryEnded = computed(() => {
-  if (!lottery.value || !lottery.value.endTime) return false
-  return new Date(lottery.value.endTime).getTime() <= Date.now()
-})
-const hasJoined = computed(() => {
-  if (!loggedIn.value) return false
-  return lotteryParticipants.value.some((p) => p.id === Number(authState.userId))
-})
-const pollParticipants = computed(() => poll.value?.participants || [])
-const pollOptionParticipants = computed(() => poll.value?.optionParticipants || {})
-const pollVotes = computed(() => poll.value?.votes || {})
-const totalPollVotes = computed(() => Object.values(pollVotes.value).reduce((a, b) => a + b, 0))
-const pollPercentages = computed(() =>
-  poll.value
-    ? poll.value.options.map((_, idx) => {
-        const c = pollVotes.value[idx] || 0
-        return totalPollVotes.value ? ((c / totalPollVotes.value) * 100).toFixed(1) : 0
-      })
-    : [],
-)
-const pollEnded = computed(() => {
-  if (!poll.value || !poll.value.endTime) return false
-  return new Date(poll.value.endTime).getTime() <= Date.now()
-})
-const hasVoted = computed(() => {
-  if (!loggedIn.value) return false
-  return pollParticipants.value.some((p) => p.id === Number(authState.userId))
-})
-watch([hasVoted, pollEnded], ([voted, ended]) => {
-  if (voted || ended) showPollResult.value = true
-})
-const currentEndTime = computed(() => {
-  if (lottery.value && lottery.value.endTime) return lottery.value.endTime
-  if (poll.value && poll.value.endTime) return poll.value.endTime
-  return null
-})
-const updateCountdown = () => {
-  if (!currentEndTime.value) {
-    countdown.value = '00:00:00'
-    return
-  }
-  const diff = new Date(currentEndTime.value).getTime() - Date.now()
-  if (diff <= 0) {
-    countdown.value = '00:00:00'
-    if (countdownTimer) {
-      clearInterval(countdownTimer)
-      countdownTimer = null
-    }
-    return
-  }
-  const h = String(Math.floor(diff / 3600000)).padStart(2, '0')
-  const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0')
-  const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0')
-  countdown.value = `${h}:${m}:${s}`
-}
-const startCountdown = () => {
-  if (!import.meta.client) return
-  if (countdownTimer) clearInterval(countdownTimer)
-  updateCountdown()
-  countdownTimer = setInterval(updateCountdown, 1000)
-}
-const gotoUser = (id) => navigateTo(`/users/${id}`, { replace: true })
 const articleMenuItems = computed(() => {
   const items = []
   if (isAuthor.value || isAdmin.value) {
@@ -628,8 +414,6 @@ watchEffect(() => {
   postTime.value = TimeManager.format(data.createdAt)
   lottery.value = data.lottery || null
   poll.value = data.poll || null
-  if ((lottery.value && lottery.value.endTime) || (poll.value && poll.value.endTime))
-    startCountdown()
 })
 
 // 404 客户端跳转
@@ -917,45 +701,6 @@ const unsubscribePost = async () => {
     toast.success('已取消订阅')
   } else {
     toast.error('操作失败')
-  }
-}
-
-const joinLottery = async () => {
-  const token = getToken()
-  if (!token) {
-    toast.error('请先登录')
-    return
-  }
-  const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/lottery/join`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  const data = await res.json().catch(() => ({}))
-  if (res.ok) {
-    toast.success('已参与抽奖')
-    await refreshPost()
-  } else {
-    toast.error(data.error || '操作失败')
-  }
-}
-
-const voteOption = async (idx) => {
-  const token = getToken()
-  if (!token) {
-    toast.error('请先登录')
-    return
-  }
-  const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/poll/vote?option=${idx}`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  const data = await res.json().catch(() => ({}))
-  if (res.ok) {
-    toast.success('投票成功')
-    await refreshPost()
-    showPollResult.value = true
-  } else {
-    toast.error(data.error || '操作失败')
   }
 }
 
@@ -1287,95 +1032,6 @@ onMounted(async () => {
   cursor: pointer;
 }
 
-.poll-option-button {
-  color: var(--text-color);
-  padding: 5px 10px;
-  border-radius: 8px;
-  background-color: var(--poll-option-button-background-color);
-  cursor: pointer;
-  width: fit-content;
-}
-
-.poll-top-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  border-bottom: 1px solid var(--normal-border-color);
-}
-
-.poll-options-container {
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  flex: 4;
-}
-
-.poll-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100px;
-}
-
-.total-votes {
-  font-size: 40px;
-  font-weight: bold;
-  opacity: 0.8;
-}
-
-.total-votes-title {
-  font-size: 18px;
-  opacity: 0.5;
-}
-
-.poll-option {
-  margin-bottom: 10px;
-  margin-right: 10px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-.poll-option-result {
-  margin-bottom: 10px;
-  margin-right: 10px;
-  gap: 5px;
-  display: flex;
-  flex-direction: column;
-}
-
-.poll-option-input {
-  margin-right: 10px;
-  width: 18px;
-  height: 18px;
-  accent-color: var(--primary-color);
-  border-radius: 50%;
-  border: 2px solid var(--primary-color);
-}
-
-.poll-option-text {
-  font-size: 18px;
-}
-
-.poll-bottom-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.poll-left-time {
-  display: flex;
-  flex-direction: row;
-}
-
-.poll-left-time-title {
-  font-size: 13px;
-  opacity: 0.7;
-}
-
 .action-menu-icon {
   cursor: pointer;
   font-size: 18px;
@@ -1491,201 +1147,6 @@ onMounted(async () => {
   position: relative;
 }
 
-.post-prize-container {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background-color: var(--lottery-background-color);
-  border-radius: 10px;
-  padding: 10px;
-}
-
-.post-poll-container {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background-color: var(--lottery-background-color);
-  border-radius: 10px;
-  padding: 10px;
-}
-
-.poll-question {
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.poll-option-progress {
-  position: relative;
-  background-color: rgb(187, 187, 187);
-  height: 20px;
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-.poll-option-progress-bar {
-  background-color: var(--primary-color);
-  height: 100%;
-}
-
-.poll-option-info-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.poll-option-progress-info {
-  font-size: 12px;
-  line-height: 20px;
-  color: var(--text-color);
-}
-
-.poll-vote-button {
-  margin-top: 5px;
-  color: var(--primary-color);
-  cursor: pointer;
-  width: fit-content;
-}
-
-.poll-participants {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-
-.poll-participant-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.prize-info {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 100%;
-  align-items: center;
-}
-
-.join-prize-button-container-mobile {
-  margin-top: 15px;
-  margin-bottom: 10px;
-}
-
-.prize-icon {
-  width: 24px;
-  height: 24px;
-}
-
-.default-prize-icon {
-  font-size: 24px;
-  opacity: 0.5;
-}
-
-.prize-icon-img {
-  width: 100%;
-  height: 100%;
-}
-
-.prize-name {
-  font-size: 13px;
-  opacity: 0.7;
-  margin-left: 10px;
-}
-
-.prize-count {
-  font-size: 13px;
-  font-weight: bold;
-  opacity: 0.7;
-  margin-left: 10px;
-  color: var(--primary-color);
-}
-
-.prize-end-time {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  font-size: 13px;
-  opacity: 0.7;
-  margin-left: 10px;
-}
-
-.poll-left-time-title,
-.prize-end-time-title {
-  font-size: 13px;
-  opacity: 0.7;
-  margin-right: 5px;
-}
-
-.poll-left-time-value,
-.prize-end-time-value {
-  font-size: 13px;
-  font-weight: bold;
-  color: var(--primary-color);
-}
-
-.prize-info-left,
-.prize-info-right {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.join-prize-button {
-  margin-left: 10px;
-  background-color: var(--primary-color);
-  color: white;
-  padding: 5px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  text-align: center;
-}
-
-.join-prize-button:hover {
-  background-color: var(--primary-color-hover);
-}
-
-.join-prize-button-disabled {
-  text-align: center;
-  margin-left: 10px;
-  background-color: var(--primary-color);
-  color: white;
-  padding: 5px 10px;
-  border-radius: 8px;
-  background-color: var(--primary-color-disabled);
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.prize-member-avatar {
-  width: 30px;
-  height: 30px;
-  margin-left: 3px;
-  border-radius: 50%;
-  object-fit: cover;
-  cursor: pointer;
-}
-
-.prize-member-winner {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 5px;
-  margin-top: 10px;
-}
-
-.medal-icon {
-  font-size: 16px;
-  color: var(--primary-color);
-}
-
-.prize-member-winner-name {
-  font-size: 13px;
-  opacity: 0.7;
-}
-
 @media (max-width: 768px) {
   .post-page-main-container {
     width: calc(100% - 20px);
@@ -1735,11 +1196,6 @@ onMounted(async () => {
 
   .loading-container {
     width: 100%;
-  }
-
-  .join-prize-button,
-  .join-prize-button-disabled {
-    margin-left: 0;
   }
 }
 </style>
