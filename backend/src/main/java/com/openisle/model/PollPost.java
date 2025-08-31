@@ -33,7 +33,7 @@ public class PollPost extends Post {
     private Set<User> participants = new HashSet<>();
 
     @Column
-    private boolean multiple = false;
+    private Boolean multiple = false;
 
     @Column
     private LocalDateTime endTime;
