@@ -11,6 +11,7 @@ import com.openisle.repository.UserRepository;
 import com.openisle.repository.ReactionRepository;
 import com.openisle.repository.CommentSubscriptionRepository;
 import com.openisle.repository.NotificationRepository;
+import com.openisle.repository.PointHistoryRepository;
 import com.openisle.service.NotificationService;
 import com.openisle.service.SubscriptionService;
 import com.openisle.model.Role;
@@ -37,6 +38,7 @@ public class CommentService {
     private final ReactionRepository reactionRepository;
     private final CommentSubscriptionRepository commentSubscriptionRepository;
     private final NotificationRepository notificationRepository;
+    private final PointHistoryRepository pointHistoryRepository;
     private final ImageUploader imageUploader;
 
     @Transactional
@@ -235,10 +237,14 @@ public class CommentService {
         for (Comment c : replies) {
             deleteCommentCascade(c);
         }
+        // 逻辑删除相关的积分历史记录
+        pointHistoryRepository.findByComment(comment).forEach(pointHistoryRepository::delete);
+        // 删除其他相关数据
         reactionRepository.findByComment(comment).forEach(reactionRepository::delete);
         commentSubscriptionRepository.findByComment(comment).forEach(commentSubscriptionRepository::delete);
         notificationRepository.deleteAll(notificationRepository.findByComment(comment));
         imageUploader.removeReferences(imageUploader.extractUrls(comment.getContent()));
+        // 逻辑删除评论
         commentRepository.delete(comment);
         log.debug("deleteCommentCascade removed comment {}", comment.getId());
     }
