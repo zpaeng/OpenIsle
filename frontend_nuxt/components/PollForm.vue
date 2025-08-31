@@ -18,6 +18,12 @@
         <flat-pickr v-model="data.endTime" :config="dateConfig" class="time-picker" />
       </client-only>
     </div>
+    <div class="poll-multiple-row">
+      <label class="poll-row-title">
+        <input type="checkbox" v-model="data.multiple" class="multiple-checkbox" />
+        多选
+      </label>
+    </div>
   </div>
 </template>
 
@@ -79,6 +85,13 @@ const removeOption = (idx) => {
 .poll-time-row {
   display: flex;
   flex-direction: column;
+}
+.poll-multiple-row {
+  display: flex;
+  align-items: center;
+}
+.multiple-checkbox {
+  margin-right: 5px;
 }
 .time-picker {
   max-width: 200px;

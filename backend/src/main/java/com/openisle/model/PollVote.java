@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "poll_votes", uniqueConstraints = @UniqueConstraint(columnNames = {"post_id", "user_id"}))
+@Table(name = "poll_votes", uniqueConstraints = @UniqueConstraint(columnNames = {"post_id", "user_id", "option_index"}))
 @Getter
 @Setter
 @NoArgsConstructor

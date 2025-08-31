@@ -74,6 +74,7 @@ const lottery = reactive({
 const poll = reactive({
   options: ['', ''],
   endTime: null,
+  multiple: false,
 })
 const startTime = ref(null)
 const isWaitingPosting = ref(false)
@@ -121,6 +122,7 @@ const clearPost = async () => {
   startTime.value = null
   poll.options = ['', '']
   poll.endTime = null
+  poll.multiple = false
 
   // 删除草稿
   const token = getToken()
@@ -318,6 +320,7 @@ const submitPost = async () => {
         prizeCount: postType.value === 'LOTTERY' ? lottery.prizeCount : undefined,
         prizeDescription: postType.value === 'LOTTERY' ? lottery.prizeDescription : undefined,
         options: postType.value === 'POLL' ? poll.options : undefined,
+        multiple: postType.value === 'POLL' ? poll.multiple : undefined,
         startTime:
           postType.value === 'LOTTERY' ? new Date(startTime.value).toISOString() : undefined,
         pointCost: postType.value === 'LOTTERY' ? lottery.pointCost : undefined,

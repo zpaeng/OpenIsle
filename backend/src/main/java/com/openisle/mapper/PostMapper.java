@@ -111,6 +111,7 @@ public class PostMapper {
                     .collect(Collectors.groupingBy(PollVote::getOptionIndex,
                             Collectors.mapping(v -> userMapper.toAuthorDto(v.getUser()), Collectors.toList())));
             p.setOptionParticipants(optionParticipants);
+            p.setMultiple(pp.isMultiple());
             dto.setPoll(p);
         }
     }

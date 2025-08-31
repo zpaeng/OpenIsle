@@ -28,5 +28,6 @@ public class PostRequest {
     private LocalDateTime endTime;
     // fields for poll posts
     private List<String> options;
+    private Boolean multiple;
 }
 
