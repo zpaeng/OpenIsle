@@ -186,7 +186,8 @@ public class PostService {
                            Integer pointCost,
                            LocalDateTime startTime,
                            LocalDateTime endTime,
-                           java.util.List<String> options) {
+                           java.util.List<String> options,
+                           Boolean multiple) {
         long recent = postRepository.countByAuthorAfter(username,
                 java.time.LocalDateTime.now().minusMinutes(5));
         if (recent >= 1) {
@@ -227,6 +228,7 @@ public class PostService {
             PollPost pp = new PollPost();
             pp.setOptions(options);
             pp.setEndTime(endTime);
+            pp.setMultiple(multiple != null && multiple);
             post = pp;
         } else {
             post = new Post();
@@ -302,7 +304,7 @@ public class PostService {
     }
 
     @Transactional
-    public PollPost votePoll(Long postId, String username, int optionIndex) {
+    public PollPost votePoll(Long postId, String username, java.util.List<Integer> optionIndices) {
         PollPost post = pollPostRepository.findById(postId)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
         if (post.getEndTime() != null && post.getEndTime().isBefore(LocalDateTime.now())) {
@@ -313,16 +315,24 @@ public class PostService {
         if (post.getParticipants().contains(user)) {
             throw new IllegalArgumentException("User already voted");
         }
-        if (optionIndex < 0 || optionIndex >= post.getOptions().size()) {
-            throw new IllegalArgumentException("Invalid option");
+        if (optionIndices == null || optionIndices.isEmpty()) {
+            throw new IllegalArgumentException("No options selected");
+        }
+        java.util.Set<Integer> unique = new java.util.HashSet<>(optionIndices);
+        for (int optionIndex : unique) {
+            if (optionIndex < 0 || optionIndex >= post.getOptions().size()) {
+                throw new IllegalArgumentException("Invalid option");
+            }
         }
         post.getParticipants().add(user);
-        post.getVotes().merge(optionIndex, 1, Integer::sum);
-        PollVote vote = new PollVote();
-        vote.setPost(post);
-        vote.setUser(user);
-        vote.setOptionIndex(optionIndex);
-        pollVoteRepository.save(vote);
+        for (int optionIndex : unique) {
+            post.getVotes().merge(optionIndex, 1, Integer::sum);
+            PollVote vote = new PollVote();
+            vote.setPost(post);
+            vote.setUser(user);
+            vote.setOptionIndex(optionIndex);
+            pollVoteRepository.save(vote);
+        }
         PollPost saved = pollPostRepository.save(post);
         if (post.getAuthor() != null && !post.getAuthor().getId().equals(user.getId())) {
             notificationService.createNotification(post.getAuthor(), NotificationType.POLL_VOTE, post, null, null, user, null, null);

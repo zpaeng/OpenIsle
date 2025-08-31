@@ -44,7 +44,7 @@ public class PostController {
                 req.getType(), req.getPrizeDescription(), req.getPrizeIcon(),
                 req.getPrizeCount(), req.getPointCost(),
                 req.getStartTime(), req.getEndTime(),
-                req.getOptions());
+                req.getOptions(), req.getMultiple());
         draftService.deleteDraft(auth.getName());
         PostDetailDto dto = postMapper.toDetailDto(post, auth.getName());
         dto.setReward(levelService.awardForPost(auth.getName()));
@@ -94,7 +94,7 @@ public class PostController {
     }
 
     @PostMapping("/{id}/poll/vote")
-    public ResponseEntity<Void> vote(@PathVariable Long id, @RequestParam("option") int option, Authentication auth) {
+    public ResponseEntity<Void> vote(@PathVariable Long id, @RequestParam("option") List<Integer> option, Authentication auth) {
         postService.votePoll(id, auth.getName(), option);
         return ResponseEntity.ok().build();
     }

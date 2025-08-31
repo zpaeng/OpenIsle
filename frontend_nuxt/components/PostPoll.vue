@@ -29,23 +29,42 @@
           </div>
         </div>
         <div v-else>
-          <div
-            v-for="(opt, idx) in poll.options"
-            :key="idx"
-            class="poll-option"
-            @click="voteOption(idx)"
-          >
-            <input type="radio" :checked="false" name="poll-option" class="poll-option-input" />
-            <span class="poll-option-text">{{ opt }}</span>
-          </div>
-
-          <div class="multi-selection-container">
-            <div class="multi-selection-title">
-              <i class="fas fa-info-circle info-icon"></i>
-              该投票为多选
+          <template v-if="poll.multiple">
+            <div
+              v-for="(opt, idx) in poll.options"
+              :key="idx"
+              class="poll-option"
+              @click="toggleOption(idx)"
+            >
+              <input
+                type="checkbox"
+                :checked="selectedOptions.includes(idx)"
+                class="poll-option-input"
+              />
+              <span class="poll-option-text">{{ opt }}</span>
             </div>
-            <div class="join-poll-button"><i class="fas fa-plus"></i> 加入投票</div>
-          </div>
+
+            <div class="multi-selection-container">
+              <div class="multi-selection-title">
+                <i class="fas fa-info-circle info-icon"></i>
+                该投票为多选
+              </div>
+              <div class="join-poll-button" @click="submitMultiPoll">
+                <i class="fas fa-plus"></i> 加入投票
+              </div>
+            </div>
+          </template>
+          <template v-else>
+            <div
+              v-for="(opt, idx) in poll.options"
+              :key="idx"
+              class="poll-option"
+              @click="voteOption(idx)"
+            >
+              <input type="radio" :checked="false" name="poll-option" class="poll-option-input" />
+              <span class="poll-option-text">{{ opt }}</span>
+            </div>
+          </template>
         </div>
       </div>
       <div class="poll-info">
@@ -166,6 +185,40 @@ const voteOption = async (idx) => {
     return
   }
   const res = await fetch(`${API_BASE_URL}/api/posts/${props.postId}/poll/vote?option=${idx}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  const data = await res.json().catch(() => ({}))
+  if (res.ok) {
+    toast.success('投票成功')
+    emit('refresh')
+    showPollResult.value = true
+  } else {
+    toast.error(data.error || '操作失败')
+  }
+}
+
+const selectedOptions = ref([])
+const toggleOption = (idx) => {
+  const i = selectedOptions.value.indexOf(idx)
+  if (i >= 0) {
+    selectedOptions.value.splice(i, 1)
+  } else {
+    selectedOptions.value.push(idx)
+  }
+}
+const submitMultiPoll = async () => {
+  const token = getToken()
+  if (!token) {
+    toast.error('请先登录')
+    return
+  }
+  if (!selectedOptions.value.length) {
+    toast.error('请选择至少一个选项')
+    return
+  }
+  const params = selectedOptions.value.map((o) => `option=${o}`).join('&')
+  const res = await fetch(`${API_BASE_URL}/api/posts/${props.postId}/poll/vote?${params}`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
   })
