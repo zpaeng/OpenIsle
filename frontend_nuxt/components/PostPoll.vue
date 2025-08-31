@@ -38,6 +38,14 @@
             <input type="radio" :checked="false" name="poll-option" class="poll-option-input" />
             <span class="poll-option-text">{{ opt }}</span>
           </div>
+
+          <div class="multi-selection-container">
+            <div class="multi-selection-title">
+              <i class="fas fa-info-circle info-icon"></i>
+              该投票为多选
+            </div>
+            <div class="join-poll-button"><i class="fas fa-plus"></i> 加入投票</div>
+          </div>
         </div>
       </div>
       <div class="poll-info">
@@ -204,6 +212,7 @@ const voteOption = async (idx) => {
   flex-direction: column;
   overflow-y: auto;
   flex: 4;
+  border-right: 1px solid var(--normal-border-color);
 }
 
 .poll-info {
@@ -265,6 +274,9 @@ const voteOption = async (idx) => {
 .poll-left-time {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
 }
 
 .poll-left-time-title {
@@ -301,6 +313,34 @@ const voteOption = async (idx) => {
   font-size: 12px;
   line-height: 20px;
   color: var(--text-color);
+}
+
+.multi-selection-container {
+  padding: 20px 15px 20px 5px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.multi-selection-title {
+  font-size: 13px;
+  color: var(--text-color);
+}
+
+.info-icon {
+  margin-right: 5px;
+}
+
+.join-poll-button {
+  padding: 5px 10px;
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.join-poll-button:hover {
+  background-color: var(--primary-color-hover);
 }
 
 .poll-participants {
