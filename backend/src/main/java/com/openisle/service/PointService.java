@@ -219,4 +219,32 @@ public class PointService {
         return result;
     }
 
+    /**
+     * 重新计算用户的积分总数
+     * 通过累加所有积分历史记录来重新计算用户的当前积分
+     */
+    public int recalculateUserPoints(User user) {
+        // 获取用户所有的积分历史记录（由于@Where注解，已删除的记录会被自动过滤）
+        List<PointHistory> histories = pointHistoryRepository.findByUserOrderByIdDesc(user);
+        
+        int totalPoints = 0;
+        for (PointHistory history : histories) {
+            totalPoints += history.getAmount();
+        }
+        
+        // 更新用户积分
+        user.setPoint(totalPoints);
+        userRepository.save(user);
+        
+        return totalPoints;
+    }
+
+    /**
+     * 重新计算用户的积分总数（通过用户名）
+     */
+    public int recalculateUserPoints(String userName) {
+        User user = userRepository.findByUsername(userName).orElseThrow();
+        return recalculateUserPoints(user);
+    }
+
 }

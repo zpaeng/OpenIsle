@@ -4,6 +4,7 @@ import com.openisle.model.Comment;
 import com.openisle.model.Post;
 import com.openisle.model.User;
 import com.openisle.model.NotificationType;
+import com.openisle.model.PointHistory;
 import com.openisle.model.CommentSort;
 import com.openisle.repository.CommentRepository;
 import com.openisle.repository.PostRepository;
@@ -14,6 +15,7 @@ import com.openisle.repository.NotificationRepository;
 import com.openisle.repository.PointHistoryRepository;
 import com.openisle.service.NotificationService;
 import com.openisle.service.SubscriptionService;
+import com.openisle.service.PointService;
 import com.openisle.model.Role;
 import com.openisle.exception.RateLimitException;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +44,7 @@ public class CommentService {
     private final CommentSubscriptionRepository commentSubscriptionRepository;
     private final NotificationRepository notificationRepository;
     private final PointHistoryRepository pointHistoryRepository;
+    private final PointService pointService;
     private final ImageUploader imageUploader;
 
     @Transactional
@@ -65,16 +71,19 @@ public class CommentService {
         log.debug("Comment {} saved for post {}", comment.getId(), postId);
         imageUploader.addReferences(imageUploader.extractUrls(content));
         if (!author.getId().equals(post.getAuthor().getId())) {
-            notificationService.createNotification(post.getAuthor(), NotificationType.COMMENT_REPLY, post, comment, null, null, null, null);
+            notificationService.createNotification(post.getAuthor(), NotificationType.COMMENT_REPLY, post, comment,
+                    null, null, null, null);
         }
         for (User u : subscriptionService.getPostSubscribers(postId)) {
             if (!u.getId().equals(author.getId())) {
-                notificationService.createNotification(u, NotificationType.POST_UPDATED, post, comment, null, null, null, null);
+                notificationService.createNotification(u, NotificationType.POST_UPDATED, post, comment, null, null,
+                        null, null);
             }
         }
         for (User u : subscriptionService.getSubscribers(author.getUsername())) {
             if (!u.getId().equals(author.getId())) {
-                notificationService.createNotification(u, NotificationType.USER_ACTIVITY, post, comment, null, null, null, null);
+                notificationService.createNotification(u, NotificationType.USER_ACTIVITY, post, comment, null, null,
+                        null, null);
             }
         }
         notificationService.notifyMentions(content, author, post, comment);
@@ -111,21 +120,25 @@ public class CommentService {
         log.debug("Reply {} saved for parent {}", comment.getId(), parentId);
         imageUploader.addReferences(imageUploader.extractUrls(content));
         if (!author.getId().equals(parent.getAuthor().getId())) {
-            notificationService.createNotification(parent.getAuthor(), NotificationType.COMMENT_REPLY, parent.getPost(), comment, null, null, null, null);
+            notificationService.createNotification(parent.getAuthor(), NotificationType.COMMENT_REPLY, parent.getPost(),
+                    comment, null, null, null, null);
         }
         for (User u : subscriptionService.getCommentSubscribers(parentId)) {
             if (!u.getId().equals(author.getId())) {
-                notificationService.createNotification(u, NotificationType.COMMENT_REPLY, parent.getPost(), comment, null, null, null, null);
+                notificationService.createNotification(u, NotificationType.COMMENT_REPLY, parent.getPost(), comment,
+                        null, null, null, null);
             }
         }
         for (User u : subscriptionService.getPostSubscribers(parent.getPost().getId())) {
             if (!u.getId().equals(author.getId())) {
-                notificationService.createNotification(u, NotificationType.POST_UPDATED, parent.getPost(), comment, null, null, null, null);
+                notificationService.createNotification(u, NotificationType.POST_UPDATED, parent.getPost(), comment,
+                        null, null, null, null);
             }
         }
         for (User u : subscriptionService.getSubscribers(author.getUsername())) {
             if (!u.getId().equals(author.getId())) {
-                notificationService.createNotification(u, NotificationType.USER_ACTIVITY, parent.getPost(), comment, null, null, null, null);
+                notificationService.createNotification(u, NotificationType.USER_ACTIVITY, parent.getPost(), comment,
+                        null, null, null, null);
             }
         }
         notificationService.notifyMentions(content, author, parent.getPost(), comment);
@@ -237,15 +250,33 @@ public class CommentService {
         for (Comment c : replies) {
             deleteCommentCascade(c);
         }
-        // 逻辑删除相关的积分历史记录
-        pointHistoryRepository.findByComment(comment).forEach(pointHistoryRepository::delete);
+
+        // 逻辑删除相关的积分历史记录，并收集受影响的用户
+        List<PointHistory> pointHistories = pointHistoryRepository.findByComment(comment);
+        // 收集需要重新计算积分的用户
+        Set<User> usersToRecalculate = pointHistories.stream().map(PointHistory::getUser).collect(Collectors.toSet());
+
         // 删除其他相关数据
         reactionRepository.findByComment(comment).forEach(reactionRepository::delete);
         commentSubscriptionRepository.findByComment(comment).forEach(commentSubscriptionRepository::delete);
         notificationRepository.deleteAll(notificationRepository.findByComment(comment));
         imageUploader.removeReferences(imageUploader.extractUrls(comment.getContent()));
+
         // 逻辑删除评论
         commentRepository.delete(comment);
+        // 删除积分历史
+        pointHistoryRepository.deleteAll(pointHistories);
+
+        // 重新计算受影响用户的积分
+        if (!usersToRecalculate.isEmpty()) {
+            for (User user : usersToRecalculate) {
+                int newPoints = pointService.recalculateUserPoints(user);
+                user.setPoint(newPoints);
+                log.debug("Recalculated points for user {}: {}", user.getUsername(), newPoints);
+            }
+            userRepository.saveAll(usersToRecalculate);
+        }
+
         log.debug("deleteCommentCascade removed comment {}", comment.getId());
     }
 
