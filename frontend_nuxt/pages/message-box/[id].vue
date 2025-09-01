@@ -334,6 +334,9 @@ onMounted(async () => {
   if (currentUser.value) {
     await fetchMessages(0)
     await markConversationAsRead()
+    await nextTick()
+    // 初次进入频道时，平滑滚动到底部
+    scrollToBottomSmooth()
     const token = getToken()
     if (token && !isConnected.value) {
       connect(token)
