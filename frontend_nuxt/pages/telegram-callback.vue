@@ -4,7 +4,6 @@
 
 <script setup>
 import CallbackPage from '~/components/CallbackPage.vue'
-import { I } from '~/dist/_nuxt/F7ewH_Zb'
 import { telegramExchange } from '~/utils/telegram'
 
 onMounted(async () => {
