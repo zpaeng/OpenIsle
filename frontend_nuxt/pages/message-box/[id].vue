@@ -371,11 +371,12 @@ watch(isConnected, (newValue) => {
 })
 
 onActivated(async () => {
-  // 返回页面时：刷新数据与已读，不做强制滚动，保持用户当前位置
+  // 返回页面时：刷新数据与已读，并滚动到底部
   if (currentUser.value) {
     await fetchMessages(0)
     await markConversationAsRead()
     await nextTick()
+    scrollToBottomSmooth()
     updateNearBottom()
     if (!isConnected.value) {
       const token = getToken()
