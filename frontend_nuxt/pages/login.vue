@@ -34,15 +34,44 @@
       </div>
     </div>
 
-    <ThirdPartyAuthButtons action="登录" />
+    <div class="other-login-page-content">
+      <div class="login-page-button" @click="loginWithGoogle">
+        <img class="login-page-button-icon" src="../assets/icons/google.svg" alt="Google Logo" />
+        <div class="login-page-button-text">Google 登录</div>
+      </div>
+      <div class="login-page-button" @click="loginWithGithub">
+        <img class="login-page-button-icon" src="../assets/icons/github.svg" alt="GitHub Logo" />
+        <div class="login-page-button-text">GitHub 登录</div>
+      </div>
+      <div class="login-page-button" @click="loginWithDiscord">
+        <img class="login-page-button-icon" src="../assets/icons/discord.svg" alt="Discord Logo" />
+        <div class="login-page-button-text">Discord 登录</div>
+      </div>
+      <div class="login-page-button" @click="loginWithTwitter">
+        <img class="login-page-button-icon" src="../assets/icons/twitter.svg" alt="Twitter Logo" />
+        <div class="login-page-button-text">Twitter 登录</div>
+      </div>
+      <div class="login-page-button" @click="loginWithTelegram">
+        <img
+          class="login-page-button-icon"
+          src="../assets/icons/telegram.svg"
+          alt="Telegram Logo"
+        />
+        <div class="login-page-button-text">Telegram 登录</div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { toast } from '~/main'
 import { setToken, loadCurrentUser } from '~/utils/auth'
+import { googleAuthorize } from '~/utils/google'
+import { githubAuthorize } from '~/utils/github'
+import { discordAuthorize } from '~/utils/discord'
+import { twitterAuthorize } from '~/utils/twitter'
+import { telegramAuthorize } from '~/utils/telegram'
 import BaseInput from '~/components/BaseInput.vue'
-import ThirdPartyAuthButtons from '~/components/ThirdPartyAuthButtons.vue'
 import { registerPush } from '~/utils/push'
 const config = useRuntimeConfig()
 const API_BASE_URL = config.public.apiBaseUrl
@@ -84,6 +113,22 @@ const submitLogin = async () => {
   } finally {
     isWaitingForLogin.value = false
   }
+}
+
+const loginWithGoogle = () => {
+  googleAuthorize()
+}
+const loginWithGithub = () => {
+  githubAuthorize()
+}
+const loginWithDiscord = () => {
+  discordAuthorize()
+}
+const loginWithTwitter = () => {
+  twitterAuthorize()
+}
+const loginWithTelegram = () => {
+  telegramAuthorize()
 }
 </script>
 
@@ -157,6 +202,16 @@ const submitLogin = async () => {
   font-size: 16px;
 }
 
+.other-login-page-content {
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 30%;
+  gap: 20px;
+}
+
 .login-page-button-primary {
   margin-top: 20px;
   display: flex;
@@ -184,6 +239,33 @@ const submitLogin = async () => {
 
 .login-page-button-primary.disabled:hover {
   background-color: var(--primary-color-disabled);
+}
+
+.login-page-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  min-width: 150px;
+  background-color: var(--login-background-color);
+  border: 1px solid var(--normal-border-color);
+  border-radius: 10px;
+  cursor: pointer;
+  gap: 10px;
+}
+
+.login-page-button:hover {
+  background-color: var(--login-background-color-hover);
+}
+
+.login-page-button-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.login-page-button-text {
+  font-size: 16px;
 }
 
 .login-page-button-secondary {
@@ -222,6 +304,17 @@ const submitLogin = async () => {
   .login-page-button-secondary {
     margin-top: 0px;
     font-size: 13px;
+  }
+
+  .other-login-page-content {
+    margin-top: 20px;
+    margin-left: 0px;
+    width: calc(100% - 40px);
+    gap: 10px;
+  }
+
+  .login-page-button {
+    width: calc(100% - 40px);
   }
 }
 </style>
