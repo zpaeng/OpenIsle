@@ -29,6 +29,15 @@
           </div>
         </div>
         <div v-else>
+          <div class="poll-title-section">
+            <div class="poll-option-title" v-if="poll.multiple">多选</div>
+            <div class="poll-option-title" v-else>单选</div>
+
+            <div class="poll-left-time">
+              <div class="poll-left-time-title">离结束还有</div>
+              <div class="poll-left-time-value">{{ countdown }}</div>
+            </div>
+          </div>
           <template v-if="poll.multiple">
             <div
               v-for="(opt, idx) in poll.options"
@@ -45,12 +54,8 @@
             </div>
 
             <div class="multi-selection-container">
-              <div class="multi-selection-title">
-                <i class="fas fa-info-circle info-icon"></i>
-                该投票为多选
-              </div>
               <div class="join-poll-button" @click="submitMultiPoll">
-                <i class="fas fa-plus"></i> 加入投票
+                <i class="fas fa-check"></i> 确认投票
               </div>
             </div>
           </template>
@@ -71,12 +76,8 @@
             </div>
 
             <div class="single-selection-container">
-              <div class="single-selection-title">
-                <i class="fas fa-info-circle info-icon"></i>
-                该投票为单选
-              </div>
               <div class="join-poll-button" @click="submitSinglePoll">
-                <i class="fas fa-plus"></i> 加入投票
+                <i class="fas fa-check"></i> 确认投票
               </div>
             </div>
           </template>
@@ -102,10 +103,11 @@
       >
         <i class="fas fa-chart-bar"></i> 结果
       </div>
-
-      <div class="poll-left-time">
-        <div class="poll-left-time-title">离结束还有</div>
-        <div class="poll-left-time-value">{{ countdown }}</div>
+      <div v-else-if="pollEnded" class="poll-option-hint">
+        <i class="fas fa-stopwatch"></i> 投票已结束
+      </div>
+      <div v-else class="poll-option-hint">
+        <i class="fas fa-stopwatch"></i> 您已投票，等待结束查看结果
       </div>
     </div>
   </div>
@@ -397,7 +399,8 @@ const submitMultiPoll = async () => {
 
 .multi-selection-container,
 .single-selection-container {
-  padding: 20px 15px 20px 5px;
+  margin-top: 30px;
+  margin-bottom: 10px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -407,6 +410,22 @@ const submitMultiPoll = async () => {
 .single-selection-title {
   font-size: 13px;
   color: var(--text-color);
+}
+
+.poll-title-section {
+  display: flex;
+  gap: 30px;
+  flex-direction: row;
+  margin-bottom: 20px;
+}
+
+.poll-option-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.poll-left-time {
+  font-size: 18px;
 }
 
 .info-icon {
