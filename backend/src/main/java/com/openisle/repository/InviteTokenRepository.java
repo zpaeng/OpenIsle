@@ -9,4 +9,8 @@ import java.util.Optional;
 
 public interface InviteTokenRepository extends JpaRepository<InviteToken, String> {
     Optional<InviteToken> findByInviterAndCreatedDate(User inviter, LocalDate createdDate);
+
+    Optional<InviteToken> findByShortToken(String shortToken);
+
+    boolean existsByShortToken(String shortToken);
 }
