@@ -15,6 +15,7 @@
         <div class="article-title-container-right">
           <div v-if="status === 'PENDING'" class="article-pending-button">审核中</div>
           <div v-if="status === 'REJECTED'" class="article-block-button">已拒绝</div>
+          <div v-if="!rssExcluded" class="article-featured-button">精品</div>
           <div v-if="closed" class="article-closed-button">已关闭</div>
           <div
             v-if="!closed && loggedIn && !isAuthor && !subscribed"
@@ -957,6 +958,7 @@ onMounted(async () => {
 
 .article-closed-button,
 .article-subscribe-button-text,
+.article-featured-button,
 .article-unsubscribe-button-text {
   white-space: nowrap;
 }
@@ -993,6 +995,15 @@ onMounted(async () => {
   background-color: var(--background-color);
   color: red;
   border: 1px solid red;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.article-featured-button {
+  background-color: var(--background-color);
+  color: var(--featured-color);
+  border: 1px solid var(--featured-color);
   padding: 5px 10px;
   border-radius: 8px;
   font-size: 14px;
