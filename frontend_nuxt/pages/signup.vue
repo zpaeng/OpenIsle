@@ -85,6 +85,14 @@
         <img class="signup-page-button-icon" src="~/assets/icons/twitter.svg" alt="Twitter Logo" />
         <div class="signup-page-button-text">Twitter 注册</div>
       </div>
+      <div class="signup-page-button" @click="signupWithTelegram">
+        <img
+          class="signup-page-button-icon"
+          src="~/assets/icons/telegram.svg"
+          alt="Telegram Logo"
+        />
+        <div class="signup-page-button-text">Telegram 注册</div>
+      </div>
     </div>
   </div>
 </template>
@@ -96,6 +104,7 @@ import { discordAuthorize } from '~/utils/discord'
 import { githubAuthorize } from '~/utils/github'
 import { googleAuthorize } from '~/utils/google'
 import { twitterAuthorize } from '~/utils/twitter'
+import { telegramAuthorize } from '~/utils/telegram'
 import { loadCurrentUser, setToken } from '~/utils/auth'
 
 const route = useRoute()
@@ -227,6 +236,9 @@ const signupWithDiscord = () => {
 }
 const signupWithTwitter = () => {
   twitterAuthorize(inviteToken.value)
+}
+const signupWithTelegram = () => {
+  telegramAuthorize(inviteToken.value)
 }
 </script>
 

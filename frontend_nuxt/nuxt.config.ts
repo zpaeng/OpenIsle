@@ -11,6 +11,7 @@ export default defineNuxtConfig({
       githubClientId: process.env.NUXT_PUBLIC_GITHUB_CLIENT_ID || '',
       discordClientId: process.env.NUXT_PUBLIC_DISCORD_CLIENT_ID || '',
       twitterClientId: process.env.NUXT_PUBLIC_TWITTER_CLIENT_ID || '',
+      telegramBotId: process.env.NUXT_PUBLIC_TELEGRAM_BOT_ID || '',
     },
   },
   css: ['vditor/dist/index.css', '~/assets/fonts.css', '~/assets/global.css'],

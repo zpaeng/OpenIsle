@@ -26,6 +26,7 @@ public class AuthController {
     private final GithubAuthService githubAuthService;
     private final DiscordAuthService discordAuthService;
     private final TwitterAuthService twitterAuthService;
+    private final TelegramAuthService telegramAuthService;
     private final RegisterModeService registerModeService;
     private final NotificationService notificationService;
     private final UserRepository userRepository;
@@ -356,6 +357,51 @@ public class AuthController {
         }
         return ResponseEntity.badRequest().body(Map.of(
                 "error", "Invalid twitter code",
+                "reason_code", "INVALID_CREDENTIALS"
+        ));
+    }
+
+    @PostMapping("/telegram")
+    public ResponseEntity<?> loginWithTelegram(@RequestBody TelegramLoginRequest req) {
+        boolean viaInvite = req.getInviteToken() != null && !req.getInviteToken().isEmpty();
+        InviteService.InviteValidateResult inviteValidateResult = inviteService.validate(req.getInviteToken());
+        if (viaInvite && !inviteValidateResult.isValidate()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid invite token"));
+        }
+        Optional<AuthResult> resultOpt = telegramAuthService.authenticate(
+                req,
+                registerModeService.getRegisterMode(),
+                viaInvite);
+        if (resultOpt.isPresent()) {
+            AuthResult result = resultOpt.get();
+            if (viaInvite && result.isNewUser()) {
+                inviteService.consume(req.getInviteToken(), inviteValidateResult.getInviteToken().getInviter().getUsername());
+                return ResponseEntity.ok(Map.of(
+                        "token", jwtService.generateToken(result.getUser().getUsername()),
+                        "reason_code", "INVITE_APPROVED"
+                ));
+            }
+            if (RegisterMode.DIRECT.equals(registerModeService.getRegisterMode())) {
+                return ResponseEntity.ok(Map.of("token", jwtService.generateToken(result.getUser().getUsername())));
+            }
+            if (!result.getUser().isApproved()) {
+                if (result.getUser().getRegisterReason() != null && !result.getUser().getRegisterReason().isEmpty()) {
+                    return ResponseEntity.badRequest().body(Map.of(
+                            "error", "Account awaiting approval",
+                            "reason_code", "IS_APPROVING",
+                            "token", jwtService.generateReasonToken(result.getUser().getUsername())
+                    ));
+                }
+                return ResponseEntity.badRequest().body(Map.of(
+                        "error", "Account awaiting approval",
+                        "reason_code", "NOT_APPROVED",
+                        "token", jwtService.generateReasonToken(result.getUser().getUsername())
+                ));
+            }
+            return ResponseEntity.ok(Map.of("token", jwtService.generateToken(result.getUser().getUsername())));
+        }
+        return ResponseEntity.badRequest().body(Map.of(
+                "error", "Invalid telegram data",
                 "reason_code", "INVALID_CREDENTIALS"
         ));
     }
