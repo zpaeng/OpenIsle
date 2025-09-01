@@ -292,6 +292,7 @@ const {
       members: (p.participants || []).map((m) => ({ id: m.id, avatar: m.avatar })),
       comments: p.commentCount,
       views: p.views,
+      rssExcluded: p.rssExcluded || false,
       time: TimeManager.format(
         selectedTopic.value === '最新回复' ? p.lastReplyAt || p.createdAt : p.createdAt,
       ),
@@ -333,6 +334,7 @@ const fetchNextPage = async () => {
     members: (p.participants || []).map((m) => ({ id: m.id, avatar: m.avatar })),
     comments: p.commentCount,
     views: p.views,
+    rssExcluded: p.rssExcluded || false,
     time: TimeManager.format(
       selectedTopic.value === '最新回复' ? p.lastReplyAt || p.createdAt : p.createdAt,
     ),
