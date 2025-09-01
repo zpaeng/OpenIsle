@@ -70,6 +70,10 @@
             <NuxtLink class="article-item-title main-item" :to="`/posts/${article.id}`">
               <i v-if="article.pinned" class="fas fa-thumbtack pinned-icon"></i>
               <i v-if="article.type === 'LOTTERY'" class="fa-solid fa-gift lottery-icon"></i>
+              <i
+                v-else-if="article.type === 'POLL'"
+                class="fa-solid fa-square-poll-vertical poll-icon"
+              ></i>
               {{ article.title }}
             </NuxtLink>
             <NuxtLink class="article-item-description main-item" :to="`/posts/${article.id}`">
@@ -542,7 +546,8 @@ const sanitizeDescription = (text) => stripMarkdown(text)
 }
 
 .pinned-icon,
-.lottery-icon {
+.lottery-icon,
+.poll-icon {
   margin-right: 4px;
   color: var(--primary-color);
 }

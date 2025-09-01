@@ -9,8 +9,11 @@ import com.openisle.model.Category;
 import com.openisle.model.Comment;
 import com.openisle.model.NotificationType;
 import com.openisle.model.LotteryPost;
+import com.openisle.model.PollPost;
+import com.openisle.model.PollVote;
 import com.openisle.repository.PostRepository;
 import com.openisle.repository.LotteryPostRepository;
+import com.openisle.repository.PollPostRepository;
 import com.openisle.repository.UserRepository;
 import com.openisle.repository.CategoryRepository;
 import com.openisle.repository.TagRepository;
@@ -20,6 +23,7 @@ import com.openisle.repository.CommentRepository;
 import com.openisle.repository.ReactionRepository;
 import com.openisle.repository.PostSubscriptionRepository;
 import com.openisle.repository.NotificationRepository;
+import com.openisle.repository.PollVoteRepository;
 import com.openisle.model.Role;
 import com.openisle.exception.RateLimitException;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +58,8 @@ public class PostService {
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
     private final LotteryPostRepository lotteryPostRepository;
+    private final PollPostRepository pollPostRepository;
+    private final PollVoteRepository pollVoteRepository;
     private PublishMode publishMode;
     private final NotificationService notificationService;
     private final SubscriptionService subscriptionService;
@@ -78,6 +84,8 @@ public class PostService {
                        CategoryRepository categoryRepository,
                        TagRepository tagRepository,
                        LotteryPostRepository lotteryPostRepository,
+                       PollPostRepository pollPostRepository,
+                       PollVoteRepository pollVoteRepository,
                        NotificationService notificationService,
                        SubscriptionService subscriptionService,
                        CommentService commentService,
@@ -97,6 +105,8 @@ public class PostService {
         this.categoryRepository = categoryRepository;
         this.tagRepository = tagRepository;
         this.lotteryPostRepository = lotteryPostRepository;
+        this.pollPostRepository = pollPostRepository;
+        this.pollVoteRepository = pollVoteRepository;
         this.notificationService = notificationService;
         this.subscriptionService = subscriptionService;
         this.commentService = commentService;
@@ -124,6 +134,15 @@ public class PostService {
         }
         for (LotteryPost lp : lotteryPostRepository.findByEndTimeBeforeAndWinnersIsEmpty(now)) {
             applicationContext.getBean(PostService.class).finalizeLottery(lp.getId());
+        }
+        for (PollPost pp : pollPostRepository.findByEndTimeAfterAndResultAnnouncedFalse(now)) {
+            ScheduledFuture<?> future = taskScheduler.schedule(
+                    () -> applicationContext.getBean(PostService.class).finalizePoll(pp.getId()),
+                    java.util.Date.from(pp.getEndTime().atZone(ZoneId.systemDefault()).toInstant()));
+            scheduledFinalizations.put(pp.getId(), future);
+        }
+        for (PollPost pp : pollPostRepository.findByEndTimeBeforeAndResultAnnouncedFalse(now)) {
+            applicationContext.getBean(PostService.class).finalizePoll(pp.getId());
         }
     }
 
@@ -166,7 +185,9 @@ public class PostService {
                            Integer prizeCount,
                            Integer pointCost,
                            LocalDateTime startTime,
-                           LocalDateTime endTime) {
+                           LocalDateTime endTime,
+                           java.util.List<String> options,
+                           Boolean multiple) {
         long recent = postRepository.countByAuthorAfter(username,
                 java.time.LocalDateTime.now().minusMinutes(5));
         if (recent >= 1) {
@@ -200,6 +221,15 @@ public class PostService {
             lp.setStartTime(startTime);
             lp.setEndTime(endTime);
             post = lp;
+        } else if (actualType == PostType.POLL) {
+            if (options == null || options.size() < 2) {
+                throw new IllegalArgumentException("At least two options required");
+            }
+            PollPost pp = new PollPost();
+            pp.setOptions(options);
+            pp.setEndTime(endTime);
+            pp.setMultiple(multiple != null && multiple);
+            post = pp;
         } else {
             post = new Post();
         }
@@ -212,6 +242,8 @@ public class PostService {
         post.setStatus(publishMode == PublishMode.REVIEW ? PostStatus.PENDING : PostStatus.PUBLISHED);
         if (post instanceof LotteryPost) {
             post = lotteryPostRepository.save((LotteryPost) post);
+        } else if (post instanceof PollPost) {
+            post = pollPostRepository.save((PollPost) post);
         } else {
             post = postRepository.save(post);
         }
@@ -246,6 +278,11 @@ public class PostService {
                     () -> applicationContext.getBean(PostService.class).finalizeLottery(lp.getId()),
                     java.util.Date.from(lp.getEndTime().atZone(ZoneId.systemDefault()).toInstant()));
             scheduledFinalizations.put(lp.getId(), future);
+        } else if (post instanceof PollPost pp && pp.getEndTime() != null) {
+            ScheduledFuture<?> future = taskScheduler.schedule(
+                    () -> applicationContext.getBean(PostService.class).finalizePoll(pp.getId()),
+                    java.util.Date.from(pp.getEndTime().atZone(ZoneId.systemDefault()).toInstant()));
+            scheduledFinalizations.put(pp.getId(), future);
         }
         return post;
     }
@@ -259,6 +296,66 @@ public class PostService {
             pointService.processLotteryJoin(user, post);
             lotteryPostRepository.save(post);
         }
+    }
+
+    public PollPost getPoll(Long postId) {
+        return pollPostRepository.findById(postId)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
+    }
+
+    @Transactional
+    public PollPost votePoll(Long postId, String username, java.util.List<Integer> optionIndices) {
+        PollPost post = pollPostRepository.findById(postId)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
+        if (post.getEndTime() != null && post.getEndTime().isBefore(LocalDateTime.now())) {
+            throw new IllegalStateException("Poll has ended");
+        }
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
+        if (post.getParticipants().contains(user)) {
+            throw new IllegalArgumentException("User already voted");
+        }
+        if (optionIndices == null || optionIndices.isEmpty()) {
+            throw new IllegalArgumentException("No options selected");
+        }
+        java.util.Set<Integer> unique = new java.util.HashSet<>(optionIndices);
+        for (int optionIndex : unique) {
+            if (optionIndex < 0 || optionIndex >= post.getOptions().size()) {
+                throw new IllegalArgumentException("Invalid option");
+            }
+        }
+        post.getParticipants().add(user);
+        for (int optionIndex : unique) {
+            post.getVotes().merge(optionIndex, 1, Integer::sum);
+            PollVote vote = new PollVote();
+            vote.setPost(post);
+            vote.setUser(user);
+            vote.setOptionIndex(optionIndex);
+            pollVoteRepository.save(vote);
+        }
+        PollPost saved = pollPostRepository.save(post);
+        if (post.getAuthor() != null && !post.getAuthor().getId().equals(user.getId())) {
+            notificationService.createNotification(post.getAuthor(), NotificationType.POLL_VOTE, post, null, null, user, null, null);
+        }
+        return saved;
+    }
+
+    @Transactional
+    public void finalizePoll(Long postId) {
+        scheduledFinalizations.remove(postId);
+        pollPostRepository.findById(postId).ifPresent(pp -> {
+            if (pp.isResultAnnounced()) {
+                return;
+            }
+            pp.setResultAnnounced(true);
+            pollPostRepository.save(pp);
+            if (pp.getAuthor() != null) {
+                notificationService.createNotification(pp.getAuthor(), NotificationType.POLL_RESULT_OWNER, pp, null, null, null, null, null);
+            }
+            for (User participant : pp.getParticipants()) {
+                notificationService.createNotification(participant, NotificationType.POLL_RESULT_PARTICIPANT, pp, null, null, null, null, null);
+            }
+        });
     }
 
     @Transactional

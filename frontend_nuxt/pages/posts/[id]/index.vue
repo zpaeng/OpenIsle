@@ -94,84 +94,10 @@
         </div>
       </div>
 
-      <div v-if="lottery" class="post-prize-container">
-        <div class="prize-content">
-          <div class="prize-info">
-            <div class="prize-info-left">
-              <div class="prize-icon">
-                <BaseImage
-                  class="prize-icon-img"
-                  v-if="lottery.prizeIcon"
-                  :src="lottery.prizeIcon"
-                  alt="prize"
-                />
-                <i v-else class="fa-solid fa-gift default-prize-icon"></i>
-              </div>
-              <div class="prize-name">{{ lottery.prizeDescription }}</div>
-              <div class="prize-count">x {{ lottery.prizeCount }}</div>
-            </div>
-            <div class="prize-end-time prize-info-right">
-              <div v-if="!isMobile" class="prize-end-time-title">离结束还有</div>
-              <div class="prize-end-time-value">{{ countdown }}</div>
-              <div v-if="!isMobile" class="join-prize-button-container-desktop">
-                <div
-                  v-if="loggedIn && !hasJoined && !lotteryEnded"
-                  class="join-prize-button"
-                  @click="joinLottery"
-                >
-                  <div class="join-prize-button-text">
-                    参与抽奖 <i class="fas fa-coins"></i> {{ lottery.pointCost }}
-                  </div>
-                </div>
-                <div v-else-if="hasJoined" class="join-prize-button-disabled">
-                  <div class="join-prize-button-text">已参与</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="isMobile" class="join-prize-button-container-mobile">
-            <div
-              v-if="loggedIn && !hasJoined && !lotteryEnded"
-              class="join-prize-button"
-              @click="joinLottery"
-            >
-              <div class="join-prize-button-text">
-                参与抽奖 <i class="fas fa-coins"></i> {{ lottery.pointCost }}
-              </div>
-            </div>
-            <div v-else-if="hasJoined" class="join-prize-button-disabled">
-              <div class="join-prize-button-text">已参与</div>
-            </div>
-          </div>
-        </div>
-        <div class="prize-member-container">
-          <BaseImage
-            v-for="p in lotteryParticipants"
-            :key="p.id"
-            class="prize-member-avatar"
-            :src="p.avatar"
-            alt="avatar"
-            @click="gotoUser(p.id)"
-          />
-          <div v-if="lotteryEnded && lotteryWinners.length" class="prize-member-winner">
-            <i class="fas fa-medal medal-icon"></i>
-            <span class="prize-member-winner-name">获奖者: </span>
-            <BaseImage
-              v-for="w in lotteryWinners"
-              :key="w.id"
-              class="prize-member-avatar"
-              :src="w.avatar"
-              alt="avatar"
-              @click="gotoUser(w.id)"
-            />
-            <div v-if="lotteryWinners.length === 1" class="prize-member-winner-name">
-              {{ lotteryWinners[0].username }}
-            </div>
-          </div>
-        </div>
-      </div>
-
+      <PostLottery v-if="lottery" :lottery="lottery" :post-id="postId" @refresh="refreshPost" />
+      <ClientOnly>
+        <PostPoll v-if="poll" :poll="poll" :post-id="postId" @refresh="refreshPost" />
+      </ClientOnly>
       <div v-if="closed" class="post-close-container">该帖子已关闭，内容仅供阅读，无法进行互动</div>
 
       <ClientOnly>
@@ -259,6 +185,8 @@ import ArticleTags from '~/components/ArticleTags.vue'
 import ArticleCategory from '~/components/ArticleCategory.vue'
 import ReactionsGroup from '~/components/ReactionsGroup.vue'
 import DropdownMenu from '~/components/DropdownMenu.vue'
+import PostLottery from '~/components/PostLottery.vue'
+import PostPoll from '~/components/PostPoll.vue'
 import { renderMarkdown, handleMarkdownClick, stripMarkdownLength } from '~/utils/markdown'
 import { getMedalTitle } from '~/utils/medal'
 import { toast } from '~/main'
@@ -314,7 +242,6 @@ useHead(() => ({
 if (import.meta.client) {
   onBeforeUnmount(() => {
     window.removeEventListener('scroll', updateCurrentIndex)
-    if (countdownTimer) clearInterval(countdownTimer)
   })
 }
 
@@ -325,44 +252,7 @@ const loggedIn = computed(() => authState.loggedIn)
 const isAdmin = computed(() => authState.role === 'ADMIN')
 const isAuthor = computed(() => authState.username === author.value.username)
 const lottery = ref(null)
-const countdown = ref('00:00:00')
-let countdownTimer = null
-const lotteryParticipants = computed(() => lottery.value?.participants || [])
-const lotteryWinners = computed(() => lottery.value?.winners || [])
-const lotteryEnded = computed(() => {
-  if (!lottery.value || !lottery.value.endTime) return false
-  return new Date(lottery.value.endTime).getTime() <= Date.now()
-})
-const hasJoined = computed(() => {
-  if (!loggedIn.value) return false
-  return lotteryParticipants.value.some((p) => p.id === Number(authState.userId))
-})
-const updateCountdown = () => {
-  if (!lottery.value || !lottery.value.endTime) {
-    countdown.value = '00:00:00'
-    return
-  }
-  const diff = new Date(lottery.value.endTime).getTime() - Date.now()
-  if (diff <= 0) {
-    countdown.value = '00:00:00'
-    if (countdownTimer) {
-      clearInterval(countdownTimer)
-      countdownTimer = null
-    }
-    return
-  }
-  const h = String(Math.floor(diff / 3600000)).padStart(2, '0')
-  const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0')
-  const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0')
-  countdown.value = `${h}:${m}:${s}`
-}
-const startCountdown = () => {
-  if (!import.meta.client) return
-  if (countdownTimer) clearInterval(countdownTimer)
-  updateCountdown()
-  countdownTimer = setInterval(updateCountdown, 1000)
-}
-const gotoUser = (id) => navigateTo(`/users/${id}`, { replace: true })
+const poll = ref(null)
 const articleMenuItems = computed(() => {
   const items = []
   if (isAuthor.value || isAdmin.value) {
@@ -523,7 +413,7 @@ watchEffect(() => {
   rssExcluded.value = data.rssExcluded
   postTime.value = TimeManager.format(data.createdAt)
   lottery.value = data.lottery || null
-  if (lottery.value && lottery.value.endTime) startCountdown()
+  poll.value = data.poll || null
 })
 
 // 404 客户端跳转
@@ -811,25 +701,6 @@ const unsubscribePost = async () => {
     toast.success('已取消订阅')
   } else {
     toast.error('操作失败')
-  }
-}
-
-const joinLottery = async () => {
-  const token = getToken()
-  if (!token) {
-    toast.error('请先登录')
-    return
-  }
-  const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/lottery/join`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  const data = await res.json().catch(() => ({}))
-  if (res.ok) {
-    toast.success('已参与抽奖')
-    await refreshPost()
-  } else {
-    toast.error(data.error || '操作失败')
   }
 }
 
@@ -1276,139 +1147,6 @@ onMounted(async () => {
   position: relative;
 }
 
-.post-prize-container {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background-color: var(--lottery-background-color);
-  border-radius: 10px;
-  padding: 10px;
-}
-
-.prize-info {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 100%;
-  align-items: center;
-}
-
-.join-prize-button-container-mobile {
-  margin-top: 15px;
-  margin-bottom: 10px;
-}
-
-.prize-icon {
-  width: 24px;
-  height: 24px;
-}
-
-.default-prize-icon {
-  font-size: 24px;
-  opacity: 0.5;
-}
-
-.prize-icon-img {
-  width: 100%;
-  height: 100%;
-}
-
-.prize-name {
-  font-size: 13px;
-  opacity: 0.7;
-  margin-left: 10px;
-}
-
-.prize-count {
-  font-size: 13px;
-  font-weight: bold;
-  opacity: 0.7;
-  margin-left: 10px;
-  color: var(--primary-color);
-}
-
-.prize-end-time {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  font-size: 13px;
-  opacity: 0.7;
-  margin-left: 10px;
-}
-
-.prize-end-time-title {
-  font-size: 13px;
-  opacity: 0.7;
-  margin-right: 5px;
-}
-
-.prize-end-time-value {
-  font-size: 13px;
-  font-weight: bold;
-  color: var(--primary-color);
-}
-
-.prize-info-left,
-.prize-info-right {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.join-prize-button {
-  margin-left: 10px;
-  background-color: var(--primary-color);
-  color: white;
-  padding: 5px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  text-align: center;
-}
-
-.join-prize-button:hover {
-  background-color: var(--primary-color-hover);
-}
-
-.join-prize-button-disabled {
-  text-align: center;
-  margin-left: 10px;
-  background-color: var(--primary-color);
-  color: white;
-  padding: 5px 10px;
-  border-radius: 8px;
-  background-color: var(--primary-color-disabled);
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.prize-member-avatar {
-  width: 30px;
-  height: 30px;
-  margin-left: 3px;
-  border-radius: 50%;
-  object-fit: cover;
-  cursor: pointer;
-}
-
-.prize-member-winner {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 5px;
-  margin-top: 10px;
-}
-
-.medal-icon {
-  font-size: 16px;
-  color: var(--primary-color);
-}
-
-.prize-member-winner-name {
-  font-size: 13px;
-  opacity: 0.7;
-}
-
 @media (max-width: 768px) {
   .post-page-main-container {
     width: calc(100% - 20px);
@@ -1458,11 +1196,6 @@ onMounted(async () => {
 
   .loading-container {
     width: 100%;
-  }
-
-  .join-prize-button,
-  .join-prize-button-disabled {
-    margin-left: 0;
   }
 }
 </style>

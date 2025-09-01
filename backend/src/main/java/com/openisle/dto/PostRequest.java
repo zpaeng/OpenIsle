@@ -26,5 +26,8 @@ public class PostRequest {
     private Integer pointCost;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    // fields for poll posts
+    private List<String> options;
+    private Boolean multiple;
 }
 
