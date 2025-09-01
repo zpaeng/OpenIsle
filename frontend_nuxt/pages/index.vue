@@ -74,7 +74,7 @@
                 v-else-if="article.type === 'POLL'"
                 class="fa-solid fa-square-poll-vertical poll-icon"
               ></i>
-              <i class="fa-solid fa-star featured-icon"></i>
+              <i v-if="!article.rssExcluded" class="fa-solid fa-star featured-icon"></i>
               {{ article.title }}
             </NuxtLink>
             <NuxtLink class="article-item-description main-item" :to="`/posts/${article.id}`">

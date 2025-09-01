@@ -15,7 +15,7 @@
         <div class="article-title-container-right">
           <div v-if="status === 'PENDING'" class="article-pending-button">审核中</div>
           <div v-if="status === 'REJECTED'" class="article-block-button">已拒绝</div>
-          <div class="article-featured-button">精品</div>
+          <div v-if="!rssExcluded" class="article-featured-button">精品</div>
           <div v-if="closed" class="article-closed-button">已关闭</div>
           <div
             v-if="!closed && loggedIn && !isAuthor && !subscribed"
