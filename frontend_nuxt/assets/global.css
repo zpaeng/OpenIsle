@@ -245,6 +245,14 @@ body {
   overflow-x: auto; /* 小屏可横向滚动 */
 }
 
+.info-content-text hr {
+  border: none;
+  border-top: 1px solid var(--normal-border-color);
+  padding: 0;
+  height: 1px;
+  width: 100%;
+}
+
 .info-content-text thead th {
   background-color: var(--primary-color);
   color: #fff;
