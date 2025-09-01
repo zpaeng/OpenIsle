@@ -23,6 +23,18 @@
             </div>
           </div>
         </div>
+        <div class="message-control-container">
+          <div class="message-control-title">邮件通知设置</div>
+          <div class="message-control-item-container">
+            <div v-for="pref in emailPrefs" :key="pref.type" class="message-control-item">
+              <div class="message-control-item-label">{{ formatType(pref.type) }}</div>
+              <BaseSwitch
+                :model-value="pref.enabled"
+                @update:modelValue="(val) => toggleEmailPref(pref, val)"
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       <template v-else>
@@ -579,6 +591,8 @@ import {
   hasMore,
   fetchNotificationPreferences,
   updateNotificationPreference,
+  fetchEmailNotificationPreferences,
+  updateEmailNotificationPreference,
 } from '~/utils/notification'
 import TimeManager from '~/utils/time'
 import BaseSwitch from '~/components/BaseSwitch.vue'
@@ -595,6 +609,7 @@ const tabs = [
   { key: 'control', label: '消息设置' },
 ]
 const notificationPrefs = ref([])
+const emailPrefs = ref([])
 const page = ref(0)
 const pageSize = 30
 
@@ -619,6 +634,10 @@ const fetchPrefs = async () => {
   notificationPrefs.value = await fetchNotificationPreferences()
 }
 
+const fetchEmailPrefs = async () => {
+  emailPrefs.value = await fetchEmailNotificationPreferences()
+}
+
 const togglePref = async (pref, value) => {
   const ok = await updateNotificationPreference(pref.type, value)
   if (ok) {
@@ -629,6 +648,15 @@ const togglePref = async (pref, value) => {
       unread: selectedTab.value === 'unread',
     })
     await fetchUnreadCount()
+  } else {
+    toast.error('操作失败')
+  }
+}
+
+const toggleEmailPref = async (pref, value) => {
+  const ok = await updateEmailNotificationPreference(pref.type, value)
+  if (ok) {
+    pref.enabled = value
   } else {
     toast.error('操作失败')
   }
@@ -729,6 +757,7 @@ onActivated(async () => {
   page.value = 0
   await fetchNotifications({ page: 0, size: pageSize, unread: selectedTab.value === 'unread' })
   fetchPrefs()
+  fetchEmailPrefs()
 })
 </script>
 

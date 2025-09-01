@@ -116,6 +116,43 @@ export async function updateNotificationPreference(type, enabled) {
   }
 }
 
+export async function fetchEmailNotificationPreferences() {
+  try {
+    const config = useRuntimeConfig()
+    const API_BASE_URL = config.public.apiBaseUrl
+
+    const token = getToken()
+    if (!token) return []
+    const res = await fetch(`${API_BASE_URL}/api/notifications/email-prefs`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!res.ok) return []
+    return await res.json()
+  } catch (e) {
+    return []
+  }
+}
+
+export async function updateEmailNotificationPreference(type, enabled) {
+  try {
+    const config = useRuntimeConfig()
+    const API_BASE_URL = config.public.apiBaseUrl
+    const token = getToken()
+    if (!token) return false
+    const res = await fetch(`${API_BASE_URL}/api/notifications/email-prefs`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ type, enabled }),
+    })
+    return res.ok
+  } catch (e) {
+    return false
+  }
+}
+
 /**
  * 处理信息的高阶函数
  * @returns

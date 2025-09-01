@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.EnumSet;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -39,6 +40,12 @@ public class NotificationService {
     private String websiteUrl;
 
     private static final Pattern MENTION_PATTERN = Pattern.compile("@\\[([^\\]]+)\\]");
+
+    private static final Set<NotificationType> EMAIL_TYPES = EnumSet.of(
+            NotificationType.COMMENT_REPLY,
+            NotificationType.LOTTERY_WIN,
+            NotificationType.LOTTERY_DRAW
+    );
 
     private String buildPayload(String body, String url) {
         // Ensure push notifications contain a link to the related resource so
@@ -75,7 +82,8 @@ public class NotificationService {
         n = notificationRepository.save(n);
 
 //        Runnable asyncTask = () -> {
-            if (type == NotificationType.COMMENT_REPLY && user.getEmail() != null && post != null && comment != null) {
+            if (type == NotificationType.COMMENT_REPLY && user.getEmail() != null && post != null && comment != null
+                    && !user.getDisabledEmailNotificationTypes().contains(NotificationType.COMMENT_REPLY)) {
                 String url = String.format("%s/posts/%d#comment-%d", websiteUrl, post.getId(), comment.getId());
                 emailSender.sendEmail(user.getEmail(), "有人回复了你", url);
                 sendCustomPush(user, "有人回复了你", url);
@@ -179,6 +187,35 @@ public class NotificationService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
         Set<NotificationType> disabled = user.getDisabledNotificationTypes();
+        if (enabled) {
+            disabled.remove(type);
+        } else {
+            disabled.add(type);
+        }
+        userRepository.save(user);
+    }
+
+    public List<NotificationPreferenceDto> listEmailPreferences(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
+        Set<NotificationType> disabled = user.getDisabledEmailNotificationTypes();
+        List<NotificationPreferenceDto> prefs = new ArrayList<>();
+        for (NotificationType nt : EMAIL_TYPES) {
+            NotificationPreferenceDto dto = new NotificationPreferenceDto();
+            dto.setType(nt);
+            dto.setEnabled(!disabled.contains(nt));
+            prefs.add(dto);
+        }
+        return prefs;
+    }
+
+    public void updateEmailPreference(String username, NotificationType type, boolean enabled) {
+        if (!EMAIL_TYPES.contains(type)) {
+            return;
+        }
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
+        Set<NotificationType> disabled = user.getDisabledEmailNotificationTypes();
         if (enabled) {
             disabled.remove(type);
         } else {

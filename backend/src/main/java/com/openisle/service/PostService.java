@@ -374,14 +374,16 @@ public class PostService {
             lp.setWinners(winners);
             lotteryPostRepository.save(lp);
             for (User w : winners) {
-                if (w.getEmail() != null) {
+                if (w.getEmail() != null &&
+                        !w.getDisabledEmailNotificationTypes().contains(NotificationType.LOTTERY_WIN)) {
                     emailSender.sendEmail(w.getEmail(), "你中奖了", "恭喜你在抽奖贴 \"" + lp.getTitle() + "\" 中获奖");
                 }
                 notificationService.createNotification(w, NotificationType.LOTTERY_WIN, lp, null, null, lp.getAuthor(), null, null);
                 notificationService.sendCustomPush(w, "你中奖了", String.format("%s/posts/%d", websiteUrl, lp.getId()));
             }
             if (lp.getAuthor() != null) {
-                if (lp.getAuthor().getEmail() != null) {
+                if (lp.getAuthor().getEmail() != null &&
+                        !lp.getAuthor().getDisabledEmailNotificationTypes().contains(NotificationType.LOTTERY_DRAW)) {
                     emailSender.sendEmail(lp.getAuthor().getEmail(), "抽奖已开奖", "您的抽奖贴 \"" + lp.getTitle() + "\" 已开奖");
                 }
                 notificationService.createNotification(lp.getAuthor(), NotificationType.LOTTERY_DRAW, lp, null, null, null, null, null);
