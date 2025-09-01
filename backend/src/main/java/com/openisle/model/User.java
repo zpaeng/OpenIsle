@@ -74,6 +74,12 @@ public class User {
             NotificationType.USER_ACTIVITY
     );
 
+    @ElementCollection(targetClass = NotificationType.class)
+    @CollectionTable(name = "user_disabled_email_notification_types", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "notification_type")
+    @Enumerated(EnumType.STRING)
+    private Set<NotificationType> disabledEmailNotificationTypes = EnumSet.noneOf(NotificationType.class);
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false,
             columnDefinition = "DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6)")

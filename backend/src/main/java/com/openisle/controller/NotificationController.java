@@ -62,4 +62,14 @@ public class NotificationController {
     public void updatePref(@RequestBody NotificationPreferenceUpdateRequest req, Authentication auth) {
         notificationService.updatePreference(auth.getName(), req.getType(), req.isEnabled());
     }
+
+    @GetMapping("/email-prefs")
+    public List<NotificationPreferenceDto> emailPrefs(Authentication auth) {
+        return notificationService.listEmailPreferences(auth.getName());
+    }
+
+    @PostMapping("/email-prefs")
+    public void updateEmailPref(@RequestBody NotificationPreferenceUpdateRequest req, Authentication auth) {
+        notificationService.updateEmailPreference(auth.getName(), req.getType(), req.isEnabled());
+    }
 }
