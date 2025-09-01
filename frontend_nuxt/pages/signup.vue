@@ -68,44 +68,15 @@
       </div>
     </div>
 
-    <div class="other-signup-page-content">
-      <div class="signup-page-button" @click="signupWithGoogle">
-        <img class="signup-page-button-icon" src="~/assets/icons/google.svg" alt="Google Logo" />
-        <div class="signup-page-button-text">Google 注册</div>
-      </div>
-      <div class="signup-page-button" @click="signupWithGithub">
-        <img class="signup-page-button-icon" src="~/assets/icons/github.svg" alt="GitHub Logo" />
-        <div class="signup-page-button-text">GitHub 注册</div>
-      </div>
-      <div class="signup-page-button" @click="signupWithDiscord">
-        <img class="signup-page-button-icon" src="~/assets/icons/discord.svg" alt="Discord Logo" />
-        <div class="signup-page-button-text">Discord 注册</div>
-      </div>
-      <div class="signup-page-button" @click="signupWithTwitter">
-        <img class="signup-page-button-icon" src="~/assets/icons/twitter.svg" alt="Twitter Logo" />
-        <div class="signup-page-button-text">Twitter 注册</div>
-      </div>
-      <div class="signup-page-button" @click="signupWithTelegram">
-        <img
-          class="signup-page-button-icon"
-          src="~/assets/icons/telegram.svg"
-          alt="Telegram Logo"
-        />
-        <div class="signup-page-button-text">Telegram 注册</div>
-      </div>
-    </div>
+    <ThirdPartyAuth mode="signup" :invite-token="inviteToken" />
   </div>
 </template>
 
 <script setup>
 import BaseInput from '~/components/BaseInput.vue'
 import { toast } from '~/main'
-import { discordAuthorize } from '~/utils/discord'
-import { githubAuthorize } from '~/utils/github'
-import { googleAuthorize } from '~/utils/google'
-import { twitterAuthorize } from '~/utils/twitter'
-import { telegramAuthorize } from '~/utils/telegram'
 import { loadCurrentUser, setToken } from '~/utils/auth'
+import ThirdPartyAuth from '~/components/ThirdPartyAuth.vue'
 
 const route = useRoute()
 const config = useRuntimeConfig()
@@ -225,21 +196,6 @@ const verifyCode = async () => {
     isWaitingForEmailVerified.value = false
   }
 }
-const signupWithGoogle = () => {
-  googleAuthorize(inviteToken.value)
-}
-const signupWithGithub = () => {
-  githubAuthorize(inviteToken.value)
-}
-const signupWithDiscord = () => {
-  discordAuthorize(inviteToken.value)
-}
-const signupWithTwitter = () => {
-  twitterAuthorize(inviteToken.value)
-}
-const signupWithTelegram = () => {
-  telegramAuthorize(inviteToken.value)
-}
 </script>
 
 <style scoped>
@@ -312,16 +268,6 @@ const signupWithTelegram = () => {
   font-size: 16px;
 }
 
-.other-signup-page-content {
-  margin-left: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 30%;
-  gap: 20px;
-}
-
 .signup-page-button-primary {
   margin-top: 20px;
   display: flex;
@@ -349,29 +295,6 @@ const signupWithTelegram = () => {
 
 .signup-page-button-primary:hover {
   background-color: var(--primary-color-hover);
-}
-
-.signup-page-button {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 20px;
-  background-color: var(--login-background-color);
-  border: 1px solid var(--normal-border-color);
-  border-radius: 10px;
-  cursor: pointer;
-  min-width: 150px;
-  gap: 10px;
-}
-
-.signup-page-button:hover {
-  background-color: var(--login-background-color-hover);
-}
-
-.signup-page-button-icon {
-  width: 20px;
-  height: 20px;
 }
 
 .signup-page-button-text {
@@ -422,17 +345,6 @@ const signupWithTelegram = () => {
   .signup-page-button-secondary {
     margin-top: 0px;
     font-size: 13px;
-  }
-
-  .other-signup-page-content {
-    margin-top: 20px;
-    margin-left: 0px;
-    width: calc(100% - 40px);
-    gap: 10px;
-  }
-
-  .signup-page-button {
-    width: calc(100% - 40px);
   }
 }
 </style>
