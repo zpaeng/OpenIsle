@@ -7,8 +7,13 @@
       :class="provider.name"
       @click="provider.action"
     >
-      <img class="third-party-button-icon" :src="provider.icon" :alt="provider.alt" />
-      <div class="third-party-button-text">
+      <img
+        class="third-party-button-icon"
+        :class="provider.name"
+        :src="provider.icon"
+        :alt="provider.alt"
+      />
+      <div class="third-party-button-text" :class="provider.name">
         {{ provider.label }}
       </div>
     </div>
@@ -68,7 +73,7 @@ const providers = computed(() => [
     icon: twitterIcon,
     action: () => twitterAuthorize(props.inviteToken),
     alt: 'Twitter Logo',
-    label: `Twitter ${actionText.value}`,
+    label: `X ${actionText.value}`,
   },
   {
     name: 'telegram',
@@ -88,7 +93,7 @@ const providers = computed(() => [
   align-items: center;
   justify-content: center;
   width: 30%;
-  gap: 20px;
+  gap: 11px;
 }
 
 .third-party-button {
@@ -96,11 +101,11 @@ const providers = computed(() => [
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  padding: 10px 20px;
+  padding: 7px 20px;
   min-width: 150px;
   background-color: var(--login-background-color);
   border: 1px solid var(--normal-border-color);
-  border-radius: 10px;
+  border-radius: 20px;
   cursor: pointer;
   gap: 10px;
 }
@@ -116,6 +121,10 @@ const providers = computed(() => [
 
 .third-party-button-text {
   font-size: 16px;
+}
+
+.third-party-button-text.twitter {
+  color: rgb(182, 182, 182);
 }
 
 /* Provider specific classes for customization */

@@ -35,6 +35,12 @@
   --article-info-background-color: #f0f0f0;
   --activity-card-background-color: #fafafa;
   --poll-option-button-background-color: rgb(218, 218, 218);
+  --telegram-bg: #caedff74;
+  --telegram-bg-hover: #67a2c088;
+  --twitter-bg: rgb(68, 68, 68);
+  --twitter-bg-hover: rgb(91, 91, 91);
+  --discord-bg: #5865f258;
+  --discord-bg-hover: #5865f2b1;
 }
 
 [data-theme='dark'] {
