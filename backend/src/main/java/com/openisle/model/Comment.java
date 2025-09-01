@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
@@ -13,6 +15,8 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @Table(name = "comments")
+@SQLDelete(sql = "UPDATE comments SET deleted_at = CURRENT_TIMESTAMP(6) WHERE id = ?")
+@Where(clause = "deleted_at IS NULL")
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,5 +44,8 @@ public class Comment {
 
     @Column
     private LocalDateTime pinnedAt;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
 }
