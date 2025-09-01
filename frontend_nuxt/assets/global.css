@@ -41,6 +41,7 @@
   --twitter-bg-hover: rgb(91, 91, 91);
   --discord-bg: #5865f258;
   --discord-bg-hover: #5865f2b1;
+  --featured-color: rgb(255, 170, 0);
 }
 
 [data-theme='dark'] {

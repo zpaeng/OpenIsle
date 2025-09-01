@@ -74,6 +74,7 @@
                 v-else-if="article.type === 'POLL'"
                 class="fa-solid fa-square-poll-vertical poll-icon"
               ></i>
+              <i class="fa-solid fa-star featured-icon"></i>
               {{ article.title }}
             </NuxtLink>
             <NuxtLink class="article-item-description main-item" :to="`/posts/${article.id}`">
@@ -547,9 +548,14 @@ const sanitizeDescription = (text) => stripMarkdown(text)
 
 .pinned-icon,
 .lottery-icon,
+.featured-icon,
 .poll-icon {
   margin-right: 4px;
   color: var(--primary-color);
+}
+
+.featured-icon {
+  color: var(--featured-color);
 }
 
 .article-item-description {
