@@ -14,9 +14,9 @@ export function telegramAuthorize(inviteToken = '') {
   const url =
     `https://oauth.telegram.org/auth` +
     `?bot_id=${encodeURIComponent(TELEGRAM_BOT_ID)}` +
-    `&origin=${encodeURIComponent(WEBSITE_BASE_URL)}` +
-    `&request_access=write` +
-    `&redirect_uri=${encodeURIComponent(redirectUri)}`
+    `&origin=${encodeURIComponent(redirectUri)}` +
+    `&request_access=write`
+  // `&redirect_uri=${encodeURIComponent(redirectUri)}`
   window.location.href = url
 }
 

@@ -4,6 +4,7 @@
 
 <script setup>
 import CallbackPage from '~/components/CallbackPage.vue'
+import { I } from '~/dist/_nuxt/F7ewH_Zb'
 import { telegramExchange } from '~/utils/telegram'
 
 onMounted(async () => {
@@ -17,7 +18,8 @@ onMounted(async () => {
   }
   let authData
   try {
-    const parsed = JSON.parse(decodeURIComponent(hash))
+    const decoded = atob(hash)
+    const parsed = JSON.parse(decoded)
     authData = {
       id: String(parsed.id),
       firstName: parsed.first_name,
