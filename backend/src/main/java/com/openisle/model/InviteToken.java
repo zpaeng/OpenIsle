@@ -14,6 +14,13 @@ public class InviteToken {
     @Id
     private String token;
 
+    /**
+     * Short token used in invite links. Existing records may have this field null
+     * and fall back to {@link #token} for backward compatibility.
+     */
+    @Column(unique = true)
+    private String shortToken;
+
     @ManyToOne
     private User inviter;
 
