@@ -58,7 +58,9 @@
         </div>
         <div class="profile-info-item">
           <div class="profile-info-item-label">最后发帖时间:</div>
-          <div class="profile-info-item-value">{{ formatDate(user.lastPostTime) }}</div>
+          <div class="profile-info-item-value">
+            {{ user.lastPostTime != null ? formatDate(user.lastPostTime) : '暂无帖子' }}
+          </div>
         </div>
         <div class="profile-info-item">
           <div class="profile-info-item-label">最后评论时间:</div>
