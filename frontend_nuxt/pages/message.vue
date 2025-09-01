@@ -14,13 +14,15 @@
         <div class="message-control-container">
           <div class="message-control-title">通知设置</div>
           <div class="message-control-item-container">
-            <div v-for="pref in notificationPrefs" :key="pref.type" class="message-control-item">
-              <div class="message-control-item-label">{{ formatType(pref.type) }}</div>
-              <BaseSwitch
-                :model-value="pref.enabled"
-                @update:modelValue="(val) => togglePref(pref, val)"
-              />
-            </div>
+            <template v-for="pref in notificationPrefs"> 
+              <div v-if="canShowNotification(pref.type)" :key="pref.type" class="message-control-item">
+                <div class="message-control-item-label">{{ formatType(pref.type) }}</div>
+                <BaseSwitch
+                  :model-value="pref.enabled"
+                  @update:modelValue="(val) => togglePref(pref, val)"
+                />
+              </div>
+            </template>
           </div>
         </div>
         <div class="message-control-container">
@@ -751,6 +753,14 @@ const formatType = (t) => {
     default:
       return t
   }
+}
+
+const isAdmin = computed(() => authState.role === 'ADMIN')
+
+const needAdminSet = new Set(['POST_REVIEW_REQUEST','REGISTER_REQUEST', 'POINT_REDEEM', 'ACTIVITY_REDEEM'])
+
+const canShowNotification = (type) => {
+  return !needAdminSet.has(type) || isAdmin.value
 }
 
 onActivated(async () => {
