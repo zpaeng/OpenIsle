@@ -22,6 +22,8 @@ class PostServiceTest {
         CategoryRepository catRepo = mock(CategoryRepository.class);
         TagRepository tagRepo = mock(TagRepository.class);
         LotteryPostRepository lotteryRepo = mock(LotteryPostRepository.class);
+        PollPostRepository pollPostRepo = mock(PollPostRepository.class);
+        PollVoteRepository pollVoteRepo = mock(PollVoteRepository.class);
         NotificationService notifService = mock(NotificationService.class);
         SubscriptionService subService = mock(SubscriptionService.class);
         CommentService commentService = mock(CommentService.class);
@@ -37,7 +39,7 @@ class PostServiceTest {
         PointService pointService = mock(PointService.class);
 
         PostService service = new PostService(postRepo, userRepo, catRepo, tagRepo, lotteryRepo,
-                notifService, subService, commentService, commentRepo,
+                pollPostRepo, pollVoteRepo, notifService, subService, commentService, commentRepo,
                 reactionRepo, subRepo, notificationRepo, postReadService,
                 imageUploader, taskScheduler, emailSender, context, pointService, PublishMode.DIRECT);
         when(context.getBean(PostService.class)).thenReturn(service);
@@ -69,6 +71,8 @@ class PostServiceTest {
         CategoryRepository catRepo = mock(CategoryRepository.class);
         TagRepository tagRepo = mock(TagRepository.class);
         LotteryPostRepository lotteryRepo = mock(LotteryPostRepository.class);
+        PollPostRepository pollPostRepo = mock(PollPostRepository.class);
+        PollVoteRepository pollVoteRepo = mock(PollVoteRepository.class);
         NotificationService notifService = mock(NotificationService.class);
         SubscriptionService subService = mock(SubscriptionService.class);
         CommentService commentService = mock(CommentService.class);
@@ -84,7 +88,7 @@ class PostServiceTest {
         PointService pointService = mock(PointService.class);
 
         PostService service = new PostService(postRepo, userRepo, catRepo, tagRepo, lotteryRepo,
-                notifService, subService, commentService, commentRepo,
+                pollPostRepo, pollVoteRepo, notifService, subService, commentService, commentRepo,
                 reactionRepo, subRepo, notificationRepo, postReadService,
                 imageUploader, taskScheduler, emailSender, context, pointService, PublishMode.DIRECT);
         when(context.getBean(PostService.class)).thenReturn(service);
@@ -122,6 +126,8 @@ class PostServiceTest {
         CategoryRepository catRepo = mock(CategoryRepository.class);
         TagRepository tagRepo = mock(TagRepository.class);
         LotteryPostRepository lotteryRepo = mock(LotteryPostRepository.class);
+        PollPostRepository pollPostRepo = mock(PollPostRepository.class);
+        PollVoteRepository pollVoteRepo = mock(PollVoteRepository.class);
         NotificationService notifService = mock(NotificationService.class);
         SubscriptionService subService = mock(SubscriptionService.class);
         CommentService commentService = mock(CommentService.class);
@@ -137,7 +143,7 @@ class PostServiceTest {
         PointService pointService = mock(PointService.class);
 
         PostService service = new PostService(postRepo, userRepo, catRepo, tagRepo, lotteryRepo,
-                notifService, subService, commentService, commentRepo,
+                pollPostRepo, pollVoteRepo, notifService, subService, commentService, commentRepo,
                 reactionRepo, subRepo, notificationRepo, postReadService,
                 imageUploader, taskScheduler, emailSender, context, pointService, PublishMode.DIRECT);
         when(context.getBean(PostService.class)).thenReturn(service);
@@ -156,6 +162,8 @@ class PostServiceTest {
         CategoryRepository catRepo = mock(CategoryRepository.class);
         TagRepository tagRepo = mock(TagRepository.class);
         LotteryPostRepository lotteryRepo = mock(LotteryPostRepository.class);
+        PollPostRepository pollPostRepo = mock(PollPostRepository.class);
+        PollVoteRepository pollVoteRepo = mock(PollVoteRepository.class);
         NotificationService notifService = mock(NotificationService.class);
         SubscriptionService subService = mock(SubscriptionService.class);
         CommentService commentService = mock(CommentService.class);
@@ -171,7 +179,7 @@ class PostServiceTest {
         PointService pointService = mock(PointService.class);
 
         PostService service = new PostService(postRepo, userRepo, catRepo, tagRepo, lotteryRepo,
-                notifService, subService, commentService, commentRepo,
+                pollPostRepo, pollVoteRepo, notifService, subService, commentService, commentRepo,
                 reactionRepo, subRepo, notificationRepo, postReadService,
                 imageUploader, taskScheduler, emailSender, context, pointService, PublishMode.DIRECT);
         when(context.getBean(PostService.class)).thenReturn(service);
