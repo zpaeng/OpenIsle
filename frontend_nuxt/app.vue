@@ -58,6 +58,7 @@ const hideMenu = computed(() => {
     '/discord-callback',
     '/forgot-password',
     '/google-callback',
+    '/telegram-callback',
   ].includes(useRoute().path)
 })
 

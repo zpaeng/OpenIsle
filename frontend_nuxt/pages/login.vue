@@ -51,6 +51,14 @@
         <img class="login-page-button-icon" src="../assets/icons/twitter.svg" alt="Twitter Logo" />
         <div class="login-page-button-text">Twitter 登录</div>
       </div>
+      <div class="login-page-button" @click="loginWithTelegram">
+        <img
+          class="login-page-button-icon"
+          src="../assets/icons/telegram.svg"
+          alt="Telegram Logo"
+        />
+        <div class="login-page-button-text">Telegram 登录</div>
+      </div>
     </div>
   </div>
 </template>
@@ -62,6 +70,7 @@ import { googleAuthorize } from '~/utils/google'
 import { githubAuthorize } from '~/utils/github'
 import { discordAuthorize } from '~/utils/discord'
 import { twitterAuthorize } from '~/utils/twitter'
+import { telegramAuthorize } from '~/utils/telegram'
 import BaseInput from '~/components/BaseInput.vue'
 import { registerPush } from '~/utils/push'
 const config = useRuntimeConfig()
@@ -117,6 +126,9 @@ const loginWithDiscord = () => {
 }
 const loginWithTwitter = () => {
   twitterAuthorize()
+}
+const loginWithTelegram = () => {
+  telegramAuthorize()
 }
 </script>
 
