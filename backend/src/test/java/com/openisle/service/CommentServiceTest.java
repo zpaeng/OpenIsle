@@ -7,6 +7,7 @@ import com.openisle.repository.ReactionRepository;
 import com.openisle.repository.CommentSubscriptionRepository;
 import com.openisle.repository.NotificationRepository;
 import com.openisle.repository.PointHistoryRepository;
+import com.openisle.service.PointService;
 import com.openisle.exception.RateLimitException;
 import org.junit.jupiter.api.Test;
 
@@ -26,10 +27,11 @@ class CommentServiceTest {
         CommentSubscriptionRepository subRepo = mock(CommentSubscriptionRepository.class);
         NotificationRepository nRepo = mock(NotificationRepository.class);
         PointHistoryRepository pointHistoryRepo = mock(PointHistoryRepository.class);
+        PointService pointService = mock(PointService.class);
         ImageUploader imageUploader = mock(ImageUploader.class);
 
         CommentService service = new CommentService(commentRepo, postRepo, userRepo,
-                notifService, subService, reactionRepo, subRepo, nRepo, pointHistoryRepo, imageUploader);
+                notifService, subService, reactionRepo, subRepo, nRepo, pointHistoryRepo, pointService, imageUploader);
 
         when(commentRepo.countByAuthorAfter(eq("alice"), any())).thenReturn(3L);
 

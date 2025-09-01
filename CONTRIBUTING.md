@@ -76,11 +76,13 @@ cp .env.staging.example .env
 
 ```yaml
 ; 本地部署后端
-NUXT_PUBLIC_API_BASE_URL=https://127.0.0.1:8081
+NUXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8081
 ; 预发环境后端
 ; NUXT_PUBLIC_API_BASE_URL=https://staging.open-isle.com
 ; 生产环境后端
 ; NUXT_PUBLIC_API_BASE_URL=https://www.open-isle.com
+; 开发环境
+NUXT_PUBLIC_WEBSITE_BASE_URL=localhost:3000
 ```
 
 2. 依赖预发环境后台环境
