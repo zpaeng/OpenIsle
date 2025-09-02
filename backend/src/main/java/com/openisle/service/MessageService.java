@@ -73,7 +73,7 @@ public class MessageService {
 
         
         try {
-            MessageDto messageDto = toDto(message)
+            MessageDto messageDto = toDto(message);
             
             long unreadCount = getUnreadMessageCount(recipientId);
 
