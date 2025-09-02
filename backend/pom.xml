@@ -114,6 +114,11 @@
       <artifactId>bcprov-jdk15on</artifactId>
       <version>1.70</version>
     </dependency>
+    <dependency>
+      <groupId>org.springdoc</groupId>
+      <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+      <version>2.2.0</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -139,6 +144,26 @@
               <version>1.18.32</version>
             </path>
           </annotationProcessorPaths>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <!-- https://github.com/OpenAPITools/openapi-generator/blob/master/modules/openapi-generator-maven-plugin/README.md -->
+        <groupId>org.springdoc</groupId>
+        <artifactId>springdoc-openapi-maven-plugin</artifactId>
+        <version>1.4</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <!-- 此处为硬编码，应优化为 env 的配置 -->
+          <apiDocsUrl>http://localhost:8080/v3/api-docs</apiDocsUrl>
+          <outputFileName>openapi.json</outputFileName>
+          <outputDir>${project.build.directory}</outputDir>
         </configuration>
       </plugin>
     </plugins>
