@@ -1,5 +1,6 @@
 package com.openisle.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ public class MessageParticipant {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "conversation_id")
+    @JsonBackReference
     private MessageConversation conversation;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)

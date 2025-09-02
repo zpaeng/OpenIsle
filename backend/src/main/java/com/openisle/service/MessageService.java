@@ -16,16 +16,18 @@ import com.openisle.dto.MessageDto;
 import com.openisle.dto.ReactionDto;
 import com.openisle.dto.UserSummaryDto;
 import com.openisle.mapper.ReactionMapper;
+import com.openisle.dto.MessageNotificationPayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,7 +39,7 @@ public class MessageService {
     private final MessageConversationRepository conversationRepository;
     private final MessageParticipantRepository participantRepository;
     private final UserRepository userRepository;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final NotificationProducer notificationProducer;
     private final ReactionRepository reactionRepository;
     private final ReactionMapper reactionMapper;
 
@@ -69,26 +71,41 @@ public class MessageService {
         conversationRepository.save(conversation);
         log.info("Conversation {} updated with last message ID {}", conversation.getId(), message.getId());
 
-        // Broadcast the new message to subscribed clients
-        MessageDto messageDto = toDto(message);
-        String conversationDestination = "/topic/conversation/" + conversation.getId();
-        messagingTemplate.convertAndSend(conversationDestination, messageDto);
-        log.info("Message {} broadcasted to destination: {}", message.getId(), conversationDestination);
-
-        // Also notify the recipient on their personal channel to update the conversation list
-        String userDestination = "/topic/user/" + recipient.getId() + "/messages";
-        messagingTemplate.convertAndSend(userDestination, messageDto);
-        log.info("Message {} notification sent to destination: {}", message.getId(), userDestination);
-
-        // Notify recipient of new unread count
-        long unreadCount = getUnreadMessageCount(recipientId);
-        log.info("Calculating unread count for user {}: {}", recipientId, unreadCount);
         
-        // Send using username instead of user ID for WebSocket routing
-        String recipientUsername = recipient.getUsername();
-        messagingTemplate.convertAndSendToUser(recipientUsername, "/queue/unread-count", unreadCount);
-        log.info("Sent unread count {} to user {} (username: {}) via WebSocket destination: /user/{}/queue/unread-count",
-                unreadCount, recipientId, recipientUsername, recipientUsername);
+        try {
+            MessageDto messageDto = toDto(message)
+            
+            long unreadCount = getUnreadMessageCount(recipientId);
+
+            // 创建包含对话和参与者信息的完整payload
+            Map<String, Object> conversationInfo = new HashMap<>();
+            conversationInfo.put("id", conversation.getId());
+            conversationInfo.put("participants", conversation.getParticipants().stream()
+                .map(p -> {
+                    Map<String, Object> participantInfo = new HashMap<>();
+                    participantInfo.put("userId", p.getUser().getId());
+                    participantInfo.put("username", p.getUser().getUsername());
+                    return participantInfo;
+                }).collect(Collectors.toList()));
+            
+            Map<String, Object> combinedPayload = new HashMap<>();
+            combinedPayload.put("message", messageDto);
+            combinedPayload.put("unreadCount", unreadCount);
+            combinedPayload.put("conversation", conversationInfo);
+            combinedPayload.put("senderId", senderId);
+            if (notificationProducer != null) {
+                log.info("NotificationProducer is available");
+            } else {
+                log.info("ERROR: NotificationProducer is NULL!");
+                return message;
+            }
+            log.info("Recipient username: {}", recipient.getUsername());
+            
+            notificationProducer.sendNotification(new MessageNotificationPayload(recipient.getUsername(), combinedPayload));
+            log.info("=== Notification call completed ===");
+        } catch (Exception e) {
+            log.error("=== Error in notification process ===", e);
+        }
 
         return message;
     }
@@ -97,7 +114,7 @@ public class MessageService {
     public Message sendMessageToConversation(Long senderId, Long conversationId, String content, Long replyToId) {
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new IllegalArgumentException("Sender not found"));
-        MessageConversation conversation = conversationRepository.findById(conversationId)
+        MessageConversation conversation = conversationRepository.findByIdWithParticipantsAndUsers(conversationId)
                 .orElseThrow(() -> new IllegalArgumentException("Conversation not found"));
 
         // Join the conversation if not already a participant (useful for channels)
@@ -125,20 +142,33 @@ public class MessageService {
 
         MessageDto messageDto = toDto(message);
         String conversationDestination = "/topic/conversation/" + conversation.getId();
-        messagingTemplate.convertAndSend(conversationDestination, messageDto);
 
-        // Notify all participants except sender for updates
         for (MessageParticipant participant : conversation.getParticipants()) {
             if (participant.getUser().getId().equals(senderId)) continue;
-            String userDestination = "/topic/user/" + participant.getUser().getId() + "/messages";
-            messagingTemplate.convertAndSend(userDestination, messageDto);
-
+            
             long unreadCount = getUnreadMessageCount(participant.getUser().getId());
-            String username = participant.getUser().getUsername();
-            messagingTemplate.convertAndSendToUser(username, "/queue/unread-count", unreadCount);
-
             long channelUnread = getUnreadChannelCount(participant.getUser().getId());
-            messagingTemplate.convertAndSendToUser(username, "/queue/channel-unread", channelUnread);
+
+            Map<String, Object> combinedPayload = new HashMap<>();
+            combinedPayload.put("message", messageDto);
+
+            Map<String, Object> conversationInfo = new HashMap<>();
+            conversationInfo.put("id", conversation.getId());
+            conversationInfo.put("participants", conversation.getParticipants().stream()
+                    .filter(item -> participant.getUser().getId().equals(item.getUser().getId()))
+                    .map(p -> {
+                        Map<String, Object> participantInfo = new HashMap<>();
+                        participantInfo.put("userId", p.getUser().getId());
+                        participantInfo.put("username", p.getUser().getUsername());
+                        return participantInfo;
+                    }).collect(Collectors.toList()));
+
+            combinedPayload.put("conversation", conversationInfo);
+            combinedPayload.put("senderId", senderId);
+            combinedPayload.put("unreadCount", unreadCount);
+            combinedPayload.put("channelUnread", channelUnread);
+
+            notificationProducer.sendNotification(new MessageNotificationPayload(participant.getUser().getUsername(), combinedPayload));
         }
 
         return message;
