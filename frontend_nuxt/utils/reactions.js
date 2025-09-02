@@ -2,7 +2,11 @@ const toCdnUrl = (emoji) => {
   const codepoints = Array.from(emoji)
     .map((c) => c.codePointAt(0).toString(16))
     .join('_')
-  return `https://fonts.gstatic.com/s/e/notoemoji/latest/${codepoints}/emoji.svg`
+  // 国外镜像有点小卡 (=ﾟωﾟ)ﾉ, 国内大部分地区访问时会触发 SNI 封锁 / DNS 污染
+  // return `https://fonts.gstatic.com/s/e/notoemoji/latest/${codepoints}/emoji.svg`
+
+  // loli.net（即字节系开源社区 mirror，比如 jsDelivr 中国优化节点背后的 CDN 体系）. 不会被墙
+  return `https://gstatic.loli.net/s/e/notoemoji/latest/${codepoints}/emoji.svg`
 }
 
 export const reactionEmojiMap = {
