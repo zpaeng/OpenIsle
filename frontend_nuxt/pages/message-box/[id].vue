@@ -100,10 +100,9 @@ import BasePlaceholder from '~/components/BasePlaceholder.vue'
 const config = useRuntimeConfig()
 const route = useRoute()
 const API_BASE_URL = config.public.apiBaseUrl
-const { connect, disconnect, subscribe, isConnected } = useWebSocket()
+const { connect, subscribe, unsubscribe, isConnected } = useWebSocket()
 const { fetchUnreadCount: refreshGlobalUnreadCount } = useUnreadCount()
 const { fetchChannelUnread: refreshChannelUnread } = useChannelsUnreadCount()
-let subscription = null
 
 const messages = ref([])
 const participants = ref([])
@@ -338,8 +337,12 @@ onMounted(async () => {
     // 初次进入频道时，平滑滚动到底部
     scrollToBottomSmooth()
     const token = getToken()
-    if (token && !isConnected.value) {
-      connect(token)
+    if (token) {
+      if (isConnected.value) {
+        subscribeToConversation()
+      } else {
+        connect(token)
+      }
     }
   } else {
     toast.error('请先登录')
@@ -347,26 +350,39 @@ onMounted(async () => {
   }
 })
 
+const subscribeToConversation = () => {
+  if (!currentUser.value) return;
+  const destination = `/topic/conversation/${conversationId}`
+  
+  subscribe(destination, async (message) => {
+    try {
+      const parsedMessage = JSON.parse(message.body)
+
+      if (parsedMessage.sender && parsedMessage.sender.id === currentUser.value.id) {
+        return
+      }
+
+      messages.value.push({
+        ...parsedMessage,
+        src: parsedMessage.sender.avatar,
+        iconClick: () => openUser(parsedMessage.sender.id),
+      })
+
+      await markConversationAsRead()
+      await nextTick()
+      
+      if (isUserNearBottom.value) {
+        scrollToBottomSmooth()
+      }
+    } catch (e) {
+      console.error("Failed to parse websocket message", e)
+    }
+  })
+}
+
 watch(isConnected, (newValue) => {
   if (newValue) {
-    setTimeout(() => {
-      subscription = subscribe(`/topic/conversation/${conversationId}`, async (message) => {
-        // 避免重复显示当前用户发送的消息
-        if (message.sender.id !== currentUser.value.id) {
-          messages.value.push({
-            ...message,
-            src: message.sender.avatar,
-            iconClick: () => {
-              openUser(message.sender.id)
-            },
-          })
-          // 收到消息后只标记已读，不强制滚动（符合“非发送不拉底”）
-          markConversationAsRead()
-          await nextTick()
-          updateNearBottom()
-        }
-      })
-    }, 500)
+    subscribeToConversation()
   }
 })
 
@@ -377,7 +393,12 @@ onActivated(async () => {
     await markConversationAsRead()
     await nextTick()
     updateNearBottom()
-    if (!isConnected.value) {
+    
+    if (isConnected.value) {
+      // 如果已连接，重新订阅
+      subscribeToConversation()
+    } else {
+      // 如果未连接，则发起连接
       const token = getToken()
       if (token) connect(token)
     }
@@ -385,22 +406,17 @@ onActivated(async () => {
 })
 
 onDeactivated(() => {
-  if (subscription) {
-    subscription.unsubscribe()
-    subscription = null
-  }
-  disconnect()
+  const destination = `/topic/conversation/${conversationId}`
+  unsubscribe(destination)
 })
 
 onUnmounted(() => {
-  if (subscription) {
-    subscription.unsubscribe()
-    subscription = null
-  }
+  const destination = `/topic/conversation/${conversationId}`
+  unsubscribe(destination)
+
   if (messagesListEl.value) {
     messagesListEl.value.removeEventListener('scroll', updateNearBottom)
   }
-  disconnect()
 })
 
 function minimize() {
