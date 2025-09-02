@@ -14,7 +14,7 @@
             :class="{ selected: userReacted(r.type) }"
             @click="toggleReaction(r.type)"
           >
-            <BaseImage :src="reactionEmojiMap[r.type]" class="emoji" alt="emoji" />
+            <BaseImage :src="reactionEmojiMap[r.type]" class="reaction-emoji" alt="emoji" />
             <div>{{ counts[r.type] }}</div>
           </div>
 
@@ -220,6 +220,7 @@ onMounted(async () => {
   align-items: center;
   width: 100%;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .reactions-viewer {
@@ -227,6 +228,12 @@ onMounted(async () => {
   flex-direction: row;
   gap: 20px;
   align-items: center;
+}
+
+.reaction-emoji {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
 }
 
 .reactions-viewer-item-container {
@@ -336,6 +343,24 @@ onMounted(async () => {
   .make-reaction-item {
     font-size: 16px;
     padding: 3px 5px;
+  }
+
+  .reactions-viewer-item.placeholder,
+  .reactions-viewer-single-item {
+    padding: 4px 8px;
+    gap: 3px;
+    border: 1px solid var(--normal-border-color);
+    border-radius: 10px;
+    margin-right: 3px;
+    margin-bottom: 3px;
+    font-size: 12px;
+    color: var(--text-color);
+    align-items: center;
+  }
+
+  .reaction-emoji {
+    width: 14px;
+    height: 14px;
   }
 }
 </style>
