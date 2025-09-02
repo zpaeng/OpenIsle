@@ -16,7 +16,8 @@
           <div class="prize-count">x {{ lottery.prizeCount }}</div>
         </div>
         <div class="prize-end-time prize-info-right">
-          <div v-if="!isMobile" class="prize-end-time-title"><i class="fas fa-stopwatch"></i>距离结束还有</div>
+          <i class="fas fa-stopwatch prize-end-time-icon"></i>
+          <div v-if="!isMobile" class="prize-end-time-title">离结束</div>
           <div class="prize-end-time-value">{{ countdown }}</div>
           <div v-if="!isMobile" class="join-prize-button-container-desktop">
             <div
@@ -188,6 +189,10 @@ const joinLottery = async () => {
   font-size: 13px;
   opacity: 0.7;
   margin-left: 10px;
+}
+
+.prize-end-time-icon {
+  font-size: 13px;
 }
 
 .prize-end-time-title {

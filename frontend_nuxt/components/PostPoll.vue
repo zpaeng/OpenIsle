@@ -34,7 +34,8 @@
             <div class="poll-option-title" v-else>单选</div>
 
             <div class="poll-left-time">
-              <div class="poll-left-time-title"><i class="fas fa-stopwatch"></i>距离结束还有</div>
+              <i class="fas fa-stopwatch poll-left-time-icon"></i>
+              <div class="poll-left-time-title">离结束</div>
               <div class="poll-left-time-value">{{ countdown }}</div>
             </div>
           </div>
@@ -109,7 +110,8 @@
       <div v-else class="poll-option-hint">
         <div>您已投票，等待结束查看结果</div>
         <div class="poll-left-time">
-          <div class="poll-left-time-title"><i class="fas fa-stopwatch"></i>距离结束还有</div>
+          <i class="fas fa-stopwatch poll-left-time-icon"></i>
+          <div class="poll-left-time-title">离结束</div>
           <div class="poll-left-time-value">{{ countdown }}</div>
         </div>
       </div>
@@ -324,6 +326,18 @@ const submitMultiPoll = async () => {
   align-items: center;
   justify-content: center;
   gap: 5px;
+}
+
+.poll-left-time-icon {
+  font-size: 13px;
+}
+
+.poll-option-hint {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .poll-left-time-title {
