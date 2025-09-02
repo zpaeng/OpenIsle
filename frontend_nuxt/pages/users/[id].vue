@@ -895,6 +895,7 @@ watch(selectedTab, async (val) => {
   font-weight: bold;
   color: var(--primary-color);
   text-decoration: none;
+  word-break: break-word;
 }
 
 .timeline-link:hover {
@@ -968,10 +969,6 @@ watch(selectedTab, async (val) => {
   .hot-topic,
   .hot-tag {
     width: 100%;
-  }
-
-  .profile-timeline {
-    width: calc(100vw - 40px);
   }
 }
 </style>
