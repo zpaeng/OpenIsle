@@ -16,7 +16,7 @@
           <div class="prize-count">x {{ lottery.prizeCount }}</div>
         </div>
         <div class="prize-end-time prize-info-right">
-          <div v-if="!isMobile" class="prize-end-time-title">离结束还有</div>
+          <div v-if="!isMobile" class="prize-end-time-title"><i class="fas fa-stopwatch"></i>距离结束还有</div>
           <div class="prize-end-time-value">{{ countdown }}</div>
           <div v-if="!isMobile" class="join-prize-button-container-desktop">
             <div
@@ -84,6 +84,7 @@ import { getToken, authState } from '~/utils/auth'
 import { toast } from '~/main'
 import { useRuntimeConfig } from '#imports'
 import { useIsMobile } from '~/utils/screen'
+import { useCountdown } from '~/composables/useCountdown'
 
 const props = defineProps({
   lottery: { type: Object, required: true },
@@ -95,52 +96,12 @@ const isMobile = useIsMobile()
 const loggedIn = computed(() => authState.loggedIn)
 const lotteryParticipants = computed(() => props.lottery?.participants || [])
 const lotteryWinners = computed(() => props.lottery?.winners || [])
-const lotteryEnded = computed(() => {
-  if (!props.lottery || !props.lottery.endTime) return false
-  return new Date(props.lottery.endTime).getTime() <= Date.now()
-})
+// 倒计时和结束flg
+const { countdown, isEnded } = useCountdown(props.lottery?.endTime)
+const lotteryEnded = computed(() => isEnded.value)
 const hasJoined = computed(() => {
   if (!loggedIn.value) return false
   return lotteryParticipants.value.some((p) => p.id === Number(authState.userId))
-})
-
-const countdown = ref('00:00:00')
-let timer = null
-const updateCountdown = () => {
-  if (!props.lottery || !props.lottery.endTime) {
-    countdown.value = '00:00:00'
-    return
-  }
-  const diff = new Date(props.lottery.endTime).getTime() - Date.now()
-  if (diff <= 0) {
-    countdown.value = '00:00:00'
-    if (timer) {
-      clearInterval(timer)
-      timer = null
-    }
-    return
-  }
-  const h = String(Math.floor(diff / 3600000)).padStart(2, '0')
-  const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0')
-  const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0')
-  countdown.value = `${h}:${m}:${s}`
-}
-const startCountdown = () => {
-  updateCountdown()
-  if (timer) clearInterval(timer)
-  timer = setInterval(updateCountdown, 1000)
-}
-watch(
-  () => props.lottery?.endTime,
-  () => {
-    if (props.lottery && props.lottery.endTime) startCountdown()
-  },
-)
-onMounted(() => {
-  if (props.lottery && props.lottery.endTime) startCountdown()
-})
-onBeforeUnmount(() => {
-  if (timer) clearInterval(timer)
 })
 
 const gotoUser = (id) => navigateTo(`/users/${id}`, { replace: true })

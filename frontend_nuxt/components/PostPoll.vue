@@ -34,7 +34,7 @@
             <div class="poll-option-title" v-else>单选</div>
 
             <div class="poll-left-time">
-              <div class="poll-left-time-title">离结束还有</div>
+              <div class="poll-left-time-title"><i class="fas fa-stopwatch"></i>距离结束还有</div>
               <div class="poll-left-time-value">{{ countdown }}</div>
             </div>
           </div>
@@ -107,7 +107,11 @@
         <i class="fas fa-stopwatch"></i> 投票已结束
       </div>
       <div v-else class="poll-option-hint">
-        <i class="fas fa-stopwatch"></i> 您已投票，等待结束查看结果
+        <div>您已投票，等待结束查看结果</div>
+        <div class="poll-left-time">
+          <div class="poll-left-time-title"><i class="fas fa-stopwatch"></i>距离结束还有</div>
+          <div class="poll-left-time-value">{{ countdown }}</div>
+        </div>
       </div>
     </div>
   </div>
@@ -118,6 +122,7 @@ import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { getToken, authState } from '~/utils/auth'
 import { toast } from '~/main'
 import { useRuntimeConfig } from '#imports'
+import { useCountdown } from '~/composables/useCountdown'
 
 const props = defineProps({
   poll: { type: Object, required: true },
@@ -140,55 +145,15 @@ const pollPercentages = computed(() =>
       })
     : [],
 )
-const pollEnded = computed(() => {
-  if (!props.poll || !props.poll.endTime) return false
-  return new Date(props.poll.endTime).getTime() <= Date.now()
-})
+// 倒计时
+const { countdown, isEnded } = useCountdown(props.poll?.endTime)
+const pollEnded = computed(() => isEnded.value)
 const hasVoted = computed(() => {
   if (!loggedIn.value) return false
   return pollParticipants.value.some((p) => p.id === Number(authState.userId))
 })
 watch([hasVoted, pollEnded], ([voted, ended]) => {
   if (voted || ended) showPollResult.value = true
-})
-
-const countdown = ref('00:00:00')
-let timer = null
-const updateCountdown = () => {
-  if (!props.poll || !props.poll.endTime) {
-    countdown.value = '00:00:00'
-    return
-  }
-  const diff = new Date(props.poll.endTime).getTime() - Date.now()
-  if (diff <= 0) {
-    countdown.value = '00:00:00'
-    if (timer) {
-      clearInterval(timer)
-      timer = null
-    }
-    return
-  }
-  const h = String(Math.floor(diff / 3600000)).padStart(2, '0')
-  const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0')
-  const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0')
-  countdown.value = `${h}:${m}:${s}`
-}
-const startCountdown = () => {
-  updateCountdown()
-  if (timer) clearInterval(timer)
-  timer = setInterval(updateCountdown, 1000)
-}
-watch(
-  () => props.poll?.endTime,
-  () => {
-    if (props.poll && props.poll.endTime) startCountdown()
-  },
-)
-onMounted(() => {
-  if (props.poll && props.poll.endTime) startCountdown()
-})
-onBeforeUnmount(() => {
-  if (timer) clearInterval(timer)
 })
 
 const gotoUser = (id) => navigateTo(`/users/${id}`, { replace: true })
