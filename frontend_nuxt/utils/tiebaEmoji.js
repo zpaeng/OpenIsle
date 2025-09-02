@@ -1,6 +1,9 @@
+// cdn.jsdelivr.net/gh/... 国内容易抽风
+// export const TIEBA_EMOJI_CDN = 'https://cdn.jsdelivr.net/gh/microlong666/tieba_mobile_emotions@master/'
+
+// Finally方案: 自托管
 export const TIEBA_EMOJI_CDN =
-  'https://cdn.jsdelivr.net/gh/microlong666/tieba_mobile_emotions@master/'
-// export const TIEBA_EMOJI_CDN = 'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/vditor/dist/images/emoji/'
+  'https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/tieba/'
 
 export const tiebaEmoji = (() => {
   const map = { tieba1: TIEBA_EMOJI_CDN + 'image_emoticon.png' }
