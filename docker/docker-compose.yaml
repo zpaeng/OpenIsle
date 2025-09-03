@@ -1,0 +1,41 @@
+services:
+  # MySQL service
+  mysql:
+    image: mysql:8.0
+    container_name: openisle-mysql
+    restart: always
+    env_file:
+      - ../backend/open-isle.env
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ../backend/src/main/resources/db/init/init_script.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - openisle-network
+
+  # Java spring boot service
+  springboot:
+    image: maven:3.9-eclipse-temurin-17
+    container_name: openisle-springboot
+    working_dir: /app
+    volumes:
+      - ../backend:/app
+      - maven-repo:/root/.m2
+    ports:
+      - '8080:8080'
+    env_file:
+      - ../backend/open-isle.env
+    depends_on:
+      - mysql
+    command: mvn clean spring-boot:run -Dmaven.test.skip=true
+    networks:
+      - openisle-network
+
+networks:
+  openisle-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+  maven-repo:
