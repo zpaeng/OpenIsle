@@ -1,14 +1,14 @@
 - [前置工作](#前置工作)
 - [启动后端服务](#启动后端服务)
     - [本地 IDEA](#本地-idea)
-        - [环境变量配置](#环境变量配置)
-        - [配置参数](#配置参数)
+        - [配置环境变量](#配置环境变量)
+        - [配置 IDEA 参数](#配置-idea-参数)
         - [配置 MySQL](#配置-mysql)
     - [Docker 环境](#docker-环境)
-        - [环境变量配置](#环境变量配置-1)
+        - [配置环境变量](#配置环境变量-1)
         - [构建并启动镜像](#构建并启动镜像)
 - [启动前端服务](#启动前端服务)
-    - [环境变量配置](#环境变量配置-2)
+    - [配置环境变量](#配置环境变量-2)
     - [安装依赖和运行](#安装依赖和运行)
 - [其他配置](#其他配置)
 
@@ -21,6 +21,11 @@ git clone https://github.com/nagisa77/OpenIsle.git
 cd OpenIsle
 ```
 
+- 后端开发环境
+    - JDK 17+
+- 前端开发环境
+    - Node.JS 20+
+
 ## 启动后端服务
 
 启动后端服务有多种方式，选择一种即可。
@@ -30,9 +35,13 @@ cd OpenIsle
 
 ### 本地 IDEA
 
+```shell
+cd backend/
+```
+
 IDEA 打开 `backend/` 文件夹。
 
-#### 环境变量配置
+#### 配置环境变量
 
 1. 生成环境变量文件
 
@@ -58,7 +67,7 @@ SERVER_PORT=8082
 
 ![配置数据库](assets/contributing/backend_img_5.png)
 
-#### 配置参数
+#### 配置 IDEA 参数
 
 - 设置 JDK 版本为 java 17
 - 设置 VM Option，最好运行在其他端口，非 `8080`，这里设置 `8081`
@@ -73,13 +82,13 @@ SERVER_PORT=8082
 
 #### 配置 MySQL
 
+> [!TIP]
+> 如果不知道怎么配置数据库可以参考 [Docker 环境](#docker-环境) 章节
+
 1. 本机配置 MySQL 服务（网上很多教程，忽略）
 
     + 可以用 Laragon，自带 MySQL 包括 Nodejs，版本建议 `6.x`，`7` 以后需要 Lisence
     + [下载地址](https://github.com/leokhoa/laragon/releases)
-
-    > [!TIP]
-    > 如果不知道怎么配置数据库可以参考 [Docker 环境](#docker-环境) 章节
 
 2. 填写环境变量
 
@@ -91,7 +100,7 @@ SERVER_PORT=8082
     MYSQL_PASSWORD=<数据库密码>
     ```
 
-3. 执行 db/init.sql 脚本，导入基本的数据
+3. 执行 [`db/init/init_script.sql`](backend/src/main/resources/db/init/init_script.sql) 脚本，导入基本的数据
 
     ![初始化脚本](assets/contributing/resources_img.png)
 
@@ -100,30 +109,57 @@ SERVER_PORT=8082
     ![运行画面](assets/contributing/backend_img_4.png)
 
 ### Docker 环境
-#### 环境变量配置
+#### 配置环境变量
 
-同上，见 [环境变量配置](#环境变量配置)
+```shell
+cd docker/
+```
+
+主要配置两个 `.env` 文件
+
+- `backend/open-isle.env`：后端环境变量，配置同上，见 [配置环境变量](#配置环境变量)。
+- `docker/.env`：Docker Compose 环境变量，主要配置 MySQL 相关
+    ```shell
+    cp .env.example .env
+    ```
+
+> [!TIP]
+> 使用单独的 `.env` 文件是为了兼容线上环境或已启用 MySQL 服务的情况，如果只是想快速体验或者启动统一的环境，则推荐使用本方式。
+
+在指定 `docker/.env` 后，`backend/open-isle.env` 中以下配置会被覆盖，这样就确保使用了同一份配置。
+
+```ini
+MYSQL_URL=
+MYSQL_USER=
+MYSQL_PASSWORD=
+```
 
 #### 构建并启动镜像
 
 ```shell
-cd docker
 docker compose up -d
+```
+
+如果想了解启动过程发生了什么可以查看日志
+
+```shell
+docker compose logs
 ```
 
 ## 启动前端服务
 
-**⚠️ 环境要求：Node.js 版本最低 20.0.0（因为 Nuxt 框架要求）**
+> [!IMPORTANT]
+> **⚠️ 环境要求：Node.js 版本最低 20.0.0（因为 Nuxt 框架要求）**
 
 ```shell
 cd frontend_nuxt/
 ```
 
-### 环境变量配置
+### 配置环境变量
 
 前端可以依赖本机部署的后端，也可以直接调用线上的后端接口。
 
-- 利用预发环境：**(⚠️强烈推荐只部署前端的朋友使用该环境)**
+- 利用预发环境：**（⚠️ 强烈推荐只开发前端的朋友使用该环境）**
 
     ```shell
     cp .env.staging.example .env
@@ -143,7 +179,7 @@ cd frontend_nuxt/
 
 ### 安装依赖和运行
 
-前端安装编译并启动服务
+前端安装依赖并启动服务。
 
 ```shell
 # 安装依赖
@@ -153,11 +189,11 @@ npm install --verbose
 npm run dev
 ```
 
-如此一来，浏览器访问 http://127.0.0.1:3000 即可访问前端页面
+如此一来，浏览器访问 http://127.0.0.1:3000 即可访问前端页面。
 
 ## 其他配置
 
-配置第三方登录，这里以 GitHub 为例
+配置第三方登录，这里以 GitHub 为例：
 
 - 修改 `application.properties` 配置
 
@@ -169,6 +205,6 @@ npm run dev
 
 - 配置第三方登录回调地址
 
-  ![github配置](assets/contributing/github_img.png)
+    ![github配置](assets/contributing/github_img.png)
 
-  ![github配置2](assets/contributing/github_img_2.png)
+    ![github配置2](assets/contributing/github_img_2.png)
