@@ -38,8 +38,8 @@ public class Tag {
     @Column(nullable = false, updatable = false,
             columnDefinition = "DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6)")
     private LocalDateTime createdAt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    // 改用redis缓存之后选择立即加载策略
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "creator_id")
     private User creator;
 }

@@ -1,9 +1,12 @@
 package com.openisle.service;
 
+import com.openisle.config.CachingConfig;
 import com.openisle.model.Tag;
 import com.openisle.model.User;
 import com.openisle.repository.TagRepository;
 import com.openisle.repository.UserRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,7 @@ public class TagService {
     private final TagValidator tagValidator;
     private final UserRepository userRepository;
 
+    @CacheEvict(value = CachingConfig.TAG_CACHE_NAME, allEntries = true)
     public Tag createTag(String name, String description, String icon, String smallIcon, boolean approved, String creatorUsername) {
         tagValidator.validate(name);
         Tag tag = new Tag();
@@ -42,6 +46,7 @@ public class TagService {
         return createTag(name, description, icon, smallIcon, true, null);
     }
 
+    @CacheEvict(value = CachingConfig.TAG_CACHE_NAME, allEntries = true)
     public Tag updateTag(Long id, String name, String description, String icon, String smallIcon) {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Tag not found"));
@@ -61,6 +66,7 @@ public class TagService {
         return tagRepository.save(tag);
     }
 
+    @CacheEvict(value = CachingConfig.TAG_CACHE_NAME, allEntries = true)
     public void deleteTag(Long id) {
         tagRepository.deleteById(id);
     }
@@ -85,10 +91,20 @@ public class TagService {
         return tagRepository.findByApprovedTrue();
     }
 
+    /**
+     * 该方法每次首页加载都会访问，加入缓存
+     * @param keyword
+     * @return
+     */
+    @Cacheable(
+            value = CachingConfig.TAG_CACHE_NAME,
+            key = "'searchTags:' + (#keyword ?: '')"//keyword为null的场合返回空
+    )
     public List<Tag> searchTags(String keyword) {
         if (keyword == null || keyword.isBlank()) {
             return tagRepository.findByApprovedTrue();
         }
+
         return tagRepository.findByNameContainingIgnoreCaseAndApprovedTrue(keyword);
     }
 
