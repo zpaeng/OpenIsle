@@ -162,6 +162,9 @@ body {
   padding-left: 1em;
   border-left: 4px solid #d0d7de;
   color: var(--blockquote-text-color);
+  background-color: var(--menu-selected-background-color);
+  padding-top: 1px;
+  padding-bottom: 1px;
 }
 
 .info-content-text pre {
