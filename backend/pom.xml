@@ -161,7 +161,7 @@
         </executions>
         <configuration>
           <!-- 此处为硬编码，应优化为 env 的配置 -->
-          <apiDocsUrl>http://localhost:8080/v3/api-docs</apiDocsUrl>
+          <apiDocsUrl>http://localhost:8080/api/v3/api-docs</apiDocsUrl>
           <outputFileName>openapi.json</outputFileName>
           <outputDir>${project.build.directory}</outputDir>
         </configuration>

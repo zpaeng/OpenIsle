@@ -110,7 +110,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers("/api/ws/**", "/api/sockjs/**").permitAll()
-                    .requestMatchers("/v3/api-docs/**").permitAll()
+                    .requestMatchers("/api/v3/api-docs/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
@@ -182,7 +182,7 @@ public class SecurityConfig {
                     }
                 } else if (!uri.startsWith("/api/auth") && !publicGet
                         && !uri.startsWith("/api/ws") && !uri.startsWith("/api/sockjs")
-                        && !uri.startsWith("/v3/api-docs")) {
+                        && !uri.startsWith("/api/v3/api-docs")) {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json");
                     response.getWriter().write("{\"error\": \"Missing token\"}");
