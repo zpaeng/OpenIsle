@@ -79,15 +79,16 @@ public class NotificationListener {
                             messagingTemplate.convertAndSend(userDestination, messageObj);
                             log.info("Message notification sent to destination: {}", userDestination);
 
-                            // 发送未读数量
-                            if (payloadMap.containsKey("unreadCount")) {
-                                messagingTemplate.convertAndSendToUser(participantUsername, "/queue/unread-count", payloadMap.get("unreadCount"));
+                            // 优先从 participant 中获取未读信息，兼容旧格式
+                            Object unreadCount = participant.getOrDefault("unreadCount", payloadMap.get("unreadCount"));
+                            if (unreadCount != null) {
+                                messagingTemplate.convertAndSendToUser(participantUsername, "/queue/unread-count", unreadCount);
                                 log.info("Sent unread count to user {} via /user/{}/queue/unread-count", participantUsername, participantUsername);
                             }
 
-                            // 发送频道未读数量（如果有）
-                            if (payloadMap.containsKey("channelUnread")) {
-                                messagingTemplate.convertAndSendToUser(participantUsername, "/queue/channel-unread", payloadMap.get("channelUnread"));
+                            Object channelUnread = participant.getOrDefault("channelUnread", payloadMap.get("channelUnread"));
+                            if (channelUnread != null) {
+                                messagingTemplate.convertAndSendToUser(participantUsername, "/queue/channel-unread", channelUnread);
                                 log.info("Sent channel-unread to {}", participantUsername);
                             }
                         }
