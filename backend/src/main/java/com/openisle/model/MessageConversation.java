@@ -1,5 +1,7 @@
 package com.openisle.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,8 +43,10 @@ public class MessageConversation {
     private Message lastMessage;
 
     @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
     private Set<MessageParticipant> participants = new HashSet<>();
 
     @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
     private Set<Message> messages = new HashSet<>();
 }

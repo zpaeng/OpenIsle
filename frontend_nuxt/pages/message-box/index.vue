@@ -118,7 +118,7 @@
 </template>
 
 <script setup>
-import { ref, onUnmounted, watch, onActivated, computed } from 'vue'
+import { ref, onUnmounted, watch, onActivated, computed, onDeactivated } from 'vue'
 import { useRoute } from 'vue-router'
 import { getToken, fetchCurrentUser } from '~/utils/auth'
 import { toast } from '~/main'
@@ -139,11 +139,10 @@ const error = ref(null)
 const route = useRoute()
 const currentUser = ref(null)
 const API_BASE_URL = config.public.apiBaseUrl
-const { connect, disconnect, subscribe, isConnected } = useWebSocket()
+const { connect, subscribe, unsubscribe, isConnected } = useWebSocket()
 const { fetchUnreadCount: refreshGlobalUnreadCount } = useUnreadCount()
 const { fetchChannelUnread: refreshChannelUnread, setFromList: setChannelUnreadFromList } =
   useChannelsUnreadCount()
-let subscription = null
 
 const activeTab = ref('channels')
 const tabs = [
@@ -259,37 +258,45 @@ onActivated(async () => {
     refreshGlobalUnreadCount()
     refreshChannelUnread()
     const token = getToken()
-    if (token && !isConnected.value) {
-      connect(token)
+    if (token) {
+      if (isConnected.value) {
+        // 如果已经连接，但可能因为组件销毁而取消了订阅，所以需要重新订阅
+        subscribeToUserMessages()
+      } else {
+        // 如果未连接，则发起连接，连接成功后 watch 回调会处理订阅
+        connect(token)
+      }
     }
   } else {
     loading.value = false
   }
 })
 
-watch(isConnected, (newValue) => {
-  if (newValue && currentUser.value) {
-    const destination = `/topic/user/${currentUser.value.id}/messages`
-
-    // 清理旧的订阅
-    if (subscription) {
-      subscription.unsubscribe()
-    }
-
-    subscription = subscribe(destination, (message) => {
+const subscribeToUserMessages = () => {
+  if (!currentUser.value) return;
+  const destination = `/topic/user/${currentUser.value.id}/messages`
+  
+  subscribe(destination, (message) => {
+    if (activeTab.value === 'messages') {
       fetchConversations()
-      if (activeTab.value === 'channels') {
-        fetchChannels()
-      }
-    })
+    }
+    fetchChannels()
+    refreshGlobalUnreadCount()
+    refreshChannelUnread()
+  })
+}
+
+watch(isConnected, (newValue) => {
+  if (newValue) {
+    subscribeToUserMessages()
   }
 })
 
-onUnmounted(() => {
-  if (subscription) {
-    subscription.unsubscribe()
+onDeactivated(() => {
+  if (currentUser.value) {
+    const destination = `/topic/user/${currentUser.value.id}/messages`
+    unsubscribe(destination)
   }
-  disconnect()
 })
 
 function goToConversation(id) {

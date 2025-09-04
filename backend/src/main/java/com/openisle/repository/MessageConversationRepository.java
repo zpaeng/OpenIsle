@@ -11,6 +11,9 @@ import java.util.List;
 
 @Repository
 public interface MessageConversationRepository extends JpaRepository<MessageConversation, Long> {
+
+    @Query("SELECT c FROM MessageConversation c LEFT JOIN FETCH c.participants p LEFT JOIN FETCH p.user WHERE c.id = :id")
+    java.util.Optional<MessageConversation> findByIdWithParticipantsAndUsers(@Param("id") Long id);
     @Query("SELECT c FROM MessageConversation c " +
            "WHERE c.channel = false AND size(c.participants) = 2 " +
            "AND EXISTS (SELECT 1 FROM c.participants p1 WHERE p1.user = :user1) " +
