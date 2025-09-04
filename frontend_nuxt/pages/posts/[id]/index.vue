@@ -786,7 +786,6 @@ onMounted(async () => {
   background-color: var(--background-color);
   display: flex;
   flex-direction: row;
-  height: 100%;
 }
 
 .loading-container {
