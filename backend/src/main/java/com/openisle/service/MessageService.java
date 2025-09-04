@@ -141,35 +141,30 @@ public class MessageService {
         conversationRepository.save(conversation);
 
         MessageDto messageDto = toDto(message);
-        String conversationDestination = "/topic/conversation/" + conversation.getId();
 
-        for (MessageParticipant participant : conversation.getParticipants()) {
-            if (participant.getUser().getId().equals(senderId)) continue;
-            
-            long unreadCount = getUnreadMessageCount(participant.getUser().getId());
-            long channelUnread = getUnreadChannelCount(participant.getUser().getId());
+        // Build participant payloads once to avoid duplicate broadcasts
+        java.util.List<Map<String, Object>> participantInfos = conversation.getParticipants().stream()
+                .filter(p -> !p.getUser().getId().equals(senderId))
+                .map(p -> {
+                    Map<String, Object> info = new HashMap<>();
+                    info.put("userId", p.getUser().getId());
+                    info.put("username", p.getUser().getUsername());
+                    info.put("unreadCount", getUnreadMessageCount(p.getUser().getId()));
+                    info.put("channelUnread", getUnreadChannelCount(p.getUser().getId()));
+                    return info;
+                }).collect(Collectors.toList());
 
-            Map<String, Object> combinedPayload = new HashMap<>();
-            combinedPayload.put("message", messageDto);
+        Map<String, Object> conversationInfo = new HashMap<>();
+        conversationInfo.put("id", conversation.getId());
+        conversationInfo.put("participants", participantInfos);
 
-            Map<String, Object> conversationInfo = new HashMap<>();
-            conversationInfo.put("id", conversation.getId());
-            conversationInfo.put("participants", conversation.getParticipants().stream()
-                    .filter(item -> participant.getUser().getId().equals(item.getUser().getId()))
-                    .map(p -> {
-                        Map<String, Object> participantInfo = new HashMap<>();
-                        participantInfo.put("userId", p.getUser().getId());
-                        participantInfo.put("username", p.getUser().getUsername());
-                        return participantInfo;
-                    }).collect(Collectors.toList()));
+        Map<String, Object> combinedPayload = new HashMap<>();
+        combinedPayload.put("message", messageDto);
+        combinedPayload.put("conversation", conversationInfo);
+        combinedPayload.put("senderId", senderId);
 
-            combinedPayload.put("conversation", conversationInfo);
-            combinedPayload.put("senderId", senderId);
-            combinedPayload.put("unreadCount", unreadCount);
-            combinedPayload.put("channelUnread", channelUnread);
-
-            notificationProducer.sendNotification(new MessageNotificationPayload(participant.getUser().getUsername(), combinedPayload));
-        }
+        // Use sender's username for sharding; only one notification is needed
+        notificationProducer.sendNotification(new MessageNotificationPayload(sender.getUsername(), combinedPayload));
 
         return message;
     }
