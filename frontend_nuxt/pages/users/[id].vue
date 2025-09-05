@@ -18,7 +18,7 @@
               class="profile-page-header-subscribe-button"
               @click="subscribeUser"
             >
-              <i class="fas fa-user-plus"></i>
+              <add-user />
               关注
             </div>
             <div
@@ -26,11 +26,11 @@
               class="profile-page-header-unsubscribe-button"
               @click="unsubscribeUser"
             >
-              <i class="fas fa-user-minus"></i>
+              <reduce-user />
               取消关注
             </div>
             <div v-if="!isMine" class="profile-page-header-subscribe-button" @click="sendMessage">
-              <i class="fas fa-paper-plane"></i>
+              <message-one />
               发私信
             </div>
           </div>
@@ -45,7 +45,7 @@
               content="经验值可通过发帖、评论等操作获得，达到目标后即可提升等级，解锁更多功能。"
               placement="bottom"
             >
-              <i class="fas fa-info-circle profile-exp-info"></i>
+              <info class="profile-exp-info" />
             </ToolTip>
           </div>
         </div>

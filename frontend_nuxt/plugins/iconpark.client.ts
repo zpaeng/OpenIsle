@@ -28,6 +28,9 @@ import {
   Loading,
   Rss,
   MessageEmoji,
+  AddUser,
+  ReduceUser,
+  MessageOne,
 } from '@icon-park/vue-next'
 
 export default defineNuxtPlugin((nuxtApp) => {
@@ -59,4 +62,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.component('Loading', Loading)
   nuxtApp.vueApp.component('Rss', Rss)
   nuxtApp.vueApp.component('MessageEmoji', MessageEmoji)
+  nuxtApp.vueApp.component('AddUser', AddUser)
+  nuxtApp.vueApp.component('ReduceUser', ReduceUser)
+  nuxtApp.vueApp.component('MessageOne', MessageOne)
 })
