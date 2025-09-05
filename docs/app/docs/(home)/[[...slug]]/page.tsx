@@ -37,7 +37,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
             a: createRelativeLink(source, page),
           })}
         />
-        <DocsCategory url={page.url} />
+        {page.data.full ? null : <DocsCategory url={page.url} />}
       </DocsBody>
     </DocsPage>
   );
