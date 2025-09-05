@@ -26,8 +26,12 @@
           <span v-if="level >= 2" class="reply-item">
             <i class="fas fa-reply reply-icon"></i>
             <span class="reply-info">
-              <BaseImage class="reply-avatar"  :src="comment.parentUserAvatar || '/default-avatar.svg'" alt="avatar"
-              @click="comment.parentUserClick && comment.parentUserClick()" />
+              <BaseImage
+                class="reply-avatar"
+                :src="comment.parentUserAvatar || '/default-avatar.svg'"
+                alt="avatar"
+                @click="comment.parentUserClick && comment.parentUserClick()"
+              />
               <span class="reply-user-name">{{ comment.parentUserName }}</span>
             </span>
           </span>
@@ -381,7 +385,8 @@ const handleContentClick = (e) => {
   justify-content: space-between;
 }
 
-.reply-item, .reply-info {
+.reply-item,
+.reply-info {
   display: inline-flex;
   flex-direction: row;
   align-items: center;
@@ -397,13 +402,16 @@ const handleContentClick = (e) => {
 
 .reply-icon {
   color: var(--primary-color);
-  margin-right: 10px;
   margin-left: 10px;
+  margin-right: 10px;
   opacity: 0.5;
+  transform: scaleX(-1);
 }
 
 .reply-user-name {
   opacity: 0.3;
+  display: none;
+  font-weight: bold;
 }
 
 .medal-name {
