@@ -68,13 +68,10 @@
         >
           <div class="article-main-container">
             <NuxtLink class="article-item-title main-item" :to="`/posts/${article.id}`">
-              <i v-if="article.pinned" class="fas fa-thumbtack pinned-icon"></i>
-              <i v-if="article.type === 'LOTTERY'" class="fa-solid fa-gift lottery-icon"></i>
-              <i
-                v-else-if="article.type === 'POLL'"
-                class="fa-solid fa-square-poll-vertical poll-icon"
-              ></i>
-              <i v-if="!article.rssExcluded" class="fa-solid fa-star featured-icon"></i>
+              <pin v-if="article.pinned" theme="outline" class="pinned-icon" />
+              <gift v-if="article.type === 'LOTTERY'" class="lottery-icon" />
+              <ranking-list v-else-if="article.type === 'POLL'" class="poll-icon" />
+              <star v-if="!article.rssExcluded" class="featured-icon" />
               {{ article.title }}
             </NuxtLink>
             <NuxtLink class="article-item-description main-item" :to="`/posts/${article.id}`">
@@ -141,7 +138,6 @@ import { getToken } from '~/utils/auth'
 import { stripMarkdown } from '~/utils/markdown'
 import { useIsMobile } from '~/utils/screen'
 import TimeManager from '~/utils/time'
-
 useHead({
   title: 'OpenIsle - 全面开源的自由社区',
   meta: [

@@ -15,16 +15,16 @@
       <div class="common-info-content-header">
         <div class="info-content-header-left">
           <span class="user-name">{{ comment.userName }}</span>
-          <i class="fas fa-medal medal-icon"></i>
+          <medal-one class="medal-icon" />
           <NuxtLink
             v-if="comment.medal"
             class="medal-name"
             :to="`/users/${comment.userId}?tab=achievements`"
             >{{ getMedalTitle(comment.medal) }}</NuxtLink
           >
-          <i v-if="comment.pinned" class="fas fa-thumbtack pin-icon"></i>
+          <pin v-if="comment.pinned" class="pin-icon" />
           <span v-if="level >= 2" class="reply-item">
-            <i class="fas fa-reply reply-icon"></i>
+            <next class="reply-icon" />
             <span class="reply-info">
               <BaseImage
                 class="reply-avatar"
@@ -40,7 +40,7 @@
         <div class="info-content-header-right">
           <DropdownMenu v-if="commentMenuItems.length > 0" :items="commentMenuItems">
             <template #trigger>
-              <i class="fas fa-ellipsis-vertical action-menu-icon"></i>
+              <more-one class="action-menu-icon" />
             </template>
           </DropdownMenu>
         </div>
@@ -53,10 +53,10 @@
       <div class="article-footer-container">
         <ReactionsGroup v-model="comment.reactions" content-type="comment" :content-id="comment.id">
           <div class="make-reaction-item comment-reaction" @click="toggleEditor">
-            <i class="far fa-comment"></i>
+            <comment-icon />
           </div>
           <div class="make-reaction-item copy-link" @click="copyCommentLink">
-            <i class="fas fa-link"></i>
+            <link-icon />
           </div>
         </ReactionsGroup>
       </div>

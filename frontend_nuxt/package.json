@@ -12,6 +12,7 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
+    "@icon-park/vue-next": "^1.4.2",
     "@nuxt/image": "^1.11.0",
     "@stomp/stompjs": "^7.0.0",
     "cropperjs": "^1.6.2",

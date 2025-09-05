@@ -19,7 +19,7 @@
           </div>
 
           <div class="reactions-viewer-item placeholder" @click="openPanel">
-            <i class="far fa-smile reactions-viewer-item-placeholder-icon"></i>
+            <face-without-mouth class="reactions-viewer-item-placeholder-icon" />
             <!-- <span class="reactions-viewer-item-placeholder-text">点击以表态</span> -->
           </div>
         </template>

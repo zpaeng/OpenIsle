@@ -15,7 +15,12 @@ export default defineNuxtConfig({
       telegramBotId: process.env.NUXT_PUBLIC_TELEGRAM_BOT_ID || '',
     },
   },
-  css: ['vditor/dist/index.css', '~/assets/fonts.css', '~/assets/global.css'],
+  css: [
+    'vditor/dist/index.css',
+    '~/assets/fonts.css',
+    '~/assets/global.css',
+    '@icon-park/vue-next/styles/index.css',
+  ],
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
     head: {
@@ -72,11 +77,11 @@ export default defineNuxtConfig({
           rel: 'manifest',
           href: '/manifest.webmanifest',
         },
-        {
-          rel: 'stylesheet',
-          href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css',
-          referrerpolicy: 'no-referrer',
-        },
+        // {
+        //   rel: 'stylesheet',
+        //   href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css',
+        //   referrerpolicy: 'no-referrer',
+        // },
       ],
     },
     baseURL: '/',
