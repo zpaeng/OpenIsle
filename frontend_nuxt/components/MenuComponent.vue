@@ -95,7 +95,7 @@
                   class="section-item-icon"
                   :alt="c.name"
                 />
-                <i v-else :class="['section-item-icon', c.smallIcon || c.icon]"></i>
+                <component v-else :is="c.smallIcon || c.icon" class="section-item-icon" />
               </template>
               <span class="section-item-text">
                 {{ c.name }}
@@ -135,7 +135,7 @@
       <ClientOnly v-if="!isMobile">
         <div class="menu-footer">
           <div class="menu-footer-btn" @click="cycleTheme">
-            <i :class="iconClass"></i>
+            <component :is="iconClass" class="menu-item-icon" />
           </div>
         </div>
       </ClientOnly>
@@ -195,11 +195,11 @@ const {
 const iconClass = computed(() => {
   switch (themeState.mode) {
     case ThemeMode.DARK:
-      return 'fas fa-moon'
+      return 'Moon'
     case ThemeMode.LIGHT:
-      return 'fas fa-sun'
+      return 'SunOne'
     default:
-      return 'fas fa-desktop'
+      return 'ComputerOne'
   }
 })
 

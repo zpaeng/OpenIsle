@@ -18,6 +18,9 @@ import {
   Next,
   DropDownList,
   MoreOne,
+  SunOne,
+  Moon,
+  ComputerOne,
   Comment,
   Link,
   SlyFaceWhitSmile,
@@ -52,6 +55,9 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.component('Next', Next)
   nuxtApp.vueApp.component('DropDownList', DropDownList)
   nuxtApp.vueApp.component('MoreOne', MoreOne)
+  nuxtApp.vueApp.component('SunOne', SunOne)
+  nuxtApp.vueApp.component('Moon', Moon)
+  nuxtApp.vueApp.component('ComputerOne', ComputerOne)
   nuxtApp.vueApp.component('CommentIcon', Comment)
   nuxtApp.vueApp.component('LinkIcon', Link)
   nuxtApp.vueApp.component('SlyFaceWhitSmile', SlyFaceWhitSmile)
