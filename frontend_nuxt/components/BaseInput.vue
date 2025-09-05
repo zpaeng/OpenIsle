@@ -1,6 +1,6 @@
 <template>
   <div class="base-input">
-    <i v-if="icon" :class="['base-input-icon', icon]" />
+    <component v-if="icon" :is="icon" class="base-input-icon" size="14" />
 
     <!-- 普通输入框 -->
     <input
@@ -29,7 +29,7 @@ export default {
   inheritAttrs: false,
   props: {
     modelValue: { type: [String, Number], default: '' },
-    icon: { type: String, default: '' },
+    icon: { type: [String, Object], default: '' },
     type: { type: String, default: 'text' },
     textarea: { type: Boolean, default: false },
   },
@@ -66,7 +66,6 @@ export default {
 
 .base-input-icon {
   opacity: 0.5;
-  font-size: 14px;
 }
 
 .base-input-text {
