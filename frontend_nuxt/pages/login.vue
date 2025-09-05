@@ -6,9 +6,9 @@
       </div>
 
       <div class="email-login-page-content">
-        <BaseInput icon="fas fa-envelope" v-model="username" placeholder="邮箱/用户名" />
+        <BaseInput icon="mail" v-model="username" placeholder="邮箱/用户名" />
 
-        <BaseInput icon="fas fa-lock" v-model="password" type="password" placeholder="密码" />
+        <BaseInput icon="lock" v-model="password" type="password" placeholder="密码" />
 
         <div v-if="!isWaitingForLogin" class="login-page-button-primary" @click="submitLogin">
           <div class="login-page-button-text">登录</div>

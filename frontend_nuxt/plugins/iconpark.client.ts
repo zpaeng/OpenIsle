@@ -37,6 +37,10 @@ import {
   AlarmClock,
   Bookmark,
   Inbox,
+  LoadingFour,
+  Mail,
+  Lock,
+  User,
 } from '@icon-park/vue-next'
 
 export default defineNuxtPlugin((nuxtApp) => {
@@ -77,4 +81,8 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.component('AlarmClock', AlarmClock)
   nuxtApp.vueApp.component('Bookmark', Bookmark)
   nuxtApp.vueApp.component('Inbox', Inbox)
+  nuxtApp.vueApp.component('LoadingFour', LoadingFour)
+  nuxtApp.vueApp.component('UserIcon', User)
+  nuxtApp.vueApp.component('Mail', Mail)
+  nuxtApp.vueApp.component('Lock', Lock)
 })

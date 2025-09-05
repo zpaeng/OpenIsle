@@ -13,7 +13,6 @@
             :is="tab.icon"
             class="base-tabs-item-icon"
           />
-          <i v-else-if="tab.icon" :class="tab.icon"></i>
           <div class="base-tabs-item-label">{{ tab.label }}</div>
         </div>
       </div>
