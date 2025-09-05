@@ -37,7 +37,12 @@
             邀请
             <i v-if="isCopying" class="fas fa-spinner fa-spin"></i>
           </div>
-
+          <ToolTip v-if="!isMobile" content="当前在线人数" placement="bottom">
+            <div class="online-count">
+              <i class="fas fa-people-group"></i>
+              <span>{{ onlineCount }}</span>
+            </div>
+          </ToolTip>
           <ToolTip content="复制RSS链接" placement="bottom">
             <div class="rss-icon" @click="copyRssLink">
               <i class="fas fa-rss"></i>
@@ -114,6 +119,46 @@ const searchDropdown = ref(null)
 const userMenu = ref(null)
 const menuBtn = ref(null)
 const isCopying = ref(false)
+
+const onlineCount = ref(0)
+
+// 心跳检测
+async function sendPing() {
+  try {
+    // 已登录就用 userId，否则随机生成游客ID
+    let userId = authState.userId
+    if (userId) {
+      // 用户已登录，清理游客 ID
+      localStorage.removeItem('guestId')
+    } else {
+      // 游客模式
+      let savedId = localStorage.getItem('guestId')
+      if (!savedId) {
+        savedId = `guest-${crypto.randomUUID()}`
+        localStorage.setItem('guestId', savedId)
+      }
+      userId = savedId
+    }
+    const res = await fetch(`${API_BASE_URL}/api/online/heartbeat?userId=${userId}`, {
+      method: 'POST',
+    })
+  } catch (e) {
+    console.error("心跳失败", e)
+  }
+}
+
+// 获取在线人数
+async function fetchCount() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/online/count`, {
+      method: 'GET',
+    })
+    onlineCount.value = await res.json()
+  } catch (e) {
+    console.error("获取在线人数失败", e)
+  }
+}
+
 
 const search = () => {
   showSearch.value = true
@@ -262,6 +307,12 @@ onMounted(async () => {
       await updateUnread()
     },
   )
+
+  // 新增的在线人数逻辑
+  sendPing()
+  fetchCount()
+  setInterval(sendPing, 120000)   // 每 2 分钟发一次心跳
+  setInterval(fetchCount, 60000)  // 每 1 分更新 UI
 })
 </script>
 
@@ -450,6 +501,15 @@ onMounted(async () => {
 
 .rss-icon {
   animation: rss-glow 2s 3;
+}
+
+.online-count {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--primary-color);
+  cursor: default;
 }
 
 @keyframes rss-glow {
