@@ -1,6 +1,6 @@
 <template>
   <div class="user-list">
-    <BasePlaceholder v-if="users.length === 0" text="暂无用户" icon="fas fa-inbox" />
+    <BasePlaceholder v-if="users.length === 0" text="暂无用户" icon="Inbox" />
     <div v-for="u in users" :key="u.id" class="user-item" @click="handleUserClick(u)">
       <BaseImage :src="u.avatar" alt="avatar" class="user-avatar" />
       <div class="user-info">

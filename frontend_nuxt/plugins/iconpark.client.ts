@@ -36,6 +36,7 @@ import {
   MessageOne,
   AlarmClock,
   Bookmark,
+  Inbox,
   LoadingFour,
   Mail,
   Lock,
@@ -79,6 +80,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.component('MessageOne', MessageOne)
   nuxtApp.vueApp.component('AlarmClock', AlarmClock)
   nuxtApp.vueApp.component('Bookmark', Bookmark)
+  nuxtApp.vueApp.component('Inbox', Inbox)
   nuxtApp.vueApp.component('LoadingFour', LoadingFour)
   nuxtApp.vueApp.component('UserIcon', User)
   nuxtApp.vueApp.component('Mail', Mail)

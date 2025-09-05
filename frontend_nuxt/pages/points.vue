@@ -63,11 +63,7 @@
         <div class="loading-points-container" v-if="historyLoading">
           <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
         </div>
-        <BasePlaceholder
-          v-else-if="histories.length === 0"
-          text="暂无积分记录"
-          icon="fas fa-inbox"
-        />
+        <BasePlaceholder v-else-if="histories.length === 0" text="暂无积分记录" icon="Inbox" />
         <div class="timeline-container" v-else>
           <BaseTimeline :items="histories">
             <template #item="{ item }">

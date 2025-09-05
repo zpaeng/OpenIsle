@@ -207,7 +207,7 @@
             <BasePlaceholder
               v-if="filteredTimelineItems.length === 0"
               text="暂无时间线"
-              icon="fas fa-inbox"
+              icon="Inbox"
             />
             <div class="timeline-list">
               <BaseTimeline :items="filteredTimelineItems">
@@ -305,7 +305,7 @@
               </BaseTimeline>
             </div>
             <div v-else>
-              <BasePlaceholder text="暂无收藏文章" icon="fas fa-inbox" />
+              <BasePlaceholder text="暂无收藏文章" icon="Inbox" />
             </div>
           </div>
 
