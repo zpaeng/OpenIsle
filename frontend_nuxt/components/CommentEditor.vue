@@ -7,7 +7,7 @@
     <div class="comment-bottom-container">
       <div class="comment-submit" :class="{ disabled: isDisabled }" @click="submit">
         <template v-if="!loading"> 发布评论 </template>
-        <template v-else> <i class="fa-solid fa-spinner fa-spin"></i> 发布中... </template>
+        <template v-else> <loading-four /> 发布中... </template>
       </div>
     </div>
   </div>

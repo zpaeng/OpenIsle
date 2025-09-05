@@ -15,7 +15,7 @@
               class="option-icon"
               :alt="option.name"
             />
-            <i v-else :class="['option-icon', option.icon]"></i>
+            <!-- <i v-else :class="['option-icon', option.icon]"></i> -->
           </template>
           <span>{{ option.name }}</span>
           <span class="option-count" v-if="option.count > 0"> x {{ option.count }}</span>

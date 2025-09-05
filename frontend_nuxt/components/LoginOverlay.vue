@@ -2,7 +2,7 @@
   <div class="login-overlay">
     <div class="login-overlay-blur"></div>
     <div class="login-overlay-content">
-      <i class="fa-solid fa-user login-overlay-icon"></i>
+      <user-icon class="login-overlay-icon" />
       <div class="login-overlay-text">请先登录，点击跳转到登录页面</div>
       <div class="login-overlay-button" @click="goLogin">登录</div>
     </div>

@@ -71,8 +71,8 @@
         />
       </div>
       <div v-if="replyCount && level < 2" class="reply-toggle" @click="toggleReplies">
-        <i v-if="showReplies" class="fas fa-chevron-up reply-toggle-icon"></i>
-        <i v-else class="fas fa-chevron-down reply-toggle-icon"></i>
+        <up v-if="showReplies" class="reply-toggle-icon" />
+        <down v-else class="reply-toggle-icon" />
         {{ replyCount }}条回复
       </div>
       <div v-if="showReplies && level < 2" class="reply-list">
@@ -375,7 +375,6 @@ const handleContentClick = (e) => {
 }
 
 .reply-toggle-icon {
-  margin-right: 5px;
 }
 
 .common-info-content-header {
