@@ -4,7 +4,7 @@
       <div class="header-content-left">
         <div v-if="showMenuBtn" class="menu-btn-wrapper">
           <button class="menu-btn" ref="menuBtn" @click="$emit('toggle-menu')">
-            <i class="fas fa-bars micon"></i>
+            <application-menu class="micon"></application-menu>
           </button>
           <span
             v-if="isMobile && (unreadMessageCount > 0 || hasChannelUnread)"
@@ -25,7 +25,7 @@
       <ClientOnly>
         <div class="header-content-right">
           <div v-if="isMobile" class="search-icon" @click="search">
-            <i class="fas fa-search"></i>
+            <search-icon />
           </div>
 
           <div v-if="isMobile" class="theme-icon" @click="cycleTheme">
@@ -33,26 +33,26 @@
           </div>
 
           <div v-if="!isMobile" class="invite_text" @click="copyInviteLink">
-            <i class="fas fa-copy"></i>
+            <copy />
             邀请
-            <i v-if="isCopying" class="fas fa-spinner fa-spin"></i>
+            <loading v-if="isCopying" />
           </div>
 
           <ToolTip content="复制RSS链接" placement="bottom">
             <div class="rss-icon" @click="copyRssLink">
-              <i class="fas fa-rss"></i>
+              <rss />
             </div>
           </ToolTip>
 
           <ToolTip v-if="!isMobile && isLogin" content="发帖" placement="bottom">
             <div class="new-post-icon" @click="goToNewPost">
-              <i class="fas fa-edit"></i>
+              <edit />
             </div>
           </ToolTip>
 
           <ToolTip v-if="isLogin" content="站内信和频道" placement="bottom">
             <div class="messages-icon" @click="goToMessages">
-              <i class="fas fa-comments"></i>
+              <message-emoji />
               <span v-if="unreadMessageCount > 0" class="unread-badge">{{
                 unreadMessageCount
               }}</span>
@@ -64,7 +64,7 @@
             <template #trigger>
               <div class="avatar-container">
                 <img class="avatar-img" :src="avatar" alt="avatar" />
-                <i class="fas fa-caret-down dropdown-icon"></i>
+                <down />
               </div>
             </template>
           </DropdownMenu>

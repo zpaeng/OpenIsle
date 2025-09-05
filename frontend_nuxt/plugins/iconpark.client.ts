@@ -22,6 +22,12 @@ import {
   Link,
   SlyFaceWhitSmile,
   Like,
+  ApplicationMenu,
+  Search,
+  Copy,
+  Loading,
+  Rss,
+  MessageEmoji,
 } from '@icon-park/vue-next'
 
 export default defineNuxtPlugin((nuxtApp) => {
@@ -47,4 +53,10 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.component('LinkIcon', Link)
   nuxtApp.vueApp.component('SlyFaceWhitSmile', SlyFaceWhitSmile)
   nuxtApp.vueApp.component('Like', Like)
+  nuxtApp.vueApp.component('ApplicationMenu', ApplicationMenu)
+  nuxtApp.vueApp.component('SearchIcon', Search)
+  nuxtApp.vueApp.component('Copy', Copy)
+  nuxtApp.vueApp.component('Loading', Loading)
+  nuxtApp.vueApp.component('Rss', Rss)
+  nuxtApp.vueApp.component('MessageEmoji', MessageEmoji)
 })
