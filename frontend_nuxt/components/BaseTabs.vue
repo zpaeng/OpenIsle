@@ -8,7 +8,12 @@
           :class="['base-tabs-item', { selected: modelValue === tab.key }]"
           @click="$emit('update:modelValue', tab.key)"
         >
-          <i v-if="tab.icon" :class="tab.icon"></i>
+          <component
+            v-if="tab.icon && (typeof tab.icon !== 'string' || !tab.icon.includes(' '))"
+            :is="tab.icon"
+            class="base-tabs-item-icon"
+          />
+          <i v-else-if="tab.icon" :class="tab.icon"></i>
           <div class="base-tabs-item-label">{{ tab.label }}</div>
         </div>
       </div>
@@ -72,6 +77,7 @@ function onTouchEnd(e) {
   align-items: center;
 }
 
+.base-tabs-item-icon,
 .base-tabs-item i {
   margin-right: 6px;
 }
