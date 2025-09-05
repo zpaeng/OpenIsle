@@ -29,7 +29,7 @@
           </div>
 
           <div v-if="isMobile" class="theme-icon" @click="cycleTheme">
-            <i :class="iconClass"></i>
+            <component :is="iconClass" />
           </div>
 
           <div v-if="!isMobile" class="invite_text" @click="copyInviteLink">
@@ -226,11 +226,11 @@ const headerMenuItems = computed(() => [
 const iconClass = computed(() => {
   switch (themeState.mode) {
     case ThemeMode.DARK:
-      return 'fas fa-moon'
+      return 'Moon'
     case ThemeMode.LIGHT:
-      return 'fas fa-sun'
+      return 'SunOne'
     default:
-      return 'fas fa-desktop'
+      return 'ComputerOne'
   }
 })
 
