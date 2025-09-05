@@ -56,7 +56,7 @@
           <BasePlaceholder
             v-if="messages.length === 0"
             text="暂无会话，发送消息试试 🎉"
-            icon="fas fa-inbox"
+            icon="Inbox"
           />
         </div>
       </template>
@@ -351,9 +351,9 @@ onMounted(async () => {
 })
 
 const subscribeToConversation = () => {
-  if (!currentUser.value) return;
+  if (!currentUser.value) return
   const destination = `/topic/conversation/${conversationId}`
-  
+
   subscribe(destination, async (message) => {
     try {
       const parsedMessage = JSON.parse(message.body)
@@ -370,12 +370,12 @@ const subscribeToConversation = () => {
 
       await markConversationAsRead()
       await nextTick()
-      
+
       if (isUserNearBottom.value) {
         scrollToBottomSmooth()
       }
     } catch (e) {
-      console.error("Failed to parse websocket message", e)
+      console.error('Failed to parse websocket message', e)
     }
   })
 }
@@ -394,7 +394,7 @@ onActivated(async () => {
     await nextTick()
     scrollToBottomSmooth()
     updateNearBottom()
-    
+
     if (isConnected.value) {
       // 如果已连接，重新订阅
       subscribeToConversation()

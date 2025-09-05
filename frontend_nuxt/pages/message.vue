@@ -14,8 +14,12 @@
         <div class="message-control-container">
           <div class="message-control-title">通知设置</div>
           <div class="message-control-item-container">
-            <template v-for="pref in notificationPrefs"> 
-              <div v-if="canShowNotification(pref.type)" :key="pref.type" class="message-control-item">
+            <template v-for="pref in notificationPrefs">
+              <div
+                v-if="canShowNotification(pref.type)"
+                :key="pref.type"
+                class="message-control-item"
+              >
                 <div class="message-control-item-label">{{ formatType(pref.type) }}</div>
                 <BaseSwitch
                   :model-value="pref.enabled"
@@ -47,7 +51,7 @@
         <BasePlaceholder
           v-else-if="notifications.length === 0"
           text="暂时没有消息 :)"
-          icon="fas fa-inbox"
+          icon="Inbox"
         />
 
         <div class="timeline-container" v-if="notifications.length > 0">
@@ -757,7 +761,12 @@ const formatType = (t) => {
 
 const isAdmin = computed(() => authState.role === 'ADMIN')
 
-const needAdminSet = new Set(['POST_REVIEW_REQUEST','REGISTER_REQUEST', 'POINT_REDEEM', 'ACTIVITY_REDEEM'])
+const needAdminSet = new Set([
+  'POST_REVIEW_REQUEST',
+  'REGISTER_REQUEST',
+  'POINT_REDEEM',
+  'ACTIVITY_REDEEM',
+])
 
 const canShowNotification = (type) => {
   return !needAdminSet.has(type) || isAdmin.value

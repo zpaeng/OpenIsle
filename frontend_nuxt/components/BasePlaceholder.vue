@@ -1,6 +1,6 @@
 <template>
   <div class="base-placeholder">
-    <i :class="['base-placeholder-icon', icon]" />
+    <component :is="icon" class="base-placeholder-icon" theme="outline" size="48" />
     <div class="base-placeholder-text">
       <slot>{{ text }}</slot>
     </div>
@@ -12,7 +12,7 @@ export default {
   name: 'BasePlaceholder',
   props: {
     text: { type: String, default: '' },
-    icon: { type: String, default: 'fas fa-inbox' },
+    icon: { type: String, default: 'Inbox' },
   },
 }
 </script>
