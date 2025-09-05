@@ -6,16 +6,11 @@
       </div>
 
       <div v-if="emailStep === 0" class="email-signup-page-content">
-        <BaseInput
-          icon="fas fa-envelope"
-          v-model="email"
-          @input="emailError = ''"
-          placeholder="邮箱"
-        />
+        <BaseInput icon="Mail" v-model="email" @input="emailError = ''" placeholder="邮箱" />
         <div v-if="emailError" class="error-message">{{ emailError }}</div>
 
         <BaseInput
-          icon="fas fa-user"
+          icon="User"
           v-model="username"
           @input="usernameError = ''"
           placeholder="用户名"
@@ -23,7 +18,7 @@
         <div v-if="usernameError" class="error-message">{{ usernameError }}</div>
 
         <BaseInput
-          icon="fas fa-lock"
+          icon="Lock"
           v-model="password"
           @input="passwordError = ''"
           type="password"
@@ -51,7 +46,7 @@
       </div>
 
       <div v-if="emailStep === 1" class="email-signup-page-content">
-        <BaseInput icon="fas fa-envelope" v-model="code" placeholder="邮箱验证码" />
+        <BaseInput icon="Mail" v-model="code" placeholder="邮箱验证码" />
         <div
           v-if="!isWaitingForEmailVerified"
           class="signup-page-button-primary"

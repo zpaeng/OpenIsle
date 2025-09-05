@@ -23,7 +23,7 @@
         </div>
         <div class="form-row username-row">
           <BaseInput
-            icon="fas fa-user"
+            icon="User"
             v-model="username"
             @input="usernameError = ''"
             placeholder="用户名"
