@@ -56,7 +56,7 @@
           <BasePlaceholder
             v-if="messages.length === 0"
             text="暂无会话，发送消息试试 🎉"
-            icon="Inbox"
+            icon="inbox"
           />
         </div>
       </template>

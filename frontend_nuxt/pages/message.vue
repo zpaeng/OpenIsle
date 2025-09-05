@@ -51,7 +51,7 @@
         <BasePlaceholder
           v-else-if="notifications.length === 0"
           text="暂时没有消息 :)"
-          icon="Inbox"
+          icon="inbox"
         />
 
         <div class="timeline-container" v-if="notifications.length > 0">

@@ -22,7 +22,7 @@
         </div>
 
         <div v-if="!loading && conversations.length === 0" class="empty-container">
-          <BasePlaceholder v-if="conversations.length === 0" text="暂无会话" icon="Inbox" />
+          <BasePlaceholder v-if="conversations.length === 0" text="暂无会话" icon="inbox" />
         </div>
 
         <div
@@ -73,7 +73,7 @@
         </div>
         <div v-else>
           <div v-if="channels.length === 0" class="empty-container">
-            <BasePlaceholder text="暂无频道" icon="Inbox" />
+            <BasePlaceholder text="暂无频道" icon="inbox" />
           </div>
           <div
             v-for="ch in channels"
