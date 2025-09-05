@@ -20,7 +20,8 @@ import {
   MoreOne,
   Comment,
   Link,
-  FaceWithoutMouth,
+  SlyFaceWhitSmile,
+  Like,
 } from '@icon-park/vue-next'
 
 export default defineNuxtPlugin((nuxtApp) => {
@@ -44,5 +45,6 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.component('MoreOne', MoreOne)
   nuxtApp.vueApp.component('CommentIcon', Comment)
   nuxtApp.vueApp.component('LinkIcon', Link)
-  nuxtApp.vueApp.component('FaceWithoutMouth', FaceWithoutMouth)
+  nuxtApp.vueApp.component('SlyFaceWhitSmile', SlyFaceWhitSmile)
+  nuxtApp.vueApp.component('Like', Like)
 })
