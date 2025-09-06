@@ -25,7 +25,7 @@
 
           <div class="point-info">
             <p v-if="authState.loggedIn && point !== null">
-              <span><i class="fas fa-coins coin-icon"></i></span>我的积分：<span
+              <span><paper-money-two class="coin-icon" /></span>我的积分：<span
                 class="point-value"
                 >{{ point }}</span
               >
@@ -37,7 +37,7 @@
               <BaseImage class="goods-item-image" :src="good.image" alt="good.name" />
               <div class="goods-item-name">{{ good.name }}</div>
               <div class="goods-item-cost">
-                <i class="fas fa-coins"></i>
+                <paper-money-two />
                 {{ good.cost }} 积分
               </div>
               <div
@@ -185,7 +185,7 @@
                   参与，获得 {{ item.amount }} 积分
                 </template>
                 <template v-else-if="item.type === 'SYSTEM_ONLINE'"> 积分历史系统上线 </template>
-                <i class="fas fa-coins"></i> 你目前的积分是 {{ item.balance }}
+                <paper-money-two /> 你目前的积分是 {{ item.balance }}
               </div>
               <div class="history-time">{{ TimeManager.format(item.createdAt) }}</div>
             </template>

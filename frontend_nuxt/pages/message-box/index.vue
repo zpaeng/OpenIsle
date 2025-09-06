@@ -1,11 +1,11 @@
 <template>
   <div class="messages-container">
     <div class="page-title">
-      <i class="fas fa-comments"></i>
+      <message-emoji />
       <span class="page-title-text">选择聊天</span>
     </div>
     <div v-if="!isFloatMode" class="float-control">
-      <i class="fas fa-compress" @click="minimize" title="最小化"></i>
+      <collapse-text-input class="float-control-icon" @click="minimize" title="最小化" />
     </div>
     <BaseTabs v-model="activeTab" :tabs="tabs">
       <div v-if="activeTab === 'messages'">

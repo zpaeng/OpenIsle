@@ -2,7 +2,7 @@
   <div class="invite-code-activity">
     <div class="invite-code-description">
       <div class="invite-code-description-title">
-        <info />
+        <info-icon />
         <span class="invite-code-description-title-text">邀请规则说明</span>
       </div>
       <div class="invite-code-description-content">

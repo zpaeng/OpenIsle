@@ -35,7 +35,7 @@
         </div>
         <div v-else class="signup-page-button-primary disabled">
           <div class="signup-page-button-text">
-            <i class="fas fa-spinner fa-spin"></i>
+            <loading-four />
             发送中...
           </div>
         </div>
@@ -56,7 +56,7 @@
         </div>
         <div v-else class="signup-page-button-primary disabled">
           <div class="signup-page-button-text">
-            <i class="fas fa-spinner fa-spin"></i>
+            <loading-four />
             验证中...
           </div>
         </div>

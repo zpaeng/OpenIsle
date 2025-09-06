@@ -4,7 +4,7 @@
       <template #right>
         <div class="message-page-header-right">
           <div class="message-page-header-right-item" @click="markAllRead">
-            <i class="fas fa-bolt message-page-header-right-item-button-icon"></i>
+            <check-correct class="message-page-header-right-item-button-icon" />
             <span class="message-page-header-right-item-button-text"> 已读所有消息 </span>
           </div>
         </div>

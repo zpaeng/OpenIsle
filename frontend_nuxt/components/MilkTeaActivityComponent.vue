@@ -2,7 +2,7 @@
   <div class="milk-tea-activity">
     <div class="milk-tea-description">
       <div class="milk-tea-description-title">
-        <i class="fas fa-info-circle"></i>
+        <info-icon />
         <span class="milk-tea-description-title-text">升级规则说明</span>
       </div>
       <div class="milk-tea-description-content">
@@ -29,7 +29,7 @@
         />
       </div>
       <div v-else class="user-level">
-        <div class="user-level-text"><i class="fas fa-user-circle"></i> 请登录查看自身等级</div>
+        <div class="user-level-text"><user-icon /> 请登录查看自身等级</div>
       </div>
     </div>
     <div

@@ -22,7 +22,7 @@
             class="article-subscribe-button"
             @click="subscribePost"
           >
-            <i class="fas fa-user-plus"></i>
+            <people-plus />
             <div class="article-subscribe-button-text">
               {{ isMobile ? '订阅' : '订阅文章' }}
             </div>
@@ -32,14 +32,14 @@
             class="article-unsubscribe-button"
             @click="unsubscribePost"
           >
-            <i class="fas fa-user-minus"></i>
+            <people-minus-one />
             <div class="article-unsubscribe-button-text">
               {{ isMobile ? '退订' : '取消订阅' }}
             </div>
           </div>
           <DropdownMenu v-if="articleMenuItems.length > 0" :items="articleMenuItems">
             <template #trigger>
-              <i class="fas fa-ellipsis-vertical action-menu-icon"></i>
+              <more-one class="action-menu-icon" />
             </template>
           </DropdownMenu>
         </div>
@@ -53,7 +53,7 @@
           <div v-if="isMobile" class="info-content-header">
             <div class="user-name">
               {{ author.username }}
-              <i class="fas fa-medal medal-icon"></i>
+              <medal-one class="medal-icon" />
               <NuxtLink
                 v-if="author.displayMedal"
                 class="user-medal"
@@ -69,7 +69,7 @@
           <div v-if="!isMobile" class="info-content-header">
             <div class="user-name">
               {{ author.username }}
-              <i class="fas fa-medal medal-icon"></i>
+              <medal-one class="medal-icon" />
               <NuxtLink
                 v-if="author.displayMedal"
                 class="user-medal"
@@ -88,7 +88,7 @@
           <div class="article-footer-container">
             <ReactionsGroup v-model="postReactions" content-type="post" :content-id="postId">
               <div class="make-reaction-item copy-link" @click="copyPostLink">
-                <i class="fas fa-link"></i>
+                <link-icon />
               </div>
             </ReactionsGroup>
           </div>
@@ -707,8 +707,8 @@ const unsubscribePost = async () => {
 
 const fetchCommentSorts = () => {
   return Promise.resolve([
-    { id: 'NEWEST', name: '最新', icon: 'fas fa-clock' },
-    { id: 'OLDEST', name: '最旧', icon: 'fas fa-hourglass-start' },
+    { id: 'NEWEST', name: '最新', icon: 'lightning' },
+    { id: 'OLDEST', name: '最旧', icon: 'history-icon' },
     // { id: 'MOST_INTERACTIONS', name: '最多互动', icon: 'fas fa-fire' }
   ])
 }

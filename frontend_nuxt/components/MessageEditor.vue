@@ -6,7 +6,7 @@
     <div class="message-bottom-container">
       <div class="message-submit" :class="{ disabled: isDisabled }" @click="submit">
         <template v-if="!loading"> 发送 </template>
-        <template v-else> <i class="fa-solid fa-spinner fa-spin"></i> 发送中... </template>
+        <template v-else> <loading-four /> 发送中... </template>
       </div>
     </div>
   </div>

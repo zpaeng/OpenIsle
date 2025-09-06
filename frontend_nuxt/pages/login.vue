@@ -16,7 +16,7 @@
 
         <div v-else class="login-page-button-primary disabled">
           <div class="login-page-button-text">
-            <i class="fas fa-spinner fa-spin"></i>
+            <loading-four />
             登录中...
           </div>
         </div>
@@ -28,7 +28,7 @@
           >
         </div>
         <div class="hint-message">
-          <i class="fas fa-info-circle"></i>
+          <info-icon />
           使用右侧第三方OAuth注册/登录的用户可使用对应的邮箱进行重设密码
         </div>
       </div>

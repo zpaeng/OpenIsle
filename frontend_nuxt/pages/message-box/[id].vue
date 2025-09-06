@@ -3,14 +3,14 @@
     <div v-if="!loading" class="chat-header">
       <div class="header-main">
         <div class="back-button" @click="goBack">
-          <i class="fas fa-arrow-left"></i>
+          <arrow-left />
         </div>
         <h2 class="participant-name">
           {{ isChannel ? conversationName : otherParticipant?.username }}
         </h2>
       </div>
       <div v-if="!isFloatMode" class="float-control">
-        <i class="fas fa-compress" @click="minimize" title="最小化"></i>
+        <collapse-text-input class="float-control-icon" @click="minimize" title="最小化" />
       </div>
     </div>
 
@@ -48,7 +48,7 @@
               :content-id="item.id"
               @update:modelValue="(v) => (item.reactions = v)"
             >
-              <i class="fas fa-reply reply-btn" @click="setReply(item)"> 写个回复...</i>
+              <div class="reply-btn"><next @click="setReply(item)" /> 写个回复...</div>
             </ReactionsGroup>
           </template>
         </BaseTimeline>
@@ -66,7 +66,7 @@
       <div v-if="replyTo" class="active-reply">
         正在回复 {{ replyTo.sender.username }}:
         {{ stripMarkdownLength(replyTo.content, 50) }}
-        <i class="fas fa-times close-reply" @click="replyTo = null"></i>
+        <close-icon class="close-reply" @click="replyTo = null" />
       </div>
       <MessageEditor :loading="sending" @submit="sendMessage" />
     </div>

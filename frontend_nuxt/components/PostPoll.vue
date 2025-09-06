@@ -34,7 +34,7 @@
             <div class="poll-option-title" v-else>单选</div>
 
             <div class="poll-left-time">
-              <i class="fas fa-stopwatch poll-left-time-icon"></i>
+              <stopwatch class="poll-left-time-icon" />
               <div class="poll-left-time-title">离结束</div>
               <div class="poll-left-time-value">{{ countdown }}</div>
             </div>
@@ -55,9 +55,7 @@
             </div>
 
             <div class="multi-selection-container">
-              <div class="join-poll-button" @click="submitMultiPoll">
-                <i class="fas fa-check"></i> 确认投票
-              </div>
+              <div class="join-poll-button" @click="submitMultiPoll"><check /> 确认投票</div>
             </div>
           </template>
           <template v-else>
@@ -77,9 +75,7 @@
             </div>
 
             <div class="single-selection-container">
-              <div class="join-poll-button" @click="submitSinglePoll">
-                <i class="fas fa-check"></i> 确认投票
-              </div>
+              <div class="join-poll-button" @click="submitSinglePoll"><check /> 确认投票</div>
             </div>
           </template>
         </div>
@@ -95,22 +91,20 @@
         class="poll-option-button"
         @click="showPollResult = false"
       >
-        <i class="fas fa-chevron-left"></i> 投票
+        <arrow-left /> 投票
       </div>
       <div
         v-else-if="!pollEnded && !hasVoted"
         class="poll-option-button"
         @click="showPollResult = true"
       >
-        <i class="fas fa-chart-bar"></i> 结果
+        <chart-histogram /> 结果
       </div>
-      <div v-else-if="pollEnded" class="poll-option-hint">
-        <i class="fas fa-stopwatch"></i> 投票已结束
-      </div>
+      <div v-else-if="pollEnded" class="poll-option-hint"><stopwatch /> 投票已结束</div>
       <div v-else class="poll-option-hint">
         <div>您已投票，等待结束查看结果</div>
         <div class="poll-left-time">
-          <i class="fas fa-stopwatch poll-left-time-icon"></i>
+          <stopwatch class="poll-left-time-icon" />
           <div class="poll-left-time-title">离结束</div>
           <div class="poll-left-time-value">{{ countdown }}</div>
         </div>

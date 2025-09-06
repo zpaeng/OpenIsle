@@ -41,6 +41,27 @@ import {
   Mail,
   Lock,
   User,
+  Send,
+  Unlock,
+  LockOne,
+  ImageFiles,
+  ExpandUp,
+  Close,
+  ArrowLeft,
+  CollapseTextInput,
+  Stopwatch,
+  PaperMoneyTwo,
+  Check,
+  ChartHistogram,
+  CheckCorrect,
+  PeoplePlus,
+  PeopleMinusOne,
+  SmartOptimization,
+  Save,
+  Clear,
+  FileText,
+  History,
+  Lightning,
 } from '@icon-park/vue-next'
 
 export default defineNuxtPlugin((nuxtApp) => {
@@ -52,7 +73,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.component('Edit', Edit)
   nuxtApp.vueApp.component('HashtagKey', HashtagKey)
   nuxtApp.vueApp.component('Remind', Remind)
-  nuxtApp.vueApp.component('Info', Info)
+  nuxtApp.vueApp.component('InfoIcon', Info)
   nuxtApp.vueApp.component('ChartLine', ChartLine)
   nuxtApp.vueApp.component('Finance', Finance)
   nuxtApp.vueApp.component('Up', Up)
@@ -85,4 +106,25 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.component('UserIcon', User)
   nuxtApp.vueApp.component('Mail', Mail)
   nuxtApp.vueApp.component('Lock', Lock)
+  nuxtApp.vueApp.component('SendIcon', Send)
+  nuxtApp.vueApp.component('Unlock', Unlock)
+  nuxtApp.vueApp.component('LockOne', LockOne)
+  nuxtApp.vueApp.component('ImageFiles', ImageFiles)
+  nuxtApp.vueApp.component('ExpandUp', ExpandUp)
+  nuxtApp.vueApp.component('CloseIcon', Close)
+  nuxtApp.vueApp.component('ArrowLeft', ArrowLeft)
+  nuxtApp.vueApp.component('CollapseTextInput', CollapseTextInput)
+  nuxtApp.vueApp.component('Stopwatch', Stopwatch)
+  nuxtApp.vueApp.component('PaperMoneyTwo', PaperMoneyTwo)
+  nuxtApp.vueApp.component('Check', Check)
+  nuxtApp.vueApp.component('ChartHistogram', ChartHistogram)
+  nuxtApp.vueApp.component('CheckCorrect', CheckCorrect)
+  nuxtApp.vueApp.component('PeoplePlus', PeoplePlus)
+  nuxtApp.vueApp.component('PeopleMinusOne', PeopleMinusOne)
+  nuxtApp.vueApp.component('SmartOptimization', SmartOptimization)
+  nuxtApp.vueApp.component('SaveIcon', Save)
+  nuxtApp.vueApp.component('ClearIcon', Clear)
+  nuxtApp.vueApp.component('FileText', FileText)
+  nuxtApp.vueApp.component('HistoryIcon', History)
+  nuxtApp.vueApp.component('Lightning', Lightning)
 })

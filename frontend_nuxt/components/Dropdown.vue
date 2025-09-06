@@ -19,13 +19,7 @@
                     class="option-icon"
                     :alt="label.name"
                   />
-                  <component
-                    v-else-if="isIconComponent(label.icon)"
-                    :is="label.icon"
-                    class="option-icon"
-                    :size="16"
-                  />
-                  <i v-else :class="['option-icon', label.icon]"></i>
+                  <component v-else :is="label.icon" class="option-icon" :size="16" />
                 </template>
                 <span>{{ label.name }}</span>
               </div>
@@ -44,13 +38,7 @@
                   class="option-icon"
                   :alt="selectedLabels[0].name"
                 />
-                <component
-                  v-else-if="isIconComponent(selectedLabels[0].icon)"
-                  :is="selectedLabels[0].icon"
-                  class="option-icon"
-                  :size="16"
-                />
-                <i v-else :class="['option-icon', selectedLabels[0].icon]"></i>
+                <component v-else :is="selectedLabels[0].icon" class="option-icon" :size="16" />
               </template>
               <span>{{ selectedLabels[0].name }}</span>
             </div>
@@ -87,13 +75,7 @@
                 class="option-icon"
                 :alt="o.name"
               />
-              <component
-                v-else-if="isIconComponent(o.icon)"
-                :is="o.icon"
-                class="option-icon"
-                :size="16"
-              />
-              <i v-else :class="['option-icon', o.icon]"></i>
+              <component v-else :is="o.icon" class="option-icon" :size="16" />
             </template>
             <span>{{ o.name }}</span>
           </slot>
@@ -129,13 +111,7 @@
                     class="option-icon"
                     :alt="o.name"
                   />
-                  <component
-                    v-else-if="isIconComponent(o.icon)"
-                    :is="o.icon"
-                    class="option-icon"
-                    :size="16"
-                  />
-                  <i v-else :class="['option-icon', o.icon]"></i>
+                  <component v-else :is="o.icon" class="option-icon" :size="16" />
                 </template>
                 <span>{{ o.name }}</span>
               </slot>
@@ -273,10 +249,6 @@ export default {
       return /^https?:\/\//.test(icon) || icon.startsWith('/')
     }
 
-    const isIconComponent = (icon) => {
-      return typeof icon === 'string' && !icon.includes(' ')
-    }
-
     expose({ toggle, close })
 
     return {
@@ -291,7 +263,6 @@ export default {
       isSelected,
       loading,
       isImageIcon,
-      isIconComponent,
       setSearch,
       isMobile,
     }

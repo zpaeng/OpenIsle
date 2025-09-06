@@ -3,20 +3,10 @@
     <iframe :src="iframeSrc" frameborder="0" ref="iframeRef" @load="injectBaseTag"></iframe>
 
     <div class="float-actions">
-      <i
-        class="fas fa-chevron-down"
-        v-if="floatHeight !== MINI_HEIGHT"
-        title="收起至 100px"
-        @click="collapseToMini"
-      ></i>
-      <i
-        class="fas fa-chevron-up"
-        v-if="floatHeight !== DEFAULT_HEIGHT"
-        title="回弹至 60vh"
-        @click="reboundToDefault"
-      ></i>
-      <i class="fas fa-expand" title="在页面中打开" @click="expand"></i>
-      <i class="fas fa-times" title="关闭" @click="close"></i>
+      <down v-if="floatHeight !== MINI_HEIGHT" title="收起至 100px" @click="collapseToMini" />
+      <up v-if="floatHeight !== DEFAULT_HEIGHT" title="回弹至 60vh" @click="reboundToDefault" />
+      <expand-up title="在页面中打开" @click="expand" />
+      <close-icon title="关闭" @click="close" />
     </div>
   </div>
 </template>

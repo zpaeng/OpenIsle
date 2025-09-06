@@ -34,7 +34,7 @@
             to="/about"
             @click="handleItemClick"
           >
-            <info class="menu-item-icon" />
+            <info-icon class="menu-item-icon" />
             <span class="menu-item-text">关于</span>
           </NuxtLink>
           <NuxtLink

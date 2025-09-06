@@ -21,7 +21,7 @@
         <div class="primary-button disabled" v-else>提交中...</div>
       </div>
       <div class="hint-message">
-        <i class="fas fa-info-circle"></i>
+        <info-icon />
         使用 Google 注册的用户可使用对应的邮箱进行找回密码
       </div>
     </div>

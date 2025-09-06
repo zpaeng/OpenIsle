@@ -42,7 +42,7 @@
         @click="toggleReaction('LIKE')"
       >
         <like v-if="!userReacted('LIKE')" />
-        <i v-else class="fas fa-heart"></i>
+        <like v-else theme="filled" />
         <span class="reactions-count" v-if="likeCount">{{ likeCount }}</span>
       </div>
       <slot></slot>

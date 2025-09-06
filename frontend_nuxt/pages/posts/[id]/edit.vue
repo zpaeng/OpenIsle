@@ -12,9 +12,9 @@
           <TagSelect v-model="selectedTags" creatable />
         </div>
         <div class="post-options-right">
-          <div class="post-clear" @click="clearPost"><i class="fa-solid fa-eraser"></i> 清空</div>
+          <div class="post-clear" @click="clearPost"><clear-icon /> 清空</div>
           <div class="ai-generate" @click="aiGenerate">
-            <i class="fa-solid fa-robot"></i>
+            <smart-optimization />
             MD 格式优化
           </div>
           <div class="post-cancel" @click="cancelEdit">取消</div>
@@ -26,9 +26,7 @@
           >
             更新
           </div>
-          <div v-else class="post-submit-loading">
-            <i class="fa-solid fa-spinner fa-spin"></i> 更新中...
-          </div>
+          <div v-else class="post-submit-loading"><loading-four /> 更新中...</div>
         </div>
       </div>
     </div>

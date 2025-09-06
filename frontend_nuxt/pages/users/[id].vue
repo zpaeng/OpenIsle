@@ -45,7 +45,7 @@
               content="经验值可通过发帖、评论等操作获得，达到目标后即可提升等级，解锁更多功能。"
               placement="bottom"
             >
-              <info class="profile-exp-info" />
+              <info-icon class="profile-exp-info" />
             </ToolTip>
           </div>
         </div>
