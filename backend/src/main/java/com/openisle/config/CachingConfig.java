@@ -22,6 +22,8 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Redis 缓存配置类
@@ -80,13 +82,16 @@ public class CachingConfig {
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(redisSerializer))
                 .disableCachingNullValues(); // 禁止缓存 null 值
-//        个别缓存单独设置TTL时间
-//        Map<String, RedisCacheConfiguration> cacheConfigs = new HashMap<>();
-//        cacheConfigs.put("openisle_tags", RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ZERO));
-//        cacheConfigs.put("openisle_categories", RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ZERO));
+
+        // 个别缓存单独设置 TTL 时间
+        Map<String, RedisCacheConfiguration> cacheConfigs = new HashMap<>();
+        RedisCacheConfiguration oneHourConfig = config.entryTtl(Duration.ofHours(1));
+        cacheConfigs.put(TAG_CACHE_NAME, oneHourConfig);
+        cacheConfigs.put(CATEGORY_CACHE_NAME, oneHourConfig);
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(config)
+                .withInitialCacheConfigurations(cacheConfigs)
                 .build();
     }
 
