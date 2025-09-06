@@ -35,9 +35,9 @@ DELETE FROM `users`;
 -- 插入用户，两个普通用户，一个管理员
 -- username:admin/user1/user2 password:123321
 INSERT INTO `users` (`id`, `approved`, `avatar`, `created_at`, `display_medal`, `email`, `experience`, `introduction`, `password`, `password_reset_code`, `point`, `register_reason`, `role`, `username`, `verification_code`, `verified`) VALUES
-	(1, b'1', '', '2025-09-01 16:08:17.426430', 'PIONEER', 'adminmail@openisle.com', 70, NULL, '$2a$10$m.lLbT3wFtnzFMi7JqN17ecv/dzH704WzU1f/xvQ0nVz4XxTXPT0K', NULL, 110, '测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试', 'ADMIN', 'admin', NULL, b'1'),
-	(2, b'1', '', '2025-09-03 16:08:17.426430', 'PIONEER', 'usermail2@openisle.com', 70, NULL, '$2a$10$m.lLbT3wFtnzFMi7JqN17ecv/dzH704WzU1f/xvQ0nVz4XxTXPT0K', NULL, 110, '测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试', 'USER', 'user1', NULL, b'1'),
-	(3, b'1', '', '2025-09-02 17:21:21.617666', 'PIONEER', 'usermail1@openisle.com', 40, NULL, '$2a$10$m.lLbT3wFtnzFMi7JqN17ecv/dzH704WzU1f/xvQ0nVz4XxTXPT0K', NULL, 40, '测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试', 'USER', 'user2', NULL, b'1');
+	(1, b'1', '', '2025-09-01 16:08:17.426430', 'PIONEER', 'adminmail@openisle.com', 70, NULL, '$2a$10$dux.NXwW09cCsdZ05BgcnOtxVqqjcmnbj3.8xcxGl/iiIlv06y7Oe', NULL, 110, '测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试', 'ADMIN', 'admin', NULL, b'1'),
+	(2, b'1', '', '2025-09-03 16:08:17.426430', 'PIONEER', 'usermail2@openisle.com', 70, NULL, '$2a$10$dux.NXwW09cCsdZ05BgcnOtxVqqjcmnbj3.8xcxGl/iiIlv06y7Oe', NULL, 110, '测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试', 'USER', 'user1', NULL, b'1'),
+	(3, b'1', '', '2025-09-02 17:21:21.617666', 'PIONEER', 'usermail1@openisle.com', 40, NULL, '$2a$10$dux.NXwW09cCsdZ05BgcnOtxVqqjcmnbj3.8xcxGl/iiIlv06y7Oe', NULL, 40, '测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试', 'USER', 'user2', NULL, b'1');
 
 -- 创建 tags 表（如果不存在）
 CREATE TABLE IF NOT EXISTS `tags` (
