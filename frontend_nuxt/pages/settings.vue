@@ -7,7 +7,7 @@
       @crop="onCropped"
     />
     <div v-if="isLoadingPage" class="loading-page">
-      <l-hatch size="20" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
+      <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
     </div>
     <div v-else>
       <div class="settings-title">个人资料设置</div>
@@ -23,7 +23,7 @@
         </div>
         <div class="form-row username-row">
           <BaseInput
-            icon="fas fa-user"
+            icon="user-icon"
             v-model="username"
             @input="usernameError = ''"
             placeholder="用户名"
@@ -133,15 +133,15 @@ const onCropped = ({ file, url }) => {
 }
 const fetchPublishModes = () => {
   return Promise.resolve([
-    { id: 'DIRECT', name: '直接发布', icon: 'fas fa-bolt' },
-    { id: 'REVIEW', name: '审核后发布', icon: 'fas fa-search' },
+    { id: 'DIRECT', name: '直接发布', icon: 'send-icon' },
+    { id: 'REVIEW', name: '审核后发布', icon: 'search-icon' },
   ])
 }
 const fetchPasswordStrengths = () => {
   return Promise.resolve([
-    { id: 'LOW', name: '低', icon: 'fas fa-lock-open' },
-    { id: 'MEDIUM', name: '中', icon: 'fas fa-lock' },
-    { id: 'HIGH', name: '高', icon: 'fas fa-user-shield' },
+    { id: 'LOW', name: '低', icon: 'unlock' },
+    { id: 'MEDIUM', name: '中', icon: 'lock-one' },
+    { id: 'HIGH', name: '高', icon: 'lock' },
   ])
 }
 const fetchAiLimits = () => {
@@ -154,8 +154,8 @@ const fetchAiLimits = () => {
 }
 const fetchRegisterModes = () => {
   return Promise.resolve([
-    { id: 'DIRECT', name: '直接注册', icon: 'fas fa-user-check' },
-    { id: 'WHITELIST', name: '白名单邀请制', icon: 'fas fa-envelope' },
+    { id: 'DIRECT', name: '直接注册', icon: 'send-icon' },
+    { id: 'WHITELIST', name: '白名单邀请制', icon: 'search-icon' },
   ])
 }
 const loadAdminConfig = async () => {

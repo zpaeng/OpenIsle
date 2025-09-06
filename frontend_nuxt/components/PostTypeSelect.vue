@@ -31,9 +31,9 @@ export default {
 
     const fetchTypes = async () => {
       return [
-        { id: 'NORMAL', name: '普通帖子', icon: 'fa-regular fa-file' },
-        { id: 'LOTTERY', name: '抽奖帖子', icon: 'fa-solid fa-gift' },
-        { id: 'POLL', name: '投票帖子', icon: 'fa-solid fa-square-poll-vertical' },
+        { id: 'NORMAL', name: '普通帖子', icon: 'file-text' },
+        { id: 'LOTTERY', name: '抽奖帖子', icon: 'gift' },
+        { id: 'POLL', name: '投票帖子', icon: 'ranking-list' },
       ]
     }
 

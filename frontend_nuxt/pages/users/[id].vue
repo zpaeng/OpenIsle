@@ -18,7 +18,7 @@
               class="profile-page-header-subscribe-button"
               @click="subscribeUser"
             >
-              <i class="fas fa-user-plus"></i>
+              <add-user />
               关注
             </div>
             <div
@@ -26,11 +26,11 @@
               class="profile-page-header-unsubscribe-button"
               @click="unsubscribeUser"
             >
-              <i class="fas fa-user-minus"></i>
+              <reduce-user />
               取消关注
             </div>
             <div v-if="!isMine" class="profile-page-header-subscribe-button" @click="sendMessage">
-              <i class="fas fa-paper-plane"></i>
+              <message-one />
               发私信
             </div>
           </div>
@@ -45,7 +45,7 @@
               content="经验值可通过发帖、评论等操作获得，达到目标后即可提升等级，解锁更多功能。"
               placement="bottom"
             >
-              <i class="fas fa-info-circle profile-exp-info"></i>
+              <info-icon class="profile-exp-info" />
             </ToolTip>
           </div>
         </div>
@@ -207,7 +207,7 @@
             <BasePlaceholder
               v-if="filteredTimelineItems.length === 0"
               text="暂无时间线"
-              icon="fas fa-inbox"
+              icon="inbox"
             />
             <div class="timeline-list">
               <BaseTimeline :items="filteredTimelineItems">
@@ -305,7 +305,7 @@
               </BaseTimeline>
             </div>
             <div v-else>
-              <BasePlaceholder text="暂无收藏文章" icon="fas fa-inbox" />
+              <BasePlaceholder text="暂无收藏文章" icon="inbox" />
             </div>
           </div>
 
@@ -368,11 +368,11 @@ const selectedTab = ref(
     : 'summary',
 )
 const tabs = [
-  { key: 'summary', label: '总结', icon: 'fas fa-chart-line' },
-  { key: 'timeline', label: '时间线', icon: 'fas fa-clock' },
-  { key: 'following', label: '关注', icon: 'fas fa-user-plus' },
-  { key: 'favorites', label: '收藏', icon: 'fas fa-bookmark' },
-  { key: 'achievements', label: '勋章', icon: 'fas fa-medal' },
+  { key: 'summary', label: '总结', icon: 'chart-line' },
+  { key: 'timeline', label: '时间线', icon: 'alarm-clock' },
+  { key: 'following', label: '关注', icon: 'add-user' },
+  { key: 'favorites', label: '收藏', icon: 'bookmark' },
+  { key: 'achievements', label: '勋章', icon: 'medal-one' },
 ]
 const followTab = ref('followers')
 
@@ -415,19 +415,19 @@ const fetchSummary = async () => {
   const postsRes = await fetch(`${API_BASE_URL}/api/users/${username}/hot-posts`)
   if (postsRes.ok) {
     const data = await postsRes.json()
-    hotPosts.value = data.map((p) => ({ icon: 'fas fa-book', post: p }))
+    hotPosts.value = data.map((p) => ({ icon: 'file-text', post: p }))
   }
 
   const repliesRes = await fetch(`${API_BASE_URL}/api/users/${username}/hot-replies`)
   if (repliesRes.ok) {
     const data = await repliesRes.json()
-    hotReplies.value = data.map((c) => ({ icon: 'fas fa-comment', comment: c }))
+    hotReplies.value = data.map((c) => ({ icon: 'comment-icon', comment: c }))
   }
 
   const tagsRes = await fetch(`${API_BASE_URL}/api/users/${username}/hot-tags`)
   if (tagsRes.ok) {
     const data = await tagsRes.json()
-    hotTags.value = data.map((t) => ({ icon: 'fas fa-tag', tag: t }))
+    hotTags.value = data.map((t) => ({ icon: 'tag-one', tag: t }))
   }
 }
 
@@ -443,19 +443,19 @@ const fetchTimeline = async () => {
   const mapped = [
     ...posts.map((p) => ({
       type: 'post',
-      icon: 'fas fa-book',
+      icon: 'file-text',
       post: p,
       createdAt: p.createdAt,
     })),
     ...replies.map((r) => ({
       type: r.parentComment ? 'reply' : 'comment',
-      icon: 'fas fa-comment',
+      icon: 'comment-icon',
       comment: r,
       createdAt: r.createdAt,
     })),
     ...tags.map((t) => ({
       type: 'tag',
-      icon: 'fas fa-tag',
+      icon: 'tag-one',
       tag: t,
       createdAt: t.createdAt,
     })),
@@ -477,7 +477,7 @@ const fetchFavorites = async () => {
   const res = await fetch(`${API_BASE_URL}/api/users/${username}/subscribed-posts`)
   if (res.ok) {
     const data = await res.json()
-    favoritePosts.value = data.map((p) => ({ icon: 'fas fa-bookmark', post: p }))
+    favoritePosts.value = data.map((p) => ({ icon: 'bookmark', post: p }))
   } else {
     favoritePosts.value = []
   }

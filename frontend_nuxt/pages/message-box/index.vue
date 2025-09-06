@@ -1,11 +1,11 @@
 <template>
   <div class="messages-container">
     <div class="page-title">
-      <i class="fas fa-comments"></i>
+      <message-emoji />
       <span class="page-title-text">选择聊天</span>
     </div>
     <div v-if="!isFloatMode" class="float-control">
-      <i class="fas fa-compress" @click="minimize" title="最小化"></i>
+      <collapse-text-input class="float-control-icon" @click="minimize" title="最小化" />
     </div>
     <BaseTabs v-model="activeTab" :tabs="tabs">
       <div v-if="activeTab === 'messages'">
@@ -22,7 +22,7 @@
         </div>
 
         <div v-if="!loading && conversations.length === 0" class="empty-container">
-          <BasePlaceholder v-if="conversations.length === 0" text="暂无会话" icon="fas fa-inbox" />
+          <BasePlaceholder v-if="conversations.length === 0" text="暂无会话" icon="inbox" />
         </div>
 
         <div
@@ -73,7 +73,7 @@
         </div>
         <div v-else>
           <div v-if="channels.length === 0" class="empty-container">
-            <BasePlaceholder text="暂无频道" icon="fas fa-inbox" />
+            <BasePlaceholder text="暂无频道" icon="inbox" />
           </div>
           <div
             v-for="ch in channels"
@@ -273,9 +273,9 @@ onActivated(async () => {
 })
 
 const subscribeToUserMessages = () => {
-  if (!currentUser.value) return;
+  if (!currentUser.value) return
   const destination = `/topic/user/${currentUser.value.id}/messages`
-  
+
   subscribe(destination, (message) => {
     if (activeTab.value === 'messages') {
       fetchConversations()

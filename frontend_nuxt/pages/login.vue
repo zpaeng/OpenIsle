@@ -6,9 +6,9 @@
       </div>
 
       <div class="email-login-page-content">
-        <BaseInput icon="fas fa-envelope" v-model="username" placeholder="邮箱/用户名" />
+        <BaseInput icon="mail" v-model="username" placeholder="邮箱/用户名" />
 
-        <BaseInput icon="fas fa-lock" v-model="password" type="password" placeholder="密码" />
+        <BaseInput icon="lock" v-model="password" type="password" placeholder="密码" />
 
         <div v-if="!isWaitingForLogin" class="login-page-button-primary" @click="submitLogin">
           <div class="login-page-button-text">登录</div>
@@ -16,7 +16,7 @@
 
         <div v-else class="login-page-button-primary disabled">
           <div class="login-page-button-text">
-            <i class="fas fa-spinner fa-spin"></i>
+            <loading-four />
             登录中...
           </div>
         </div>
@@ -28,7 +28,7 @@
           >
         </div>
         <div class="hint-message">
-          <i class="fas fa-info-circle"></i>
+          <info-icon />
           使用右侧第三方OAuth注册/登录的用户可使用对应的邮箱进行重设密码
         </div>
       </div>

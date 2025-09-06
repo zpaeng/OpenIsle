@@ -25,7 +25,7 @@
 
           <div class="point-info">
             <p v-if="authState.loggedIn && point !== null">
-              <span><i class="fas fa-coins coin-icon"></i></span>我的积分：<span
+              <span><paper-money-two class="coin-icon" /></span>我的积分：<span
                 class="point-value"
                 >{{ point }}</span
               >
@@ -37,7 +37,7 @@
               <BaseImage class="goods-item-image" :src="good.image" alt="good.name" />
               <div class="goods-item-name">{{ good.name }}</div>
               <div class="goods-item-cost">
-                <i class="fas fa-coins"></i>
+                <paper-money-two />
                 {{ good.cost }} 积分
               </div>
               <div
@@ -63,11 +63,7 @@
         <div class="loading-points-container" v-if="historyLoading">
           <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
         </div>
-        <BasePlaceholder
-          v-else-if="histories.length === 0"
-          text="暂无积分记录"
-          icon="fas fa-inbox"
-        />
+        <BasePlaceholder v-else-if="histories.length === 0" text="暂无积分记录" icon="inbox" />
         <div class="timeline-container" v-else>
           <BaseTimeline :items="histories">
             <template #item="{ item }">
@@ -189,7 +185,7 @@
                   参与，获得 {{ item.amount }} 积分
                 </template>
                 <template v-else-if="item.type === 'SYSTEM_ONLINE'"> 积分历史系统上线 </template>
-                <i class="fas fa-coins"></i> 你目前的积分是 {{ item.balance }}
+                <paper-money-two /> 你目前的积分是 {{ item.balance }}
               </div>
               <div class="history-time">{{ TimeManager.format(item.createdAt) }}</div>
             </template>
@@ -242,18 +238,18 @@ const loading = ref(false)
 const selectedGood = ref(null)
 
 const iconMap = {
-  POST: 'fas fa-file-alt',
-  COMMENT: 'fas fa-comment',
-  POST_LIKED: 'fas fa-thumbs-up',
-  COMMENT_LIKED: 'fas fa-thumbs-up',
-  INVITE: 'fas fa-user-plus',
-  SYSTEM_ONLINE: 'fas fa-clock',
-  REDEEM: 'fas fa-gift',
-  FEATURE: 'fas fa-star',
-  LOTTERY_JOIN: 'fas fa-ticket-alt',
-  LOTTERY_REWARD: 'fas fa-ticket-alt',
-  POST_LIKE_CANCELLED: 'fas fa-thumbs-down',
-  COMMENT_LIKE_CANCELLED: 'fas fa-thumbs-down',
+  POST: 'file-text',
+  COMMENT: 'comment-icon',
+  POST_LIKED: 'like',
+  COMMENT_LIKED: 'like',
+  INVITE: 'add-user',
+  SYSTEM_ONLINE: 'history-icon',
+  REDEEM: 'gift',
+  FEATURE: 'star',
+  LOTTERY_JOIN: 'medal-one',
+  LOTTERY_REWARD: 'fireworks',
+  POST_LIKE_CANCELLED: 'clear-icon',
+  COMMENT_LIKE_CANCELLED: 'clear-icon',
 }
 
 const loadTrend = async () => {

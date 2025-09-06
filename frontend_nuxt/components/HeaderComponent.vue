@@ -4,7 +4,7 @@
       <div class="header-content-left">
         <div v-if="showMenuBtn" class="menu-btn-wrapper">
           <button class="menu-btn" ref="menuBtn" @click="$emit('toggle-menu')">
-            <i class="fas fa-bars micon"></i>
+            <application-menu class="micon"></application-menu>
           </button>
           <span
             v-if="isMobile && (unreadMessageCount > 0 || hasChannelUnread)"
@@ -25,39 +25,39 @@
       <ClientOnly>
         <div class="header-content-right">
           <div v-if="isMobile" class="search-icon" @click="search">
-            <i class="fas fa-search"></i>
+            <search-icon />
           </div>
 
           <div v-if="isMobile" class="theme-icon" @click="cycleTheme">
-            <i :class="iconClass"></i>
+            <component :is="iconClass" />
           </div>
 
           <div v-if="!isMobile" class="invite_text" @click="copyInviteLink">
-            <i class="fas fa-copy"></i>
+            <copy />
             邀请
-            <i v-if="isCopying" class="fas fa-spinner fa-spin"></i>
+            <loading v-if="isCopying" />
           </div>
           <ToolTip v-if="!isMobile" content="当前在线人数" placement="bottom">
             <div class="online-count">
-              <i class="fas fa-people-group"></i>
+              <peoples-two />
               <span>{{ onlineCount }}</span>
             </div>
           </ToolTip>
           <ToolTip content="复制RSS链接" placement="bottom">
             <div class="rss-icon" @click="copyRssLink">
-              <i class="fas fa-rss"></i>
+              <rss />
             </div>
           </ToolTip>
 
           <ToolTip v-if="!isMobile && isLogin" content="发帖" placement="bottom">
             <div class="new-post-icon" @click="goToNewPost">
-              <i class="fas fa-edit"></i>
+              <edit />
             </div>
           </ToolTip>
 
           <ToolTip v-if="isLogin" content="站内信和频道" placement="bottom">
             <div class="messages-icon" @click="goToMessages">
-              <i class="fas fa-comments"></i>
+              <message-emoji />
               <span v-if="unreadMessageCount > 0" class="unread-badge">{{
                 unreadMessageCount
               }}</span>
@@ -69,7 +69,7 @@
             <template #trigger>
               <div class="avatar-container">
                 <img class="avatar-img" :src="avatar" alt="avatar" />
-                <i class="fas fa-caret-down dropdown-icon"></i>
+                <down />
               </div>
             </template>
           </DropdownMenu>
@@ -143,7 +143,7 @@ async function sendPing() {
       method: 'POST',
     })
   } catch (e) {
-    console.error("心跳失败", e)
+    console.error('心跳失败', e)
   }
 }
 
@@ -155,10 +155,9 @@ async function fetchCount() {
     })
     onlineCount.value = await res.json()
   } catch (e) {
-    console.error("获取在线人数失败", e)
+    console.error('获取在线人数失败', e)
   }
 }
-
 
 const search = () => {
   showSearch.value = true
@@ -271,11 +270,11 @@ const headerMenuItems = computed(() => [
 const iconClass = computed(() => {
   switch (themeState.mode) {
     case ThemeMode.DARK:
-      return 'fas fa-moon'
+      return 'Moon'
     case ThemeMode.LIGHT:
-      return 'fas fa-sun'
+      return 'SunOne'
     default:
-      return 'fas fa-desktop'
+      return 'ComputerOne'
   }
 })
 
@@ -311,8 +310,8 @@ onMounted(async () => {
   // 新增的在线人数逻辑
   sendPing()
   fetchCount()
-  setInterval(sendPing, 120000)   // 每 2 分钟发一次心跳
-  setInterval(fetchCount, 60000)  // 每 1 分更新 UI
+  setInterval(sendPing, 120000) // 每 2 分钟发一次心跳
+  setInterval(fetchCount, 60000) // 每 1 分更新 UI
 })
 </script>
 

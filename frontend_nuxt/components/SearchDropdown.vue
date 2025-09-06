@@ -13,7 +13,7 @@
     >
       <template #display="{ setSearch }">
         <div class="search-input">
-          <i class="search-input-icon fas fa-search"></i>
+          <search-icon class="search-input-icon" />
           <input
             class="text-input"
             v-model="keyword"
@@ -24,7 +24,7 @@
       </template>
       <template #option="{ option }">
         <div class="search-option-item">
-          <i :class="['result-icon', iconMap[option.type] || 'fas fa-question']"></i>
+          <component :is="iconMap[option.type]" class="result-icon" />
           <div class="result-body">
             <div class="result-main" v-html="highlight(option.text)"></div>
             <div v-if="option.subText" class="result-sub" v-html="highlight(option.subText)"></div>
@@ -83,11 +83,12 @@ const highlight = (text) => {
 }
 
 const iconMap = {
-  user: 'fas fa-user',
-  post: 'fas fa-file-alt',
-  comment: 'fas fa-comment',
-  category: 'fas fa-folder',
-  tag: 'fas fa-hashtag',
+  user: 'UserIcon',
+  post: 'FileText',
+  post_title: 'FileText',
+  comment: 'CommentIcon',
+  category: 'Inbox',
+  tag: 'TagOne',
 }
 
 watch(selected, (val) => {

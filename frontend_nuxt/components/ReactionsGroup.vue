@@ -19,8 +19,7 @@
           </div>
 
           <div class="reactions-viewer-item placeholder" @click="openPanel">
-            <i class="far fa-smile reactions-viewer-item-placeholder-icon"></i>
-            <!-- <span class="reactions-viewer-item-placeholder-text">点击以表态</span> -->
+            <sly-face-whit-smile class="reactions-viewer-item-placeholder-icon" />
           </div>
         </template>
         <template v-else-if="displayedReactions.length">
@@ -42,8 +41,8 @@
         class="make-reaction-item like-reaction"
         @click="toggleReaction('LIKE')"
       >
-        <i v-if="!userReacted('LIKE')" class="far fa-heart"></i>
-        <i v-else class="fas fa-heart"></i>
+        <like v-if="!userReacted('LIKE')" />
+        <like v-else theme="filled" />
         <span class="reactions-count" v-if="likeCount">{{ likeCount }}</span>
       </div>
       <slot></slot>

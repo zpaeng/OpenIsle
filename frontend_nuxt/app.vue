@@ -25,7 +25,7 @@
         class="app-new-post-icon"
         @click="goToNewPost"
       >
-        <i class="fas fa-edit"></i>
+        <edit />
       </div>
     </div>
     <GlobalPopups />

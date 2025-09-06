@@ -15,16 +15,16 @@
       <div class="common-info-content-header">
         <div class="info-content-header-left">
           <span class="user-name">{{ comment.userName }}</span>
-          <i class="fas fa-medal medal-icon"></i>
+          <medal-one class="medal-icon" />
           <NuxtLink
             v-if="comment.medal"
             class="medal-name"
             :to="`/users/${comment.userId}?tab=achievements`"
             >{{ getMedalTitle(comment.medal) }}</NuxtLink
           >
-          <i v-if="comment.pinned" class="fas fa-thumbtack pin-icon"></i>
+          <pin v-if="comment.pinned" class="pin-icon" />
           <span v-if="level >= 2" class="reply-item">
-            <i class="fas fa-reply reply-icon"></i>
+            <next class="reply-icon" />
             <span class="reply-info">
               <BaseImage
                 class="reply-avatar"
@@ -40,7 +40,7 @@
         <div class="info-content-header-right">
           <DropdownMenu v-if="commentMenuItems.length > 0" :items="commentMenuItems">
             <template #trigger>
-              <i class="fas fa-ellipsis-vertical action-menu-icon"></i>
+              <more-one class="action-menu-icon" />
             </template>
           </DropdownMenu>
         </div>
@@ -53,10 +53,10 @@
       <div class="article-footer-container">
         <ReactionsGroup v-model="comment.reactions" content-type="comment" :content-id="comment.id">
           <div class="make-reaction-item comment-reaction" @click="toggleEditor">
-            <i class="far fa-comment"></i>
+            <comment-icon />
           </div>
           <div class="make-reaction-item copy-link" @click="copyCommentLink">
-            <i class="fas fa-link"></i>
+            <link-icon />
           </div>
         </ReactionsGroup>
       </div>
@@ -71,8 +71,8 @@
         />
       </div>
       <div v-if="replyCount && level < 2" class="reply-toggle" @click="toggleReplies">
-        <i v-if="showReplies" class="fas fa-chevron-up reply-toggle-icon"></i>
-        <i v-else class="fas fa-chevron-down reply-toggle-icon"></i>
+        <up v-if="showReplies" class="reply-toggle-icon" />
+        <down v-else class="reply-toggle-icon" />
         {{ replyCount }}条回复
       </div>
       <div v-if="showReplies && level < 2" class="reply-list">
@@ -375,7 +375,6 @@ const handleContentClick = (e) => {
 }
 
 .reply-toggle-icon {
-  margin-right: 5px;
 }
 
 .common-info-content-header {

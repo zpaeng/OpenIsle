@@ -13,7 +13,7 @@
     >
       <template #display="{ setSearch }">
         <div class="search-input">
-          <i class="search-input-icon fas fa-search"></i>
+          <search-icon class="search-input-icon" />
           <input
             class="text-input"
             v-model="keyword"

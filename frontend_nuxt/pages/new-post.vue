@@ -13,13 +13,13 @@
           <PostTypeSelect v-model="postType" />
         </div>
         <div class="post-options-right">
-          <div class="post-clear" @click="clearPost"><i class="fa-solid fa-eraser"></i> 清空</div>
+          <div class="post-clear" @click="clearPost"><clear-icon /> 清空</div>
           <div class="ai-generate" @click="aiGenerate">
-            <i class="fa-solid fa-robot"></i>
+            <smart-optimization />
             MD 格式优化
           </div>
           <div class="post-draft" @click="saveDraft">
-            <i class="fa-solid fa-floppy-disk"></i>
+            <save-icon />
             存草稿
           </div>
           <div
@@ -30,9 +30,7 @@
           >
             发布
           </div>
-          <div v-else class="post-submit-loading">
-            <i class="fa-solid fa-spinner fa-spin"></i> 发布中...
-          </div>
+          <div v-else class="post-submit-loading"><loading-four /> 发布中...</div>
         </div>
       </div>
       <LotteryForm v-if="postType === 'LOTTERY'" :data="lottery" />

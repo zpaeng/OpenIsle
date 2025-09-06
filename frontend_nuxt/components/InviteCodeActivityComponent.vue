@@ -2,7 +2,7 @@
   <div class="invite-code-activity">
     <div class="invite-code-description">
       <div class="invite-code-description-title">
-        <i class="fas fa-info-circle"></i>
+        <info-icon />
         <span class="invite-code-description-title-text">邀请规则说明</span>
       </div>
       <div class="invite-code-description-content">
@@ -17,7 +17,7 @@
     <div v-if="inviteLink" class="invite-code-link-content">
       <p class="invite-code-link-content-text">
         邀请链接：{{ inviteLink }}
-        <span @click="copyLink"><i class="fas fa-copy copy-icon"></i></span>
+        <span @click="copyLink"><copy class="copy-icon" /></span>
       </p>
     </div>
 

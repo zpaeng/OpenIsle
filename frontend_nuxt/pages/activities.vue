@@ -18,7 +18,7 @@
           <div class="activity-list-page-card-content">{{ a.content }}</div>
           <div class="activity-list-page-card-footer">
             <div class="activity-list-page-card-footer-start-time">
-              <i class="fas fa-clock"></i>
+              <stopwatch />
               <span>开始于 {{ TimeManager.format(a.startTime) }}</span>
             </div>
           </div>

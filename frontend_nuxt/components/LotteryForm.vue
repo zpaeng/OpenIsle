@@ -10,7 +10,7 @@
       <span class="prize-row-title">奖品图片</span>
       <label class="prize-container">
         <BaseImage v-if="data.prizeIcon" :src="data.prizeIcon" class="prize-preview" alt="prize" />
-        <i v-else class="fa-solid fa-image default-prize-icon"></i>
+        <image-files v-else class="default-prize-icon" />
         <div class="prize-overlay">上传奖品图片</div>
         <input type="file" class="prize-input" accept="image/*" @change="onPrizeIconChange" />
       </label>

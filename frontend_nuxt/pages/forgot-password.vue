@@ -2,26 +2,26 @@
   <div class="forgot-page">
     <div class="forgot-content">
       <div class="forgot-title">找回密码</div>
- 
+
       <div v-if="step === 0" class="step-content">
-        <BaseInput icon="fas fa-envelope" v-model="email" placeholder="邮箱" />
+        <BaseInput icon="mail" v-model="email" placeholder="邮箱" />
         <div v-if="emailError" class="error-message">{{ emailError }}</div>
         <div class="primary-button" @click="sendCode" v-if="!isSending">发送验证码</div>
         <div class="primary-button disabled" v-else>发送中...</div>
       </div>
       <div v-else-if="step === 1" class="step-content">
-        <BaseInput icon="fas fa-envelope" v-model="code" placeholder="邮箱验证码" />
+        <BaseInput icon="mail" v-model="code" placeholder="邮箱验证码" />
         <div class="primary-button" @click="verifyCode" v-if="!isVerifying">验证</div>
         <div class="primary-button disabled" v-else>验证中...</div>
       </div>
       <div v-else class="step-content">
-        <BaseInput icon="fas fa-lock" v-model="password" type="password" placeholder="新密码" />
+        <BaseInput icon="lock" v-model="password" type="password" placeholder="新密码" />
         <div v-if="passwordError" class="error-message">{{ passwordError }}</div>
         <div class="primary-button" @click="resetPassword" v-if="!isResetting">重置密码</div>
         <div class="primary-button disabled" v-else>提交中...</div>
       </div>
       <div class="hint-message">
-        <i class="fas fa-info-circle"></i>
+        <info-icon />
         使用 Google 注册的用户可使用对应的邮箱进行找回密码
       </div>
     </div>

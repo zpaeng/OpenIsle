@@ -10,13 +10,13 @@
               :src="lottery.prizeIcon"
               alt="prize"
             />
-            <i v-else class="fa-solid fa-gift default-prize-icon"></i>
+            <gift v-else class="default-prize-icon" />
           </div>
           <div class="prize-name">{{ lottery.prizeDescription }}</div>
           <div class="prize-count">x {{ lottery.prizeCount }}</div>
         </div>
         <div class="prize-end-time prize-info-right">
-          <i v-if="!lotteryEnded" class="fas fa-stopwatch prize-end-time-icon"></i>
+          <stopwatch v-if="!lotteryEnded" class="prize-end-time-icon" />
           <div v-if="!isMobile && !lotteryEnded" class="prize-end-time-title">离结束</div>
           <div class="prize-end-time-value">{{ countdown }}</div>
           <div v-if="!isMobile" class="join-prize-button-container-desktop">
@@ -26,7 +26,8 @@
               @click="joinLottery"
             >
               <div class="join-prize-button-text">
-                参与抽奖 <i class="fas fa-coins"></i> {{ lottery.pointCost }}
+                参与抽奖 <paper-money-two class="join-prize-button-text-icon" />
+                {{ lottery.pointCost }}
               </div>
             </div>
             <div v-else-if="hasJoined" class="join-prize-button-disabled">
@@ -43,7 +44,7 @@
           @click="joinLottery"
         >
           <div class="join-prize-button-text">
-            参与抽奖 <i class="fas fa-coins"></i> {{ lottery.pointCost }}
+            参与抽奖 <paper-money-two class="join-prize-button-text-icon" /> {{ lottery.pointCost }}
           </div>
         </div>
         <div v-else-if="hasJoined" class="join-prize-button-disabled">
@@ -61,7 +62,7 @@
         @click="gotoUser(p.id)"
       />
       <div v-if="lotteryEnded && lotteryWinners.length" class="prize-member-winner">
-        <i class="fas fa-medal medal-icon"></i>
+        <medal-one class="medal-icon"></medal-one>
         <span class="prize-member-winner-name">获奖者: </span>
         <BaseImage
           v-for="w in lotteryWinners"

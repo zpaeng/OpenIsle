@@ -4,7 +4,7 @@
       <div class="menu-content">
         <div class="menu-item-container">
           <NuxtLink class="menu-item" exact-active-class="selected" to="/" @click="handleItemClick">
-            <i class="menu-item-icon fas fa-hashtag"></i>
+            <hashtag-key class="menu-item-icon" />
             <span class="menu-item-text">话题</span>
           </NuxtLink>
           <NuxtLink
@@ -13,7 +13,7 @@
             to="/new-post"
             @click="handleItemClick"
           >
-            <i class="menu-item-icon fas fa-edit"></i>
+            <edit class="menu-item-icon" />
             <span class="menu-item-text">发帖</span>
           </NuxtLink>
           <NuxtLink
@@ -22,7 +22,7 @@
             to="/message"
             @click="handleItemClick"
           >
-            <i class="menu-item-icon fas fa-envelope"></i>
+            <remind class="menu-item-icon" />
             <span class="menu-item-text">我的消息</span>
             <span v-if="unreadCount > 0" class="unread-container">
               <span class="unread"> {{ showUnreadCount }} </span>
@@ -34,7 +34,7 @@
             to="/about"
             @click="handleItemClick"
           >
-            <i class="menu-item-icon fas fa-info-circle"></i>
+            <info-icon class="menu-item-icon" />
             <span class="menu-item-text">关于</span>
           </NuxtLink>
           <NuxtLink
@@ -43,7 +43,7 @@
             to="/activities"
             @click="handleItemClick"
           >
-            <i class="menu-item-icon fas fa-gift"></i>
+            <gift class="menu-item-icon" />
             <span class="menu-item-text">🔥 活动</span>
           </NuxtLink>
           <NuxtLink
@@ -53,7 +53,7 @@
             to="/about/stats"
             @click="handleItemClick"
           >
-            <i class="menu-item-icon fas fa-chart-line"></i>
+            <chart-line class="menu-item-icon" />
             <span class="menu-item-text">站点统计</span>
           </NuxtLink>
           <NuxtLink
@@ -63,7 +63,7 @@
             to="/points"
             @click="handleItemClick"
           >
-            <i class="menu-item-icon fas fa-coins"></i>
+            <finance class="menu-item-icon" />
             <span class="menu-item-text">
               积分商城
               <span v-if="myPoint !== null" class="point-count">{{ myPoint }}</span>
@@ -74,7 +74,8 @@
         <div class="menu-section">
           <div class="section-header" @click="categoryOpen = !categoryOpen">
             <span>类别</span>
-            <i :class="categoryOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+            <up v-if="categoryOpen" class="menu-item-icon" />
+            <down v-else class="menu-item-icon" />
           </div>
           <div v-if="categoryOpen" class="section-items">
             <div v-if="isLoadingCategory" class="menu-loading-container">
@@ -94,7 +95,7 @@
                   class="section-item-icon"
                   :alt="c.name"
                 />
-                <i v-else :class="['section-item-icon', c.smallIcon || c.icon]"></i>
+                <component v-else :is="c.smallIcon || c.icon" class="section-item-icon" />
               </template>
               <span class="section-item-text">
                 {{ c.name }}
@@ -107,7 +108,8 @@
         <div class="menu-section">
           <div class="section-header" @click="tagOpen = !tagOpen">
             <span>标签</span>
-            <i :class="tagOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+            <up v-if="tagOpen" class="menu-item-icon" />
+            <down v-else class="menu-item-icon" />
           </div>
           <div v-if="tagOpen" class="section-items">
             <div v-if="isLoadingTag" class="menu-loading-container">
@@ -120,7 +122,7 @@
                 class="section-item-icon"
                 :alt="t.name"
               />
-              <i v-else class="section-item-icon fas fa-hashtag"></i>
+              <tag-one v-else class="section-item-icon" />
               <span class="section-item-text"
                 >{{ t.name }} <span class="section-item-text-count">x {{ t.count }}</span></span
               >
@@ -133,7 +135,7 @@
       <ClientOnly v-if="!isMobile">
         <div class="menu-footer">
           <div class="menu-footer-btn" @click="cycleTheme">
-            <i :class="iconClass"></i>
+            <component :is="iconClass" class="menu-item-icon" />
           </div>
         </div>
       </ClientOnly>
@@ -193,11 +195,11 @@ const {
 const iconClass = computed(() => {
   switch (themeState.mode) {
     case ThemeMode.DARK:
-      return 'fas fa-moon'
+      return 'Moon'
     case ThemeMode.LIGHT:
-      return 'fas fa-sun'
+      return 'SunOne'
     default:
-      return 'fas fa-desktop'
+      return 'ComputerOne'
   }
 })
 
