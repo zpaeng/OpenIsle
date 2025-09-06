@@ -7,6 +7,11 @@
         @click="item.iconClick && item.iconClick()"
       >
         <BaseImage v-if="item.src" :src="item.src" class="timeline-img" alt="timeline item" />
+        <component
+          v-else-if="item.icon && (typeof item.icon !== 'string' || !item.icon.includes(' '))"
+          :is="item.icon"
+          :size="20"
+        />
         <i v-else-if="item.icon" :class="item.icon"></i>
         <BaseImage v-else-if="item.emoji" :src="item.emoji" class="timeline-emoji" alt="emoji" />
       </div>
