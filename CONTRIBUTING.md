@@ -103,9 +103,9 @@ SERVER_PORT=8082
     ```
 
 3. 执行 [`db/init/init_script.sql`](backend/src/main/resources/db/init/init_script.sql) 脚本，导入基本的数据
-    管理员：**adminmail@openisle.com/123456**
-    普通用户1：**usermail1@openisle.com/123456**
-    普通用户2：**usermail2@openisle.com/123456**
+    管理员：**admin/123456**
+    普通用户1：**user1/123456**
+    普通用户2：**user2/123456**
     
     ![初始化脚本](assets/contributing/resources_img.png)
 
@@ -225,3 +225,24 @@ npm run dev
     ![github配置](assets/contributing/github_img.png)
 
     ![github配置2](assets/contributing/github_img_2.png)
+
+### 配置 Resend 邮箱服务
+
+https://resend.com/emails 创建账号并登录
+
+- `Domains` -> `Add Domain`
+  ![image-20250906150459400](assets/contributing/image-20250906150459400.png)
+
+- 填写域名
+  ![image-20250906150541817](assets/contributing/image-20250906150541817.png)
+
+- 等待一段时间后解析成功，创建 key
+  `API Keys` -> `Create API Key`，输入名称，设置 `Permission` 为 `Sending access`
+  **Key 只能查看一次，务必保存下来**
+  ![image-20250906150811572](assets/contributing/image-20250906150811572.png)
+  ![image-20250906150924975](assets/contributing/image-20250906150924975.png)
+  ![image-20250906150944130](assets/contributing/image-20250906150944130.png)
+- 修改 `.env` 配置中的 `RESEND_API_KEY` 和 `RESEND_FROM_EMAIL`
+  `RESEND_FROM_EMAIL`： **noreply@域名**
+  `RESEND_API_KEY`：**刚刚复制的 Key**
+  ![image-20250906151218330](assets/contributing/image-20250906151218330.png)
