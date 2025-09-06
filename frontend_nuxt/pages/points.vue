@@ -238,18 +238,18 @@ const loading = ref(false)
 const selectedGood = ref(null)
 
 const iconMap = {
-  POST: 'fas fa-file-alt',
-  COMMENT: 'fas fa-comment',
-  POST_LIKED: 'fas fa-thumbs-up',
-  COMMENT_LIKED: 'fas fa-thumbs-up',
-  INVITE: 'fas fa-user-plus',
-  SYSTEM_ONLINE: 'fas fa-clock',
-  REDEEM: 'fas fa-gift',
-  FEATURE: 'fas fa-star',
-  LOTTERY_JOIN: 'fas fa-ticket-alt',
-  LOTTERY_REWARD: 'fas fa-ticket-alt',
-  POST_LIKE_CANCELLED: 'fas fa-thumbs-down',
-  COMMENT_LIKE_CANCELLED: 'fas fa-thumbs-down',
+  POST: 'file-text',
+  COMMENT: 'comment-icon',
+  POST_LIKED: 'like',
+  COMMENT_LIKED: 'like',
+  INVITE: 'add-user',
+  SYSTEM_ONLINE: 'history-icon',
+  REDEEM: 'gift',
+  FEATURE: 'star',
+  LOTTERY_JOIN: 'medal-one',
+  LOTTERY_REWARD: 'fireworks',
+  POST_LIKE_CANCELLED: 'clear-icon',
+  COMMENT_LIKE_CANCELLED: 'clear-icon',
 }
 
 const loadTrend = async () => {
