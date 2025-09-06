@@ -415,19 +415,19 @@ const fetchSummary = async () => {
   const postsRes = await fetch(`${API_BASE_URL}/api/users/${username}/hot-posts`)
   if (postsRes.ok) {
     const data = await postsRes.json()
-    hotPosts.value = data.map((p) => ({ icon: 'fas fa-book', post: p }))
+    hotPosts.value = data.map((p) => ({ icon: 'file-text', post: p }))
   }
 
   const repliesRes = await fetch(`${API_BASE_URL}/api/users/${username}/hot-replies`)
   if (repliesRes.ok) {
     const data = await repliesRes.json()
-    hotReplies.value = data.map((c) => ({ icon: 'fas fa-comment', comment: c }))
+    hotReplies.value = data.map((c) => ({ icon: 'comment-icon', comment: c }))
   }
 
   const tagsRes = await fetch(`${API_BASE_URL}/api/users/${username}/hot-tags`)
   if (tagsRes.ok) {
     const data = await tagsRes.json()
-    hotTags.value = data.map((t) => ({ icon: 'fas fa-tag', tag: t }))
+    hotTags.value = data.map((t) => ({ icon: 'tag-one', tag: t }))
   }
 }
 
@@ -443,19 +443,19 @@ const fetchTimeline = async () => {
   const mapped = [
     ...posts.map((p) => ({
       type: 'post',
-      icon: 'fas fa-book',
+      icon: 'file-text',
       post: p,
       createdAt: p.createdAt,
     })),
     ...replies.map((r) => ({
       type: r.parentComment ? 'reply' : 'comment',
-      icon: 'fas fa-comment',
+      icon: 'comment-icon',
       comment: r,
       createdAt: r.createdAt,
     })),
     ...tags.map((t) => ({
       type: 'tag',
-      icon: 'fas fa-tag',
+      icon: 'tag-one',
       tag: t,
       createdAt: t.createdAt,
     })),
@@ -477,7 +477,7 @@ const fetchFavorites = async () => {
   const res = await fetch(`${API_BASE_URL}/api/users/${username}/subscribed-posts`)
   if (res.ok) {
     const data = await res.json()
-    favoritePosts.value = data.map((p) => ({ icon: 'fas fa-bookmark', post: p }))
+    favoritePosts.value = data.map((p) => ({ icon: 'bookmark', post: p }))
   } else {
     favoritePosts.value = []
   }
