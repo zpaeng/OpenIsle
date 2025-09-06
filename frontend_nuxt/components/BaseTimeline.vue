@@ -12,7 +12,6 @@
           :is="item.icon"
           :size="20"
         />
-        <i v-else-if="item.icon" :class="item.icon"></i>
         <BaseImage v-else-if="item.emoji" :src="item.emoji" class="timeline-emoji" alt="emoji" />
       </div>
       <div class="timeline-content">

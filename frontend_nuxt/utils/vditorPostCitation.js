@@ -23,7 +23,7 @@ export default (apiBaseUrl, websiteBaseUrl) => {
           return (
             body.map((item) => ({
               value: `[🔗${item.title}](${websiteBaseUrl}/posts/${item.id})`,
-              html: `<div><i class="fas fa-link"></i> ${item.title}</div>`,
+              html: `<div><link-icon /> ${item.title}</div>`,
             })) ?? []
           )
         } else {
