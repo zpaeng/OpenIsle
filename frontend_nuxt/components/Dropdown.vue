@@ -45,7 +45,7 @@
           </span>
           <span v-else class="placeholder">{{ placeholder }}</span>
         </template>
-        <i class="fas fa-caret-down dropdown-caret"></i>
+        <down class="dropdown-caret" />
       </slot>
     </div>
     <div
@@ -54,7 +54,7 @@
       v-click-outside="close"
     >
       <div v-if="showSearch" class="dropdown-search">
-        <i class="fas fa-search search-icon"></i>
+        <search-icon class="search-icon" />
         <input type="text" v-model="search" placeholder="搜索" />
       </div>
       <div v-if="loading" class="dropdown-loading">
@@ -85,12 +85,12 @@
     <Teleport to="body">
       <div v-if="open && isMobile" class="dropdown-mobile-page">
         <div class="dropdown-mobile-header">
-          <i class="fas fa-arrow-left" @click="close"></i>
+          <left class="back-icon" @click="close" />
           <span class="mobile-title">{{ placeholder }}</span>
         </div>
         <div class="dropdown-mobile-menu">
           <div v-if="showSearch" class="dropdown-search">
-            <i class="fas fa-search search-icon"></i>
+            <search-icon class="search-icon" />
             <input type="text" v-model="search" placeholder="搜索" />
           </div>
           <div v-if="loading" class="dropdown-loading">
@@ -374,6 +374,10 @@ export default {
   gap: 10px;
   padding: 10px;
   border-bottom: 1px solid var(--normal-border-color);
+}
+
+.back-icon {
+  cursor: pointer;
 }
 
 .dropdown-mobile-menu {
