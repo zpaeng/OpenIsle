@@ -108,12 +108,22 @@ SERVER_PORT=8082
     普通用户2：**usermail2@openisle.com/123456**
     
     ![初始化脚本](assets/contributing/resources_img.png)
-    
-4. 处理完环境问题直接跑起来就能通了
 
-    ![运行画面](assets/contributing/backend_img_4.png)
+#### 配置 Redis
+
+填写环境变量 `.env` 中的 Redis 相关配置并启动 Redis
+
+```ini
+REDIS_HOST=<Redis 地址>
+REDIS_PORT=<Redis 端口>
+```
+
+处理完环境问题直接跑起来就能通了
+
+![运行画面](assets/contributing/backend_img_4.png)
 
 ### Docker 环境
+
 #### 配置环境变量
 
 ```shell
