@@ -16,6 +16,7 @@ import {
   TagOne,
   MedalOne,
   Next,
+  Left,
   DropDownList,
   MoreOne,
   SunOne,
@@ -60,6 +61,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.component('TagOne', TagOne)
   nuxtApp.vueApp.component('MedalOne', MedalOne)
   nuxtApp.vueApp.component('Next', Next)
+  nuxtApp.vueApp.component('Left', Left)
   nuxtApp.vueApp.component('DropDownList', DropDownList)
   nuxtApp.vueApp.component('MoreOne', MoreOne)
   nuxtApp.vueApp.component('SunOne', SunOne)
