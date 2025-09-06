@@ -19,6 +19,12 @@
                     class="option-icon"
                     :alt="label.name"
                   />
+                  <component
+                    v-else-if="isIconComponent(label.icon)"
+                    :is="label.icon"
+                    class="option-icon"
+                    :size="16"
+                  />
                   <i v-else :class="['option-icon', label.icon]"></i>
                 </template>
                 <span>{{ label.name }}</span>
@@ -38,6 +44,12 @@
                   class="option-icon"
                   :alt="selectedLabels[0].name"
                 />
+                <component
+                  v-else-if="isIconComponent(selectedLabels[0].icon)"
+                  :is="selectedLabels[0].icon"
+                  class="option-icon"
+                  :size="16"
+                />
                 <i v-else :class="['option-icon', selectedLabels[0].icon]"></i>
               </template>
               <span>{{ selectedLabels[0].name }}</span>
@@ -45,7 +57,7 @@
           </span>
           <span v-else class="placeholder">{{ placeholder }}</span>
         </template>
-        <i class="fas fa-caret-down dropdown-caret"></i>
+        <down class="dropdown-caret" />
       </slot>
     </div>
     <div
@@ -54,7 +66,7 @@
       v-click-outside="close"
     >
       <div v-if="showSearch" class="dropdown-search">
-        <i class="fas fa-search search-icon"></i>
+        <search-icon class="search-icon" />
         <input type="text" v-model="search" placeholder="搜索" />
       </div>
       <div v-if="loading" class="dropdown-loading">
@@ -75,6 +87,12 @@
                 class="option-icon"
                 :alt="o.name"
               />
+              <component
+                v-else-if="isIconComponent(o.icon)"
+                :is="o.icon"
+                class="option-icon"
+                :size="16"
+              />
               <i v-else :class="['option-icon', o.icon]"></i>
             </template>
             <span>{{ o.name }}</span>
@@ -85,12 +103,12 @@
     <Teleport to="body">
       <div v-if="open && isMobile" class="dropdown-mobile-page">
         <div class="dropdown-mobile-header">
-          <i class="fas fa-arrow-left" @click="close"></i>
+          <next class="back-icon" @click="close" />
           <span class="mobile-title">{{ placeholder }}</span>
         </div>
         <div class="dropdown-mobile-menu">
           <div v-if="showSearch" class="dropdown-search">
-            <i class="fas fa-search search-icon"></i>
+            <search-icon class="search-icon" />
             <input type="text" v-model="search" placeholder="搜索" />
           </div>
           <div v-if="loading" class="dropdown-loading">
@@ -110,6 +128,12 @@
                     :src="o.icon"
                     class="option-icon"
                     :alt="o.name"
+                  />
+                  <component
+                    v-else-if="isIconComponent(o.icon)"
+                    :is="o.icon"
+                    class="option-icon"
+                    :size="16"
                   />
                   <i v-else :class="['option-icon', o.icon]"></i>
                 </template>
@@ -249,6 +273,10 @@ export default {
       return /^https?:\/\//.test(icon) || icon.startsWith('/')
     }
 
+    const isIconComponent = (icon) => {
+      return typeof icon === 'string' && !icon.includes(' ')
+    }
+
     expose({ toggle, close })
 
     return {
@@ -263,6 +291,7 @@ export default {
       isSelected,
       loading,
       isImageIcon,
+      isIconComponent,
       setSearch,
       isMobile,
     }
@@ -303,6 +332,10 @@ export default {
   overflow-y: auto;
 }
 
+.dropdown-caret {
+  margin-left: 5px;
+}
+
 .selected-label {
   display: inline-flex;
   align-items: center;
@@ -324,6 +357,10 @@ export default {
   margin-left: 5px;
   background-color: var(--app-menu-background-color);
   color: var(--text-color);
+}
+
+.search-icon {
+  font-size: 14px;
 }
 
 .dropdown-option {
@@ -374,6 +411,11 @@ export default {
   gap: 10px;
   padding: 10px;
   border-bottom: 1px solid var(--normal-border-color);
+}
+
+.back-icon {
+  transform: rotate(180deg);
+  cursor: pointer;
 }
 
 .dropdown-mobile-menu {
