@@ -70,7 +70,9 @@ SERVER_PORT=8082
 #### 配置 IDEA 参数
 
 - 设置 JDK 版本为 java 17
+
 - 设置 VM Option，最好运行在其他端口，非 `8080`，这里设置 `8081`
+    若上面在环境变量中设置了端口，那这里就不需要再额外设置
 
     ```shell
     -Dserver.port=8081
@@ -101,9 +103,12 @@ SERVER_PORT=8082
     ```
 
 3. 执行 [`db/init/init_script.sql`](backend/src/main/resources/db/init/init_script.sql) 脚本，导入基本的数据
-
+    管理员：**adminmail@openisle.com/123456**
+    普通用户1：**usermail1@openisle.com/123456**
+    普通用户2：**usermail2@openisle.com/123456**
+    
     ![初始化脚本](assets/contributing/resources_img.png)
-
+    
 4. 处理完环境问题直接跑起来就能通了
 
     ![运行画面](assets/contributing/backend_img_4.png)
@@ -177,6 +182,8 @@ cd frontend_nuxt/
     cp .env.dev.example .env
     ```
 
+若依赖本机部署的后端，需要修改 `.env` 中的 `NUXT_PUBLIC_API_BASE_URL` 值与后端服务端口一致
+
 ### 安装依赖和运行
 
 前端安装依赖并启动服务。
@@ -193,7 +200,7 @@ npm run dev
 
 ## 其他配置
 
-配置第三方登录，这里以 GitHub 为例：
+### 配置第三方登录，这里以 GitHub 为例：
 
 - 修改 `application.properties` 配置
 
