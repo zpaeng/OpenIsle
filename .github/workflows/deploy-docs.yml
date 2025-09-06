@@ -1,0 +1,40 @@
+name: Deploy Documentation
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Bun dependencies
+        run: bun install
+        working-directory: ./docs
+
+      - name: Generate API MDX
+        run: bun run generate
+        working-directory: ./docs
+
+      - name: Build documentation
+        run: bun run build
+        working-directory: ./docs
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: ./docs/out
