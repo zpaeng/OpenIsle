@@ -368,11 +368,11 @@ const selectedTab = ref(
     : 'summary',
 )
 const tabs = [
-  { key: 'summary', label: '总结', icon: 'ChartLine' },
-  { key: 'timeline', label: '时间线', icon: 'AlarmClock' },
-  { key: 'following', label: '关注', icon: 'AddUser' },
-  { key: 'favorites', label: '收藏', icon: 'Bookmark' },
-  { key: 'achievements', label: '勋章', icon: 'MedalOne' },
+  { key: 'summary', label: '总结', icon: 'chart-line' },
+  { key: 'timeline', label: '时间线', icon: 'alarm-clock' },
+  { key: 'following', label: '关注', icon: 'add-user' },
+  { key: 'favorites', label: '收藏', icon: 'bookmark' },
+  { key: 'achievements', label: '勋章', icon: 'medal-one' },
 ]
 const followTab = ref('followers')
 
