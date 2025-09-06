@@ -62,6 +62,7 @@ import {
   FileText,
   History,
   Lightning,
+  PeoplesTwo,
 } from '@icon-park/vue-next'
 
 export default defineNuxtPlugin((nuxtApp) => {
@@ -127,4 +128,5 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.component('FileText', FileText)
   nuxtApp.vueApp.component('HistoryIcon', History)
   nuxtApp.vueApp.component('Lightning', Lightning)
+  nuxtApp.vueApp.component('PeoplesTwo', PeoplesTwo)
 })

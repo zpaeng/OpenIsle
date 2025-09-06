@@ -39,7 +39,7 @@
           </div>
           <ToolTip v-if="!isMobile" content="当前在线人数" placement="bottom">
             <div class="online-count">
-              <i class="fas fa-people-group"></i>
+              <peoples-two />
               <span>{{ onlineCount }}</span>
             </div>
           </ToolTip>
@@ -143,7 +143,7 @@ async function sendPing() {
       method: 'POST',
     })
   } catch (e) {
-    console.error("心跳失败", e)
+    console.error('心跳失败', e)
   }
 }
 
@@ -155,10 +155,9 @@ async function fetchCount() {
     })
     onlineCount.value = await res.json()
   } catch (e) {
-    console.error("获取在线人数失败", e)
+    console.error('获取在线人数失败', e)
   }
 }
-
 
 const search = () => {
   showSearch.value = true
@@ -311,8 +310,8 @@ onMounted(async () => {
   // 新增的在线人数逻辑
   sendPing()
   fetchCount()
-  setInterval(sendPing, 120000)   // 每 2 分钟发一次心跳
-  setInterval(fetchCount, 60000)  // 每 1 分更新 UI
+  setInterval(sendPing, 120000) // 每 2 分钟发一次心跳
+  setInterval(fetchCount, 60000) // 每 1 分更新 UI
 })
 </script>
 
