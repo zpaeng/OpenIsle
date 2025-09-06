@@ -70,7 +70,9 @@ SERVER_PORT=8082
 #### 配置 IDEA 参数
 
 - 设置 JDK 版本为 java 17
+
 - 设置 VM Option，最好运行在其他端口，非 `8080`，这里设置 `8081`
+    若上面在环境变量中设置了端口，那这里就不需要再额外设置
 
     ```shell
     -Dserver.port=8081
@@ -101,14 +103,27 @@ SERVER_PORT=8082
     ```
 
 3. 执行 [`db/init/init_script.sql`](backend/src/main/resources/db/init/init_script.sql) 脚本，导入基本的数据
-
+    管理员：**admin/123456**
+    普通用户1：**user1/123456**
+    普通用户2：**user2/123456**
+    
     ![初始化脚本](assets/contributing/resources_img.png)
 
-4. 处理完环境问题直接跑起来就能通了
+#### 配置 Redis
 
-    ![运行画面](assets/contributing/backend_img_4.png)
+填写环境变量 `.env` 中的 Redis 相关配置并启动 Redis
+
+```ini
+REDIS_HOST=<Redis 地址>
+REDIS_PORT=<Redis 端口>
+```
+
+处理完环境问题直接跑起来就能通了
+
+![运行画面](assets/contributing/backend_img_4.png)
 
 ### Docker 环境
+
 #### 配置环境变量
 
 ```shell
@@ -177,6 +192,8 @@ cd frontend_nuxt/
     cp .env.dev.example .env
     ```
 
+若依赖本机部署的后端，需要修改 `.env` 中的 `NUXT_PUBLIC_API_BASE_URL` 值与后端服务端口一致
+
 ### 安装依赖和运行
 
 前端安装依赖并启动服务。
@@ -193,7 +210,7 @@ npm run dev
 
 ## 其他配置
 
-配置第三方登录，这里以 GitHub 为例：
+### 配置第三方登录，这里以 GitHub 为例：
 
 - 修改 `application.properties` 配置
 
@@ -208,3 +225,24 @@ npm run dev
     ![github配置](assets/contributing/github_img.png)
 
     ![github配置2](assets/contributing/github_img_2.png)
+
+### 配置 Resend 邮箱服务
+
+https://resend.com/emails 创建账号并登录
+
+- `Domains` -> `Add Domain`
+  ![image-20250906150459400](assets/contributing/image-20250906150459400.png)
+
+- 填写域名
+  ![image-20250906150541817](assets/contributing/image-20250906150541817.png)
+
+- 等待一段时间后解析成功，创建 key
+  `API Keys` -> `Create API Key`，输入名称，设置 `Permission` 为 `Sending access`
+  **Key 只能查看一次，务必保存下来**
+  ![image-20250906150811572](assets/contributing/image-20250906150811572.png)
+  ![image-20250906150924975](assets/contributing/image-20250906150924975.png)
+  ![image-20250906150944130](assets/contributing/image-20250906150944130.png)
+- 修改 `.env` 配置中的 `RESEND_API_KEY` 和 `RESEND_FROM_EMAIL`
+  `RESEND_FROM_EMAIL`： **noreply@域名**
+  `RESEND_API_KEY`：**刚刚复制的 Key**
+  ![image-20250906151218330](assets/contributing/image-20250906151218330.png)

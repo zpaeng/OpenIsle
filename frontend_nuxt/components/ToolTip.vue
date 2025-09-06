@@ -56,7 +56,6 @@ import {
   onBeforeUnmount,
   nextTick,
   watch,
-  defineProps,
   defineEmits,
   defineOptions,
   useId,

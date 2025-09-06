@@ -18,6 +18,9 @@ public class ResendEmailSender extends EmailSender {
     @Value("${resend.api.key}")
     private String apiKey;
 
+    @Value("${resend.from.email}")
+    private String fromEmail;
+
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Override
@@ -33,7 +36,7 @@ public class ResendEmailSender extends EmailSender {
         body.put("to", to);
         body.put("subject", subject);
         body.put("text", text);
-        body.put("from", "openisle <noreply@chenjiating.com>"); // todo(tim): use config
+        body.put("from", "openisle <" + fromEmail + ">");
 
         HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
         restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
