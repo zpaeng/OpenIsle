@@ -36,6 +36,8 @@ public class CachingConfig {
     public static final String TAG_CACHE_NAME="openisle_tags";
     // 分类缓存名
     public static final String CATEGORY_CACHE_NAME="openisle_categories";
+    // 在线人数缓存名
+    public static final String ONLINE_CACHE_NAME="openisle_online";
 
     /**
      * 自定义Redis的序列化器
