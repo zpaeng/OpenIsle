@@ -404,7 +404,6 @@ const handleContentClick = (e) => {
   margin-left: 10px;
   margin-right: 10px;
   opacity: 0.5;
-  transform: scaleX(-1);
 }
 
 .reply-user-name {
