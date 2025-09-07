@@ -529,7 +529,7 @@ const sanitizeDescription = (text) => stripMarkdown(text)
 }
 
 .article-item-title {
-  margin-top: 20px;
+  margin-top: 15px;
   font-size: 18px;
   text-decoration: none;
   color: var(--text-color);
@@ -605,7 +605,7 @@ const sanitizeDescription = (text) => stripMarkdown(text)
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding-bottom: 10px;
+  padding-bottom: 5px;
 }
 
 .article-member-avatars-container {
