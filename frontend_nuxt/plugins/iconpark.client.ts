@@ -63,6 +63,16 @@ import {
   History,
   Lightning,
   PeoplesTwo,
+  Code,
+  GoodTwo,
+  Twitter,
+  Bitcoin,
+  Fire,
+  Communication,
+  WaterLevel,
+  RobotOne,
+  Server,
+  Protection,
 } from '@icon-park/vue-next'
 
 export default defineNuxtPlugin((nuxtApp) => {
@@ -129,4 +139,14 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.component('HistoryIcon', History)
   nuxtApp.vueApp.component('Lightning', Lightning)
   nuxtApp.vueApp.component('PeoplesTwo', PeoplesTwo)
+  nuxtApp.vueApp.component('CodeIcon', Code)
+  nuxtApp.vueApp.component('GoodTwo', GoodTwo)
+  nuxtApp.vueApp.component('Twitter', Twitter)
+  nuxtApp.vueApp.component('Bitcoin', Bitcoin)
+  nuxtApp.vueApp.component('Fire', Fire)
+  nuxtApp.vueApp.component('Communication', Communication)
+  nuxtApp.vueApp.component('WaterLevel', WaterLevel)
+  nuxtApp.vueApp.component('RobotOne', RobotOne)
+  nuxtApp.vueApp.component('ServerIcon', Server)
+  nuxtApp.vueApp.component('Protection', Protection)
 })

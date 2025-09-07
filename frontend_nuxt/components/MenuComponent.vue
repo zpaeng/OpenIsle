@@ -122,6 +122,11 @@
                 class="section-item-icon"
                 :alt="t.name"
               />
+              <component
+                v-else-if="t.smallIcon || t.icon"
+                :is="t.smallIcon || t.icon"
+                class="section-item-icon"
+              />
               <tag-one v-else class="section-item-icon" />
               <span class="section-item-text"
                 >{{ t.name }} <span class="section-item-text-count">x {{ t.count }}</span></span

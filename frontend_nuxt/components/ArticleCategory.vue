@@ -2,11 +2,12 @@
   <div class="article-category-container" v-if="category">
     <div class="article-info-item" @click="gotoCategory">
       <BaseImage
-        v-if="category.smallIcon"
+        v-if="isImageIcon(category.smallIcon)"
         class="article-info-item-img"
         :src="category.smallIcon"
         :alt="category.name"
       />
+      <component v-else :is="category.smallIcon || category.icon" class="article-info-item-img" />
       <div class="article-info-item-text">{{ category.name }}</div>
     </div>
   </div>
@@ -21,6 +22,11 @@ const gotoCategory = async () => {
   if (!props.category) return
   const value = encodeURIComponent(props.category.id ?? props.category.name)
   await navigateTo({ path: '/', query: { category: value } }, { replace: true })
+}
+
+const isImageIcon = (icon) => {
+  if (!icon) return false
+  return /^https?:\/\//.test(icon) || icon.startsWith('/')
 }
 </script>
 
