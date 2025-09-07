@@ -67,9 +67,13 @@
     </div>
 
     <div class="message-input-area">
-      <div class="new-message-container">
+      <div
+        v-if="newMessagesCount > 0 && !isUserNearBottom"
+        class="new-message-container"
+        @click="handleScrollToBottom"
+      >
         <double-down />
-        <div class="new-message-count">有5条新消息</div>
+        <div class="new-message-count">有{{ newMessagesCount }}条新消息</div>
       </div>
 
       <div v-if="replyTo" class="active-reply">
@@ -130,6 +134,7 @@ const isChannel = ref(false)
 const isFloatMode = computed(() => route.query.float !== undefined)
 const floatRoute = useState('messageFloatRoute')
 const replyTo = ref(null)
+const newMessagesCount = ref(0)
 
 const isUserNearBottom = ref(true)
 function updateNearBottom() {
@@ -137,6 +142,9 @@ function updateNearBottom() {
   if (!el) return
   const threshold = 40 // px
   isUserNearBottom.value = el.scrollHeight - el.scrollTop - el.clientHeight <= threshold
+  if (isUserNearBottom.value) {
+    newMessagesCount.value = 0
+  }
 }
 
 const hasMoreMessages = computed(() => currentPage.value < totalPages.value - 1)
@@ -178,6 +186,11 @@ function scrollToBottomInstant() {
   const el = messagesListEl.value
   if (!el) return
   el.scrollTop = el.scrollHeight
+}
+
+function handleScrollToBottom() {
+  scrollToBottomSmooth()
+  newMessagesCount.value = 0
 }
 
 async function fetchMessages(page = 0) {
@@ -311,6 +324,7 @@ async function sendMessage(content, clearInput) {
     await nextTick()
     // 仅“发送消息成功后”才平滑滚动到底部
     scrollToBottomSmooth()
+    newMessagesCount.value = 0
   } catch (e) {
     toast.error(e.message)
   } finally {
@@ -383,6 +397,8 @@ const subscribeToConversation = () => {
 
       if (isUserNearBottom.value) {
         scrollToBottomSmooth()
+      } else {
+        newMessagesCount.value += 1
       }
     } catch (e) {
       console.error('Failed to parse websocket message', e)
@@ -566,7 +582,6 @@ function goBack() {
 
 .new-message-container {
   display: flex;
-
   flex-direction: row;
   align-items: center;
   gap: 5px;
@@ -576,7 +591,12 @@ function goBack() {
   padding: 3px 6px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
   width: fit-content;
-  margin: auto;
+  position: absolute;
+  bottom: calc(100% + 20px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background-color: var(--background-color);
 }
 
 .user-name {
@@ -609,11 +629,6 @@ function goBack() {
   border-bottom-left-radius: 4px;
 }
 
-.message-input-area {
-  margin-left: 20px;
-  margin-right: 20px;
-}
-
 .loading-container {
   display: flex;
   justify-content: center;
@@ -630,6 +645,7 @@ function goBack() {
 .message-input-area {
   margin-left: 10px;
   margin-right: 10px;
+  position: relative;
 }
 
 .reply-icon {
