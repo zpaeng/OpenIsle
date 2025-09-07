@@ -529,7 +529,7 @@ const sanitizeDescription = (text) => stripMarkdown(text)
 }
 
 .article-item-title {
-  margin-top: 10px;
+  margin-top: 20px;
   font-size: 18px;
   text-decoration: none;
   color: var(--text-color);
@@ -605,6 +605,7 @@ const sanitizeDescription = (text) => stripMarkdown(text)
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  padding-bottom: 10px;
 }
 
 .article-member-avatars-container {
@@ -719,8 +720,13 @@ const sanitizeDescription = (text) => stripMarkdown(text)
   }
 
   .article-item-title {
+    margin-top: 10px;
     font-size: 16px;
     font-weight: bold;
+  }
+
+  .article-main-container {
+    padding-bottom: 0px;
   }
 
   .article-item-description {
