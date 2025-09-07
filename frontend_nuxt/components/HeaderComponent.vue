@@ -4,7 +4,9 @@
       <div class="header-content-left">
         <div v-if="showMenuBtn" class="menu-btn-wrapper">
           <button class="menu-btn" ref="menuBtn" @click="$emit('toggle-menu')">
-            <application-menu class="micon"></application-menu>
+            <ToolTip content="展开/收起菜单" placement="bottom">
+              <application-menu class="micon"></application-menu>
+            </ToolTip>
           </button>
           <span
             v-if="isMobile && (unreadMessageCount > 0 || hasChannelUnread)"
