@@ -73,6 +73,7 @@ import {
   RobotOne,
   Server,
   Protection,
+  DoubleDown,
 } from '@icon-park/vue-next'
 
 export default defineNuxtPlugin((nuxtApp) => {
@@ -149,4 +150,5 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.component('RobotOne', RobotOne)
   nuxtApp.vueApp.component('ServerIcon', Server)
   nuxtApp.vueApp.component('Protection', Protection)
+  nuxtApp.vueApp.component('DoubleDown', DoubleDown)
 })
