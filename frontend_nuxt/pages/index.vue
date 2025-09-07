@@ -65,16 +65,17 @@
           class="article-item"
           v-for="article in articles"
           :key="article.id"
+          @click="navigateTo(`/posts/${article.id}`)"
         >
           <div class="article-main-container">
-            <NuxtLink class="article-item-title main-item" :to="`/posts/${article.id}`">
+            <NuxtLink class="article-item-title main-item">
               <pin v-if="article.pinned" theme="outline" class="pinned-icon" />
               <gift v-if="article.type === 'LOTTERY'" class="lottery-icon" />
               <ranking-list v-else-if="article.type === 'POLL'" class="poll-icon" />
               <star v-if="!article.rssExcluded" class="featured-icon" />
               {{ article.title }}
             </NuxtLink>
-            <NuxtLink class="article-item-description main-item" :to="`/posts/${article.id}`">
+            <NuxtLink class="article-item-description main-item">
               {{ sanitizeDescription(article.description) }}
             </NuxtLink>
             <div class="article-info-container main-item">
@@ -486,6 +487,11 @@ const sanitizeDescription = (text) => stripMarkdown(text)
   align-items: center;
   width: 100%;
   border-bottom: 1px solid var(--normal-border-color);
+}
+
+.article-item:hover {
+  background-color: var(--menu-selected-background-color-hover);
+  cursor: pointer;
 }
 
 .article-main-container,

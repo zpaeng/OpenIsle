@@ -316,6 +316,10 @@ const gotoTag = (t) => {
   align-items: center;
 }
 
+.menu-item:hover {
+  background-color: var(--menu-selected-background-color-hover);
+}
+
 .menu-item.selected {
   font-weight: bold;
   background-color: var(--menu-selected-background-color);
@@ -407,7 +411,7 @@ const gotoTag = (t) => {
 }
 
 .section-item:hover {
-  background-color: var(--menu-selected-background-color);
+  background-color: var(--menu-selected-background-color-hover);
 }
 
 .section-item-text-count {
