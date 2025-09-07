@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface PointHistoryRepository extends JpaRepository<PointHistory, Long> {
     List<PointHistory> findByUserOrderByIdDesc(User user);
+    List<PointHistory> findByUserOrderByIdAsc(User user);
     long countByUser(User user);
 
     List<PointHistory> findByUserAndCreatedAtAfterOrderByCreatedAtDesc(User user, LocalDateTime createdAt);
