@@ -225,17 +225,20 @@ public class PointService {
      */
     public int recalculateUserPoints(User user) {
         // 获取用户所有的积分历史记录（由于@Where注解，已删除的记录会被自动过滤）
-        List<PointHistory> histories = pointHistoryRepository.findByUserOrderByIdDesc(user);
-        
+        List<PointHistory> histories = pointHistoryRepository.findByUserOrderByIdAsc(user);
+
         int totalPoints = 0;
         for (PointHistory history : histories) {
             totalPoints += history.getAmount();
+            // 重新计算每条历史记录的余额
+            history.setBalance(totalPoints);
         }
-        
-        // 更新用户积分
+
+        // 批量更新历史记录及用户积分
+        pointHistoryRepository.saveAll(histories);
         user.setPoint(totalPoints);
         userRepository.save(user);
-        
+
         return totalPoints;
     }
 
