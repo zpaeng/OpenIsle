@@ -331,11 +331,11 @@ onMounted(async () => {
 
 .reactions-viewer-item.placeholder,
 .reactions-viewer-single-item.selected {
-  background-color: var(--menu-selected-background-color);
+  background-color: var(--normal-light-background-color);
 }
 
 .reaction-option.selected {
-  background-color: var(--menu-selected-background-color);
+  background-color: var(--normal-light-background-color);
 }
 
 @media (max-width: 768px) {

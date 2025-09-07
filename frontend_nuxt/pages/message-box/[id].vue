@@ -48,7 +48,7 @@
               :content-id="item.id"
               @update:modelValue="(v) => (item.reactions = v)"
             >
-              <div class="reply-btn"><next @click="setReply(item)" /> 写个回复...</div>
+              <div @click="setReply(item)" class="reply-btn"><next /> 写个回复...</div>
             </ReactionsGroup>
           </template>
         </BaseTimeline>
@@ -614,7 +614,7 @@ function goBack() {
   border-left: 5px solid var(--primary-color);
   margin-bottom: 5px;
   font-size: 13px;
-  background-color: var(--menu-selected-background-color);
+  background-color: var(--normal-light-background-color);
 }
 
 .reply-author {
@@ -634,7 +634,7 @@ function goBack() {
 }
 
 .active-reply {
-  background-color: var(--bg-color-soft);
+  background-color: var(--normal-light-background-color);
   padding: 5px 10px;
   border-left: 5px solid var(--primary-color);
   margin-bottom: 5px;

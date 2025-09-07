@@ -419,7 +419,7 @@ function minimize() {
 }
 
 .conversation-item:hover {
-  background-color: var(--menu-selected-background-color);
+  background-color: var(--normal-light-background-color);
 }
 
 .conversation-avatar {

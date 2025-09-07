@@ -136,7 +136,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background: var(--menu-selected-background-color);
+  background: var(--normal-light-background-color);
   display: flex;
   align-items: center;
   justify-content: center;
