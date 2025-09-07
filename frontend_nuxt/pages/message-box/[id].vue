@@ -36,7 +36,11 @@
               </div>
             </div>
             <div v-if="item.replyTo" class="reply-preview info-content-text">
-              <div class="reply-author">{{ item.replyTo.sender.username }}</div>
+              <div class="reply-header">
+                <next class="reply-icon" />
+                <BaseImage class="reply-avatar" :src="item.replyTo.sender.avatar" alt="avatar" />
+                <div class="reply-author">{{ item.replyTo.sender.username }}:</div>
+              </div>
               <div class="reply-content" v-html="renderMarkdown(item.replyTo.content)"></div>
             </div>
             <div class="message-content">
@@ -63,11 +67,17 @@
     </div>
 
     <div class="message-input-area">
+      <div class="new-message-container">
+        <double-down />
+        <div class="new-message-count">有5条新消息</div>
+      </div>
+
       <div v-if="replyTo" class="active-reply">
         正在回复 {{ replyTo.sender.username }}:
         {{ stripMarkdownLength(replyTo.content, 50) }}
         <close-icon class="close-reply" @click="replyTo = null" />
       </div>
+
       <MessageEditor :loading="sending" @submit="sendMessage" />
     </div>
   </div>
@@ -454,7 +464,6 @@ function goBack() {
 }
 
 .chat-container.float {
-  height: 100vh;
 }
 
 .chat-header {
@@ -555,6 +564,21 @@ function goBack() {
   gap: 10px;
 }
 
+.new-message-container {
+  display: flex;
+
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  border: 1px solid var(--normal-border-color);
+  border-radius: 20px;
+  padding: 3px 6px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+  width: fit-content;
+  margin: auto;
+}
+
 .user-name {
   font-size: 14px;
   font-weight: 600;
@@ -608,6 +632,18 @@ function goBack() {
   margin-right: 10px;
 }
 
+.reply-icon {
+  color: var(--primary-color);
+  margin-right: 5px;
+}
+
+.reply-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
 .reply-preview {
   margin-top: 10px;
   padding: 10px;
@@ -617,9 +653,16 @@ function goBack() {
   background-color: var(--normal-light-background-color);
 }
 
+.reply-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
 .reply-author {
   font-weight: bold;
   margin-bottom: 2px;
+  opacity: 0.5;
 }
 
 .reply-btn {
