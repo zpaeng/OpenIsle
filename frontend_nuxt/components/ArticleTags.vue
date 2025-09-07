@@ -7,11 +7,17 @@
       @click="gotoTag(tag)"
     >
       <BaseImage
-        v-if="tag.smallIcon"
+        v-if="isImageIcon(tag.smallIcon)"
         class="article-info-item-img"
         :src="tag.smallIcon"
         :alt="tag.name"
       />
+      <component
+        v-else-if="tag.smallIcon || tag.icon"
+        :is="tag.smallIcon || tag.icon"
+        class="article-info-item-img"
+      />
+      <tag-one v-else class="article-info-item-img" />
       <div class="article-info-item-text">{{ tag.name }}</div>
     </div>
   </div>
@@ -25,6 +31,11 @@ defineProps({
 const gotoTag = async (tag) => {
   const value = encodeURIComponent(tag.id ?? tag.name)
   await navigateTo({ path: '/', query: { tags: value } }, { replace: true })
+}
+
+const isImageIcon = (icon) => {
+  if (!icon) return false
+  return /^https?:\/\//.test(icon) || icon.startsWith('/')
 }
 </script>
 
