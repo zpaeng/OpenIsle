@@ -1,18 +1,22 @@
 package com.openisle.controller;
 
+import com.openisle.config.CachingConfig;
 import com.openisle.dto.*;
 import com.openisle.exception.FieldException;
 import com.openisle.model.RegisterMode;
 import com.openisle.model.User;
 import com.openisle.repository.UserRepository;
 import com.openisle.service.*;
+import com.openisle.util.VerifyType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -56,7 +60,8 @@ public class AuthController {
                 User user = userService.registerWithInvite(
                         req.getUsername(), req.getEmail(), req.getPassword());
                 inviteService.consume(req.getInviteToken(), user.getUsername());
-                emailService.sendEmail(user.getEmail(), "在网站填写验证码以验证", "您的验证码是 " + user.getVerificationCode());
+                // 发送确认邮件
+                userService.sendVerifyMail(user, VerifyType.REGISTER);
                 return ResponseEntity.ok(Map.of(
                         "token", jwtService.generateToken(user.getUsername()),
                         "reason_code", "INVITE_APPROVED"
@@ -70,7 +75,8 @@ public class AuthController {
         }
         User user = userService.register(
                 req.getUsername(), req.getEmail(), req.getPassword(), "", registerModeService.getRegisterMode());
-        emailService.sendEmail(user.getEmail(), "在网站填写验证码以验证", "您的验证码是 " + user.getVerificationCode());
+        // 发送确认邮件
+        userService.sendVerifyMail(user, VerifyType.REGISTER);
         if (!user.isApproved()) {
             notificationService.createRegisterRequestNotifications(user, user.getRegisterReason());
         }
@@ -79,13 +85,12 @@ public class AuthController {
 
     @PostMapping("/verify")
     public ResponseEntity<?> verify(@RequestBody VerifyRequest req) {
-        boolean ok = userService.verifyCode(req.getUsername(), req.getCode());
+        Optional<User> userOpt = userService.findByUsername(req.getUsername());
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid credentials"));
+        }
+        boolean ok = userService.verifyCode(userOpt.get(), req.getCode(), VerifyType.REGISTER);
         if (ok) {
-            Optional<User> userOpt = userService.findByUsername(req.getUsername());
-            if (userOpt.isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Invalid credentials"));
-            }
-
             User user = userOpt.get();
 
             if (user.isApproved()) {
@@ -122,7 +127,7 @@ public class AuthController {
         User user = userOpt.get();
         if (!user.isVerified()) {
             user = userService.register(user.getUsername(), user.getEmail(), user.getPassword(), user.getRegisterReason(), registerModeService.getRegisterMode());
-            emailService.sendEmail(user.getEmail(), "在网站填写验证码以验证", "您的验证码是 " + user.getVerificationCode());
+            userService.sendVerifyMail(user, VerifyType.REGISTER);
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "User not verified",
                     "reason_code", "NOT_VERIFIED",
@@ -417,14 +422,17 @@ public class AuthController {
         if (userOpt.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", "User not found"));
         }
-        String code = userService.generatePasswordResetCode(req.getEmail());
-        emailService.sendEmail(req.getEmail(), "请填写验证码以重置密码", "您的验证码是" + code);
+        userService.sendVerifyMail(userOpt.get(), VerifyType.RESET_PASSWORD);
         return ResponseEntity.ok(Map.of("message", "Verification code sent"));
     }
 
     @PostMapping("/forgot/verify")
     public ResponseEntity<?> verifyReset(@RequestBody VerifyForgotRequest req) {
-        boolean ok = userService.verifyPasswordResetCode(req.getEmail(), req.getCode());
+        Optional<User> userOpt = userService.findByEmail(req.getEmail());
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "User not found"));
+        }
+        boolean ok = userService.verifyCode(userOpt.get(), req.getCode(), VerifyType.RESET_PASSWORD);
         if (ok) {
             String username = userService.findByEmail(req.getEmail()).get().getUsername();
             return ResponseEntity.ok(Map.of("token", jwtService.generateResetToken(username)));

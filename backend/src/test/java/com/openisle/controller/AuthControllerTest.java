@@ -4,6 +4,7 @@ import com.openisle.model.User;
 import com.openisle.service.*;
 import com.openisle.model.RegisterMode;
 import com.openisle.repository.UserRepository;
+import com.openisle.util.VerifyType;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +72,9 @@ class AuthControllerTest {
 
     @Test
     void verifyCodeEndpoint() throws Exception {
-        Mockito.when(userService.verifyCode("u", "123")).thenReturn(true);
+        User user = new User();
+        user.setUsername("u");
+        Mockito.when(userService.verifyCode(user, "123", VerifyType.REGISTER)).thenReturn(true);
         Mockito.when(jwtService.generateReasonToken("u")).thenReturn("reason_token");
 
         mockMvc.perform(post("/api/auth/verify")
