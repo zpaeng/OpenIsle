@@ -1163,6 +1163,7 @@ onMounted(async () => {
   margin-top: 10px;
   gap: 10px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .info-content-container {
@@ -1218,7 +1219,7 @@ onMounted(async () => {
 }
 
 .post-time {
-  font-size: 14px;
+  font-size: 12px;
   opacity: 0.5;
 }
 
@@ -1281,10 +1282,6 @@ onMounted(async () => {
   }
 
   .user-medal {
-    font-size: 12px;
-  }
-
-  .post-time {
     font-size: 12px;
   }
 
