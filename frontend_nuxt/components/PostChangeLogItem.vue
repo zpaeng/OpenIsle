@@ -2,7 +2,10 @@
   <div :id="`change-log-${log.id}`" class="change-log-container">
     <div class="change-log-text">
       <span class="change-log-user">{{ log.username }}</span>
-      <span v-if="log.type === 'CONTENT'">变更了文章内容</span>
+      <span v-if="log.type === 'CONTENT'">
+        变更了文章内容
+        <div class="content-diff" v-html="diffHtml"></div>
+      </span>
       <span v-else-if="log.type === 'TITLE'">变更了文章标题</span>
       <span v-else-if="log.type === 'CATEGORY'">变更了文章分类</span>
       <span v-else-if="log.type === 'TAG'">变更了文章标签</span>
@@ -24,7 +27,20 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { html } from 'diff2html'
+import { createTwoFilesPatch } from 'diff'
+import 'diff2html/bundles/css/diff2html.min.css'
 const props = defineProps({ log: Object })
+const diffHtml = computed(() => {
+  if (props.log.type === 'CONTENT') {
+    const oldContent = props.log.oldContent ?? ''
+    const newContent = props.log.newContent ?? ''
+    const diff = createTwoFilesPatch('old', 'new', oldContent, newContent)
+    return html(diff, { inputFormat: 'diff', showFiles: false, matching: 'lines' })
+  }
+  return ''
+})
 </script>
 
 <style scoped>
@@ -41,5 +57,9 @@ const props = defineProps({ log: Object })
 .change-log-time {
   font-size: 12px;
   opacity: 0.6;
+}
+
+.content-diff {
+  margin-top: 8px;
 }
 </style>
