@@ -11,8 +11,18 @@
       <span v-if="log.username" class="change-log-user">{{ log.username }}</span>
       <span v-if="log.type === 'CONTENT'" class="change-log-content">变更了文章内容</span>
       <span v-else-if="log.type === 'TITLE'" class="change-log-content">变更了文章标题</span>
-      <span v-else-if="log.type === 'CATEGORY'" class="change-log-content">变更了文章分类</span>
-      <span v-else-if="log.type === 'TAG'" class="change-log-content">变更了文章标签</span>
+      <span v-else-if="log.type === 'CATEGORY'" class="change-log-content change-log-category">
+        <div class="change-log-category-text">变更了文章分类, 从</div>
+        <ArticleCategory :category="log.oldCategory" />
+        <div class="change-log-category-text">修改为</div>
+        <ArticleCategory :category="log.newCategory" />
+      </span>
+      <span v-else-if="log.type === 'TAG'" class="change-log-content change-log-category">
+        <div class="change-log-category-text">变更了文章标签, 从</div>
+        <ArticleTags :tags="log.oldTags" />
+        <div class="change-log-category-text">修改为</div>
+        <ArticleTags :tags="log.newTags" />
+      </span>
       <span v-else-if="log.type === 'CLOSED'" class="change-log-content">
         <template v-if="log.newClosed">关闭了文章</template>
         <template v-else>重新打开了文章</template>
@@ -46,6 +56,8 @@ import 'diff2html/bundles/css/diff2html.min.css'
 import BaseImage from '~/components/BaseImage.vue'
 import { navigateTo } from 'nuxt/app'
 import { themeState } from '~/utils/theme'
+import ArticleCategory from '~/components/ArticleCategory.vue'
+import ArticleTags from '~/components/ArticleTags.vue'
 const props = defineProps({
   log: Object,
   title: String,
@@ -123,5 +135,12 @@ const diffHtml = computed(() => {
 
 .content-diff {
   margin-top: 8px;
+}
+
+.change-log-category {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: center;
 }
 </style>
