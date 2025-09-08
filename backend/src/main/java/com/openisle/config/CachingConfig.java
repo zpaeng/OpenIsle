@@ -40,6 +40,8 @@ public class CachingConfig {
     public static final String CATEGORY_CACHE_NAME="openisle_categories";
     // 在线人数缓存名
     public static final String ONLINE_CACHE_NAME="openisle_online";
+    // 注册验证码
+    public static final String VERIFY_CACHE_NAME="openisle_verify";
 
     /**
      * 自定义Redis的序列化器
