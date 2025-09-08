@@ -35,8 +35,12 @@
         <template v-if="log.newFeatured">将文章设为精选</template>
         <template v-else>取消精选文章</template>
       </span>
-      <span v-else-if="log.type === 'VOTE_RESULT'" class="change-log-content">投票已出结果</span>
-      <span v-else-if="log.type === 'LOTTERY_RESULT'" class="change-log-content">抽奖已开奖</span>
+      <span v-else-if="log.type === 'VOTE_RESULT'" class="change-log-content"
+        >系统已计算投票结果</span
+      >
+      <span v-else-if="log.type === 'LOTTERY_RESULT'" class="change-log-content"
+        >系统已「精密计算」抽奖结果 (=ﾟωﾟ)ﾉ</span
+      >
     </div>
     <div class="change-log-time">{{ log.time }}</div>
     <div
