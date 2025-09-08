@@ -31,7 +31,8 @@ const props = defineProps({ log: Object })
 .change-log-container {
   display: flex;
   flex-direction: column;
-  padding: 4px 0;
+  padding-bottom: 30px;
+  opacity: 0.7;
 }
 .change-log-user {
   font-weight: bold;

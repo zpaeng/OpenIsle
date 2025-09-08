@@ -134,7 +134,7 @@
               :post-closed="closed"
               @deleted="onCommentDeleted"
             />
-            <PostChangeLogItem v-else :key="item.id" :log="item" />
+            <PostChangeLogItem v-else :log="item" />
           </template>
         </BaseTimeline>
       </div>
@@ -229,11 +229,7 @@ const subscribed = ref(false)
 const commentSort = ref('NEWEST')
 const isFetchingComments = ref(false)
 const isMobile = useIsMobile()
-const timelineItems = computed(() => {
-  const cs = comments.value.map((c) => ({ ...c, kind: 'comment' }))
-  const ls = changeLogs.value.map((l) => ({ ...l, kind: 'log' }))
-  return [...cs, ...ls].sort((a, b) => new Date(a.time) - new Date(b.time))
-})
+const timelineItems = ref([])
 
 const headerHeight = import.meta.client
   ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0
@@ -337,20 +333,51 @@ const mapComment = (
   ),
   openReplies: level === 0,
   src: c.author.avatar,
+  createdAt: c.createdAt,
   iconClick: () => navigateTo(`/users/${c.author.id}`),
   parentUserName: parentUserName,
   parentUserAvatar: parentUserAvatar,
   parentUserClick: parentUserId ? () => navigateTo(`/users/${parentUserId}`) : null,
 })
 
+const changeLogIcon = (l) => {
+  if (l.type === 'CONTENT') {
+    return 'edit'
+  } else if (l.type === 'TITLE') {
+    return 'hashtag-key'
+  } else if (l.type === 'CATEGORY') {
+    return 'tag-one'
+  } else if (l.type === 'TAG') {
+    return 'tag-one'
+  } else if (l.type === 'CLOSED') {
+    if (l.newClosed) {
+      return 'lock-one'
+    } else {
+      return 'unlock'
+    }
+  } else if (l.type === 'PINNED') {
+    return 'pin-icon'
+  } else if (l.type === 'FEATURED') {
+    if (l.newFeatured) {
+      return 'star'
+    } else {
+      return 'dislike'
+    }
+  } else {
+    return 'info'
+  }
+}
+
 const mapChangeLog = (l) => ({
   id: l.id,
   username: l.username,
   type: l.type,
+  createdAt: l.time,
   time: TimeManager.format(l.time),
   newClosed: l.newClosed,
   newPinnedAt: l.newPinnedAt,
   newFeatured: l.newFeatured,
+  icon: changeLogIcon(l),
 })
 
 const getTop = (el) => {
@@ -788,7 +815,28 @@ const fetchChangeLogs = async () => {
   }
 }
 
-watch(commentSort, fetchComments)
+//
+// todo(tim): fetchComments, fetchChangeLogs 整合到一个请求，并且取消前端排序
+//
+const fetchTimeline = async () => {
+  await Promise.all([fetchComments(), fetchChangeLogs()])
+  const cs = comments.value.map((c) => ({ ...c, kind: 'comment' }))
+  const ls = changeLogs.value.map((l) => ({ ...l, kind: 'log' }))
+
+  if (commentSort.value === 'NEWEST') {
+    timelineItems.value = [...cs, ...ls].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+    )
+  } else {
+    timelineItems.value = [...cs, ...ls].sort(
+      (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
+    )
+  }
+}
+
+watch(commentSort, async () => {
+  await fetchTimeline()
+})
 
 const jumpToHashComment = async () => {
   const hash = location.hash
@@ -811,7 +859,7 @@ const gotoProfile = () => {
 
 const initPage = async () => {
   scrollTo(0, 0)
-  await Promise.all([fetchComments(), fetchChangeLogs()])
+  await fetchTimeline()
   const hash = location.hash
   const id = hash.startsWith('#comment-') ? hash.substring('#comment-'.length) : null
   if (id) expandCommentPath(id)
