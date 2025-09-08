@@ -348,6 +348,22 @@ body {
   }
 }
 
+/* Adjust diff2html layout on mobile */
+@media (max-width: 768px) {
+  .content-diff .d2h-wrapper,
+  .content-diff .d2h-code-line,
+  .content-diff .d2h-code-side-line,
+  .content-diff .d2h-code-line-ctn,
+  .content-diff .d2h-code-side-line-ctn,
+  .content-diff .d2h-file-header {
+    font-size: 12px;
+  }
+
+  .content-diff .d2h-wrapper {
+    overflow-x: auto;
+  }
+}
+
 /* Transition API */
 ::view-transition-old(root),
 ::view-transition-new(root) {
