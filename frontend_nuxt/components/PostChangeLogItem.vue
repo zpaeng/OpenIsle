@@ -11,18 +11,18 @@
       <span v-if="log.username" class="change-log-user">{{ log.username }}</span>
       <span v-if="log.type === 'CONTENT'" class="change-log-content">变更了文章内容</span>
       <span v-else-if="log.type === 'TITLE'" class="change-log-content">变更了文章标题</span>
-      <span v-else-if="log.type === 'CATEGORY'" class="change-log-content change-log-category">
+      <template v-else-if="log.type === 'CATEGORY'">
         <div class="change-log-category-text">变更了文章分类, 从</div>
         <ArticleCategory :category="log.oldCategory" />
         <div class="change-log-category-text">修改为</div>
         <ArticleCategory :category="log.newCategory" />
-      </span>
-      <span v-else-if="log.type === 'TAG'" class="change-log-content change-log-category">
+      </template>
+      <template v-else-if="log.type === 'TAG'">
         <div class="change-log-category-text">变更了文章标签, 从</div>
         <ArticleTags :tags="log.oldTags" />
         <div class="change-log-category-text">修改为</div>
         <ArticleTags :tags="log.newTags" />
-      </span>
+      </template>
       <span v-else-if="log.type === 'CLOSED'" class="change-log-content">
         <template v-if="log.newClosed">关闭了文章</template>
         <template v-else>重新打开了文章</template>
@@ -68,7 +68,6 @@ const props = defineProps({
 })
 
 const diffHtml = computed(() => {
-  const isMobile = useIsMobile()
   // Track theme changes
   const isDark = import.meta.client && document.documentElement.dataset.theme === 'dark'
   themeState.mode
@@ -83,7 +82,6 @@ const diffHtml = computed(() => {
       showFiles: false,
       matching: 'lines',
       drawFileList: false,
-      outputFormat: isMobile.value ? 'line-by-line' : 'side-by-side',
       colorScheme,
     })
   } else if (props.log.type === 'TITLE') {
@@ -95,7 +93,6 @@ const diffHtml = computed(() => {
       showFiles: false,
       matching: 'lines',
       drawFileList: false,
-      outputFormat: isMobile.value ? 'line-by-line' : 'side-by-side',
       colorScheme,
     })
   }
@@ -110,9 +107,12 @@ const diffHtml = computed(() => {
   /* padding-top: 5px; */
   /* padding-bottom: 30px; */
   font-size: 14px;
+  border-bottom: 1px solid var(--normal-border-color);
+  padding-bottom: 10px;
 }
 .change-log-text {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
 }
 .change-log-user {
@@ -146,5 +146,6 @@ const diffHtml = computed(() => {
   flex-direction: row;
   gap: 4px;
   align-items: center;
+  flex-wrap: wrap;
 }
 </style>
