@@ -134,7 +134,7 @@
               :post-closed="closed"
               @deleted="onCommentDeleted"
             />
-            <PostChangeLogItem v-else :log="item" />
+            <PostChangeLogItem v-else :log="item" :title="title" />
           </template>
         </BaseTimeline>
       </div>
@@ -377,6 +377,14 @@ const mapChangeLog = (l) => ({
   newClosed: l.newClosed,
   newPinnedAt: l.newPinnedAt,
   newFeatured: l.newFeatured,
+  oldContent: l.oldContent,
+  newContent: l.newContent,
+  oldTitle: l.oldTitle,
+  newTitle: l.newTitle,
+  oldCategory: l.oldCategory,
+  newCategory: l.newCategory,
+  oldTags: l.oldTags,
+  newTags: l.newTags,
   icon: changeLogIcon(l),
 })
 

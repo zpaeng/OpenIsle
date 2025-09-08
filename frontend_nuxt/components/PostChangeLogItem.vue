@@ -2,10 +2,7 @@
   <div :id="`change-log-${log.id}`" class="change-log-container">
     <div class="change-log-text">
       <span class="change-log-user">{{ log.username }}</span>
-      <span v-if="log.type === 'CONTENT'">
-        变更了文章内容
-        <div class="content-diff" v-html="diffHtml"></div>
-      </span>
+      <span v-if="log.type === 'CONTENT'">变更了文章内容</span>
       <span v-else-if="log.type === 'TITLE'">变更了文章标题</span>
       <span v-else-if="log.type === 'CATEGORY'">变更了文章分类</span>
       <span v-else-if="log.type === 'TAG'">变更了文章标签</span>
@@ -23,6 +20,11 @@
       </span>
     </div>
     <div class="change-log-time">{{ log.time }}</div>
+    <div
+      v-if="log.type === 'CONTENT' || log.type === 'TITLE'"
+      class="content-diff"
+      v-html="diffHtml"
+    ></div>
   </div>
 </template>
 
@@ -30,14 +32,37 @@
 import { computed } from 'vue'
 import { html } from 'diff2html'
 import { createTwoFilesPatch } from 'diff'
+import { useIsMobile } from '~/utils/screen'
 import 'diff2html/bundles/css/diff2html.min.css'
-const props = defineProps({ log: Object })
+const props = defineProps({
+  log: Object,
+  title: String,
+})
+
 const diffHtml = computed(() => {
+  const isMobile = useIsMobile()
   if (props.log.type === 'CONTENT') {
     const oldContent = props.log.oldContent ?? ''
     const newContent = props.log.newContent ?? ''
-    const diff = createTwoFilesPatch('old', 'new', oldContent, newContent)
-    return html(diff, { inputFormat: 'diff', showFiles: false, matching: 'lines' })
+    const diff = createTwoFilesPatch(props.title, props.title, oldContent, newContent)
+    return html(diff, {
+      inputFormat: 'diff',
+      showFiles: false,
+      matching: 'lines',
+      drawFileList: false,
+      outputFormat: isMobile.value ? 'line-by-line' : 'side-by-side',
+    })
+  } else if (props.log.type === 'TITLE') {
+    const oldTitle = props.log.oldTitle ?? ''
+    const newTitle = props.log.newTitle ?? ''
+    const diff = createTwoFilesPatch(oldTitle, newTitle, '', '')
+    return html(diff, {
+      inputFormat: 'diff',
+      showFiles: false,
+      matching: 'lines',
+      drawFileList: false,
+      outputFormat: isMobile.value ? 'line-by-line' : 'side-by-side',
+    })
   }
   return ''
 })
@@ -47,8 +72,9 @@ const diffHtml = computed(() => {
 .change-log-container {
   display: flex;
   flex-direction: column;
-  padding-bottom: 30px;
+  /* padding-bottom: 30px; */
   opacity: 0.7;
+  font-size: 14px;
 }
 .change-log-user {
   font-weight: bold;
