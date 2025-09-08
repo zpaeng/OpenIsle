@@ -17,7 +17,7 @@
   --background-color: white;
   --background-color-blur: rgba(255, 255, 255, 0.57);
   --menu-border-color: lightgray;
-  --normal-border-color: lightgray;
+  --normal-border-color: rgba(211, 211, 211, 0.63);
   --menu-selected-background-color: rgba(88, 241, 255, 0.166);
   --normal-light-background-color: rgba(242, 242, 242, 0.884);
   --menu-selected-background-color-hover: rgba(242, 242, 242, 0.884);
