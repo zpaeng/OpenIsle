@@ -37,22 +37,22 @@ public class AdminPostController {
     }
 
     @PostMapping("/{id}/pin")
-    public PostSummaryDto pin(@PathVariable Long id) {
-        return postMapper.toSummaryDto(postService.pinPost(id));
+    public PostSummaryDto pin(@PathVariable Long id, org.springframework.security.core.Authentication auth) {
+        return postMapper.toSummaryDto(postService.pinPost(id, auth.getName()));
     }
 
     @PostMapping("/{id}/unpin")
-    public PostSummaryDto unpin(@PathVariable Long id) {
-        return postMapper.toSummaryDto(postService.unpinPost(id));
+    public PostSummaryDto unpin(@PathVariable Long id, org.springframework.security.core.Authentication auth) {
+        return postMapper.toSummaryDto(postService.unpinPost(id, auth.getName()));
     }
 
     @PostMapping("/{id}/rss-exclude")
-    public PostSummaryDto excludeFromRss(@PathVariable Long id) {
-        return postMapper.toSummaryDto(postService.excludeFromRss(id));
+    public PostSummaryDto excludeFromRss(@PathVariable Long id, org.springframework.security.core.Authentication auth) {
+        return postMapper.toSummaryDto(postService.excludeFromRss(id, auth.getName()));
     }
 
     @PostMapping("/{id}/rss-include")
-    public PostSummaryDto includeInRss(@PathVariable Long id) {
-        return postMapper.toSummaryDto(postService.includeInRss(id));
+    public PostSummaryDto includeInRss(@PathVariable Long id, org.springframework.security.core.Authentication auth) {
+        return postMapper.toSummaryDto(postService.includeInRss(id, auth.getName()));
     }
 }

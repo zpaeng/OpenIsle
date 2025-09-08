@@ -19,6 +19,7 @@ import com.openisle.repository.CategoryRepository;
 import com.openisle.repository.TagRepository;
 import com.openisle.service.SubscriptionService;
 import com.openisle.service.CommentService;
+import com.openisle.service.PostChangeLogService;
 import com.openisle.repository.CommentRepository;
 import com.openisle.repository.ReactionRepository;
 import com.openisle.repository.PostSubscriptionRepository;
@@ -74,6 +75,7 @@ public class PostService {
     private final EmailSender emailSender;
     private final ApplicationContext applicationContext;
     private final PointService pointService;
+    private final PostChangeLogService postChangeLogService;
     private final ConcurrentMap<Long, ScheduledFuture<?>> scheduledFinalizations = new ConcurrentHashMap<>();
     @Value("${app.website-url:https://www.open-isle.com}")
     private String websiteUrl;
@@ -99,6 +101,7 @@ public class PostService {
                        EmailSender emailSender,
                        ApplicationContext applicationContext,
                        PointService pointService,
+                       PostChangeLogService postChangeLogService,
                        @Value("${app.post.publish-mode:DIRECT}") PublishMode publishMode) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
@@ -120,6 +123,7 @@ public class PostService {
         this.emailSender = emailSender;
         this.applicationContext = applicationContext;
         this.pointService = pointService;
+        this.postChangeLogService = postChangeLogService;
         this.publishMode = publishMode;
     }
 
@@ -159,19 +163,28 @@ public class PostService {
         return postRepository.findByStatusAndRssExcludedFalseOrderByCreatedAtDesc(PostStatus.PUBLISHED, pageable);
     }
 
-    public Post excludeFromRss(Long id) {
+    public Post excludeFromRss(Long id, String username) {
         Post post = postRepository.findById(id).orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
+        boolean oldFeatured = !Boolean.TRUE.equals(post.getRssExcluded());
         post.setRssExcluded(true);
-        return postRepository.save(post);
+        Post saved = postRepository.save(post);
+        postChangeLogService.recordFeaturedChange(saved, user, oldFeatured, false);
+        return saved;
     }
 
-    public Post includeInRss(Long id) {
+    public Post includeInRss(Long id, String username) {
         Post post = postRepository.findById(id).orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
+        boolean oldFeatured = !Boolean.TRUE.equals(post.getRssExcluded());
         post.setRssExcluded(false);
-        post = postRepository.save(post);
-        notificationService.createNotification(post.getAuthor(), NotificationType.POST_FEATURED, post, null, null, null, null, null);
-        pointService.awardForFeatured(post.getAuthor().getUsername(), post.getId());
-        return post;
+        Post saved = postRepository.save(post);
+        postChangeLogService.recordFeaturedChange(saved, user, oldFeatured, true);
+        notificationService.createNotification(saved.getAuthor(), NotificationType.POST_FEATURED, saved, null, null, null, null, null);
+        pointService.awardForFeatured(saved.getAuthor().getUsername(), saved.getId());
+        return saved;
     }
 
     public Post createPost(String username,
@@ -638,18 +651,28 @@ public class PostService {
         return post;
     }
 
-    public Post pinPost(Long id) {
+    public Post pinPost(Long id, String username) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
+        java.time.LocalDateTime oldPinned = post.getPinnedAt();
         post.setPinnedAt(java.time.LocalDateTime.now());
-        return postRepository.save(post);
+        Post saved = postRepository.save(post);
+        postChangeLogService.recordPinnedChange(saved, user, oldPinned, saved.getPinnedAt());
+        return saved;
     }
 
-    public Post unpinPost(Long id) {
+    public Post unpinPost(Long id, String username) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new com.openisle.exception.NotFoundException("User not found"));
+        java.time.LocalDateTime oldPinned = post.getPinnedAt();
         post.setPinnedAt(null);
-        return postRepository.save(post);
+        Post saved = postRepository.save(post);
+        postChangeLogService.recordPinnedChange(saved, user, oldPinned, null);
+        return saved;
     }
 
     public Post closePost(Long id, String username) {
@@ -660,8 +683,11 @@ public class PostService {
         if (!user.getId().equals(post.getAuthor().getId()) && user.getRole() != Role.ADMIN) {
             throw new IllegalArgumentException("Unauthorized");
         }
+        boolean oldClosed = post.isClosed();
         post.setClosed(true);
-        return postRepository.save(post);
+        Post saved = postRepository.save(post);
+        postChangeLogService.recordClosedChange(saved, user, oldClosed, true);
+        return saved;
     }
 
     public Post reopenPost(Long id, String username) {
@@ -672,8 +698,11 @@ public class PostService {
         if (!user.getId().equals(post.getAuthor().getId()) && user.getRole() != Role.ADMIN) {
             throw new IllegalArgumentException("Unauthorized");
         }
+        boolean oldClosed = post.isClosed();
         post.setClosed(false);
-        return postRepository.save(post);
+        Post saved = postRepository.save(post);
+        postChangeLogService.recordClosedChange(saved, user, oldClosed, false);
+        return saved;
     }
 
     @org.springframework.transaction.annotation.Transactional
@@ -702,14 +731,30 @@ public class PostService {
         if (tags.isEmpty()) {
             throw new IllegalArgumentException("Tag not found");
         }
-        post.setTitle(title);
+        String oldTitle = post.getTitle();
         String oldContent = post.getContent();
+        Category oldCategory = post.getCategory();
+        java.util.Set<com.openisle.model.Tag> oldTags = new java.util.HashSet<>(post.getTags());
+        post.setTitle(title);
         post.setContent(content);
         post.setCategory(category);
         post.setTags(new java.util.HashSet<>(tags));
         Post updated = postRepository.save(post);
         imageUploader.adjustReferences(oldContent, content);
         notificationService.notifyMentions(content, user, updated, null);
+        if (!java.util.Objects.equals(oldTitle, title)) {
+            postChangeLogService.recordTitleChange(updated, user, oldTitle, title);
+        }
+        if (!java.util.Objects.equals(oldContent, content)) {
+            postChangeLogService.recordContentChange(updated, user, oldContent, content);
+        }
+        if (!java.util.Objects.equals(oldCategory.getId(), category.getId())) {
+            postChangeLogService.recordCategoryChange(updated, user, oldCategory.getName(), category.getName());
+        }
+        java.util.Set<com.openisle.model.Tag> newTags = new java.util.HashSet<>(tags);
+        if (!oldTags.equals(newTags)) {
+            postChangeLogService.recordTagChange(updated, user, oldTags, newTags);
+        }
         return updated;
     }
 
