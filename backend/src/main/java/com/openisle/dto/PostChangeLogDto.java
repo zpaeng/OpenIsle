@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -19,10 +18,10 @@ public class PostChangeLogDto {
     private String newTitle;
     private String oldContent;
     private String newContent;
-    private CategoryDto oldCategory;
-    private CategoryDto newCategory;
-    private List<TagDto> oldTags;
-    private List<TagDto> newTags;
+    private String oldCategory;
+    private String newCategory;
+    private String oldTags;
+    private String newTags;
     private Boolean oldClosed;
     private Boolean newClosed;
     private LocalDateTime oldPinnedAt;
