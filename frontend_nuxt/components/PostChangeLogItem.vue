@@ -45,6 +45,7 @@ import { useIsMobile } from '~/utils/screen'
 import 'diff2html/bundles/css/diff2html.min.css'
 import BaseImage from '~/components/BaseImage.vue'
 import { navigateTo } from 'nuxt/app'
+import { themeState } from '~/utils/theme'
 const props = defineProps({
   log: Object,
   title: String,
@@ -52,6 +53,11 @@ const props = defineProps({
 
 const diffHtml = computed(() => {
   const isMobile = useIsMobile()
+  // Track theme changes
+  const isDark = import.meta.client && document.documentElement.dataset.theme === 'dark'
+  themeState.mode
+  const colorScheme = isDark ? 'dark' : 'light'
+
   if (props.log.type === 'CONTENT') {
     const oldContent = props.log.oldContent ?? ''
     const newContent = props.log.newContent ?? ''
@@ -62,6 +68,7 @@ const diffHtml = computed(() => {
       matching: 'lines',
       drawFileList: false,
       outputFormat: isMobile.value ? 'line-by-line' : 'side-by-side',
+      colorScheme,
     })
   } else if (props.log.type === 'TITLE') {
     const oldTitle = props.log.oldTitle ?? ''
@@ -73,6 +80,7 @@ const diffHtml = computed(() => {
       matching: 'lines',
       drawFileList: false,
       outputFormat: isMobile.value ? 'line-by-line' : 'side-by-side',
+      colorScheme,
     })
   }
   return ''
