@@ -6,26 +6,27 @@
         class="change-log-avatar"
         :src="log.userAvatar"
         alt="avatar"
+        @click="() => navigateTo(`/users/${log.username}`)"
       />
       <span v-if="log.username" class="change-log-user">{{ log.username }}</span>
-      <span v-if="log.type === 'CONTENT'">变更了文章内容</span>
-      <span v-else-if="log.type === 'TITLE'">变更了文章标题</span>
-      <span v-else-if="log.type === 'CATEGORY'">变更了文章分类</span>
-      <span v-else-if="log.type === 'TAG'">变更了文章标签</span>
-      <span v-else-if="log.type === 'CLOSED'">
+      <span v-if="log.type === 'CONTENT'" class="change-log-content">变更了文章内容</span>
+      <span v-else-if="log.type === 'TITLE'" class="change-log-content">变更了文章标题</span>
+      <span v-else-if="log.type === 'CATEGORY'" class="change-log-content">变更了文章分类</span>
+      <span v-else-if="log.type === 'TAG'" class="change-log-content">变更了文章标签</span>
+      <span v-else-if="log.type === 'CLOSED'" class="change-log-content">
         <template v-if="log.newClosed">关闭了文章</template>
         <template v-else>重新打开了文章</template>
       </span>
-      <span v-else-if="log.type === 'PINNED'">
+      <span v-else-if="log.type === 'PINNED'" class="change-log-content">
         <template v-if="log.newPinnedAt">置顶了文章</template>
-        <template v-else>取消置顶了文章</template>
+        <template v-else>取消置顶文章</template>
       </span>
-      <span v-else-if="log.type === 'FEATURED'">
+      <span v-else-if="log.type === 'FEATURED'" class="change-log-content">
         <template v-if="log.newFeatured">将文章设为精选</template>
         <template v-else>取消精选文章</template>
       </span>
-      <span v-else-if="log.type === 'VOTE_RESULT'">投票已出结果</span>
-      <span v-else-if="log.type === 'LOTTERY_RESULT'">抽奖已开奖</span>
+      <span v-else-if="log.type === 'VOTE_RESULT'" class="change-log-content">投票已出结果</span>
+      <span v-else-if="log.type === 'LOTTERY_RESULT'" class="change-log-content">抽奖已开奖</span>
     </div>
     <div class="change-log-time">{{ log.time }}</div>
     <div
@@ -43,6 +44,7 @@ import { createTwoFilesPatch } from 'diff'
 import { useIsMobile } from '~/utils/screen'
 import 'diff2html/bundles/css/diff2html.min.css'
 import BaseImage from '~/components/BaseImage.vue'
+import { navigateTo } from 'nuxt/app'
 const props = defineProps({
   log: Object,
   title: String,
@@ -81,8 +83,8 @@ const diffHtml = computed(() => {
 .change-log-container {
   display: flex;
   flex-direction: column;
+  /* padding-top: 5px; */
   /* padding-bottom: 30px; */
-  opacity: 0.7;
   font-size: 14px;
 }
 .change-log-text {
@@ -93,11 +95,18 @@ const diffHtml = computed(() => {
   font-weight: bold;
   margin-right: 4px;
 }
+
+.change-log-user,
+.change-log-content {
+  opacity: 0.7;
+}
+
 .change-log-avatar {
   width: 20px;
   height: 20px;
   border-radius: 50%;
   margin-right: 4px;
+  cursor: pointer;
 }
 .change-log-time {
   font-size: 12px;
