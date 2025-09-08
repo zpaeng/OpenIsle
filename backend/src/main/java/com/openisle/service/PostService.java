@@ -368,6 +368,7 @@ public class PostService {
             for (User participant : pp.getParticipants()) {
                 notificationService.createNotification(participant, NotificationType.POLL_RESULT_PARTICIPANT, pp, null, null, null, null, null);
             }
+            postChangeLogService.recordVoteResult(pp);
         });
     }
 
@@ -402,6 +403,7 @@ public class PostService {
                 notificationService.createNotification(lp.getAuthor(), NotificationType.LOTTERY_DRAW, lp, null, null, null, null, null);
                 notificationService.sendCustomPush(lp.getAuthor(), "抽奖已开奖", String.format("%s/posts/%d", websiteUrl, lp.getId()));
             }
+            postChangeLogService.recordLotteryResult(lp);
         });
     }
 
