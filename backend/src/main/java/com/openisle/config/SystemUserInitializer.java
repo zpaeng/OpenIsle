@@ -23,10 +23,12 @@ public class SystemUserInitializer implements CommandLineRunner {
             User system = new User();
             system.setUsername("system");
             system.setEmail("system@openisle.local");
+            // todo(tim): raw password 采用环境变量
             system.setPassword(passwordEncoder.encode("system"));
-            system.setRole(Role.ADMIN);
+            system.setRole(Role.USER);
             system.setVerified(true);
             system.setApproved(true);
+            system.setAvatar("https://openisle-1307107697.cos.ap-guangzhou.myqcloud.com/assert/image.png");
             return userRepository.save(system);
         });
     }
