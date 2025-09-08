@@ -3,6 +3,7 @@ package com.openisle.service;
 import com.openisle.model.*;
 import com.openisle.repository.PostChangeLogRepository;
 import com.openisle.repository.PostRepository;
+import com.openisle.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,12 @@ import java.util.stream.Collectors;
 public class PostChangeLogService {
     private final PostChangeLogRepository logRepository;
     private final PostRepository  postRepository;
+    private final UserRepository userRepository;
+
+    private User getSystemUser() {
+        return userRepository.findByUsername("system")
+                .orElseThrow(() -> new IllegalStateException("System user not found"));
+    }
 
     public void recordContentChange(Post post, User user, String oldContent, String newContent) {
         PostContentChangeLog log = new PostContentChangeLog();
@@ -89,6 +96,7 @@ public class PostChangeLogService {
     public void recordVoteResult(Post post) {
         PostVoteResultChangeLog log = new PostVoteResultChangeLog();
         log.setPost(post);
+        log.setUser(getSystemUser());
         log.setType(PostChangeType.VOTE_RESULT);
         logRepository.save(log);
     }
@@ -96,6 +104,7 @@ public class PostChangeLogService {
     public void recordLotteryResult(Post post) {
         PostLotteryResultChangeLog log = new PostLotteryResultChangeLog();
         log.setPost(post);
+        log.setUser(getSystemUser());
         log.setType(PostChangeType.LOTTERY_RESULT);
         logRepository.save(log);
     }
