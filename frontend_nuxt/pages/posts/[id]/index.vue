@@ -363,6 +363,10 @@ const changeLogIcon = (l) => {
     } else {
       return 'dislike'
     }
+  } else if (l.type === 'VOTE_RESULT') {
+    return 'check-one'
+  } else if (l.type === 'LOTTERY_RESULT') {
+    return 'gift'
   } else {
     return 'info'
   }
@@ -371,6 +375,7 @@ const changeLogIcon = (l) => {
 const mapChangeLog = (l) => ({
   id: l.id,
   username: l.username,
+  userAvatar: l.userAvatar,
   type: l.type,
   createdAt: l.time,
   time: TimeManager.format(l.time),

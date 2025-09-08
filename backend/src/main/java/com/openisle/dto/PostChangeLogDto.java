@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class PostChangeLogDto {
     private Long id;
     private String username;
+    private String userAvatar;
     private PostChangeType type;
     private LocalDateTime time;
     private String oldTitle;

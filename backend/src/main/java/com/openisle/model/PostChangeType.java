@@ -7,5 +7,7 @@ public enum PostChangeType {
     TAG,
     CLOSED,
     PINNED,
-    FEATURED
+    FEATURED,
+    VOTE_RESULT,
+    LOTTERY_RESULT
 }
