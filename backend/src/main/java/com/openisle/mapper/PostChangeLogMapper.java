@@ -9,7 +9,10 @@ public class PostChangeLogMapper {
     public PostChangeLogDto toDto(PostChangeLog log) {
         PostChangeLogDto dto = new PostChangeLogDto();
         dto.setId(log.getId());
-        dto.setUsername(log.getUser().getUsername());
+        if (log.getUser() != null) {
+            dto.setUsername(log.getUser().getUsername());
+            dto.setUserAvatar(log.getUser().getAvatar());
+        }
         dto.setType(log.getType());
         dto.setTime(log.getCreatedAt());
         if (log instanceof PostTitleChangeLog t) {

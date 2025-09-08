@@ -86,6 +86,20 @@ public class PostChangeLogService {
         logRepository.save(log);
     }
 
+    public void recordVoteResult(Post post) {
+        PostVoteResultChangeLog log = new PostVoteResultChangeLog();
+        log.setPost(post);
+        log.setType(PostChangeType.VOTE_RESULT);
+        logRepository.save(log);
+    }
+
+    public void recordLotteryResult(Post post) {
+        PostLotteryResultChangeLog log = new PostLotteryResultChangeLog();
+        log.setPost(post);
+        log.setType(PostChangeType.LOTTERY_RESULT);
+        logRepository.save(log);
+    }
+
     public List<PostChangeLog> listLogs(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new com.openisle.exception.NotFoundException("Post not found"));
