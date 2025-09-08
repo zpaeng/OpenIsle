@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TagRepository extends JpaRepository<Tag, Long> {
     List<Tag> findByNameContainingIgnoreCase(String keyword);
@@ -15,4 +16,6 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
 
     List<Tag> findByCreatorOrderByCreatedAtDesc(User creator, Pageable pageable);
     List<Tag> findByCreator(User creator);
+
+    Optional<Tag> findByName(String name);
 }

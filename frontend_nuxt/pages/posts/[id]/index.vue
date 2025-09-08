@@ -122,9 +122,10 @@
         <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
       </div>
       <div v-else class="comments-container">
-        <BaseTimeline :items="comments">
+        <BaseTimeline :items="timelineItems">
           <template #item="{ item }">
             <CommentItem
+              v-if="item.kind === 'comment'"
               :key="item.id"
               :comment="item"
               :level="0"
@@ -133,6 +134,7 @@
               :post-closed="closed"
               @deleted="onCommentDeleted"
             />
+            <PostChangeLogItem v-else :log="item" :title="title" />
           </template>
         </BaseTimeline>
       </div>
@@ -182,6 +184,7 @@ import { useRoute } from 'vue-router'
 import CommentItem from '~/components/CommentItem.vue'
 import CommentEditor from '~/components/CommentEditor.vue'
 import BaseTimeline from '~/components/BaseTimeline.vue'
+import PostChangeLogItem from '~/components/PostChangeLogItem.vue'
 import ArticleTags from '~/components/ArticleTags.vue'
 import ArticleCategory from '~/components/ArticleCategory.vue'
 import ReactionsGroup from '~/components/ReactionsGroup.vue'
@@ -212,6 +215,7 @@ const category = ref('')
 const tags = ref([])
 const postReactions = ref([])
 const comments = ref([])
+const changeLogs = ref([])
 const status = ref('PUBLISHED')
 const closed = ref(false)
 const pinnedAt = ref(null)
@@ -225,6 +229,7 @@ const subscribed = ref(false)
 const commentSort = ref('NEWEST')
 const isFetchingComments = ref(false)
 const isMobile = useIsMobile()
+const timelineItems = ref([])
 
 const headerHeight = import.meta.client
   ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0
@@ -290,8 +295,13 @@ const gatherPostItems = () => {
     const main = mainContainer.value.querySelector('.info-content-container')
     if (main) items.push({ el: main, top: getTop(main) })
 
-    for (const c of comments.value) {
-      const el = document.getElementById('comment-' + c.id)
+    for (const c of timelineItems.value) {
+      let el
+      if (c.kind === 'comment') {
+        el = document.getElementById('comment-' + c.id)
+      } else {
+        el = document.getElementById('change-log-' + c.id)
+      }
       if (el) {
         items.push({ el, top: getTop(el) })
       }
@@ -323,10 +333,64 @@ const mapComment = (
   ),
   openReplies: level === 0,
   src: c.author.avatar,
+  createdAt: c.createdAt,
   iconClick: () => navigateTo(`/users/${c.author.id}`),
   parentUserName: parentUserName,
   parentUserAvatar: parentUserAvatar,
   parentUserClick: parentUserId ? () => navigateTo(`/users/${parentUserId}`) : null,
+})
+
+const changeLogIcon = (l) => {
+  if (l.type === 'CONTENT') {
+    return 'edit'
+  } else if (l.type === 'TITLE') {
+    return 'hashtag-key'
+  } else if (l.type === 'CATEGORY') {
+    return 'tag-one'
+  } else if (l.type === 'TAG') {
+    return 'tag-one'
+  } else if (l.type === 'CLOSED') {
+    if (l.newClosed) {
+      return 'lock-one'
+    } else {
+      return 'unlock'
+    }
+  } else if (l.type === 'PINNED') {
+    return 'pin-icon'
+  } else if (l.type === 'FEATURED') {
+    if (l.newFeatured) {
+      return 'star'
+    } else {
+      return 'dislike'
+    }
+  } else if (l.type === 'VOTE_RESULT') {
+    return 'check-one'
+  } else if (l.type === 'LOTTERY_RESULT') {
+    return 'gift'
+  } else {
+    return 'info'
+  }
+}
+
+const mapChangeLog = (l) => ({
+  id: l.id,
+  username: l.username,
+  userAvatar: l.userAvatar,
+  type: l.type,
+  createdAt: l.time,
+  time: TimeManager.format(l.time),
+  newClosed: l.newClosed,
+  newPinnedAt: l.newPinnedAt,
+  newFeatured: l.newFeatured,
+  oldContent: l.oldContent,
+  newContent: l.newContent,
+  oldTitle: l.oldTitle,
+  newTitle: l.newTitle,
+  oldCategory: l.oldCategory,
+  newCategory: l.newCategory,
+  oldTags: l.oldTags,
+  newTags: l.newTags,
+  icon: changeLogIcon(l),
 })
 
 const getTop = (el) => {
@@ -422,19 +486,21 @@ watchEffect(() => {
 //   router.replace('/404')
 // }
 
-const totalPosts = computed(() => comments.value.length + 1)
+const totalPosts = computed(() => timelineItems.value.length + 1)
 const lastReplyTime = computed(() =>
-  comments.value.length ? comments.value[comments.value.length - 1].time : postTime.value,
+  timelineItems.value.length
+    ? timelineItems.value[timelineItems.value.length - 1].time
+    : postTime.value,
 )
 const firstReplyTime = computed(() =>
-  comments.value.length ? comments.value[0].time : postTime.value,
+  timelineItems.value.length ? timelineItems.value[0].time : postTime.value,
 )
 const scrollerTopTime = computed(() =>
   commentSort.value === 'OLDEST' ? postTime.value : firstReplyTime.value,
 )
 
 watch(
-  () => comments.value.length,
+  () => timelineItems.value.length,
   async () => {
     await nextTick()
     gatherPostItems()
@@ -546,6 +612,7 @@ const approvePost = async () => {
     status.value = 'PUBLISHED'
     toast.success('已通过审核')
     await refreshPost()
+    await fetchChangeLogs()
   } else {
     toast.error('操作失败')
   }
@@ -561,6 +628,7 @@ const pinPost = async () => {
   if (res.ok) {
     toast.success('已置顶')
     await refreshPost()
+    await fetchChangeLogs()
   } else {
     toast.error('操作失败')
   }
@@ -576,6 +644,7 @@ const unpinPost = async () => {
   if (res.ok) {
     toast.success('已取消置顶')
     await refreshPost()
+    await fetchChangeLogs()
   } else {
     toast.error('操作失败')
   }
@@ -591,6 +660,7 @@ const excludeRss = async () => {
   if (res.ok) {
     rssExcluded.value = true
     toast.success('已标记为rss不推荐')
+    await fetchChangeLogs()
   } else {
     toast.error('操作失败')
   }
@@ -606,6 +676,7 @@ const includeRss = async () => {
   if (res.ok) {
     rssExcluded.value = false
     toast.success('已标记为rss推荐')
+    await fetchChangeLogs()
   } else {
     toast.error('操作失败')
   }
@@ -622,6 +693,7 @@ const closePost = async () => {
     closed.value = true
     toast.success('已关闭')
     await refreshPost()
+    await fetchChangeLogs()
   } else {
     toast.error('操作失败')
   }
@@ -638,6 +710,7 @@ const reopenPost = async () => {
     closed.value = false
     toast.success('已重新打开')
     await refreshPost()
+    await fetchChangeLogs()
   } else {
     toast.error('操作失败')
   }
@@ -682,6 +755,7 @@ const rejectPost = async () => {
     status.value = 'REJECTED'
     toast.success('已驳回')
     await refreshPost()
+    await fetchChangeLogs()
   } else {
     toast.error('操作失败')
   }
@@ -740,7 +814,42 @@ const fetchComments = async () => {
   }
 }
 
-watch(commentSort, fetchComments)
+const fetchChangeLogs = async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/change-logs`)
+    if (res.ok) {
+      const data = await res.json()
+      changeLogs.value = data.map(mapChangeLog)
+      await nextTick()
+      gatherPostItems()
+    }
+  } catch (e) {
+    console.debug('Fetch change logs error', e)
+  }
+}
+
+//
+// todo(tim): fetchComments, fetchChangeLogs 整合到一个请求，并且取消前端排序
+//
+const fetchTimeline = async () => {
+  await Promise.all([fetchComments(), fetchChangeLogs()])
+  const cs = comments.value.map((c) => ({ ...c, kind: 'comment' }))
+  const ls = changeLogs.value.map((l) => ({ ...l, kind: 'log' }))
+
+  if (commentSort.value === 'NEWEST') {
+    timelineItems.value = [...cs, ...ls].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+    )
+  } else {
+    timelineItems.value = [...cs, ...ls].sort(
+      (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
+    )
+  }
+}
+
+watch(commentSort, async () => {
+  await fetchTimeline()
+})
 
 const jumpToHashComment = async () => {
   const hash = location.hash
@@ -763,7 +872,7 @@ const gotoProfile = () => {
 
 const initPage = async () => {
   scrollTo(0, 0)
-  await fetchComments()
+  await fetchTimeline()
   const hash = location.hash
   const id = hash.startsWith('#comment-') ? hash.substring('#comment-'.length) : null
   if (id) expandCommentPath(id)
