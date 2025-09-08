@@ -480,6 +480,7 @@ function goBack() {
 }
 
 .chat-container.float {
+  height: 100vh;
 }
 
 .chat-header {
