@@ -90,6 +90,9 @@ public class SecurityConfig {
                 "http://192.168.7.98",
                 "http://192.168.7.98:3000",
                 "https://petstore.swagger.io",
+                // 允许自建OpenAPI地址
+                "https://docs.open-isle.com",
+                "https://www.docs.open-isle.com",
                 websiteUrl,
                 websiteUrl.replace("://www.", "://")
         ));
