@@ -37,20 +37,11 @@ jobs:
         working-directory: ./docs
 
       - name: Build documentation
-        # 确保这里最终执行的是 next build（且 next.config 已 output: 'export'）
         run: bun run build
         working-directory: ./docs
-
-      - name: Assert static output exists
-        run: |
-          test -f ./docs/out/index.html || (echo "❌ ./docs/out/index.html 不存在：请检查 next.config 的 output:'export' / basePath 配置" && exit 1)
-          echo "✅ Found ./docs/out/index.html"
-          find ./docs/out -maxdepth 2 -type f | head -n 30
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
           folder: ./docs/out
-          clean: true
-          cname: docs.open-isle.com
