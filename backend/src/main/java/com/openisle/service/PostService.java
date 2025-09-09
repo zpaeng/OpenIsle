@@ -1,5 +1,6 @@
 package com.openisle.service;
 
+import com.openisle.config.CachingConfig;
 import com.openisle.model.Post;
 import com.openisle.model.PostStatus;
 import com.openisle.model.PostType;
@@ -28,12 +29,15 @@ import com.openisle.repository.PollVoteRepository;
 import com.openisle.model.Role;
 import com.openisle.exception.RateLimitException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.scheduling.TaskScheduler;
 import com.openisle.service.EmailSender;
 
+import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -80,6 +84,8 @@ public class PostService {
     @Value("${app.website-url:https://www.open-isle.com}")
     private String websiteUrl;
 
+    private final RedisTemplate redisTemplate;
+
     @org.springframework.beans.factory.annotation.Autowired
     public PostService(PostRepository postRepository,
                        UserRepository userRepository,
@@ -102,7 +108,8 @@ public class PostService {
                        ApplicationContext applicationContext,
                        PointService pointService,
                        PostChangeLogService postChangeLogService,
-                       @Value("${app.post.publish-mode:DIRECT}") PublishMode publishMode) {
+                       @Value("${app.post.publish-mode:DIRECT}") PublishMode publishMode,
+                       RedisTemplate redisTemplate) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
@@ -125,6 +132,8 @@ public class PostService {
         this.pointService = pointService;
         this.postChangeLogService = postChangeLogService;
         this.publishMode = publishMode;
+
+        this.redisTemplate = redisTemplate;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -201,9 +210,9 @@ public class PostService {
                            LocalDateTime endTime,
                            java.util.List<String> options,
                            Boolean multiple) {
-        long recent = postRepository.countByAuthorAfter(username,
-                java.time.LocalDateTime.now().minusMinutes(5));
-        if (recent >= 1) {
+        // 限制访问次数
+        boolean limitResult = postRateLimit(username);
+        if (!limitResult) {
             throw new RateLimitException("Too many posts");
         }
         if (tagIds == null || tagIds.isEmpty()) {
@@ -298,6 +307,23 @@ public class PostService {
             scheduledFinalizations.put(pp.getId(), future);
         }
         return post;
+    }
+
+    /**
+     * 限制发帖频率
+     * @param username
+     * @return
+     */
+    private boolean postRateLimit(String username){
+        String key = CachingConfig.LIMIT_CACHE_NAME +":posts:"+username;
+        String result = (String)redisTemplate.opsForValue().get(key);
+        //最近没有创建过文章
+        if(StringUtils.isEmpty(result)){
+            // 限制频率为5分钟
+            redisTemplate.opsForValue().set(key,"1", Duration.ofMinutes(5));
+            return true;
+        }
+        return false;
     }
 
     public void joinLottery(Long postId, String username) {
