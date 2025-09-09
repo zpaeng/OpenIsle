@@ -82,6 +82,7 @@ public class UserController {
         ));
     }
 
+    // 这个方法似乎没有使用？
     @PostMapping("/me/signin")
     public Map<String, Integer> signIn(Authentication auth) {
         int reward = levelService.awardForSignin(auth.getName());

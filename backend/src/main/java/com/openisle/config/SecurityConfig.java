@@ -6,6 +6,7 @@ import com.openisle.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,6 +27,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.beans.factory.annotation.Value;
+
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.servlet.FilterChain;
@@ -43,6 +46,8 @@ public class SecurityConfig {
     private final UserVisitService userVisitService;
     @Value("${app.website-url}")
     private String websiteUrl;
+
+    private final RedisTemplate redisTemplate;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -208,7 +213,8 @@ public class SecurityConfig {
             protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
                 var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
                 if (auth != null && auth.isAuthenticated() && !(auth instanceof org.springframework.security.authentication.AnonymousAuthenticationToken)) {
-                    userVisitService.recordVisit(auth.getName());
+                    String key = CachingConfig.VISIT_CACHE_NAME+":"+ LocalDate.now();
+                    redisTemplate.opsForSet().add(key, auth.getName());
                 }
                 filterChain.doFilter(request, response);
             }

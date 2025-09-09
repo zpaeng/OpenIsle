@@ -115,10 +115,10 @@ public class PostController {
         if (tagId != null) {
             tids = java.util.List.of(tagId);
         }
-
-        if (auth != null) {
-            userVisitService.recordVisit(auth.getName());
-        }
+// 只需要在请求的一开始统计一次
+//        if (auth != null) {
+//            userVisitService.recordVisit(auth.getName());
+//        }
 
         boolean hasCategories = ids != null && !ids.isEmpty();
         boolean hasTags = tids != null && !tids.isEmpty();
@@ -152,10 +152,10 @@ public class PostController {
         if (tagId != null) {
             tids = java.util.List.of(tagId);
         }
-
-        if (auth != null) {
-            userVisitService.recordVisit(auth.getName());
-        }
+// 只需要在请求的一开始统计一次
+//        if (auth != null) {
+//            userVisitService.recordVisit(auth.getName());
+//        }
 
         return postService.listPostsByViews(ids, tids, page, pageSize)
                 .stream().map(postMapper::toSummaryDto).collect(Collectors.toList());
@@ -177,10 +177,10 @@ public class PostController {
         if (tagId != null) {
             tids = java.util.List.of(tagId);
         }
-
-        if (auth != null) {
-            userVisitService.recordVisit(auth.getName());
-        }
+// 只需要在请求的一开始统计一次
+//        if (auth != null) {
+//            userVisitService.recordVisit(auth.getName());
+//        }
 
         return postService.listPostsByLatestReply(ids, tids, page, pageSize)
                 .stream().map(postMapper::toSummaryDto).collect(Collectors.toList());
@@ -202,9 +202,10 @@ public class PostController {
         if (tagId != null) {
             tids = java.util.List.of(tagId);
         }
-        if (auth != null) {
-            userVisitService.recordVisit(auth.getName());
-        }
+// 只需要在请求的一开始统计一次
+//        if (auth != null) {
+//            userVisitService.recordVisit(auth.getName());
+//        }
         return postService.listFeaturedPosts(ids, tids, page, pageSize)
                 .stream().map(postMapper::toSummaryDto).collect(Collectors.toList());
     }

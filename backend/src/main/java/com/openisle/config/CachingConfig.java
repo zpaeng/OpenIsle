@@ -44,6 +44,8 @@ public class CachingConfig {
     public static final String VERIFY_CACHE_NAME="openisle_verify";
     // 发帖频率限制
     public static final String LIMIT_CACHE_NAME="openisle_limit";
+    // 用户访问统计
+    public static final String VISIT_CACHE_NAME="openisle_visit";
 
     /**
      * 自定义Redis的序列化器
