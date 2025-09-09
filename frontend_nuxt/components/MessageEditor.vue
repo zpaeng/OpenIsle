@@ -70,7 +70,6 @@ export default {
     onMounted(() => {
       vditorInstance.value = createVditor(editorId.value, {
         placeholder: '输入消息...',
-        height: 150,
         toolbar: [
           'emoji',
           'bold',
@@ -178,5 +177,11 @@ export default {
 
 .message-submit:not(.disabled):hover {
   background-color: var(--primary-color-hover);
+}
+
+.message-editor-container .vditor {
+  min-height: 80px;
+  max-height: 150px;
+  overflow-y: auto;
 }
 </style>
