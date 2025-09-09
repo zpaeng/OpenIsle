@@ -100,7 +100,7 @@ export default {
 
 .timeline-content {
   flex: 1;
-  width: calc(100% - 32px);
+  width: calc(100% - 42px);
 }
 
 @media (max-width: 768px) {
