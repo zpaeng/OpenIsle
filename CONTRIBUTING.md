@@ -246,3 +246,9 @@ https://resend.com/emails 创建账号并登录
   `RESEND_FROM_EMAIL`： **noreply@域名**
   `RESEND_API_KEY`：**刚刚复制的 Key**
   ![image-20250906151218330](assets/contributing/image-20250906151218330.png)
+
+## 开源共建和API文档
+
+- API文档: https://openisle-docs.netlify.app/docs/openapi
+
+
