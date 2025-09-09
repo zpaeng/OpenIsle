@@ -6,6 +6,7 @@ import com.openisle.exception.RateLimitException;
 import org.junit.jupiter.api.Test;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,11 +39,12 @@ class PostServiceTest {
         ApplicationContext context = mock(ApplicationContext.class);
         PointService pointService = mock(PointService.class);
         PostChangeLogService postChangeLogService = mock(PostChangeLogService.class);
+        RedisTemplate redisTemplate = mock(RedisTemplate.class);
 
         PostService service = new PostService(postRepo, userRepo, catRepo, tagRepo, lotteryRepo,
                 pollPostRepo, pollVoteRepo, notifService, subService, commentService, commentRepo,
                 reactionRepo, subRepo, notificationRepo, postReadService,
-                imageUploader, taskScheduler, emailSender, context, pointService, postChangeLogService, PublishMode.DIRECT);
+                imageUploader, taskScheduler, emailSender, context, pointService, postChangeLogService, PublishMode.DIRECT, redisTemplate);
         when(context.getBean(PostService.class)).thenReturn(service);
 
         Post post = new Post();
@@ -88,11 +90,12 @@ class PostServiceTest {
         ApplicationContext context = mock(ApplicationContext.class);
         PointService pointService = mock(PointService.class);
         PostChangeLogService postChangeLogService = mock(PostChangeLogService.class);
+        RedisTemplate redisTemplate = mock(RedisTemplate.class);
 
         PostService service = new PostService(postRepo, userRepo, catRepo, tagRepo, lotteryRepo,
                 pollPostRepo, pollVoteRepo, notifService, subService, commentService, commentRepo,
                 reactionRepo, subRepo, notificationRepo, postReadService,
-                imageUploader, taskScheduler, emailSender, context, pointService, postChangeLogService, PublishMode.DIRECT);
+                imageUploader, taskScheduler, emailSender, context, pointService, postChangeLogService, PublishMode.DIRECT, redisTemplate);
         when(context.getBean(PostService.class)).thenReturn(service);
 
         Post post = new Post();
@@ -144,11 +147,12 @@ class PostServiceTest {
         ApplicationContext context = mock(ApplicationContext.class);
         PointService pointService = mock(PointService.class);
         PostChangeLogService postChangeLogService = mock(PostChangeLogService.class);
+        RedisTemplate redisTemplate = mock(RedisTemplate.class);
 
         PostService service = new PostService(postRepo, userRepo, catRepo, tagRepo, lotteryRepo,
                 pollPostRepo, pollVoteRepo, notifService, subService, commentService, commentRepo,
                 reactionRepo, subRepo, notificationRepo, postReadService,
-                imageUploader, taskScheduler, emailSender, context, pointService, postChangeLogService, PublishMode.DIRECT);
+                imageUploader, taskScheduler, emailSender, context, pointService, postChangeLogService, PublishMode.DIRECT, redisTemplate);
         when(context.getBean(PostService.class)).thenReturn(service);
 
         when(postRepo.countByAuthorAfter(eq("alice"), any())).thenReturn(1L);
@@ -181,11 +185,12 @@ class PostServiceTest {
         ApplicationContext context = mock(ApplicationContext.class);
         PointService pointService = mock(PointService.class);
         PostChangeLogService postChangeLogService = mock(PostChangeLogService.class);
+        RedisTemplate redisTemplate = mock(RedisTemplate.class);
 
         PostService service = new PostService(postRepo, userRepo, catRepo, tagRepo, lotteryRepo,
                 pollPostRepo, pollVoteRepo, notifService, subService, commentService, commentRepo,
                 reactionRepo, subRepo, notificationRepo, postReadService,
-                imageUploader, taskScheduler, emailSender, context, pointService, postChangeLogService, PublishMode.DIRECT);
+                imageUploader, taskScheduler, emailSender, context, pointService, postChangeLogService, PublishMode.DIRECT, redisTemplate);
         when(context.getBean(PostService.class)).thenReturn(service);
 
         User author = new User();
