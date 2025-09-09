@@ -6,6 +6,9 @@ import com.openisle.model.User;
 import com.openisle.service.EmailSender;
 import com.openisle.repository.NotificationRepository;
 import com.openisle.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,9 @@ public class AdminUserController {
     private String websiteUrl;
 
     @PostMapping("/{id}/approve")
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Approve user", description = "Approve a pending user registration")
+    @ApiResponse(responseCode = "200", description = "User approved")
     public ResponseEntity<?> approve(@PathVariable Long id) {
         User user = userRepository.findById(id).orElseThrow();
         user.setApproved(true);
@@ -33,6 +39,9 @@ public class AdminUserController {
     }
 
     @PostMapping("/{id}/reject")
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Reject user", description = "Reject a pending user registration")
+    @ApiResponse(responseCode = "200", description = "User rejected")
     public ResponseEntity<?> reject(@PathVariable Long id) {
         User user = userRepository.findById(id).orElseThrow();
         user.setApproved(false);

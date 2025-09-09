@@ -5,6 +5,11 @@ import com.openisle.service.AiUsageService;
 import com.openisle.service.PasswordValidator;
 import com.openisle.service.PostService;
 import com.openisle.service.RegisterModeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +23,10 @@ public class AdminConfigController {
     private final RegisterModeService registerModeService;
 
     @GetMapping
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Get configuration", description = "Retrieve application configuration settings")
+    @ApiResponse(responseCode = "200", description = "Current configuration",
+            content = @Content(schema = @Schema(implementation = ConfigDto.class)))
     public ConfigDto getConfig() {
         ConfigDto dto = new ConfigDto();
         dto.setPublishMode(postService.getPublishMode());
@@ -28,6 +37,10 @@ public class AdminConfigController {
     }
 
     @PostMapping
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Update configuration", description = "Update application configuration settings")
+    @ApiResponse(responseCode = "200", description = "Updated configuration",
+            content = @Content(schema = @Schema(implementation = ConfigDto.class)))
     public ConfigDto updateConfig(@RequestBody ConfigDto dto) {
         if (dto.getPublishMode() != null) {
             postService.setPublishMode(dto.getPublishMode());

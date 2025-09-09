@@ -14,6 +14,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,6 +42,10 @@ public class CommentController {
     private boolean commentCaptchaEnabled;
 
     @PostMapping("/posts/{postId}/comments")
+    @Operation(summary = "Create comment", description = "Add a comment to a post")
+    @ApiResponse(responseCode = "200", description = "Created comment",
+            content = @Content(schema = @Schema(implementation = CommentDto.class)))
+    @SecurityRequirement(name = "JWT")
     public ResponseEntity<CommentDto> createComment(@PathVariable Long postId,
                                                     @RequestBody CommentRequest req,
                                                     Authentication auth) {
@@ -53,6 +63,10 @@ public class CommentController {
     }
 
     @PostMapping("/comments/{commentId}/replies")
+    @Operation(summary = "Reply to comment", description = "Reply to an existing comment")
+    @ApiResponse(responseCode = "200", description = "Reply created",
+            content = @Content(schema = @Schema(implementation = CommentDto.class)))
+    @SecurityRequirement(name = "JWT")
     public ResponseEntity<CommentDto> replyComment(@PathVariable Long commentId,
                                                    @RequestBody CommentRequest req,
                                                    Authentication auth) {
@@ -69,6 +83,9 @@ public class CommentController {
     }
 
     @GetMapping("/posts/{postId}/comments")
+    @Operation(summary = "List comments", description = "List comments for a post")
+    @ApiResponse(responseCode = "200", description = "Comments",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = CommentDto.class))))
     public List<CommentDto> listComments(@PathVariable Long postId,
                                          @RequestParam(value = "sort", required = false, defaultValue = "OLDEST") com.openisle.model.CommentSort sort) {
         log.debug("listComments called for post {} with sort {}", postId, sort);
@@ -80,6 +97,9 @@ public class CommentController {
     }
 
     @DeleteMapping("/comments/{id}")
+    @Operation(summary = "Delete comment", description = "Delete a comment")
+    @ApiResponse(responseCode = "200", description = "Deleted")
+    @SecurityRequirement(name = "JWT")
     public void deleteComment(@PathVariable Long id, Authentication auth) {
         log.debug("deleteComment called by user {} for comment {}", auth.getName(), id);
         commentService.deleteComment(auth.getName(), id);
@@ -87,12 +107,20 @@ public class CommentController {
     }
 
     @PostMapping("/comments/{id}/pin")
+    @Operation(summary = "Pin comment", description = "Pin a comment")
+    @ApiResponse(responseCode = "200", description = "Pinned comment",
+            content = @Content(schema = @Schema(implementation = CommentDto.class)))
+    @SecurityRequirement(name = "JWT")
     public CommentDto pinComment(@PathVariable Long id, Authentication auth) {
         log.debug("pinComment called by user {} for comment {}", auth.getName(), id);
         return commentMapper.toDto(commentService.pinComment(auth.getName(), id));
     }
 
     @PostMapping("/comments/{id}/unpin")
+    @Operation(summary = "Unpin comment", description = "Unpin a comment")
+    @ApiResponse(responseCode = "200", description = "Unpinned comment",
+            content = @Content(schema = @Schema(implementation = CommentDto.class)))
+    @SecurityRequirement(name = "JWT")
     public CommentDto unpinComment(@PathVariable Long id, Authentication auth) {
         log.debug("unpinComment called by user {} for comment {}", auth.getName(), id);
         return commentMapper.toDto(commentService.unpinComment(auth.getName(), id));

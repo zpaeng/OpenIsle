@@ -12,6 +12,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/api")
@@ -26,11 +31,18 @@ public class ReactionController {
      * Get all available reaction types.
      */
     @GetMapping("/reaction-types")
+    @Operation(summary = "List reaction types", description = "Get all available reaction types")
+    @ApiResponse(responseCode = "200", description = "Reaction types",
+            content = @Content(schema = @Schema(implementation = ReactionType[].class)))
     public ReactionType[] listReactionTypes() {
         return ReactionType.values();
     }
 
     @PostMapping("/posts/{postId}/reactions")
+    @Operation(summary = "React to post", description = "React to a post")
+    @ApiResponse(responseCode = "200", description = "Reaction result",
+            content = @Content(schema = @Schema(implementation = ReactionDto.class)))
+    @SecurityRequirement(name = "JWT")
     public ResponseEntity<ReactionDto> reactToPost(@PathVariable Long postId,
                                                    @RequestBody ReactionRequest req,
                                                    Authentication auth) {
@@ -46,6 +58,10 @@ public class ReactionController {
     }
 
     @PostMapping("/comments/{commentId}/reactions")
+    @Operation(summary = "React to comment", description = "React to a comment")
+    @ApiResponse(responseCode = "200", description = "Reaction result",
+            content = @Content(schema = @Schema(implementation = ReactionDto.class)))
+    @SecurityRequirement(name = "JWT")
     public ResponseEntity<ReactionDto> reactToComment(@PathVariable Long commentId,
                                                       @RequestBody ReactionRequest req,
                                                       Authentication auth) {
@@ -61,6 +77,10 @@ public class ReactionController {
     }
 
     @PostMapping("/messages/{messageId}/reactions")
+    @Operation(summary = "React to message", description = "React to a message")
+    @ApiResponse(responseCode = "200", description = "Reaction result",
+            content = @Content(schema = @Schema(implementation = ReactionDto.class)))
+    @SecurityRequirement(name = "JWT")
     public ResponseEntity<ReactionDto> reactToMessage(@PathVariable Long messageId,
                                                       @RequestBody ReactionRequest req,
                                                       Authentication auth) {

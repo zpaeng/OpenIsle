@@ -13,6 +13,12 @@ import com.openisle.service.PostService;
 import com.openisle.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import java.util.List;
 import java.util.Map;
@@ -29,6 +35,10 @@ public class TagController {
     private final TagMapper tagMapper;
 
     @PostMapping
+    @Operation(summary = "Create tag", description = "Create a new tag")
+    @ApiResponse(responseCode = "200", description = "Created tag",
+            content = @Content(schema = @Schema(implementation = TagDto.class)))
+    @SecurityRequirement(name = "JWT")
     public TagDto create(@RequestBody TagRequest req, org.springframework.security.core.Authentication auth) {
         boolean approved = true;
         if (postService.getPublishMode() == PublishMode.REVIEW && auth != null) {
@@ -49,6 +59,9 @@ public class TagController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update tag", description = "Update an existing tag")
+    @ApiResponse(responseCode = "200", description = "Updated tag",
+            content = @Content(schema = @Schema(implementation = TagDto.class)))
     public TagDto update(@PathVariable Long id, @RequestBody TagRequest req) {
         Tag tag = tagService.updateTag(id, req.getName(), req.getDescription(), req.getIcon(), req.getSmallIcon());
         long count = postService.countPostsByTag(tag.getId());
@@ -56,11 +69,16 @@ public class TagController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete tag", description = "Delete a tag by id")
+    @ApiResponse(responseCode = "200", description = "Tag deleted")
     public void delete(@PathVariable Long id) {
         tagService.deleteTag(id);
     }
 
     @GetMapping
+    @Operation(summary = "List tags", description = "List tags with optional keyword")
+    @ApiResponse(responseCode = "200", description = "List of tags",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = TagDto.class))))
     public List<TagDto> list(@RequestParam(value = "keyword", required = false) String keyword,
                              @RequestParam(value = "limit", required = false) Integer limit) {
         List<Tag> tags = tagService.searchTags(keyword);
@@ -77,6 +95,9 @@ public class TagController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get tag", description = "Get tag by id")
+    @ApiResponse(responseCode = "200", description = "Tag detail",
+            content = @Content(schema = @Schema(implementation = TagDto.class)))
     public TagDto get(@PathVariable Long id) {
         Tag tag = tagService.getTag(id);
         long count = postService.countPostsByTag(tag.getId());
@@ -84,6 +105,9 @@ public class TagController {
     }
 
     @GetMapping("/{id}/posts")
+    @Operation(summary = "List posts by tag", description = "Get posts with specific tag")
+    @ApiResponse(responseCode = "200", description = "List of posts",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostSummaryDto.class))))
     public List<PostSummaryDto> listPostsByTag(@PathVariable Long id,
                                                @RequestParam(value = "page", required = false) Integer page,
                                                @RequestParam(value = "pageSize", required = false) Integer pageSize) {
