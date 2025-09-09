@@ -703,13 +703,6 @@ function goBack() {
   opacity: 0.5;
 }
 
-.info-content-text img,
-.reply-content img {
-  max-width: 600px;
-  width: 100%;
-  cursor: pointer;
-}
-
 .reply-btn {
   cursor: pointer;
   padding: 4px;

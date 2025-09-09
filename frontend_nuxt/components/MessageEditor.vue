@@ -70,22 +70,6 @@ export default {
     onMounted(() => {
       vditorInstance.value = createVditor(editorId.value, {
         placeholder: '输入消息...',
-        toolbar: [
-          'emoji',
-          'bold',
-          'italic',
-          'strike',
-          'link',
-          '|',
-          'list',
-          '|',
-          'line',
-          'quote',
-          'code',
-          'inline-code',
-          '|',
-          'upload',
-        ],
         preview: {
           actions: [],
           markdown: { toc: false },
@@ -148,11 +132,17 @@ export default {
   border-radius: 8px;
 }
 
+.vditor {
+  min-height: 50px;
+  max-height: 150px;
+}
+
 .message-bottom-container {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  padding: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
   background-color: var(--bg-color-soft);
   border-top: 1px solid var(--border-color);
   border-bottom-left-radius: 8px;
@@ -177,11 +167,5 @@ export default {
 
 .message-submit:not(.disabled):hover {
   background-color: var(--primary-color-hover);
-}
-
-.message-editor-container .vditor {
-  min-height: 80px;
-  max-height: 150px;
-  overflow-y: auto;
 }
 </style>
