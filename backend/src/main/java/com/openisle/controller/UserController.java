@@ -6,6 +6,12 @@ import com.openisle.mapper.TagMapper;
 import com.openisle.mapper.UserMapper;
 import com.openisle.model.User;
 import com.openisle.service.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -48,12 +54,20 @@ public class UserController {
     private int defaultTagsLimit;
 
     @GetMapping("/me")
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Current user", description = "Get current authenticated user information")
+    @ApiResponse(responseCode = "200", description = "User detail",
+            content = @Content(schema = @Schema(implementation = UserDto.class)))
     public ResponseEntity<UserDto> me(Authentication auth) {
         User user = userService.findByUsername(auth.getName()).orElseThrow();
         return ResponseEntity.ok(userMapper.toDto(user, auth));
     }
 
     @PostMapping("/me/avatar")
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Upload avatar", description = "Upload avatar for current user")
+    @ApiResponse(responseCode = "200", description = "Upload result",
+            content = @Content(schema = @Schema(implementation = Map.class)))
     public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file,
                                           Authentication auth) {
         if (checkImageType && (file.getContentType() == null || !file.getContentType().startsWith("image/"))) {
@@ -73,6 +87,10 @@ public class UserController {
     }
 
     @PutMapping("/me")
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Update profile", description = "Update current user's profile")
+    @ApiResponse(responseCode = "200", description = "Updated profile",
+            content = @Content(schema = @Schema(implementation = Map.class)))
     public ResponseEntity<?> updateProfile(@RequestBody UpdateProfileDto dto,
                                            Authentication auth) {
         User user = userService.updateProfile(auth.getName(), dto.getUsername(), dto.getIntroduction());
@@ -83,12 +101,19 @@ public class UserController {
     }
 
     @PostMapping("/me/signin")
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Daily sign in", description = "Sign in to receive rewards")
+    @ApiResponse(responseCode = "200", description = "Sign in reward",
+            content = @Content(schema = @Schema(implementation = Map.class)))
     public Map<String, Integer> signIn(Authentication auth) {
         int reward = levelService.awardForSignin(auth.getName());
         return Map.of("reward", reward);
     }
 
     @GetMapping("/{identifier}")
+    @Operation(summary = "Get user", description = "Get user by identifier")
+    @ApiResponse(responseCode = "200", description = "User detail",
+            content = @Content(schema = @Schema(implementation = UserDto.class)))
     public ResponseEntity<UserDto> getUser(@PathVariable("identifier") String identifier,
                                            Authentication auth) {
         User user = userService.findByIdentifier(identifier).orElseThrow(() -> new NotFoundException("User not found"));
@@ -96,6 +121,9 @@ public class UserController {
     }
 
     @GetMapping("/{identifier}/posts")
+    @Operation(summary = "User posts", description = "Get recent posts by user")
+    @ApiResponse(responseCode = "200", description = "User posts",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostMetaDto.class))))
     public java.util.List<PostMetaDto> userPosts(@PathVariable("identifier") String identifier,
                                                  @RequestParam(value = "limit", required = false) Integer limit) {
         int l = limit != null ? limit : defaultPostsLimit;
@@ -106,6 +134,9 @@ public class UserController {
     }
 
     @GetMapping("/{identifier}/subscribed-posts")
+    @Operation(summary = "Subscribed posts", description = "Get posts the user subscribed to")
+    @ApiResponse(responseCode = "200", description = "Subscribed posts",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostMetaDto.class))))
     public java.util.List<PostMetaDto> subscribedPosts(@PathVariable("identifier") String identifier,
                                                        @RequestParam(value = "limit", required = false) Integer limit) {
         int l = limit != null ? limit : defaultPostsLimit;
@@ -117,6 +148,9 @@ public class UserController {
     }
 
     @GetMapping("/{identifier}/replies")
+    @Operation(summary = "User replies", description = "Get recent replies by user")
+    @ApiResponse(responseCode = "200", description = "User replies",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = CommentInfoDto.class))))
     public java.util.List<CommentInfoDto> userReplies(@PathVariable("identifier") String identifier,
                                                       @RequestParam(value = "limit", required = false) Integer limit) {
         int l = limit != null ? limit : defaultRepliesLimit;
@@ -127,6 +161,9 @@ public class UserController {
     }
 
     @GetMapping("/{identifier}/hot-posts")
+    @Operation(summary = "User hot posts", description = "Get most reacted posts by user")
+    @ApiResponse(responseCode = "200", description = "Hot posts",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostMetaDto.class))))
     public java.util.List<PostMetaDto> hotPosts(@PathVariable("identifier") String identifier,
                                                 @RequestParam(value = "limit", required = false) Integer limit) {
         int l = limit != null ? limit : 10;
@@ -138,6 +175,9 @@ public class UserController {
     }
 
     @GetMapping("/{identifier}/hot-replies")
+    @Operation(summary = "User hot replies", description = "Get most reacted replies by user")
+    @ApiResponse(responseCode = "200", description = "Hot replies",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = CommentInfoDto.class))))
     public java.util.List<CommentInfoDto> hotReplies(@PathVariable("identifier") String identifier,
                                                      @RequestParam(value = "limit", required = false) Integer limit) {
         int l = limit != null ? limit : 10;
@@ -149,6 +189,9 @@ public class UserController {
     }
 
     @GetMapping("/{identifier}/hot-tags")
+    @Operation(summary = "User hot tags", description = "Get tags frequently used by user")
+    @ApiResponse(responseCode = "200", description = "Hot tags",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = TagDto.class))))
     public java.util.List<TagDto> hotTags(@PathVariable("identifier") String identifier,
                                           @RequestParam(value = "limit", required = false) Integer limit) {
         int l = limit != null ? limit : 10;
@@ -161,6 +204,9 @@ public class UserController {
     }
 
     @GetMapping("/{identifier}/tags")
+    @Operation(summary = "User tags", description = "Get recent tags used by user")
+    @ApiResponse(responseCode = "200", description = "User tags",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = TagDto.class))))
     public java.util.List<TagDto> userTags(@PathVariable("identifier") String identifier,
                                            @RequestParam(value = "limit", required = false) Integer limit) {
         int l = limit != null ? limit : defaultTagsLimit;
@@ -171,6 +217,9 @@ public class UserController {
     }
 
     @GetMapping("/{identifier}/following")
+    @Operation(summary = "Following users", description = "Get users that this user is following")
+    @ApiResponse(responseCode = "200", description = "Following list",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserDto.class))))
     public java.util.List<UserDto> following(@PathVariable("identifier") String identifier) {
         User user = userService.findByIdentifier(identifier).orElseThrow();
         return subscriptionService.getSubscribedUsers(user.getUsername()).stream()
@@ -179,6 +228,9 @@ public class UserController {
     }
 
     @GetMapping("/{identifier}/followers")
+    @Operation(summary = "Followers", description = "Get followers of this user")
+    @ApiResponse(responseCode = "200", description = "Followers list",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserDto.class))))
     public java.util.List<UserDto> followers(@PathVariable("identifier") String identifier) {
         User user = userService.findByIdentifier(identifier).orElseThrow();
         return subscriptionService.getSubscribers(user.getUsername()).stream()
@@ -187,6 +239,9 @@ public class UserController {
     }
 
     @GetMapping("/admins")
+    @Operation(summary = "Admin users", description = "List administrator users")
+    @ApiResponse(responseCode = "200", description = "Admin users",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserDto.class))))
     public java.util.List<UserDto> admins() {
         return userService.getAdmins().stream()
                 .map(userMapper::toDto)
@@ -194,6 +249,9 @@ public class UserController {
     }
 
     @GetMapping("/{identifier}/all")
+    @Operation(summary = "User aggregate", description = "Get aggregate information for user")
+    @ApiResponse(responseCode = "200", description = "User aggregate",
+            content = @Content(schema = @Schema(implementation = UserAggregateDto.class)))
     public ResponseEntity<UserAggregateDto> userAggregate(@PathVariable("identifier") String identifier,
                                                           @RequestParam(value = "postsLimit", required = false) Integer postsLimit,
                                                           @RequestParam(value = "repliesLimit", required = false) Integer repliesLimit,

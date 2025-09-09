@@ -10,6 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import java.util.List;
 
@@ -26,6 +30,9 @@ public class SitemapController {
     private String websiteUrl;
 
     @GetMapping(value = "/sitemap.xml", produces = MediaType.APPLICATION_XML_VALUE)
+    @Operation(summary = "Sitemap", description = "Generate sitemap xml")
+    @ApiResponse(responseCode = "200", description = "Sitemap xml",
+            content = @Content(schema = @Schema(implementation = String.class)))
     public ResponseEntity<String> sitemap() {
         List<Post> posts = postRepository.findByStatus(PostStatus.PUBLISHED);
 

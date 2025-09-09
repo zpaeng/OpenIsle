@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import java.util.Map;
 
@@ -21,6 +26,10 @@ public class AiController {
     private final AiUsageService aiUsageService;
 
     @PostMapping("/format")
+    @Operation(summary = "Format markdown", description = "Format text via AI")
+    @ApiResponse(responseCode = "200", description = "Formatted content",
+            content = @Content(schema = @Schema(implementation = Map.class)))
+    @SecurityRequirement(name = "JWT")
     public ResponseEntity<Map<String, String>> format(@RequestBody Map<String, String> req,
                                                      Authentication auth) {
         String text = req.get("text");

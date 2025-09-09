@@ -8,6 +8,11 @@ import com.openisle.model.User;
 import com.openisle.repository.UserRepository;
 import com.openisle.service.*;
 import com.openisle.util.VerifyType;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -47,6 +52,9 @@ public class AuthController {
     private boolean loginCaptchaEnabled;
 
     @PostMapping("/register")
+    @Operation(summary = "Register user", description = "Register a new user account")
+    @ApiResponse(responseCode = "200", description = "Registration result",
+            content = @Content(schema = @Schema(implementation = Map.class)))
     public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
         if (captchaEnabled && registerCaptchaEnabled && !captchaService.verify(req.getCaptcha())) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid captcha"));
@@ -84,6 +92,9 @@ public class AuthController {
     }
 
     @PostMapping("/verify")
+    @Operation(summary = "Verify account", description = "Verify registration code")
+    @ApiResponse(responseCode = "200", description = "Verification result",
+            content = @Content(schema = @Schema(implementation = Map.class)))
     public ResponseEntity<?> verify(@RequestBody VerifyRequest req) {
         Optional<User> userOpt = userService.findByUsername(req.getUsername());
         if (userOpt.isEmpty()) {
@@ -111,6 +122,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Login", description = "Authenticate with username/email and password")
+    @ApiResponse(responseCode = "200", description = "Authentication result",
+            content = @Content(schema = @Schema(implementation = Map.class)))
     public ResponseEntity<?> login(@RequestBody LoginRequest req) {
         if (captchaEnabled && loginCaptchaEnabled && !captchaService.verify(req.getCaptcha())) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid captcha"));
@@ -149,6 +163,9 @@ public class AuthController {
     }
 
     @PostMapping("/google")
+    @Operation(summary = "Login with Google", description = "Authenticate using Google account")
+    @ApiResponse(responseCode = "200", description = "Authentication result",
+            content = @Content(schema = @Schema(implementation = Map.class)))
     public ResponseEntity<?> loginWithGoogle(@RequestBody GoogleLoginRequest req) {
         boolean viaInvite = req.getInviteToken() != null && !req.getInviteToken().isEmpty();
         InviteService.InviteValidateResult inviteValidateResult = inviteService.validate(req.getInviteToken());
@@ -196,6 +213,9 @@ public class AuthController {
 
 
     @PostMapping("/reason")
+    @Operation(summary = "Submit register reason", description = "Submit registration reason for approval")
+    @ApiResponse(responseCode = "200", description = "Submission result",
+            content = @Content(schema = @Schema(implementation = Map.class)))
     public ResponseEntity<?> reason(@RequestBody MakeReasonRequest req) {
         String username = jwtService.validateAndGetSubjectForReason(req.getToken());
         Optional<User> userOpt = userService.findByUsername(username);
@@ -224,6 +244,9 @@ public class AuthController {
     }
 
     @PostMapping("/github")
+    @Operation(summary = "Login with GitHub", description = "Authenticate using GitHub account")
+    @ApiResponse(responseCode = "200", description = "Authentication result",
+            content = @Content(schema = @Schema(implementation = Map.class)))
     public ResponseEntity<?> loginWithGithub(@RequestBody GithubLoginRequest req) {
         boolean viaInvite = req.getInviteToken() != null && !req.getInviteToken().isEmpty();
         InviteService.InviteValidateResult inviteValidateResult = inviteService.validate(req.getInviteToken());
@@ -272,6 +295,9 @@ public class AuthController {
     }
 
     @PostMapping("/discord")
+    @Operation(summary = "Login with Discord", description = "Authenticate using Discord account")
+    @ApiResponse(responseCode = "200", description = "Authentication result",
+            content = @Content(schema = @Schema(implementation = Map.class)))
     public ResponseEntity<?> loginWithDiscord(@RequestBody DiscordLoginRequest req) {
         boolean viaInvite = req.getInviteToken() != null && !req.getInviteToken().isEmpty();
         InviteService.InviteValidateResult inviteValidateResult = inviteService.validate(req.getInviteToken());
@@ -319,6 +345,9 @@ public class AuthController {
     }
       
     @PostMapping("/twitter")
+    @Operation(summary = "Login with Twitter", description = "Authenticate using Twitter account")
+    @ApiResponse(responseCode = "200", description = "Authentication result",
+            content = @Content(schema = @Schema(implementation = Map.class)))
     public ResponseEntity<?> loginWithTwitter(@RequestBody TwitterLoginRequest req) {
         boolean viaInvite = req.getInviteToken() != null && !req.getInviteToken().isEmpty();
         InviteService.InviteValidateResult inviteValidateResult = inviteService.validate(req.getInviteToken());
@@ -367,6 +396,9 @@ public class AuthController {
     }
 
     @PostMapping("/telegram")
+    @Operation(summary = "Login with Telegram", description = "Authenticate using Telegram data")
+    @ApiResponse(responseCode = "200", description = "Authentication result",
+            content = @Content(schema = @Schema(implementation = Map.class)))
     public ResponseEntity<?> loginWithTelegram(@RequestBody TelegramLoginRequest req) {
         boolean viaInvite = req.getInviteToken() != null && !req.getInviteToken().isEmpty();
         InviteService.InviteValidateResult inviteValidateResult = inviteService.validate(req.getInviteToken());
@@ -412,11 +444,18 @@ public class AuthController {
     }
 
     @GetMapping("/check")
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Check token", description = "Validate JWT token")
+    @ApiResponse(responseCode = "200", description = "Token valid",
+            content = @Content(schema = @Schema(implementation = Map.class)))
     public ResponseEntity<?> checkToken() {
         return ResponseEntity.ok(Map.of("valid", true));
     }
 
     @PostMapping("/forgot/send")
+    @Operation(summary = "Send reset code", description = "Send verification code for password reset")
+    @ApiResponse(responseCode = "200", description = "Sending result",
+            content = @Content(schema = @Schema(implementation = Map.class)))
     public ResponseEntity<?> sendReset(@RequestBody ForgotPasswordRequest req) {
         Optional<User> userOpt = userService.findByEmail(req.getEmail());
         if (userOpt.isEmpty()) {
@@ -427,6 +466,9 @@ public class AuthController {
     }
 
     @PostMapping("/forgot/verify")
+    @Operation(summary = "Verify reset code", description = "Verify password reset code")
+    @ApiResponse(responseCode = "200", description = "Verification result",
+            content = @Content(schema = @Schema(implementation = Map.class)))
     public ResponseEntity<?> verifyReset(@RequestBody VerifyForgotRequest req) {
         Optional<User> userOpt = userService.findByEmail(req.getEmail());
         if (userOpt.isEmpty()) {
@@ -441,6 +483,9 @@ public class AuthController {
     }
 
     @PostMapping("/forgot/reset")
+    @Operation(summary = "Reset password", description = "Reset user password after verification")
+    @ApiResponse(responseCode = "200", description = "Reset result",
+            content = @Content(schema = @Schema(implementation = Map.class)))
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest req) {
         String username = jwtService.validateAndGetSubjectForReset(req.getToken());
         try {
