@@ -5,7 +5,7 @@
         <div class="about-api">
           <div class="about-api-title">调试Token</div>
           <div v-if="!authState.loggedIn" class="about-api-login">
-            请<NuxtLink to="/login">登录</NuxtLink>后查看 Token
+            请<NuxtLink to="/login" class="about-api-login-link">登录</NuxtLink>后查看 Token
           </div>
           <div v-else class="about-api-token">
             <div class="token-row">
@@ -189,6 +189,16 @@ export default {
   margin-bottom: 10px;
   margin-top: 30px;
   margin-bottom: 15px;
+}
+
+.about-api-login-link {
+  color: var(--primary-color);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.about-api-login-link:hover {
+  text-decoration: underline;
 }
 
 .warning-row {
