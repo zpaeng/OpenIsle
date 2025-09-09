@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 1
 
       - name: Log build
-        run: echo "Running documentation deployment from build ${{ inputs.build-id }}"
+        run: echo "Running documentation deployment from build ${{ inputs['build-id'] || 'manual' }}"
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
@@ -36,12 +36,27 @@ jobs:
         run: bun run generate
         working-directory: ./docs
 
-      - name: Build documentation
+      - name: Build documentation (Next export)
         run: bun run build
         working-directory: ./docs
+        # 确保你的 package.json 的 build 最终会生成 ./docs/out
+        # 对于 Next，需要包含 next export；若没有，可在这里追加一行：
+        # run: bun run build && bunx next export
+
+      - name: Add .nojekyll & CNAME into publish dir
+        run: |
+          test -d ./docs/out || (echo "❌ ./docs/out not found. Did build/export run?" && exit 1)
+          touch ./docs/out/.nojekyll
+          echo "docs.open-isle.com" > ./docs/out/CNAME
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
           folder: ./docs/out
+          clean: true
+          single-commit: true
+          git-config-name: github-actions[bot]
+          git-config-email: github-actions[bot]@users.noreply.github.com
+          # 也可以不写上面的 CNAME 步骤，改用这一行由 Action 生成：
+          # cname: docs.open-isle.com
