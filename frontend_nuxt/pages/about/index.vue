@@ -3,21 +3,22 @@
     <BaseTabs v-model="selectedTab" :tabs="tabs">
       <template v-if="selectedTab === 'api'">
         <div class="about-api">
+          <div class="about-api-title">调试Token</div>
           <div v-if="!authState.loggedIn" class="about-api-login">
             请<NuxtLink to="/login">登录</NuxtLink>后查看 Token
           </div>
           <div v-else class="about-api-token">
             <div class="token-row">
-              <span class="token-text">{{ token }}</span>
-              <button class="copy-btn" @click="copyToken">复制</button>
+              <span class="token-text">{{ shortToken }}</span>
+              <span @click="copyToken"><copy class="copy-icon" /></span>
             </div>
-            <div class="token-warning">请不要将 Token 泄露给他人</div>
+            <div class="warning-row">
+              <info-icon class="warning-icon" />
+              <div class="token-warning">请不要将 Token 泄露给他人</div>
+            </div>
           </div>
-          <div class="about-api-link">
-            <a href="https://docs.open-isle.com" target="_blank" rel="noopener noreferrer"
-              >API Playground</a
-            >
-          </div>
+          <div class="about-api-title">API文档和调试入口</div>
+          <div class="about-api-link">API Playground <share /></div>
         </div>
       </template>
       <template v-else>
@@ -78,6 +79,12 @@ export default {
     const selectedTab = ref(tabs[0].key)
     const content = ref('')
     const token = computed(() => (authState.loggedIn ? getToken() : ''))
+
+    const shortToken = computed(() => {
+      if (!token.value) return ''
+      if (token.value.length <= 20) return token.value
+      return `${token.value.slice(0, 20)}...${token.value.slice(-10)}`
+    })
 
     const loadContent = async (file) => {
       if (!file) return
@@ -147,6 +154,7 @@ export default {
       authState,
       token,
       copyToken,
+      shortToken,
     }
   },
 }
@@ -175,10 +183,34 @@ export default {
   padding: 20px;
 }
 
+.about-api-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+.warning-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.7;
+}
+
+.warning-icon {
+  font-size: 13px;
+}
+
+.token-warning {
+  font-size: 13px;
+}
+
 .token-row {
   display: flex;
   align-items: center;
   gap: 10px;
+  font: 14px;
   margin-bottom: 10px;
   word-break: break-all;
 }
@@ -188,13 +220,12 @@ export default {
   cursor: pointer;
 }
 
-.token-warning {
-  color: var(--danger-color);
-  margin-bottom: 20px;
+.about-api-link {
+  color: var(--primary-color);
+  cursor: pointer;
 }
 
-.about-api-link a {
-  color: var(--primary-color);
+.about-api-link:hover {
   text-decoration: underline;
 }
 
