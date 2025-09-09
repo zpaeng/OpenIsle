@@ -239,8 +239,16 @@ body {
 }
 
 .info-content-text img {
-  max-width: 100%;
+  max-width: 400px;
+  max-height: 600px;
   height: auto;
+  cursor: pointer;
+  box-shadow: 4px 12px 48px 0 rgba(0, 0, 0, 0.11);
+  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.info-content-text img:hover {
+  box-shadow: 4px 12px 48px 0 rgba(0, 0, 0, 0.35);
 }
 
 .info-content-text table {

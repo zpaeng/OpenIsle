@@ -1,5 +1,11 @@
 <template>
   <div class="chat-container" :class="{ float: isFloatMode }">
+    <vue-easy-lightbox
+      :visible="lightboxVisible"
+      :index="lightboxIndex"
+      :imgs="lightboxImgs"
+      @hide="lightboxVisible = false"
+    />
     <div v-if="!loading" class="chat-header">
       <div class="header-main">
         <div class="back-button" @click="goBack">
@@ -14,7 +20,7 @@
       </div>
     </div>
 
-    <div class="messages-list" ref="messagesListEl">
+    <div class="messages-list" ref="messagesListEl" @click="handleContentClick">
       <div v-if="loading" class="loading-container">
         <l-hatch size="28" stroke="4" speed="3.5" color="var(--primary-color)"></l-hatch>
       </div>
@@ -101,7 +107,7 @@ import {
 import { useRoute } from 'vue-router'
 import { getToken, fetchCurrentUser } from '~/utils/auth'
 import { toast } from '~/main'
-import { renderMarkdown, stripMarkdownLength } from '~/utils/markdown'
+import { renderMarkdown, stripMarkdownLength, handleMarkdownClick } from '~/utils/markdown'
 import MessageEditor from '~/components/MessageEditor.vue'
 import ReactionsGroup from '~/components/ReactionsGroup.vue'
 import { useWebSocket } from '~/composables/useWebSocket'
@@ -110,6 +116,7 @@ import { useChannelsUnreadCount } from '~/composables/useChannelsUnreadCount'
 import TimeManager from '~/utils/time'
 import BaseTimeline from '~/components/BaseTimeline.vue'
 import BasePlaceholder from '~/components/BasePlaceholder.vue'
+import VueEasyLightbox from 'vue-easy-lightbox'
 
 const config = useRuntimeConfig()
 const route = useRoute()
@@ -135,6 +142,9 @@ const isFloatMode = computed(() => route.query.float !== undefined)
 const floatRoute = useState('messageFloatRoute')
 const replyTo = ref(null)
 const newMessagesCount = ref(0)
+const lightboxVisible = ref(false)
+const lightboxIndex = ref(0)
+const lightboxImgs = ref([])
 
 const isUserNearBottom = ref(true)
 function updateNearBottom() {
@@ -449,6 +459,17 @@ onUnmounted(() => {
 function minimize() {
   floatRoute.value = route.fullPath
   navigateTo('/')
+}
+
+function handleContentClick(e) {
+  handleMarkdownClick(e)
+  if (e.target.tagName === 'IMG') {
+    const container = e.target.parentNode
+    const imgs = [...container.querySelectorAll('img')].map((i) => i.src)
+    lightboxImgs.value = imgs
+    lightboxIndex.value = imgs.indexOf(e.target.src)
+    lightboxVisible.value = true
+  }
 }
 
 function openUser(id) {
