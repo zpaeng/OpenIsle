@@ -249,6 +249,6 @@ https://resend.com/emails 创建账号并登录
 
 ## 开源共建和API文档
 
-- API文档: https://openisle-docs.netlify.app/openapi
+- API文档: https://openisle-docs.netlify.app/docs/openapi
 
 

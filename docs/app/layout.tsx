@@ -6,7 +6,7 @@ const inter = Inter({
   subsets: ['latin'],
 });
 
-export default function Layout({ children }: LayoutProps<'/'>) {
+export default function Layout({ children }: LayoutProps<'/docs'>) {
   return (
     <html lang="zh" className={inter.className} suppressHydrationWarning>
       <body className="flex flex-col min-h-screen">

@@ -19,7 +19,7 @@ function DocsCategory({ url }: { url: string }) {
   );
 }
 
-export default async function Page(props: PageProps<'/[[...slug]]'>) {
+export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const params = await props.params;
   const page = source.getPage(params.slug);
   if (!page) notFound();
@@ -48,7 +48,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata(
-  props: PageProps<'/[[...slug]]'>
+  props: PageProps<'/docs/[[...slug]]'>
 ): Promise<Metadata> {
   const params = await props.params;
   const page = source.getPage(params.slug);

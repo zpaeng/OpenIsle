@@ -28,7 +28,7 @@ function TabTitle({ children }: { children: React.ReactNode }) {
   return <span className="text-[11px]">{children}</span>;
 }
 
-export default function Layout({ children }: LayoutProps<'/'>) {
+export default function Layout({ children }: LayoutProps<'/docs'>) {
   return (
     // @ts-ignore
     <DocsLayout
@@ -40,7 +40,7 @@ export default function Layout({ children }: LayoutProps<'/'>) {
           {
             title: 'OpenIsle 前端',
             description: <TabTitle>前端开发文档</TabTitle>,
-            url: '/frontend',
+            url: '/docs/frontend',
             icon: (
               <TabIcon color="#4ca154">
                 <CompassIcon />
@@ -50,7 +50,7 @@ export default function Layout({ children }: LayoutProps<'/'>) {
           {
             title: 'OpenIsle 后端',
             description: <TabTitle>后端开发文档</TabTitle>,
-            url: '/backend',
+            url: '/docs/backend',
             icon: (
               <TabIcon color="#1f66f4">
                 <ServerIcon />
@@ -60,7 +60,7 @@ export default function Layout({ children }: LayoutProps<'/'>) {
           {
             title: 'OpenIsle API',
             description: <TabTitle>后端 API 文档</TabTitle>,
-            url: '/openapi',
+            url: '/docs/openapi',
             icon: (
               <TabIcon color="#677489">
                 <CodeXmlIcon />
