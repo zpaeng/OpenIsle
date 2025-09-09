@@ -100,6 +100,7 @@ public class UserController {
         ));
     }
 
+    // 这个方法似乎没有使用？
     @PostMapping("/me/signin")
     @SecurityRequirement(name = "JWT")
     @Operation(summary = "Daily sign in", description = "Sign in to receive rewards")
