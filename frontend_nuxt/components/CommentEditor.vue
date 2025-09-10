@@ -8,7 +8,7 @@
       <div class="comment-submit" :class="{ disabled: isDisabled }" @click="submit">
         <template v-if="!loading">
           发布评论
-          <span class="shortcut-icon">
+          <span class="shortcut-icon" v-if="!isMobile">
             {{ isMac ? '⌘' : 'Ctrl' }} ⏎
           </span>
         </template>
@@ -31,6 +31,7 @@ import {
 } from '~/utils/vditor'
 import '~/assets/global.css'
 import LoginOverlay from '~/components/LoginOverlay.vue'
+import { useIsMobile } from '~/utils/screen'
 
 export default {
   name: 'CommentEditor',
@@ -171,7 +172,7 @@ export default {
       },
     )
 
-    return { submit, isDisabled, editorId, isMac }
+    return { submit, isDisabled, editorId, isMac, isMobile}
   },
 }
 </script>
