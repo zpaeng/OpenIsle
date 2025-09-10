@@ -59,6 +59,7 @@ export default {
   },
   components: { LoginOverlay },
   setup(props, { emit }) {
+    const isMobile = useIsMobile()
     const vditorInstance = ref(null)
     const text = ref('')
     const editorId = ref(props.editorId)
@@ -112,23 +113,27 @@ export default {
           applyTheme()
         },
       })
+      // 不是手机的情况下不添加快捷键
+      if(!isMobile.value){
+        // 添加快捷键监听 (Ctrl+Enter 或 Cmd+Enter)
+        const handleKeydown = (e) => {
+          if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault()
+            submit()
+          }
+        }
 
-      // 添加快捷键监听 (Ctrl+Enter 或 Cmd+Enter)
-      const handleKeydown = (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-          e.preventDefault()
-          submit()
-        }
-      }
-      const el = document.getElementById(editorId.value)
-      if (el) {
-        el.addEventListener('keydown', handleKeydown)
-      }
-      onUnmounted(() => {
+        const el = document.getElementById(editorId.value)
         if (el) {
-          el.removeEventListener('keydown', handleKeydown)
+          el.addEventListener('keydown', handleKeydown)
         }
-      })
+
+        onUnmounted(() => {
+          if (el) {
+            el.removeEventListener('keydown', handleKeydown)
+          }
+        })
+      }
     })
 
     onUnmounted(() => {
