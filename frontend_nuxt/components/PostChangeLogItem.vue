@@ -110,11 +110,13 @@ const diffHtml = computed(() => {
   border-bottom: 1px solid var(--normal-border-color);
   padding-bottom: 10px;
 }
+
 .change-log-text {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
 }
+
 .change-log-user {
   font-weight: bold;
   margin-right: 4px;
@@ -132,6 +134,7 @@ const diffHtml = computed(() => {
   margin-right: 4px;
   cursor: pointer;
 }
+
 .change-log-time {
   font-size: 12px;
   opacity: 0.6;
