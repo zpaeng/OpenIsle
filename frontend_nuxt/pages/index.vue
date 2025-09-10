@@ -432,12 +432,10 @@ const sanitizeDescription = (text) => stripMarkdown(text)
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 10px 0;
   backdrop-filter: var(--blur-10);
 }
 
 .topic-item-container {
-  margin-left: 20px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -478,6 +476,7 @@ const sanitizeDescription = (text) => stripMarkdown(text)
   width: 100%;
   color: gray;
   border-bottom: 1px solid var(--normal-border-color);
+  padding-top: 30px;
   padding-bottom: 10px;
 }
 
