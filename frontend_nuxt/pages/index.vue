@@ -424,7 +424,8 @@ const sanitizeDescription = (text) => stripMarkdown(text)
 
 .topic-container {
   position: sticky;
-  top: calc(var(--header-height) + 1px);
+  top: var(--header-height);
+  padding-top: 10px;
   z-index: 10;
   background-color: var(--background-color-blur);
   display: flex;
