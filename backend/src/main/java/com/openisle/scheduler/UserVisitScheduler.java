@@ -1,4 +1,4 @@
-package com.openisle.schdule;
+package com.openisle.scheduler;
 
 import com.openisle.config.CachingConfig;
 import com.openisle.model.User;

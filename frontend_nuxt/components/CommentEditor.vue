@@ -6,8 +6,15 @@
     </div>
     <div class="comment-bottom-container">
       <div class="comment-submit" :class="{ disabled: isDisabled }" @click="submit">
-        <template v-if="!loading"> 发布评论 </template>
-        <template v-else> <loading-four /> 发布中... </template>
+        <template v-if="!loading">
+          发布评论
+          <span class="shortcut-icon">
+            {{ isMac ? '⌘' : 'Ctrl' }} ⏎
+          </span>
+        </template>
+        <template v-else>
+          <loading-four /> 发布中...
+        </template>
       </div>
     </div>
   </div>
@@ -58,6 +65,15 @@ export default {
     if (!editorId.value) {
       editorId.value = 'editor-' + useId()
     }
+
+    const isMac = ref(false)
+
+    if (navigator.userAgentData) {
+      isMac.value = navigator.userAgentData.platform === 'macOS'
+    } else {
+      isMac.value = /Mac|iPhone|iPad|iPod/.test(navigator.userAgent)
+    }
+
     const getEditorTheme = getEditorThemeUtil
     const getPreviewTheme = getPreviewThemeUtil
     const applyTheme = () => {
@@ -96,7 +112,23 @@ export default {
           applyTheme()
         },
       })
-      // applyTheme()
+
+      // 添加快捷键监听 (Ctrl+Enter 或 Cmd+Enter)
+      const handleKeydown = (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+          e.preventDefault()
+          submit()
+        }
+      }
+      const el = document.getElementById(editorId.value)
+      if (el) {
+        el.addEventListener('keydown', handleKeydown)
+      }
+      onUnmounted(() => {
+        if (el) {
+          el.removeEventListener('keydown', handleKeydown)
+        }
+      })
     })
 
     onUnmounted(() => {
@@ -134,7 +166,7 @@ export default {
       },
     )
 
-    return { submit, isDisabled, editorId }
+    return { submit, isDisabled, editorId, isMac }
   },
 }
 </script>
@@ -174,10 +206,16 @@ export default {
 .comment-submit:hover {
   background-color: var(--primary-color-hover);
 }
-
-@media (max-width: 768px) {
-  .comment-editor-container {
-    margin-bottom: 10px;
-  }
+/** 评论按钮快捷键样式 */
+.shortcut-icon {
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  background-color: rgba(0, 0, 0, 0.25);
+}
+.comment-submit.disabled .shortcut-icon {
+  background-color: rgba(0, 0, 0, 0);
 }
 </style>
