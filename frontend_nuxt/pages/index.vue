@@ -487,6 +487,7 @@ const sanitizeDescription = (text) => stripMarkdown(text)
   align-items: center;
   width: 100%;
   border-bottom: 1px solid var(--normal-border-color);
+  transition: background-color 0.5s ease;
 }
 
 .article-item:hover {

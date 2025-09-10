@@ -314,6 +314,7 @@ const gotoTag = (t) => {
   border-radius: 10px;
   display: flex;
   align-items: center;
+  transition: background-color 0.5s ease;
 }
 
 .menu-item:hover {
@@ -408,6 +409,7 @@ const gotoTag = (t) => {
   gap: 5px;
   border-radius: 8px;
   cursor: pointer;
+  transition: background-color 0.5s ease;
 }
 
 .section-item:hover {
