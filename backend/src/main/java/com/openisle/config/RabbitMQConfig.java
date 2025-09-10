@@ -1,6 +1,7 @@
 package com.openisle.config;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -23,6 +24,7 @@ import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
 public class RabbitMQConfig {
 
     public static final String EXCHANGE_NAME = "openisle-exchange";
@@ -38,7 +40,7 @@ public class RabbitMQConfig {
 
     @PostConstruct
     public void init() {
-        System.out.println("RabbitMQ配置初始化: 队列数量=" + queueCount + ", 持久化=" + queueDurable);
+        log.info("RabbitMQ配置初始化: 队列数量={}, 持久化={}", queueCount, queueDurable);
     }
 
     @Bean
@@ -51,7 +53,7 @@ public class RabbitMQConfig {
      */
     @Bean
     public List<Queue> shardedQueues() {
-        System.out.println("开始创建分片队列 Bean...");
+        log.info("开始创建分片队列 Bean...");
         
         List<Queue> queues = new ArrayList<>();
         for (int i = 0; i < queueCount; i++) {
@@ -61,7 +63,7 @@ public class RabbitMQConfig {
             queues.add(queue);
         }
         
-        System.out.println("分片队列 Bean 创建完成，总数: " + queues.size());
+        log.info("分片队列 Bean 创建完成，总数: {}", queues.size());
         return queues;
     }
 
@@ -70,7 +72,7 @@ public class RabbitMQConfig {
      */
     @Bean
     public List<Binding> shardedBindings(TopicExchange exchange, @Qualifier("shardedQueues") List<Queue> shardedQueues) {
-        System.out.println("开始创建分片绑定 Bean...");
+        log.info("开始创建分片绑定 Bean...");
         List<Binding> bindings = new ArrayList<>();
         if (shardedQueues != null) {
             for (Queue queue : shardedQueues) {
@@ -82,7 +84,7 @@ public class RabbitMQConfig {
             }
         }
         
-        System.out.println("分片绑定 Bean 创建完成，总数: " + bindings.size());
+        log.info("分片绑定 Bean 创建完成，总数: {}", bindings.size());
         return bindings;
     }
 
@@ -135,14 +137,14 @@ public class RabbitMQConfig {
                                                    @Qualifier("shardedBindings") List<Binding> shardedBindings,
                                                    Binding legacyBinding) {
         return args -> {
-            System.out.println("=== 开始主动声明 RabbitMQ 组件 ===");
+            log.info("=== 开始主动声明 RabbitMQ 组件 ===");
             
             try {
                 // 声明交换
                 rabbitAdmin.declareExchange(exchange);
                 
                 // 声明分片队列 - 检查存在性
-                System.out.println("开始检查并声明 " + shardedQueues.size() + " 个分片队列...");
+                log.info("开始检查并声明 {} 个分片队列...", shardedQueues.size());
                 int successCount = 0;
                 int skippedCount = 0;
                 
@@ -159,45 +161,44 @@ public class RabbitMQConfig {
                             skippedCount++;
                         }
                     } catch (Exception e) {
-                        System.err.println("队列声明失败: " + queueName + ", 错误: " + e.getMessage());
+                        log.error("队列声明失败: {}, 错误: {}", queueName, e.getMessage());
                     }
                 }
-                System.out.println("分片队列处理完成: 成功 " + successCount + ", 跳过 " + skippedCount + ", 总数 " + shardedQueues.size());
+                log.info("分片队列处理完成: 成功 {}, 跳过 {}, 总数 {}", successCount, skippedCount, shardedQueues.size());
                 
                 // 声明分片绑定
-                System.out.println("开始声明 " + shardedBindings.size() + " 个分片绑定...");
+                log.info("开始声明 {} 个分片绑定...", shardedBindings.size());
                 int bindingSuccessCount = 0;
                 for (Binding binding : shardedBindings) {
                     try {
                         rabbitAdmin.declareBinding(binding);
                         bindingSuccessCount++;
                     } catch (Exception e) {
-                        System.err.println("绑定声明失败: " + e.getMessage());
+                        log.error("绑定声明失败: {}", e.getMessage());
                     }
                 }
-                System.out.println("分片绑定声明完成: 成功 " + bindingSuccessCount + "/" + shardedBindings.size());
+                log.info("分片绑定声明完成: 成功 {}/{}", bindingSuccessCount, shardedBindings.size());
                 
                 // 声明遗留队列和绑定 - 检查存在性
                 try {
                     rabbitAdmin.declareQueue(legacyQueue);
                     rabbitAdmin.declareBinding(legacyBinding);
-                    System.out.println("遗留队列和绑定就绪: " + QUEUE_NAME + " (已存在或新创建)");
+                    log.info("遗留队列和绑定就绪: {} (已存在或新创建)", QUEUE_NAME);
                 } catch (org.springframework.amqp.AmqpIOException e) {
                     if (e.getMessage().contains("PRECONDITION_FAILED") && e.getMessage().contains("durable")) {
-                        System.out.println("遗留队列已存在但 durable 设置不匹配: " + QUEUE_NAME + ", 保持现有队列");
+                        log.warn("遗留队列已存在但 durable 设置不匹配: {}, 保持现有队列", QUEUE_NAME);
                     } else {
-                        System.err.println("遗留队列声明失败: " + QUEUE_NAME + ", 错误: " + e.getMessage());
+                        log.error("遗留队列声明失败: {}, 错误: {}", QUEUE_NAME, e.getMessage());
                     }
                 } catch (Exception e) {
-                    System.err.println("遗留队列声明失败: " + QUEUE_NAME + ", 错误: " + e.getMessage());
+                    log.error("遗留队列声明失败: {}, 错误: {}", QUEUE_NAME, e.getMessage());
                 }
                 
-                System.out.println("=== RabbitMQ 组件声明完成 ===");
-                System.out.println("请检查 RabbitMQ 管理界面确认队列已正确创建");
+                log.info("=== RabbitMQ 组件声明完成 ===");
+                log.info("请检查 RabbitMQ 管理界面确认队列已正确创建");
                 
             } catch (Exception e) {
-                System.err.println("RabbitMQ 组件声明过程中发生严重错误:");
-                e.printStackTrace();
+                log.error("RabbitMQ 组件声明过程中发生严重错误", e);
             }
         };
     }
