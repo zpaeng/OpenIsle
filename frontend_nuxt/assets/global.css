@@ -239,7 +239,7 @@ body {
 }
 
 .info-content-text img {
-  max-width: 400px;
+  max-width: min(800px, 100%);
   max-height: 600px;
   height: auto;
   cursor: pointer;
@@ -354,25 +354,41 @@ body {
     position: relative;
     min-width: 0;
   }
-}
 
-/* Adjust diff2html layout on mobile */
-@media (max-width: 768px) {
-  .content-diff .d2h-wrapper,
-  .content-diff .d2h-code-line,
-  .content-diff .d2h-code-side-line,
-  .content-diff .d2h-code-line-ctn,
-  .content-diff .d2h-code-side-line-ctn,
-  .content-diff .d2h-file-header {
-    font-size: 12px;
+  .d2h-file-name {
+    font-size: 12px !important;
   }
 
-  .content-diff .d2h-wrapper {
-    overflow-x: auto;
+  .d2h-file-header {
+    height: auto !important;
   }
+
+  .d2h-code-linenumber {
+    display: none !important;
+  }
+
+  .d2h-code-line {
+    padding-left: 10px !important;
+  }
+
+  .d2h-diff-table {
+    font-size: 6px !important;
+  }
+
+  .d2h-code-line ins {
+    height: 100%;
+    font-size: 13px !important;
+  }
+
+  /* .d2h-code-line {
+    height: 12px;
+  }
+
+  .d2h-code-line-ctn {
+    font-size: 12px !important;
+  } */
 }
 
-/* Transition API */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
