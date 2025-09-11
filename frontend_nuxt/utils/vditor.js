@@ -3,6 +3,8 @@ import { getToken, authState } from './auth'
 import { searchUsers, fetchFollowings, fetchAdmins } from './user'
 import { tiebaEmoji } from './tiebaEmoji'
 import vditorPostCitation from './vditorPostCitation.js'
+import { checkFileSize, formatFileSize, compressVideo, VIDEO_CONFIG } from './videoCompressor.js'
+import { UPLOAD_CONFIG } from '../config/uploadConfig.js'
 
 export function getEditorTheme() {
   return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'classic'
@@ -91,10 +93,81 @@ export function createVditor(editorId, options = {}) {
       multiple: false,
       handler: async (files) => {
         const file = files[0]
-        vditor.tip('图片上传中', 0)
+        const ext = file.name.split('.').pop().toLowerCase()
+        const videoExts = ['mp4', 'webm', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'm4v', 'ogv']
+        const isVideo = videoExts.includes(ext)
+
+        // 检查文件大小
+        const sizeCheck = checkFileSize(file)
+        if (!sizeCheck.isValid) {
+          console.log(
+            '文件大小不能超过',
+            formatFileSize(sizeCheck.maxSize),
+            '，当前文件',
+            formatFileSize(sizeCheck.actualSize),
+          )
+          vditor.tip(
+            `文件大小不能超过 ${formatFileSize(sizeCheck.maxSize)}，当前文件 ${formatFileSize(sizeCheck.actualSize)}`,
+            3000,
+          )
+          return '文件过大'
+        }
+
+        let processedFile = file
+
+        // 如果是视频文件且需要压缩
+        if (isVideo && sizeCheck.needsCompression) {
+          try {
+            vditor.tip('视频压缩中...', 0)
+            vditor.disabled()
+
+            // 使用 FFmpeg 压缩视频
+            processedFile = await compressVideo(file, (progress) => {
+              const messages = {
+                initializing: '初始化 FFmpeg',
+                preparing: '准备压缩',
+                analyzing: '分析视频',
+                compressing: '压缩中',
+                finalizing: '完成压缩',
+                completed: '压缩完成',
+              }
+              const message = messages[progress.stage] || progress.stage
+              vditor.tip(`${message} ${progress.progress}%`, 0)
+            })
+
+            const originalSize = formatFileSize(file.size)
+            const compressedSize = formatFileSize(processedFile.size)
+            const savings = Math.round((1 - processedFile.size / file.size) * 100)
+
+            vditor.tip(`压缩完成！${originalSize} → ${compressedSize} (节省 ${savings}%)`, 2000)
+            // 压缩成功但仍然超过最大限制，则阻止上传
+            if (processedFile.size > VIDEO_CONFIG.MAX_SIZE) {
+              vditor.tip(
+                `压缩后仍超过限制 (${formatFileSize(VIDEO_CONFIG.MAX_SIZE)}). 请降低分辨率或码率后再上传。`,
+                4000,
+              )
+              vditor.enable()
+              return '压缩后仍超过大小限制'
+            }
+          } catch (error) {
+            // 压缩失败时，如果原文件超过最大限制，则阻止上传
+            if (file.size > VIDEO_CONFIG.MAX_SIZE) {
+              vditor.tip(
+                `视频压缩失败，且文件超过限制 (${formatFileSize(VIDEO_CONFIG.MAX_SIZE)}). 请先压缩后再上传。`,
+                4000,
+              )
+              vditor.enable()
+              return '视频压缩失败且文件过大'
+            }
+            vditor.tip('视频压缩失败，将尝试上传原文件', 3000)
+            processedFile = file
+          }
+        }
+
+        vditor.tip('文件上传中', 0)
         vditor.disabled()
         const res = await fetch(
-          `${API_BASE_URL}/api/upload/presign?filename=${encodeURIComponent(file.name)}`,
+          `${API_BASE_URL}/api/upload/presign?filename=${encodeURIComponent(processedFile.name)}`,
           { headers: { Authorization: `Bearer ${getToken()}` } },
         )
         if (!res.ok) {
@@ -103,14 +176,13 @@ export function createVditor(editorId, options = {}) {
           return '获取上传地址失败'
         }
         const info = await res.json()
-        const put = await fetch(info.uploadUrl, { method: 'PUT', body: file })
+        const put = await fetch(info.uploadUrl, { method: 'PUT', body: processedFile })
         if (!put.ok) {
           vditor.enable()
           vditor.tip('上传失败')
           return '上传失败'
         }
 
-        const ext = file.name.split('.').pop().toLowerCase()
         const imageExts = [
           'apng',
           'bmp',
@@ -132,6 +204,8 @@ export function createVditor(editorId, options = {}) {
           md = `![${file.name}](${info.fileUrl})`
         } else if (audioExts.includes(ext)) {
           md = `<audio controls="controls" src="${info.fileUrl}"></audio>`
+        } else if (videoExts.includes(ext)) {
+          md = `<video width="600" controls>\n  <source src="${info.fileUrl}" type="video/${ext}">\n  你的浏览器不支持 video 标签。\n</video>`
         } else {
           md = `[${file.name}](${info.fileUrl})`
         }
